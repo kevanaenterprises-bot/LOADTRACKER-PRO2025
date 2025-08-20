@@ -25,11 +25,15 @@ function Router() {
 
   return (
     <Switch>
-      {!isAuthenticated ? (
-        <Route path="/" component={Landing} />
+      {!isAuthenticated || !user ? (
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/dashboard" component={Landing} />
+          <Route path="/driver" component={Landing} />
+        </>
       ) : (
         <>
-          <Route path="/" component={user?.role === "driver" ? DriverPortal : Dashboard} />
+          <Route path="/" component={user.role === "driver" ? DriverPortal : Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/driver" component={DriverPortal} />
         </>
