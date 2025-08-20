@@ -16,29 +16,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function Dashboard() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading, user } = useAuth();
+  const adminAuth = useAdminAuth();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "invoicing">("loads");
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && !adminAuth.isLoading && !isAuthenticated && !adminAuth.isAuthenticated) {
       toast({
         title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
+        description: "You are logged out. Please log in...",
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        setLocation("/");
       }, 500);
       return;
     }
-  }, [isAuthenticated, isLoading, toast]);
+  }, [isAuthenticated, adminAuth.isAuthenticated, isLoading, adminAuth.isLoading, toast, setLocation]);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
-    enabled: isAuthenticated,
+    enabled: isAuthenticated || adminAuth.isAuthenticated,
   });
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading || adminAuth.isLoading || (!isAuthenticated && !adminAuth.isAuthenticated)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -106,11 +108,11 @@ export default function Dashboard() {
               <div className="flex items-center space-x-2">
                 <img 
                   className="h-8 w-8 rounded-full bg-primary" 
-                  src={user?.profileImageUrl || `https://ui-avatars.io/api/?name=${user?.firstName}+${user?.lastName}&background=1976D2&color=fff`}
+                  src={user?.profileImageUrl || `https://ui-avatars.io/api/?name=${((adminAuth.user as any)?.firstName || user?.firstName)}+${((adminAuth.user as any)?.lastName || user?.lastName)}&background=1976D2&color=fff`}
                   alt="User avatar" 
                 />
                 <span className="text-sm font-medium text-secondary">
-                  {adminAuth.user?.firstName || user?.firstName} {adminAuth.user?.lastName || user?.lastName}
+                  {(adminAuth.user as any)?.firstName || user?.firstName} {(adminAuth.user as any)?.lastName || user?.lastName}
                 </span>
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout}>

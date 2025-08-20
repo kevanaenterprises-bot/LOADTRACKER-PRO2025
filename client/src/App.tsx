@@ -44,7 +44,7 @@ function Router() {
         <Route path="/driver-portal" component={DriverPortal} />
       )}
       
-      {/* Admin/Office routes - prioritize admin auth, then Replit auth */}
+      {/* Admin/Office routes - Check admin auth OR Replit auth (but not drivers) */}
       {adminAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role !== "driver") ? (
         <>
           <Route path="/" component={Dashboard} />
@@ -54,7 +54,7 @@ function Router() {
         <>
           {/* Landing page with options for both admin and Replit login */}
           <Route path="/" component={Landing} />
-          <Route path="/dashboard" component={AdminLogin} />
+          <Route path="/dashboard" component={Landing} />
         </>
       )}
       
