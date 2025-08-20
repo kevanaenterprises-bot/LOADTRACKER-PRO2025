@@ -1,9 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLocation } from "wouter";
 
 export default function Landing() {
+  const [, setLocation] = useLocation();
+  
   const handleLogin = () => {
     window.location.href = "/api/login";
+  };
+
+  const handleDriverLogin = () => {
+    setLocation("/driver-login");
   };
 
   return (
@@ -76,10 +83,16 @@ export default function Landing() {
               <p className="text-gray-600 mb-6">
                 Sign in to access your dashboard and start managing your logistics operations.
               </p>
-              <Button onClick={handleLogin} size="lg" className="px-8 py-3 text-lg">
-                <i className="fas fa-sign-in-alt mr-2"></i>
-                Sign In
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button onClick={handleLogin} size="lg" className="px-8 py-3 text-lg">
+                  <i className="fas fa-sign-in-alt mr-2"></i>
+                  Office Sign In
+                </Button>
+                <Button onClick={handleDriverLogin} variant="outline" size="lg" className="px-8 py-3 text-lg">
+                  <i className="fas fa-truck mr-2"></i>
+                  Driver Login
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>

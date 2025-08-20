@@ -34,6 +34,8 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   role: varchar("role").notNull().default("office"), // "office" or "driver"
   phoneNumber: varchar("phone_number"),
+  username: varchar("username").unique(), // For driver login
+  password: varchar("password"), // For driver login (phone number)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -63,6 +65,8 @@ export const loads = pgTable("loads", {
   bolNumber: varchar("bol_number"),
   tripNumber: varchar("trip_number"),
   podDocumentPath: varchar("pod_document_path"),
+  extraStops: integer("extra_stops").default(0), // Number of extra stops
+  lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"), // Lumper charge amount
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   // Timestamps for tracking
@@ -84,13 +88,14 @@ export const bolNumbers = pgTable("bol_numbers", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Rates table for invoice calculation
+// Rates table for invoice calculation (based on city/state)
 export const rates = pgTable("rates", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   city: varchar("city").notNull(),
   state: varchar("state").notNull(),
-  ratePerMile: decimal("rate_per_mile", { precision: 10, scale: 2 }).notNull(),
-  baseFee: decimal("base_fee", { precision: 10, scale: 2 }).default("0.00"),
+  flatRate: decimal("flat_rate", { precision: 10, scale: 2 }).notNull(), // Fixed rate for city/state
+  lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"),
+  extraStopCharge: decimal("extra_stop_charge", { precision: 10, scale: 2 }).default("50.00"), // $50 per extra stop
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -101,9 +106,10 @@ export const invoices = pgTable("invoices", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   loadId: varchar("load_id").references(() => loads.id),
   invoiceNumber: varchar("invoice_number").notNull().unique(),
-  totalMiles: integer("total_miles"),
-  ratePerMile: decimal("rate_per_mile", { precision: 10, scale: 2 }),
-  baseFee: decimal("base_fee", { precision: 10, scale: 2 }),
+  flatRate: decimal("flat_rate", { precision: 10, scale: 2 }),
+  lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"),
+  extraStopsCharge: decimal("extra_stops_charge", { precision: 10, scale: 2 }).default("0.00"), // $50 * number of extra stops
+  extraStopsCount: integer("extra_stops_count").default(0),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
   status: varchar("status").default("pending"), // pending, sent, paid
   generatedAt: timestamp("generated_at").defaultNow(),
@@ -126,6 +132,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   profileImageUrl: true,
   role: true,
   phoneNumber: true,
+  username: true,
+  password: true,
 });
 
 export const insertLocationSchema = createInsertSchema(locations).omit({

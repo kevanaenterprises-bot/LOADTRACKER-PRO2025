@@ -28,6 +28,7 @@ export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  getDriverByUsername(username: string): Promise<User | undefined>;
 
   // Location operations
   getLocations(): Promise<Location[]>;
@@ -78,6 +79,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
+    // Handle case where id might be undefined for new users
+    if (!userData.id) {
+      // New user - insert with role defaulting to "office"
+      const [user] = await db
+        .insert(users)
+        .values({
+          ...userData,
+          role: userData.role || "office", // Default to office for new users
+        })
+        .returning();
+      return user;
+    }
+
     // First check if user exists
     const existingUser = await this.getUser(userData.id);
     
@@ -107,6 +121,11 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return user;
     }
+  }
+
+  async getDriverByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async getLocations(): Promise<Location[]> {

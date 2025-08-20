@@ -27,6 +27,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Driver login with username/password
+  app.post('/api/auth/driver-login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      const driver = await storage.getDriverByUsername(username);
+      if (!driver) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+
+      // Check if password matches phone number
+      if (driver.password !== password || driver.phoneNumber !== password) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+
+      // Create session for driver
+      (req.session as any).driverAuth = {
+        userId: driver.id,
+        username: driver.username,
+        role: driver.role
+      };
+
+      res.json({ 
+        message: "Login successful",
+        user: {
+          id: driver.id,
+          username: driver.username,
+          firstName: driver.firstName,
+          lastName: driver.lastName,
+          role: driver.role,
+          phoneNumber: driver.phoneNumber
+        }
+      });
+    } catch (error) {
+      console.error("Driver login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // Driver logout
+  app.post('/api/auth/driver-logout', (req, res) => {
+    (req.session as any).driverAuth = undefined;
+    res.json({ message: "Logout successful" });
+  });
+
+  // Check driver authentication
+  app.get('/api/auth/driver-user', (req, res) => {
+    if ((req.session as any).driverAuth) {
+      res.json((req.session as any).driverAuth);
+    } else {
+      res.status(401).json({ message: "Not authenticated" });
+    }
+  });
+
   // Dashboard stats
   app.get("/api/dashboard/stats", isAuthenticated, async (req, res) => {
     try {
@@ -84,7 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loads
   app.get("/api/loads", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = (req.user as any)?.claims?.sub;
       const user = await storage.getUser(userId);
       
       let loads;
@@ -219,7 +277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "POD document URL is required" });
       }
 
-      const userId = req.user?.claims?.sub;
+      const userId = (req.user as any)?.claims?.sub;
       const objectStorageService = new ObjectStorageService();
       
       // Set ACL policy for the uploaded document
@@ -264,20 +322,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Rate not found for this location" });
       }
 
-      // Calculate invoice amount
-      const totalMiles = load.estimatedMiles || 0;
-      const rateAmount = parseFloat(rate.ratePerMile.toString());
-      const baseAmount = parseFloat(rate.baseFee.toString());
-      const totalAmount = (totalMiles * rateAmount) + baseAmount;
+      // Calculate invoice amount based on new flat rate system
+      const flatRate = parseFloat(rate.flatRate.toString());
+      const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
+      const extraStopsCharge = (load.extraStops || 0) * 50; // $50 per extra stop
+      const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
       // Generate invoice
       const invoiceNumber = `INV-${Date.now()}`;
       await storage.createInvoice({
         loadId: load.id,
         invoiceNumber,
-        totalMiles,
-        ratePerMile: rate.ratePerMile,
-        baseFee: rate.baseFee,
+        flatRate: rate.flatRate,
+        lumperCharge: load.lumperCharge || "0.00",
+        extraStopsCharge: extraStopsCharge.toString(),
+        extraStopsCount: load.extraStops || 0,
         totalAmount: totalAmount.toString(),
         status: "pending",
       });
@@ -327,7 +386,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Serve private objects (POD documents)
   app.get("/objects/:objectPath(*)", isAuthenticated, async (req, res) => {
-    const userId = req.user?.claims?.sub;
+    const userId = (req.user as any)?.claims?.sub;
     const objectStorageService = new ObjectStorageService();
     
     try {
