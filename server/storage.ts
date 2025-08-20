@@ -55,6 +55,7 @@ export interface IStorage {
   // Invoice operations
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
   getInvoices(): Promise<Invoice[]>;
+  markInvoicePrinted(invoiceId: string): Promise<Invoice>;
 
   // Statistics
   getDashboardStats(): Promise<{
@@ -329,7 +330,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getInvoices(): Promise<Invoice[]> {
-    return await db.select().from(invoices).orderBy(desc(invoices.generatedAt));
+    const invoicesWithDetails = await db
+      .select()
+      .from(invoices)
+      .leftJoin(loads, eq(invoices.loadId, loads.id))
+      .leftJoin(users, eq(loads.driverId, users.id))
+      .leftJoin(locations, eq(loads.locationId, locations.id))
+      .orderBy(desc(invoices.generatedAt));
+
+    return invoicesWithDetails.map((row) => ({
+      ...row.invoices,
+      load: row.loads ? {
+        ...row.loads,
+        driver: row.users,
+        location: row.locations,
+      } : undefined,
+    }));
+  }
+
+  async markInvoicePrinted(invoiceId: string): Promise<Invoice> {
+    const [invoice] = await db
+      .update(invoices)
+      .set({ 
+        status: "printed",
+        printedAt: new Date()
+      })
+      .where(eq(invoices.id, invoiceId))
+      .returning();
+    return invoice;
   }
 
   async getDashboardStats(): Promise<{

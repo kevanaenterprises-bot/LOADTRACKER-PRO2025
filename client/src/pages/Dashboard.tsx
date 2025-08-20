@@ -6,6 +6,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import StatsCards from "@/components/StatsCards";
 import LoadForm from "@/components/LoadForm";
 import LoadsTable from "@/components/LoadsTable";
+import InvoiceInbox from "@/components/InvoiceInbox";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -106,7 +107,7 @@ export default function Dashboard() {
 
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Dashboard Stats */}
-        <StatsCards stats={stats} isLoading={statsLoading} />
+        <StatsCards stats={stats as any} isLoading={statsLoading} />
 
         {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-8">
@@ -183,43 +184,7 @@ export default function Dashboard() {
 
           {/* Invoicing Tab */}
           <TabsContent value="invoicing" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <i className="fas fa-calculator text-primary"></i>
-                    Rate Management
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Configure rates per mile and base fees for different locations to calculate invoices automatically.
-                  </p>
-                  <Button className="w-full">
-                    <i className="fas fa-cog mr-2"></i>
-                    Manage Rates
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <i className="fas fa-file-invoice text-primary"></i>
-                    Generated Invoices
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    View and manage invoices that have been automatically generated from completed loads.
-                  </p>
-                  <Button variant="outline" className="w-full">
-                    <i className="fas fa-list mr-2"></i>
-                    View Invoices
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            <InvoiceInbox />
           </TabsContent>
         </Tabs>
       </div>

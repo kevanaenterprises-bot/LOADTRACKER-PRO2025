@@ -111,8 +111,9 @@ export const invoices = pgTable("invoices", {
   extraStopsCharge: decimal("extra_stops_charge", { precision: 10, scale: 2 }).default("0.00"), // $50 * number of extra stops
   extraStopsCount: integer("extra_stops_count").default(0),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
-  status: varchar("status").default("pending"), // pending, sent, paid
+  status: varchar("status").default("pending"), // pending, printed
   generatedAt: timestamp("generated_at").defaultNow(),
+  printedAt: timestamp("printed_at"),
 });
 
 // Load status history for tracking

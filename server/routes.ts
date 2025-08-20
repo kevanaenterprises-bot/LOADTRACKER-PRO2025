@@ -297,6 +297,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateLoadStatus(req.params.id, "delivered");
       }
 
+      // Automatically generate invoice when POD is uploaded
+      try {
+        const loadWithDetails = await storage.getLoad(req.params.id);
+        if (loadWithDetails && loadWithDetails.location) {
+          // Get rate for the location
+          const rate = await storage.getRateByLocation(
+            loadWithDetails.location.city, 
+            loadWithDetails.location.state
+          );
+          
+          if (rate) {
+            // Calculate invoice amount based on flat rate system
+            const flatRate = parseFloat(rate.flatRate.toString());
+            const lumperCharge = parseFloat(loadWithDetails.lumperCharge?.toString() || "0");
+            const extraStopsCharge = (loadWithDetails.extraStops || 0) * 50;
+            const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+
+            // Generate invoice
+            const invoiceNumber = `INV-${Date.now()}`;
+            await storage.createInvoice({
+              loadId: loadWithDetails.id,
+              invoiceNumber,
+              flatRate: rate.flatRate,
+              lumperCharge: loadWithDetails.lumperCharge || "0.00",
+              extraStopsCharge: extraStopsCharge.toString(),
+              extraStopsCount: loadWithDetails.extraStops || 0,
+              totalAmount: totalAmount.toString(),
+              status: "pending",
+            });
+
+            console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109}`);
+          }
+        }
+      } catch (invoiceError) {
+        console.error("Failed to auto-generate invoice:", invoiceError);
+        // Don't fail the POD upload if invoice generation fails
+      }
+
       res.json(load);
     } catch (error) {
       console.error("Error updating POD:", error);
@@ -381,6 +419,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching invoices:", error);
       res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  // Mark invoice as printed
+  app.patch("/api/invoices/:id/print", isAuthenticated, async (req, res) => {
+    try {
+      const invoice = await storage.markInvoicePrinted(req.params.id);
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error marking invoice as printed:", error);
+      res.status(500).json({ message: "Failed to mark invoice as printed" });
     }
   });
 
