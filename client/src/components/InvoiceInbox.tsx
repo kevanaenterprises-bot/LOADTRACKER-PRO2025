@@ -85,8 +85,12 @@ export default function InvoiceInbox() {
           </head>
           <body>
             <div class="header">
-              <h1>LoadTracker Pro</h1>
-              <h2>Invoice ${invoice.invoiceNumber}</h2>
+              <h1>GO 4 Farms & Cattle</h1>
+              <p style="margin: 5px 0;">1510 Crystal Valley Way<br>
+                 Melissa, TX 75454<br>
+                 Phone: 214-878-1230<br>
+                 Email: accounting@go4fc.com</p>
+              <h2 style="margin-top: 20px;">Invoice ${invoice.invoiceNumber}</h2>
             </div>
             
             <div class="invoice-details">
@@ -121,7 +125,7 @@ export default function InvoiceInbox() {
 
             <div class="footer">
               <p>Generated automatically upon POD upload</p>
-              <p>LoadTracker Pro - Comprehensive Logistics Management</p>
+              <p>GO 4 Farms & Cattle - Professional Logistics Services</p>
             </div>
           </body>
         </html>
