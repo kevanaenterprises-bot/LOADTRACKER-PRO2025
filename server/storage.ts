@@ -78,18 +78,35 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
+    // First check if user exists
+    const existingUser = await this.getUser(userData.id);
+    
+    if (existingUser) {
+      // User exists - update only non-role fields
+      const [user] = await db
+        .update(users)
+        .set({
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImageUrl: userData.profileImageUrl,
+          phoneNumber: userData.phoneNumber,
           updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
+        })
+        .where(eq(users.id, userData.id))
+        .returning();
+      return user;
+    } else {
+      // New user - insert with role defaulting to "office"
+      const [user] = await db
+        .insert(users)
+        .values({
+          ...userData,
+          role: userData.role || "office", // Default to office for new users
+        })
+        .returning();
+      return user;
+    }
   }
 
   async getLocations(): Promise<Location[]> {
