@@ -433,6 +433,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test data endpoint (development only)
+  if (process.env.NODE_ENV === "development") {
+    app.post("/api/test/create-sample-loads", isAuthenticated, async (req, res) => {
+      try {
+        // Get test driver
+        const driver = await storage.getUserByUsername("John Smith");
+        if (!driver) {
+          return res.status(400).json({ message: "Test driver 'John Smith' not found" });
+        }
+
+        // Get locations that match our rates
+        const miamiFLLocation = await storage.getLocationByName("Miami, FL");
+        const houstonTXLocation = await storage.getLocationByName("Houston, TX");
+        const phoenixAZLocation = await storage.getLocationByName("Phoenix, AZ");
+
+        // Create test loads
+        const testLoads = [
+          {
+            number109: "TEST001",
+            pickupLocation: "Atlanta Warehouse",
+            deliveryLocation: "Miami Distribution Center",
+            pickupDate: new Date(),
+            deliveryDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+            driverId: driver.id,
+            locationId: miamiFLLocation?.id,
+            lumperCharge: "150.00",
+            extraStops: 2,
+            status: "in_transit" as const
+          },
+          {
+            number109: "TEST002",
+            pickupLocation: "Chicago Depot",
+            deliveryLocation: "Houston Terminal",
+            pickupDate: new Date(),
+            deliveryDate: new Date(Date.now() + 48 * 60 * 60 * 1000), // Day after tomorrow
+            driverId: driver.id,
+            locationId: houstonTXLocation?.id,
+            lumperCharge: "0.00",
+            extraStops: 1,
+            status: "delivered" as const
+          },
+          {
+            number109: "TEST003", 
+            pickupLocation: "Los Angeles Port",
+            deliveryLocation: "Phoenix Center",
+            pickupDate: new Date(),
+            deliveryDate: new Date(Date.now() + 72 * 60 * 60 * 1000), // 3 days from now
+            driverId: driver.id,
+            locationId: phoenixAZLocation?.id,
+            lumperCharge: "75.00",
+            extraStops: 0,
+            status: "at_receiver" as const
+          }
+        ];
+
+        const createdLoads = [];
+        for (const loadData of testLoads) {
+          const load = await storage.createLoad(loadData);
+          createdLoads.push(load);
+        }
+
+        res.json({ 
+          message: `Created ${createdLoads.length} test loads`,
+          loads: createdLoads 
+        });
+      } catch (error) {
+        console.error("Error creating test loads:", error);
+        res.status(500).json({ message: "Failed to create test loads" });
+      }
+    });
+  }
+
   // Serve private objects (POD documents)
   app.get("/objects/:objectPath(*)", isAuthenticated, async (req, res) => {
     const userId = (req.user as any)?.claims?.sub;

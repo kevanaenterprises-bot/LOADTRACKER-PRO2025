@@ -27,11 +27,13 @@ import { eq, desc, and, sql } from "drizzle-orm";
 export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   getDriverByUsername(username: string): Promise<User | undefined>;
 
   // Location operations
   getLocations(): Promise<Location[]>;
+  getLocationByName(name: string): Promise<Location | undefined>;
   createLocation(location: InsertLocation): Promise<Location>;
 
   // Load operations
@@ -124,13 +126,26 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getDriverByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(username: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async getDriverByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(and(
+      eq(users.username, username),
+      eq(users.role, "driver")
+    ));
     return user;
   }
 
   async getLocations(): Promise<Location[]> {
     return await db.select().from(locations).orderBy(locations.name);
+  }
+
+  async getLocationByName(name: string): Promise<Location | undefined> {
+    const [location] = await db.select().from(locations).where(eq(locations.name, name));
+    return location;
   }
 
   async createLocation(location: InsertLocation): Promise<Location> {
