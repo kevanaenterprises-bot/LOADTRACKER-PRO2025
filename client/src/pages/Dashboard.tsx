@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import StatsCards from "@/components/StatsCards";
@@ -47,8 +49,23 @@ export default function Dashboard() {
     );
   }
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      // Try admin logout first
+      if (adminAuth.isAuthenticated) {
+        await fetch("/api/auth/admin-logout", {
+          method: "POST",
+          credentials: "include"
+        });
+        setLocation("/");
+      } else {
+        // Replit logout
+        window.location.href = "/api/logout";
+      }
+    } catch (error) {
+      // Fallback to Replit logout
+      window.location.href = "/api/logout";
+    }
   };
 
   const switchToDriverView = () => {
@@ -93,7 +110,7 @@ export default function Dashboard() {
                   alt="User avatar" 
                 />
                 <span className="text-sm font-medium text-secondary">
-                  {user?.firstName} {user?.lastName}
+                  {adminAuth.user?.firstName || user?.firstName} {adminAuth.user?.lastName || user?.lastName}
                 </span>
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout}>

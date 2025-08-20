@@ -15,6 +15,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
 
+  // Admin authentication middleware
+  const isAdminAuthenticated = (req: any, res: any, next: any) => {
+    // Check if user is authenticated via Replit Auth or Admin Auth
+    const isReplitAuth = req.isAuthenticated() && req.user?.claims?.sub;
+    const isAdminAuth = (req.session as any)?.adminAuth;
+    
+    if (isReplitAuth || isAdminAuth) {
+      return next();
+    }
+    
+    return res.status(401).json({ message: "Unauthorized" });
+  };
+
   // Auth routes
   app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
     try {
@@ -85,6 +98,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin authentication routes
+  app.post("/api/auth/admin-login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      // Check for admin credentials
+      if (username === "admin" && password === "go4fc2024") {
+        // Create admin user session
+        (req.session as any).adminAuth = {
+          id: "admin-001",
+          username: "admin",
+          role: "admin",
+          firstName: "Admin",
+          lastName: "User"
+        };
+
+        res.json({ 
+          message: "Login successful", 
+          user: (req.session as any).adminAuth 
+        });
+      } else {
+        res.status(401).json({ message: "Invalid admin credentials" });
+      }
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.get("/api/auth/admin-user", async (req, res) => {
+    try {
+      const adminUser = (req.session as any)?.adminAuth;
+      if (adminUser) {
+        res.json(adminUser);
+      } else {
+        res.status(401).json({ message: "Not authenticated" });
+      }
+    } catch (error) {
+      console.error("Admin user fetch error:", error);
+      res.status(500).json({ message: "Failed to fetch admin user" });
+    }
+  });
+
+  app.post("/api/auth/admin-logout", async (req, res) => {
+    try {
+      delete (req.session as any).adminAuth;
+      res.json({ message: "Logout successful" });
+    } catch (error) {
+      console.error("Admin logout error:", error);
+      res.status(500).json({ message: "Logout failed" });
+    }
+  });
+
   // Dashboard stats
   app.get("/api/dashboard/stats", isAuthenticated, async (req, res) => {
     try {
@@ -97,7 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Locations
-  app.get("/api/locations", isAuthenticated, async (req, res) => {
+  app.get("/api/locations", isAdminAuthenticated, async (req, res) => {
     try {
       const locations = await storage.getLocations();
       res.json(locations);
@@ -107,7 +177,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/locations", isAuthenticated, async (req, res) => {
+  app.post("/api/locations", isAdminAuthenticated, async (req, res) => {
     try {
       const validatedData = insertLocationSchema.parse(req.body);
       const location = await storage.createLocation(validatedData);

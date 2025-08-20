@@ -88,6 +88,10 @@ export default function Landing() {
                   <i className="fas fa-sign-in-alt mr-2"></i>
                   Office Sign In
                 </Button>
+                <Button onClick={() => setLocation('/admin-login')} variant="secondary" size="lg" className="px-8 py-3 text-lg">
+                  <i className="fas fa-user-shield mr-2"></i>
+                  Admin Login
+                </Button>
                 <Button onClick={handleDriverLogin} variant="outline" size="lg" className="px-8 py-3 text-lg">
                   <i className="fas fa-truck mr-2"></i>
                   Driver Login

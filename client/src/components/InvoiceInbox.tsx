@@ -39,9 +39,11 @@ export default function InvoiceInbox() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: invoices = [], isLoading } = useQuery({
+  const { data: invoicesData, isLoading } = useQuery({
     queryKey: ["/api/invoices"],
   });
+
+  const invoices = Array.isArray(invoicesData) ? invoicesData as Invoice[] : [];
 
   const markPrintedMutation = useMutation({
     mutationFn: async (invoiceId: string) => {
@@ -252,7 +254,7 @@ export default function InvoiceInbox() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => window.open(invoice.load.podDocumentPath, '_blank')}
+                            onClick={() => window.open(invoice.load?.podDocumentPath, '_blank')}
                           >
                             <Eye className="h-4 w-4 mr-1" />
                             View POD

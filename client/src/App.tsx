@@ -5,17 +5,20 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
+import AdminLogin from "@/pages/AdminLogin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   const officeAuth = useAuth();
   const driverAuth = useDriverAuth();
+  const adminAuth = useAdminAuth();
 
-  const isLoading = officeAuth.isLoading || driverAuth.isLoading;
+  const isLoading = officeAuth.isLoading || driverAuth.isLoading || adminAuth.isLoading;
 
   if (isLoading) {
     return (
@@ -30,6 +33,9 @@ function Router() {
 
   return (
     <Switch>
+      {/* Admin login page */}
+      <Route path="/admin-login" component={AdminLogin} />
+      
       {/* Driver login page */}
       <Route path="/driver-login" component={DriverLogin} />
       
@@ -38,16 +44,17 @@ function Router() {
         <Route path="/driver-portal" component={DriverPortal} />
       )}
       
-      {/* Office routes - for authenticated office users */}
-      {officeAuth.isAuthenticated && officeAuth.user?.role !== "driver" ? (
+      {/* Admin/Office routes - prioritize admin auth, then Replit auth */}
+      {adminAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role !== "driver") ? (
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
         </>
       ) : (
         <>
+          {/* Landing page with options for both admin and Replit login */}
           <Route path="/" component={Landing} />
-          <Route path="/dashboard" component={Landing} />
+          <Route path="/dashboard" component={AdminLogin} />
         </>
       )}
       
