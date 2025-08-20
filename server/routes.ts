@@ -1,0 +1,354 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { setupAuth, isAuthenticated } from "./replitAuth";
+import { ObjectStorageService } from "./objectStorage";
+import { sendSMSToDriver } from "./smsService";
+import {
+  insertLoadSchema,
+  insertLocationSchema,
+  insertBolNumberSchema,
+  insertRateSchema,
+} from "@shared/schema";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Auth middleware
+  await setupAuth(app);
+
+  // Auth routes
+  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Dashboard stats
+  app.get("/api/dashboard/stats", isAuthenticated, async (req, res) => {
+    try {
+      const stats = await storage.getDashboardStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // Locations
+  app.get("/api/locations", isAuthenticated, async (req, res) => {
+    try {
+      const locations = await storage.getLocations();
+      res.json(locations);
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      res.status(500).json({ message: "Failed to fetch locations" });
+    }
+  });
+
+  app.post("/api/locations", isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertLocationSchema.parse(req.body);
+      const location = await storage.createLocation(validatedData);
+      res.status(201).json(location);
+    } catch (error) {
+      console.error("Error creating location:", error);
+      res.status(400).json({ message: "Invalid location data" });
+    }
+  });
+
+  // Drivers
+  app.get("/api/drivers", isAuthenticated, async (req, res) => {
+    try {
+      const drivers = await storage.getDrivers();
+      res.json(drivers);
+    } catch (error) {
+      console.error("Error fetching drivers:", error);
+      res.status(500).json({ message: "Failed to fetch drivers" });
+    }
+  });
+
+  app.get("/api/drivers/available", isAuthenticated, async (req, res) => {
+    try {
+      const drivers = await storage.getAvailableDrivers();
+      res.json(drivers);
+    } catch (error) {
+      console.error("Error fetching available drivers:", error);
+      res.status(500).json({ message: "Failed to fetch available drivers" });
+    }
+  });
+
+  // Loads
+  app.get("/api/loads", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const user = await storage.getUser(userId);
+      
+      let loads;
+      if (user?.role === "driver") {
+        loads = await storage.getLoadsByDriver(userId);
+      } else {
+        loads = await storage.getLoads();
+      }
+      
+      res.json(loads);
+    } catch (error) {
+      console.error("Error fetching loads:", error);
+      res.status(500).json({ message: "Failed to fetch loads" });
+    }
+  });
+
+  app.post("/api/loads", isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertLoadSchema.parse(req.body);
+      
+      // Check if 109 number already exists
+      const existingLoads = await storage.getLoads();
+      const exists = existingLoads.some(load => load.number109 === validatedData.number109);
+      if (exists) {
+        return res.status(400).json({ message: "109 number already exists" });
+      }
+
+      const load = await storage.createLoad(validatedData);
+
+      // Send SMS to driver if assigned
+      if (validatedData.driverId) {
+        try {
+          const driver = await storage.getUser(validatedData.driverId);
+          const location = validatedData.locationId 
+            ? (await storage.getLocations()).find(l => l.id === validatedData.locationId)
+            : null;
+
+          if (driver?.phoneNumber) {
+            await sendSMSToDriver(
+              driver.phoneNumber,
+              `New load assigned: ${validatedData.number109}. Pickup: 1800 East Plano Parkway. Delivery: ${location?.name || 'See details'}. Est. miles: ${validatedData.estimatedMiles || 'TBD'}`
+            );
+          }
+        } catch (smsError) {
+          console.error("Failed to send SMS:", smsError);
+          // Don't fail the load creation if SMS fails
+        }
+      }
+
+      res.status(201).json(load);
+    } catch (error) {
+      console.error("Error creating load:", error);
+      res.status(400).json({ message: "Invalid load data" });
+    }
+  });
+
+  app.get("/api/loads/:id", isAuthenticated, async (req, res) => {
+    try {
+      const load = await storage.getLoad(req.params.id);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      res.json(load);
+    } catch (error) {
+      console.error("Error fetching load:", error);
+      res.status(500).json({ message: "Failed to fetch load" });
+    }
+  });
+
+  app.patch("/api/loads/:id/status", isAuthenticated, async (req, res) => {
+    try {
+      const { status } = req.body;
+      const load = await storage.updateLoadStatus(req.params.id, status);
+      res.json(load);
+    } catch (error) {
+      console.error("Error updating load status:", error);
+      res.status(500).json({ message: "Failed to update load status" });
+    }
+  });
+
+  // BOL validation and entry
+  app.get("/api/bol/check/:bolNumber", isAuthenticated, async (req, res) => {
+    try {
+      const exists = await storage.checkBOLExists(req.params.bolNumber);
+      res.json({ exists });
+    } catch (error) {
+      console.error("Error checking BOL:", error);
+      res.status(500).json({ message: "Failed to check BOL number" });
+    }
+  });
+
+  app.patch("/api/loads/:id/bol", isAuthenticated, async (req, res) => {
+    try {
+      const { bolNumber, tripNumber } = req.body;
+      
+      // Validate trip number format (4 digits)
+      if (!/^\d{4}$/.test(tripNumber)) {
+        return res.status(400).json({ message: "Trip number must be 4 digits" });
+      }
+
+      // Check if BOL already exists
+      const exists = await storage.checkBOLExists(bolNumber);
+      if (exists) {
+        return res.status(400).json({ message: "BOL number already exists" });
+      }
+
+      const load = await storage.updateLoadBOL(req.params.id, bolNumber, tripNumber);
+      res.json(load);
+    } catch (error) {
+      console.error("Error updating load BOL:", error);
+      res.status(500).json({ message: "Failed to update BOL information" });
+    }
+  });
+
+  // POD upload
+  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
+  app.patch("/api/loads/:id/pod", isAuthenticated, async (req, res) => {
+    try {
+      const { podDocumentURL } = req.body;
+      
+      if (!podDocumentURL) {
+        return res.status(400).json({ message: "POD document URL is required" });
+      }
+
+      const userId = req.user?.claims?.sub;
+      const objectStorageService = new ObjectStorageService();
+      
+      // Set ACL policy for the uploaded document
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        podDocumentURL,
+        {
+          owner: userId,
+          visibility: "private", // POD documents should be private
+        }
+      );
+
+      // Update load with POD document path
+      const load = await storage.updateLoadPOD(req.params.id, objectPath);
+      
+      // Update status to delivered if not already
+      if (load.status !== "delivered" && load.status !== "completed") {
+        await storage.updateLoadStatus(req.params.id, "delivered");
+      }
+
+      res.json(load);
+    } catch (error) {
+      console.error("Error updating POD:", error);
+      res.status(500).json({ message: "Failed to update POD document" });
+    }
+  });
+
+  // Complete load and generate invoice
+  app.post("/api/loads/:id/complete", isAuthenticated, async (req, res) => {
+    try {
+      const load = await storage.getLoad(req.params.id);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      if (!load.location) {
+        return res.status(400).json({ message: "Load location not found" });
+      }
+
+      // Get rate for the location
+      const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+      if (!rate) {
+        return res.status(400).json({ message: "Rate not found for this location" });
+      }
+
+      // Calculate invoice amount
+      const totalMiles = load.estimatedMiles || 0;
+      const rateAmount = parseFloat(rate.ratePerMile.toString());
+      const baseAmount = parseFloat(rate.baseFee.toString());
+      const totalAmount = (totalMiles * rateAmount) + baseAmount;
+
+      // Generate invoice
+      const invoiceNumber = `INV-${Date.now()}`;
+      await storage.createInvoice({
+        loadId: load.id,
+        invoiceNumber,
+        totalMiles,
+        ratePerMile: rate.ratePerMile,
+        baseFee: rate.baseFee,
+        totalAmount: totalAmount.toString(),
+        status: "pending",
+      });
+
+      // Update load status to completed
+      const updatedLoad = await storage.updateLoadStatus(load.id, "completed");
+
+      res.json(updatedLoad);
+    } catch (error) {
+      console.error("Error completing load:", error);
+      res.status(500).json({ message: "Failed to complete load" });
+    }
+  });
+
+  // Rates
+  app.get("/api/rates", isAuthenticated, async (req, res) => {
+    try {
+      const rates = await storage.getRates();
+      res.json(rates);
+    } catch (error) {
+      console.error("Error fetching rates:", error);
+      res.status(500).json({ message: "Failed to fetch rates" });
+    }
+  });
+
+  app.post("/api/rates", isAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertRateSchema.parse(req.body);
+      const rate = await storage.createRate(validatedData);
+      res.status(201).json(rate);
+    } catch (error) {
+      console.error("Error creating rate:", error);
+      res.status(400).json({ message: "Invalid rate data" });
+    }
+  });
+
+  // Invoices
+  app.get("/api/invoices", isAuthenticated, async (req, res) => {
+    try {
+      const invoices = await storage.getInvoices();
+      res.json(invoices);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      res.status(500).json({ message: "Failed to fetch invoices" });
+    }
+  });
+
+  // Serve private objects (POD documents)
+  app.get("/objects/:objectPath(*)", isAuthenticated, async (req, res) => {
+    const userId = req.user?.claims?.sub;
+    const objectStorageService = new ObjectStorageService();
+    
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      const canAccess = await objectStorageService.canAccessObjectEntity({
+        objectFile,
+        userId: userId,
+        requestedPermission: "read" as any,
+      });
+      
+      if (!canAccess) {
+        return res.sendStatus(401);
+      }
+      
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error accessing object:", error);
+      return res.sendStatus(404);
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}

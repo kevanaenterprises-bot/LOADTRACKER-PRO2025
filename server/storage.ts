@@ -1,0 +1,362 @@
+import {
+  users,
+  locations,
+  loads,
+  bolNumbers,
+  rates,
+  invoices,
+  loadStatusHistory,
+  type User,
+  type UpsertUser,
+  type Location,
+  type InsertLocation,
+  type Load,
+  type InsertLoad,
+  type LoadWithDetails,
+  type BolNumber,
+  type InsertBolNumber,
+  type Rate,
+  type InsertRate,
+  type Invoice,
+  type InsertInvoice,
+  type LoadStatusHistoryEntry,
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, desc, and, sql } from "drizzle-orm";
+
+export interface IStorage {
+  // User operations (required for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+
+  // Location operations
+  getLocations(): Promise<Location[]>;
+  createLocation(location: InsertLocation): Promise<Location>;
+
+  // Load operations
+  createLoad(load: InsertLoad): Promise<Load>;
+  getLoads(): Promise<LoadWithDetails[]>;
+  getLoad(id: string): Promise<LoadWithDetails | undefined>;
+  updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load>;
+  updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load>;
+  updateLoadPOD(id: string, podDocumentPath: string): Promise<Load>;
+  getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]>;
+
+  // BOL operations
+  checkBOLExists(bolNumber: string): Promise<boolean>;
+  createBOLNumber(bol: InsertBolNumber): Promise<BolNumber>;
+
+  // Rate operations
+  getRates(): Promise<Rate[]>;
+  getRateByLocation(city: string, state: string): Promise<Rate | undefined>;
+  createRate(rate: InsertRate): Promise<Rate>;
+
+  // Invoice operations
+  createInvoice(invoice: InsertInvoice): Promise<Invoice>;
+  getInvoices(): Promise<Invoice[]>;
+
+  // Statistics
+  getDashboardStats(): Promise<{
+    activeLoads: number;
+    inTransit: number;
+    deliveredToday: number;
+    revenueToday: string;
+  }>;
+
+  // Driver operations
+  getDrivers(): Promise<User[]>;
+  getAvailableDrivers(): Promise<User[]>;
+
+  // Status history
+  addStatusHistory(loadId: string, status: string, notes?: string): Promise<void>;
+}
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async getLocations(): Promise<Location[]> {
+    return await db.select().from(locations).orderBy(locations.name);
+  }
+
+  async createLocation(location: InsertLocation): Promise<Location> {
+    const [newLocation] = await db.insert(locations).values(location).returning();
+    return newLocation;
+  }
+
+  async createLoad(load: InsertLoad): Promise<Load> {
+    const [newLoad] = await db.insert(loads).values(load).returning();
+    
+    // Add initial status history
+    await this.addStatusHistory(newLoad.id, "created", "Load created by office staff");
+    
+    return newLoad;
+  }
+
+  async getLoads(): Promise<LoadWithDetails[]> {
+    const result = await db
+      .select({
+        load: loads,
+        driver: users,
+        location: locations,
+        invoice: invoices,
+      })
+      .from(loads)
+      .leftJoin(users, eq(loads.driverId, users.id))
+      .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(invoices, eq(loads.id, invoices.loadId))
+      .orderBy(desc(loads.createdAt));
+
+    return result.map(row => ({
+      ...row.load,
+      driver: row.driver || undefined,
+      location: row.location || undefined,
+      invoice: row.invoice || undefined,
+    }));
+  }
+
+  async getLoad(id: string): Promise<LoadWithDetails | undefined> {
+    const [result] = await db
+      .select({
+        load: loads,
+        driver: users,
+        location: locations,
+        invoice: invoices,
+      })
+      .from(loads)
+      .leftJoin(users, eq(loads.driverId, users.id))
+      .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(invoices, eq(loads.id, invoices.loadId))
+      .where(eq(loads.id, id));
+
+    if (!result) return undefined;
+
+    return {
+      ...result.load,
+      driver: result.driver || undefined,
+      location: result.location || undefined,
+      invoice: result.invoice || undefined,
+    };
+  }
+
+  async updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load> {
+    const updateData: any = { status, updatedAt: new Date() };
+    
+    // Update specific timestamp fields based on status
+    const now = timestamp || new Date();
+    switch (status) {
+      case "en_route_pickup":
+        updateData.enRoutePickupAt = now;
+        break;
+      case "at_shipper":
+        updateData.atShipperAt = now;
+        break;
+      case "left_shipper":
+        updateData.leftShipperAt = now;
+        break;
+      case "en_route_receiver":
+        updateData.enRouteReceiverAt = now;
+        break;
+      case "at_receiver":
+        updateData.atReceiverAt = now;
+        break;
+      case "delivered":
+        updateData.deliveredAt = now;
+        break;
+      case "completed":
+        updateData.completedAt = now;
+        break;
+    }
+
+    const [updatedLoad] = await db
+      .update(loads)
+      .set(updateData)
+      .where(eq(loads.id, id))
+      .returning();
+
+    // Add status history
+    await this.addStatusHistory(id, status);
+
+    return updatedLoad;
+  }
+
+  async updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load> {
+    const [updatedLoad] = await db
+      .update(loads)
+      .set({ bolNumber, tripNumber, updatedAt: new Date() })
+      .where(eq(loads.id, id))
+      .returning();
+
+    // Create BOL record for duplicate tracking
+    await this.createBOLNumber({
+      bolNumber,
+      tripNumber,
+      loadId: id,
+    });
+
+    return updatedLoad;
+  }
+
+  async updateLoadPOD(id: string, podDocumentPath: string): Promise<Load> {
+    const [updatedLoad] = await db
+      .update(loads)
+      .set({ podDocumentPath, updatedAt: new Date() })
+      .where(eq(loads.id, id))
+      .returning();
+    
+    return updatedLoad;
+  }
+
+  async getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]> {
+    const result = await db
+      .select({
+        load: loads,
+        driver: users,
+        location: locations,
+        invoice: invoices,
+      })
+      .from(loads)
+      .leftJoin(users, eq(loads.driverId, users.id))
+      .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(invoices, eq(loads.id, invoices.loadId))
+      .where(eq(loads.driverId, driverId))
+      .orderBy(desc(loads.createdAt));
+
+    return result.map(row => ({
+      ...row.load,
+      driver: row.driver || undefined,
+      location: row.location || undefined,
+      invoice: row.invoice || undefined,
+    }));
+  }
+
+  async checkBOLExists(bolNumber: string): Promise<boolean> {
+    const [existing] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(bolNumbers)
+      .where(eq(bolNumbers.bolNumber, bolNumber));
+    
+    return existing.count > 0;
+  }
+
+  async createBOLNumber(bol: InsertBolNumber): Promise<BolNumber> {
+    const [newBol] = await db.insert(bolNumbers).values(bol).returning();
+    return newBol;
+  }
+
+  async getRates(): Promise<Rate[]> {
+    return await db
+      .select()
+      .from(rates)
+      .where(eq(rates.isActive, true))
+      .orderBy(rates.state, rates.city);
+  }
+
+  async getRateByLocation(city: string, state: string): Promise<Rate | undefined> {
+    const [rate] = await db
+      .select()
+      .from(rates)
+      .where(and(
+        eq(rates.city, city),
+        eq(rates.state, state),
+        eq(rates.isActive, true)
+      ));
+    
+    return rate;
+  }
+
+  async createRate(rate: InsertRate): Promise<Rate> {
+    const [newRate] = await db.insert(rates).values(rate).returning();
+    return newRate;
+  }
+
+  async createInvoice(invoice: InsertInvoice): Promise<Invoice> {
+    const [newInvoice] = await db.insert(invoices).values(invoice).returning();
+    return newInvoice;
+  }
+
+  async getInvoices(): Promise<Invoice[]> {
+    return await db.select().from(invoices).orderBy(desc(invoices.generatedAt));
+  }
+
+  async getDashboardStats(): Promise<{
+    activeLoads: number;
+    inTransit: number;
+    deliveredToday: number;
+    revenueToday: string;
+  }> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Active loads (not completed)
+    const [activeLoadsResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(loads)
+      .where(sql`status != 'completed'`);
+
+    // In transit loads
+    const [inTransitResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(loads)
+      .where(sql`status IN ('en_route_pickup', 'left_shipper', 'en_route_receiver')`);
+
+    // Delivered today
+    const [deliveredTodayResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(loads)
+      .where(sql`delivered_at >= ${today}`);
+
+    // Revenue today
+    const [revenueTodayResult] = await db
+      .select({ total: sql<string>`COALESCE(SUM(total_amount), 0)` })
+      .from(invoices)
+      .where(sql`generated_at >= ${today}`);
+
+    return {
+      activeLoads: activeLoadsResult.count,
+      inTransit: inTransitResult.count,
+      deliveredToday: deliveredTodayResult.count,
+      revenueToday: `$${revenueTodayResult.total}`,
+    };
+  }
+
+  async getDrivers(): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(eq(users.role, "driver"))
+      .orderBy(users.firstName, users.lastName);
+  }
+
+  async getAvailableDrivers(): Promise<User[]> {
+    // For now, return all drivers. In a real system, you'd check current load assignments
+    return this.getDrivers();
+  }
+
+  async addStatusHistory(loadId: string, status: string, notes?: string): Promise<void> {
+    await db.insert(loadStatusHistory).values({
+      loadId,
+      status,
+      notes,
+    });
+  }
+}
+
+export const storage = new DatabaseStorage();
