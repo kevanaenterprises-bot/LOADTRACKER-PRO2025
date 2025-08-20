@@ -7,11 +7,13 @@ import StatsCards from "@/components/StatsCards";
 import LoadForm from "@/components/LoadForm";
 import LoadsTable from "@/components/LoadsTable";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Dashboard() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading, user } = useAuth();
-  const [activeView, setActiveView] = useState<"office" | "driver">("office");
+  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "invoicing">("loads");
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -31,18 +33,6 @@ export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
     enabled: isAuthenticated,
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      }
-    },
   });
 
   if (isLoading || !isAuthenticated) {
@@ -118,17 +108,120 @@ export default function Dashboard() {
         {/* Dashboard Stats */}
         <StatsCards stats={stats} isLoading={statsLoading} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          {/* Create New Load Form */}
-          <div className="lg:col-span-1">
-            <LoadForm />
-          </div>
+        {/* Main Navigation Tabs */}
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-8">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="loads" className="flex items-center gap-2">
+              <i className="fas fa-truck"></i>
+              Load Management
+            </TabsTrigger>
+            <TabsTrigger value="drivers" className="flex items-center gap-2">
+              <i className="fas fa-users"></i>
+              Driver Management
+            </TabsTrigger>
+            <TabsTrigger value="invoicing" className="flex items-center gap-2">
+              <i className="fas fa-file-invoice-dollar"></i>
+              Automated Invoicing
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Active Loads Table */}
-          <div className="lg:col-span-2">
-            <LoadsTable />
-          </div>
-        </div>
+          {/* Load Management Tab */}
+          <TabsContent value="loads" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Create New Load Form */}
+              <div className="lg:col-span-1">
+                <LoadForm />
+              </div>
+
+              {/* Active Loads Table */}
+              <div className="lg:col-span-2">
+                <LoadsTable />
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Driver Management Tab */}
+          <TabsContent value="drivers" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-user-plus text-primary"></i>
+                    Add New Driver
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 mb-4">
+                    Register new drivers to assign loads and enable mobile access to the driver portal.
+                  </p>
+                  <Button className="w-full">
+                    <i className="fas fa-plus mr-2"></i>
+                    Add Driver
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-mobile-alt text-primary"></i>
+                    Driver Portal Access
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 mb-4">
+                    Switch to driver view to see the mobile interface for BOL entry and status updates.
+                  </p>
+                  <Button variant="outline" className="w-full" onClick={switchToDriverView}>
+                    <i className="fas fa-eye mr-2"></i>
+                    View Driver Portal
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Invoicing Tab */}
+          <TabsContent value="invoicing" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-calculator text-primary"></i>
+                    Rate Management
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 mb-4">
+                    Configure rates per mile and base fees for different locations to calculate invoices automatically.
+                  </p>
+                  <Button className="w-full">
+                    <i className="fas fa-cog mr-2"></i>
+                    Manage Rates
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-file-invoice text-primary"></i>
+                    Generated Invoices
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 mb-4">
+                    View and manage invoices that have been automatically generated from completed loads.
+                  </p>
+                  <Button variant="outline" className="w-full">
+                    <i className="fas fa-list mr-2"></i>
+                    View Invoices
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

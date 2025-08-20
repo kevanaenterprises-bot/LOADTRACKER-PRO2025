@@ -17,7 +17,7 @@ export default function Landing() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
-          <Card className="material-card">
+          <Card className="material-card cursor-pointer hover:shadow-lg transition-shadow" onClick={handleLogin}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <i className="fas fa-truck text-primary text-2xl"></i>
@@ -28,10 +28,13 @@ export default function Landing() {
               <p className="text-gray-600">
                 Create and track loads with 109 numbers, assign drivers, and manage deliveries from pickup to completion.
               </p>
+              <Button variant="outline" className="mt-4 w-full">
+                Access Load Management
+              </Button>
             </CardContent>
           </Card>
 
-          <Card className="material-card">
+          <Card className="material-card cursor-pointer hover:shadow-lg transition-shadow" onClick={handleLogin}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <i className="fas fa-mobile-alt text-primary text-2xl"></i>
@@ -42,10 +45,13 @@ export default function Landing() {
               <p className="text-gray-600">
                 Mobile-optimized interface for drivers to update status, enter BOL numbers, and upload POD documents.
               </p>
+              <Button variant="outline" className="mt-4 w-full">
+                Access Driver Portal
+              </Button>
             </CardContent>
           </Card>
 
-          <Card className="material-card">
+          <Card className="material-card cursor-pointer hover:shadow-lg transition-shadow" onClick={handleLogin}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <i className="fas fa-file-invoice-dollar text-primary text-2xl"></i>
@@ -56,6 +62,9 @@ export default function Landing() {
               <p className="text-gray-600">
                 Generate invoices automatically based on location rates and mileage calculations upon load completion.
               </p>
+              <Button variant="outline" className="mt-4 w-full">
+                Access Invoicing
+              </Button>
             </CardContent>
           </Card>
         </div>
