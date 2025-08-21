@@ -117,6 +117,7 @@ export default function LoadsTable() {
   });
 
   const handleLoadClick = (load: any) => {
+    console.log("Load clicked:", load);
     setSelectedLoad(load);
     setDialogOpen(true);
   };
@@ -188,6 +189,7 @@ export default function LoadsTable() {
           <div className="text-center py-8">
             <i className="fas fa-truck text-4xl text-gray-400 mb-4"></i>
             <p className="text-gray-600">No active loads found</p>
+            <p className="text-xs text-gray-400 mt-2">Debug: {Array.isArray(loads) ? loads.length : 'Loading...'} total loads</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -203,7 +205,11 @@ export default function LoadsTable() {
               </TableHeader>
               <TableBody>
                 {activeLoads.map((load: any) => (
-                  <TableRow key={load.id} className="hover:bg-gray-50">
+                  <TableRow 
+                    key={load.id} 
+                    className="hover:bg-gray-50 cursor-pointer"
+                    onClick={() => handleLoadClick(load)}
+                  >
                     <TableCell>
                       <div>
                         <div className="text-sm font-medium text-secondary">
@@ -257,7 +263,10 @@ export default function LoadsTable() {
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => handleLoadClick(load)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLoadClick(load);
+                          }}
                           title="View load details"
                         >
                           <i className="fas fa-eye text-primary"></i>
@@ -270,7 +279,10 @@ export default function LoadsTable() {
                           <Button 
                             variant="ghost" 
                             size="sm"
-                            onClick={() => handleLoadClick(load)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleLoadClick(load);
+                            }}
                             title="Generate invoice"
                             className="text-green-600 hover:text-green-700"
                           >

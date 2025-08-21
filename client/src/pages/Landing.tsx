@@ -99,10 +99,16 @@ export default function Landing() {
               </div>
               
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <Button onClick={() => setLocation('/test')} variant="ghost" size="lg" className="px-8 py-3 text-lg">
-                  <i className="fas fa-cog mr-2"></i>
-                  Testing & Development Tools
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <Button onClick={() => setLocation('/test')} variant="ghost" size="lg" className="px-8 py-3 text-lg">
+                    <i className="fas fa-cog mr-2"></i>
+                    Testing Tools
+                  </Button>
+                  <Button onClick={() => setLocation('/test-loads')} variant="ghost" size="lg" className="px-8 py-3 text-lg">
+                    <i className="fas fa-mouse-pointer mr-2"></i>
+                    Test Load Clicks
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
