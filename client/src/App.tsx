@@ -22,6 +22,7 @@ import TestLoadClicks from "@/pages/TestLoadClicks";
 import QuickInvoiceTest from "@/pages/QuickInvoiceTest";
 import AdminInvoiceTest from "@/pages/AdminInvoiceTest";
 import SimpleInvoiceTest from "@/pages/SimpleInvoiceTest";
+import QuickDriverAssignTest from "@/pages/QuickDriverAssignTest";
 import DebugInvoice from "@/pages/DebugInvoice";
 import AdminTestPage from "@/pages/AdminTestPage";
 import NotFound from "@/pages/not-found";
@@ -87,6 +88,9 @@ function Router() {
       
       {/* Admin test page - always accessible */}
       <Route path="/admin-test" component={AdminTestPage} />
+      
+      {/* Quick driver assignment test - always accessible */}
+      <Route path="/quick-assign" component={QuickDriverAssignTest} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (

@@ -417,7 +417,7 @@ export default function LoadsTable() {
                                 <SelectValue placeholder="Select a driver..." />
                               </SelectTrigger>
                               <SelectContent>
-                                {availableDrivers.map((driver: any) => (
+                                {Array.isArray(availableDrivers) && availableDrivers.map((driver: any) => (
                                   <SelectItem key={driver.id} value={driver.id}>
                                     {driver.firstName} {driver.lastName} - {driver.phoneNumber}
                                   </SelectItem>
