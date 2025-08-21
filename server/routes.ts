@@ -45,17 +45,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, password } = req.body;
       
+      console.log("Driver login attempt:", { username, password: password ? "[PROVIDED]" : "[MISSING]" });
+      
       if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
       }
 
       const driver = await storage.getDriverByUsername(username);
+      console.log("Driver lookup result:", driver ? "Found" : "Not found");
+      
       if (!driver) {
         return res.status(401).json({ message: "Invalid username or password" });
       }
 
-      // Check if password matches phone number
-      if (driver.password !== password || driver.phoneNumber !== password) {
+      // Check if password matches phone number (driver password should be their phone number)
+      console.log("Password check:", { provided: password, expected: driver.phoneNumber });
+      if (driver.phoneNumber !== password) {
         return res.status(401).json({ message: "Invalid username or password" });
       }
 
@@ -107,8 +112,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username and password are required" });
       }
 
+      console.log("Admin login attempt:", { username, password: password ? "[PROVIDED]" : "[MISSING]" });
+      
       // Check for admin credentials
       if (username === "admin" && password === "go4fc2024") {
+        console.log("Admin credentials matched successfully");
         // Create admin user session
         (req.session as any).adminAuth = {
           id: "admin-001",
@@ -123,6 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           user: (req.session as any).adminAuth 
         });
       } else {
+        console.log("Invalid admin credentials provided:", { username, passwordLength: password?.length });
         res.status(401).json({ message: "Invalid admin credentials" });
       }
     } catch (error) {
