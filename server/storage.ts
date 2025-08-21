@@ -70,6 +70,7 @@ export interface IStorage {
   // Driver operations
   getDrivers(): Promise<User[]>;
   getAvailableDrivers(): Promise<User[]>;
+  createDriver(driver: any): Promise<User>;
 
   // Status history
   addStatusHistory(loadId: string, status: string, notes?: string): Promise<void>;
@@ -449,6 +450,18 @@ export class DatabaseStorage implements IStorage {
   async getAvailableDrivers(): Promise<User[]> {
     // For now, return all drivers. In a real system, you'd check current load assignments
     return this.getDrivers();
+  }
+
+  async createDriver(driver: any): Promise<User> {
+    const [newDriver] = await db
+      .insert(users)
+      .values({
+        ...driver,
+        role: "driver",
+        email: driver.email || null,
+      })
+      .returning();
+    return newDriver;
   }
 
   async addStatusHistory(loadId: string, status: string, notes?: string): Promise<void> {

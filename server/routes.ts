@@ -231,11 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/drivers", isAdminAuthenticated, async (req, res) => {
     try {
       const validatedData = insertUserSchema.parse(req.body);
-      const driver = await storage.createUser({
-        ...validatedData,
-        role: "driver",
-        email: validatedData.email || null,
-      });
+      const driver = await storage.createDriver(validatedData);
       res.status(201).json(driver);
     } catch (error) {
       console.error("Error creating driver:", error);
