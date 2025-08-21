@@ -322,6 +322,18 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Dashboard Stats */}
         <StatsCards stats={stats as any} isLoading={statsLoading} />
+        
+        {/* Driver Debug Button - Always Visible */}
+        <div className="mt-4 flex justify-center">
+          <Button 
+            onClick={() => window.open('/driver-debug-test', '_blank')}
+            variant="outline"
+            size="lg"
+            className="bg-red-50 border-red-200 text-red-800 hover:bg-red-100"
+          >
+            🔧 Debug Driver Creation Issue
+          </Button>
+        </div>
 
         {/* Test Data Button (Development) */}
         {process.env.NODE_ENV === "development" && (
