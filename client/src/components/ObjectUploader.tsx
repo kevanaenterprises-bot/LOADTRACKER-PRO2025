@@ -18,6 +18,7 @@ interface ObjectUploaderProps {
   onComplete?: (
     result: UploadResult<Record<string, unknown>, Record<string, unknown>>
   ) => void;
+  onUploadStart?: () => void;
   buttonClassName?: string;
   children: ReactNode;
 }
@@ -55,6 +56,7 @@ export function ObjectUploader({
   maxFileSize = 10485760, // 10MB default
   onGetUploadParameters,
   onComplete,
+  onUploadStart,
   buttonClassName,
   children,
 }: ObjectUploaderProps) {
@@ -69,9 +71,27 @@ export function ObjectUploader({
     })
       .use(AwsS3, {
         shouldUseMultipart: false,
-        getUploadParameters: onGetUploadParameters,
+        getUploadParameters: async () => {
+          try {
+            console.log("Getting upload parameters...");
+            const params = await onGetUploadParameters();
+            console.log("Upload parameters received:", params);
+            return params;
+          } catch (error) {
+            console.error("Failed to get upload parameters:", error);
+            throw error;
+          }
+        },
+      })
+      .on("upload", () => {
+        console.log("Upload started");
+        onUploadStart?.();
+      })
+      .on("upload-error", (file, error) => {
+        console.error("Upload error:", error);
       })
       .on("complete", (result) => {
+        console.log("Upload complete:", result);
         onComplete?.(result);
       })
   );

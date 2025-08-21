@@ -185,6 +185,7 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
               maxFileSize={10485760} // 10MB
               onGetUploadParameters={handleGetUploadParameters}
               onComplete={handleUploadComplete}
+              onUploadStart={handleUploadStart}
               buttonClassName="w-full bg-blue-500 hover:bg-blue-600 text-white py-3"
             >
               <div className="flex items-center justify-center space-x-2">
