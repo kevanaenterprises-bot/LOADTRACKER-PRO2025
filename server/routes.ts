@@ -244,17 +244,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: "User"
         };
 
-        // Force session save
+        // Force session save with explicit reload to ensure persistence
         req.session.save((err) => {
           if (err) {
             console.error("Session save error:", err);
             return res.status(500).json({ message: "Session save failed" });
           }
           
-          console.log("Session saved successfully, adminAuth:", (req.session as any).adminAuth);
-          res.json({ 
-            message: "Login successful", 
-            user: (req.session as any).adminAuth 
+          // Reload session to verify save
+          req.session.reload((reloadErr) => {
+            if (reloadErr) {
+              console.error("Session reload error:", reloadErr);
+              return res.status(500).json({ message: "Session verification failed" });
+            }
+            
+            console.log("Session saved and verified, adminAuth:", (req.session as any).adminAuth);
+            res.json({ 
+              message: "Login successful", 
+              user: (req.session as any).adminAuth 
+            });
           });
         });
       } else {
