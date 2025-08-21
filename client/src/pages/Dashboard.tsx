@@ -131,22 +131,34 @@ export default function Dashboard() {
   // Mutations
   const createDriverMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("/api/drivers", "POST", data);
+      console.log("🚀 Dashboard driver creation starting...");
+      console.log("📝 Driver data:", JSON.stringify(data, null, 2));
+      console.log("🔑 Bypass token in localStorage:", !!localStorage.getItem('bypass-token'));
+      
+      const result = await apiRequest("/api/drivers", "POST", data);
+      console.log("✅ Dashboard driver creation successful:", result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      console.log("🎉 Driver mutation onSuccess triggered:", result);
       toast({
         title: "Driver Added",
-        description: "New driver has been successfully registered.",
+        description: `New driver ${result.username} has been successfully registered.`,
       });
       driverForm.reset();
       setDriverDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/drivers/available"] });
     },
     onError: (error: any) => {
-      console.error("Driver creation error:", error);
+      console.error("💥 Dashboard driver creation error details:");
+      console.error("Error object:", error);
+      console.error("Error message:", error?.message);
+      console.error("Error stack:", error?.stack);
+      console.error("Error response:", error?.response);
+      
       toast({
-        title: "Error",
-        description: error?.message || "Failed to add driver. Please try again.",
+        title: "Driver Creation Failed",
+        description: `Error: ${error?.message || "Failed to add driver. Please try again."}`,
         variant: "destructive",
       });
     },
