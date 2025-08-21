@@ -495,8 +495,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const extraStopsCharge = (load.extraStops || 0) * 50;
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
-      // Generate invoice
-      const invoiceNumber = `INV-${Date.now()}`;
+      // Generate invoice number starting with GO6000
+      const baseNumber = 6000;
+      const timestamp = Date.now().toString().slice(-4); // Last 4 digits of timestamp
+      const invoiceNumber = `GO${baseNumber + parseInt(timestamp.slice(-2))}`; // GO6000-GO6099 range
       const invoice = await storage.createInvoice({
         loadId: load.id,
         invoiceNumber,
@@ -637,8 +639,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const extraStopsCharge = (loadWithDetails.extraStops || 0) * 50;
               const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
-              // Generate invoice
-              const invoiceNumber = `INV-${Date.now()}`;
+              // Auto-generate invoice with GO6000 series
+              const baseNumber = 6000;
+              const timestamp = Date.now().toString().slice(-4);
+              const invoiceNumber = `GO${baseNumber + parseInt(timestamp.slice(-2))}`;
               await storage.createInvoice({
                 loadId: loadWithDetails.id,
                 invoiceNumber,
@@ -711,8 +715,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const extraStopsCharge = (loadWithDetails.extraStops || 0) * 50;
             const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
-            // Generate invoice
-            const invoiceNumber = `INV-${Date.now()}`;
+            // Auto-generate invoice with GO6000 series  
+            const baseNumber = 6000;
+            const timestamp = Date.now().toString().slice(-4);
+            const invoiceNumber = `GO${baseNumber + parseInt(timestamp.slice(-2))}`;
             await storage.createInvoice({
               loadId: loadWithDetails.id,
               invoiceNumber,
@@ -763,8 +769,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const extraStopsCharge = (load.extraStops || 0) * 50; // $50 per extra stop
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
-      // Generate invoice
-      const invoiceNumber = `INV-${Date.now()}`;
+      // Auto-generate invoice with GO6000 series
+      const baseNumber = 6000;
+      const timestamp = Date.now().toString().slice(-4);
+      const invoiceNumber = `GO${baseNumber + parseInt(timestamp.slice(-2))}`;
       await storage.createInvoice({
         loadId: load.id,
         invoiceNumber,
