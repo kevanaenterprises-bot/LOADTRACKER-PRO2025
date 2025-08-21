@@ -46,7 +46,16 @@ export default function Landing() {
           Driver Login
         </Button>
         
-        <div className="mt-6 pt-6 border-t border-gray-200">
+        <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
+          <Button 
+            onClick={() => setLocation("/how-to-assign")} 
+            variant="outline" 
+            size="sm" 
+            className="w-full bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+          >
+            <i className="fas fa-book mr-2"></i>
+            How to Assign Drivers
+          </Button>
           <Button 
             onClick={() => setLocation("/quick-assign")} 
             variant="outline" 
@@ -54,7 +63,7 @@ export default function Landing() {
             className="w-full bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
           >
             <i className="fas fa-vial mr-2"></i>
-            Test Driver Assignment
+            Quick Test
           </Button>
         </div>
       </div>

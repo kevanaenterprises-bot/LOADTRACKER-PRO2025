@@ -23,6 +23,7 @@ import QuickInvoiceTest from "@/pages/QuickInvoiceTest";
 import AdminInvoiceTest from "@/pages/AdminInvoiceTest";
 import SimpleInvoiceTest from "@/pages/SimpleInvoiceTest";
 import QuickDriverAssignTest from "@/pages/QuickDriverAssignTest";
+import DriverAssignmentGuide from "@/pages/DriverAssignmentGuide";
 import DebugInvoice from "@/pages/DebugInvoice";
 import AdminTestPage from "@/pages/AdminTestPage";
 import NotFound from "@/pages/not-found";
@@ -91,6 +92,9 @@ function Router() {
       
       {/* Quick driver assignment test - always accessible */}
       <Route path="/quick-assign" component={QuickDriverAssignTest} />
+      
+      {/* Driver assignment guide - always accessible */}
+      <Route path="/how-to-assign" component={DriverAssignmentGuide} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (
