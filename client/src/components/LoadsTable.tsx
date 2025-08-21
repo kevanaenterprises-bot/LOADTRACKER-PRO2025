@@ -6,6 +6,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -70,6 +71,7 @@ export default function LoadsTable() {
   const queryClient = useQueryClient();
   const [selectedLoad, setSelectedLoad] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [assigningDriver, setAssigningDriver] = useState(false);
 
   const { data: loads, isLoading } = useQuery({
     queryKey: ["/api/loads"],
@@ -79,6 +81,12 @@ export default function LoadsTable() {
 
   const { data: invoices = [] } = useQuery({
     queryKey: ["/api/invoices"],
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: availableDrivers = [] } = useQuery({
+    queryKey: ["/api/drivers/available"],
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -142,6 +150,45 @@ export default function LoadsTable() {
   // Check if a load already has an invoice
   const hasInvoice = (loadId: string) => {
     return Array.isArray(invoices) && invoices.some((invoice: any) => invoice.loadId === loadId);
+  };
+
+  // Driver assignment mutation
+  const assignDriverMutation = useMutation({
+    mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
+      return apiRequest(`/api/loads/${loadId}/assign-driver`, "PATCH", { driverId });
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Driver Assigned Successfully",
+        description: `${data.driver?.firstName || 'Driver'} assigned to load ${data.number109}`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      setSelectedLoad(data); // Update the dialog with new data
+      setAssigningDriver(false);
+    },
+    onError: (error: any) => {
+      console.error("Driver assignment error:", error);
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Authentication Required",
+          description: "Please activate bypass token or log in to assign drivers.",
+          variant: "destructive",
+        });
+        return;
+      }
+      toast({
+        title: "Driver Assignment Failed",
+        description: error.message || "Unable to assign driver to this load.",
+        variant: "destructive",
+      });
+      setAssigningDriver(false);
+    },
+  });
+
+  const handleAssignDriver = (driverId: string) => {
+    if (selectedLoad && driverId) {
+      assignDriverMutation.mutate({ loadId: selectedLoad.id, driverId });
+    }
   };
 
   if (isLoading) {
@@ -333,12 +380,67 @@ export default function LoadsTable() {
                 
                 <div>
                   <h4 className="font-semibold mb-2">Driver & Destination</h4>
-                  <div className="space-y-2 text-sm">
-                    {selectedLoad.driver ? (
-                      <div><strong>Driver:</strong> {selectedLoad.driver.firstName} {selectedLoad.driver.lastName}</div>
-                    ) : (
-                      <div><strong>Driver:</strong> <span className="text-gray-500">Not assigned</span></div>
-                    )}
+                  <div className="space-y-3 text-sm">
+                    <div>
+                      <strong>Driver:</strong> 
+                      {selectedLoad.driver ? (
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-blue-600">{selectedLoad.driver.firstName} {selectedLoad.driver.lastName}</span>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setAssigningDriver(true)}
+                            className="ml-2"
+                          >
+                            Change Driver
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="mt-1">
+                          <span className="text-gray-500">Not assigned</span>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setAssigningDriver(true)}
+                            className="ml-2"
+                          >
+                            Assign Driver
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {assigningDriver && (
+                        <div className="mt-2 p-3 border rounded bg-gray-50">
+                          <div className="flex items-center space-x-2">
+                            <Select onValueChange={handleAssignDriver}>
+                              <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="Select a driver..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {availableDrivers.map((driver: any) => (
+                                  <SelectItem key={driver.id} value={driver.id}>
+                                    {driver.firstName} {driver.lastName} - {driver.phoneNumber}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setAssigningDriver(false)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                          {assignDriverMutation.isPending && (
+                            <div className="mt-2 text-sm text-blue-600">
+                              Assigning driver...
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
                     {selectedLoad.location && (
                       <div><strong>Destination:</strong> {selectedLoad.location.name}</div>
                     )}

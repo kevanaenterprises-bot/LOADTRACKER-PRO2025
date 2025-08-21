@@ -63,12 +63,16 @@ export default function AdminTestPage() {
         setBypassToken(result.token);
         // Store token for subsequent requests
         localStorage.setItem('bypass-token', result.token);
-        toast({ title: "Bypass token received", description: "You can now assign drivers" });
+        
+        // Force refresh all queries to use the new token
+        window.location.reload();
+        
+        toast({ title: "Auth token activated", description: "Dashboard now fully accessible" });
       } else {
-        toast({ title: "Bypass failed", description: result.message, variant: "destructive" });
+        toast({ title: "Token activation failed", description: result.message, variant: "destructive" });
       }
     } catch (error) {
-      toast({ title: "Error", description: "Bypass request failed", variant: "destructive" });
+      toast({ title: "Error", description: "Token request failed", variant: "destructive" });
     }
   };
 
