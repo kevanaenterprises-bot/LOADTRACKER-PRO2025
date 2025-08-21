@@ -45,7 +45,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { username, password } = req.body;
       
-      console.log("Driver login attempt:", { username, password: password ? "[PROVIDED]" : "[MISSING]" });
+      console.log("Driver login attempt:", { 
+        username, 
+        usernameLength: username?.length,
+        password: password ? `[LENGTH:${password.length}]` : "[MISSING]",
+        passwordActual: JSON.stringify(password)
+      });
       
       if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
@@ -112,10 +117,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username and password are required" });
       }
 
-      console.log("Admin login attempt:", { username, password: password ? "[PROVIDED]" : "[MISSING]" });
+      console.log("Admin login attempt:", { 
+        username, 
+        usernameLength: username?.length,
+        password: password ? `[LENGTH:${password.length}]` : "[MISSING]",
+        passwordActual: JSON.stringify(password)
+      });
       
-      // Check for admin credentials
-      if (username === "admin" && password === "go4fc2024") {
+      // Check for admin credentials (case insensitive, trim whitespace)
+      if (username.toLowerCase().trim() === "admin" && password.trim() === "go4fc2024") {
         console.log("Admin credentials matched successfully");
         // Create admin user session
         (req.session as any).adminAuth = {
