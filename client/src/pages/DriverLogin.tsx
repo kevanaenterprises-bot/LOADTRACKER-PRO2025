@@ -40,7 +40,21 @@ export default function DriverLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: DriverLoginForm) => {
-      return await apiRequest("/api/auth/driver-login", "POST", data);
+      const response = await fetch("/api/auth/driver-login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -48,7 +62,8 @@ export default function DriverLogin() {
         description: "Welcome to the driver portal!",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/driver-user"] });
-      setLocation("/driver-portal");
+      // Force reload to refresh authentication state
+      window.location.href = "/driver-portal";
     },
     onError: (error: any) => {
       toast({

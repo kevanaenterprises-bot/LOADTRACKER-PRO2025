@@ -34,7 +34,8 @@ export default function AdminLogin() {
           title: "Login Successful",
           description: "Welcome to GO 4 Farms & Cattle Admin Portal",
         });
-        setLocation("/");
+        // Force reload to refresh authentication state
+        window.location.href = "/";
       } else {
         const data = await response.json();
         toast({
