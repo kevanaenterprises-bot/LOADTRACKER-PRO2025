@@ -12,6 +12,7 @@ import AdminTestDashboard from "@/pages/AdminTestDashboard";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import DebugUpload from "@/pages/DebugUpload";
+import ProductionDebug from "@/pages/ProductionDebug";
 import UploadTest from "@/pages/UploadTest";
 import QuickUploadPage from "@/pages/QuickUploadPage";
 import InvoiceTestPage from "@/pages/InvoiceTestPage";
@@ -99,6 +100,9 @@ function Router() {
       
       {/* Troubleshoot page - always accessible */}
       <Route path="/troubleshoot" component={TroubleshootPage} />
+      
+      {/* Production debug page - always accessible */}
+      <Route path="/production-debug" component={ProductionDebug} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (
