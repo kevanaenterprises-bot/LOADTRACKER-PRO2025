@@ -95,45 +95,56 @@ export default function DriverTestDebug() {
         setResult(prev => prev + `✗ Load creation failed: ${loadError}\n`);
       }
       
-      // Step 5: Test driver creation
-      setResult(prev => prev + "Step 5: Creating test driver...\n");
+      // Step 5: Test dashboard-style driver creation (same as real form)
+      setResult(prev => prev + "Step 5: Testing dashboard driver creation (real API flow)...\n");
+      
+      // Import the same apiRequest function the dashboard uses
+      const { apiRequest } = await import("@/lib/queryClient");
+      
       const driverData = {
-        firstName: "Test",
-        lastName: "Driver",
+        firstName: "Dashboard",
+        lastName: "Test",
         phoneNumber: "1234567890",
-        username: `test_driver_${Date.now()}`,
+        username: `dashboard_driver_${Date.now()}`,
         role: "driver"
       };
       
-      setResult(prev => prev + `Sending data: ${JSON.stringify(driverData, null, 2)}\n`);
+      setResult(prev => prev + `Testing with apiRequest (same as dashboard): ${JSON.stringify(driverData, null, 2)}\n`);
       
-      const driverResponse = await fetch("/api/drivers", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "X-Bypass-Token": token
-        },
-        body: JSON.stringify(driverData),
-        credentials: "include",
-      });
-      
-      setResult(prev => prev + `Driver response status: ${driverResponse.status}\n`);
-      const headersList = Array.from(driverResponse.headers.entries());
-      setResult(prev => prev + `Driver response headers: ${JSON.stringify(headersList)}\n`);
-      
-      if (driverResponse.ok) {
-        const driverResult = await driverResponse.json();
-        setResult(prev => prev + `🎉 SUCCESS! Driver created: ${driverResult.username}\n`);
+      try {
+        const driverResult = await apiRequest("/api/drivers", "POST", driverData);
+        setResult(prev => prev + `🎉 SUCCESS! Dashboard-style driver created: ${driverResult.username}\n`);
         setResult(prev => prev + `Driver ID: ${driverResult.id}\n`);
         toast({
           title: "SUCCESS!",
-          description: "All tests passed! Load and driver creation working!"
+          description: "Dashboard driver creation working!"
         });
-      } else {
-        const errorText = await driverResponse.text();
-        setResult(prev => prev + `✗ Driver creation failed:\n`);
-        setResult(prev => prev + `Status: ${driverResponse.status}\n`);
-        setResult(prev => prev + `Error: ${errorText}\n`);
+      } catch (error: any) {
+        setResult(prev => prev + `✗ Dashboard driver creation failed:\n`);
+        setResult(prev => prev + `Error: ${error.message}\n`);
+        
+        // Also test with manual bypass token as fallback
+        setResult(prev => prev + "Fallback: Testing with manual bypass token...\n");
+        const driverResponse = await fetch("/api/drivers", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "X-Bypass-Token": token
+          },
+          body: JSON.stringify({
+            ...driverData,
+            username: `fallback_driver_${Date.now()}`
+          }),
+          credentials: "include",
+        });
+        
+        if (driverResponse.ok) {
+          const fallbackResult = await driverResponse.json();
+          setResult(prev => prev + `✓ Fallback bypass token worked: ${fallbackResult.username}\n`);
+        } else {
+          const errorText = await driverResponse.text();
+          setResult(prev => prev + `✗ Even bypass token failed: ${errorText}\n`);
+        }
       }
       
     } catch (error: any) {
