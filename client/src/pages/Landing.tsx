@@ -120,6 +120,10 @@ export default function Landing() {
                     <i className="fas fa-cog mr-2"></i>
                     Simple Invoice Test
                   </Button>
+                  <Button onClick={() => setLocation('/debug-invoice')} variant="ghost" size="lg" className="px-8 py-3 text-lg bg-red-100 hover:bg-red-200">
+                    <i className="fas fa-bug mr-2"></i>
+                    Debug HTTP Error
+                  </Button>
                 </div>
               </div>
             </CardContent>
