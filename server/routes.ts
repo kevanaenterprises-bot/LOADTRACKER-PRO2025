@@ -224,7 +224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/drivers/available", isAuthenticated, async (req, res) => {
+  app.get("/api/drivers/available", isAdminAuthenticated, async (req, res) => {
     try {
       const drivers = await storage.getAvailableDrivers();
       res.json(drivers);
@@ -235,7 +235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Loads
-  app.get("/api/loads", isAuthenticated, async (req, res) => {
+  app.get("/api/loads", isAdminAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub;
       const user = await storage.getUser(userId);
@@ -254,7 +254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/loads", isAuthenticated, async (req, res) => {
+  app.post("/api/loads", isAdminAuthenticated, async (req, res) => {
     try {
       const validatedData = insertLoadSchema.parse(req.body);
       

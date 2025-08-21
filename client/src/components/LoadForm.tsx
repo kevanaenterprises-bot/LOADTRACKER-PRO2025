@@ -54,34 +54,14 @@ export default function LoadForm() {
 
   const { data: locations } = useQuery({
     queryKey: ["/api/locations"],
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      }
-    },
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const { data: drivers } = useQuery({
     queryKey: ["/api/drivers/available"],
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      }
-    },
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   const createLoadMutation = useMutation({
