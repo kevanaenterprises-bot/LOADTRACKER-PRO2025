@@ -15,14 +15,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Dashboard() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const auth = useAuth();
   const adminAuth = useAdminAuth();
+  
+  // Check both auth systems - prefer admin auth if available
+  const isAuthenticated = adminAuth.isAuthenticated || auth.isAuthenticated;
+  const isLoading = auth.isLoading || adminAuth.isLoading;
+  const user = adminAuth.user || auth.user;
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "invoicing">("loads");
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isLoading && !adminAuth.isLoading && !isAuthenticated && !adminAuth.isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       toast({
         title: "Unauthorized",
         description: "You are logged out. Please log in...",
@@ -33,14 +38,14 @@ export default function Dashboard() {
       }, 500);
       return;
     }
-  }, [isAuthenticated, adminAuth.isAuthenticated, isLoading, adminAuth.isLoading, toast, setLocation]);
+  }, [isAuthenticated, isLoading, toast, setLocation]);
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
-    enabled: isAuthenticated || adminAuth.isAuthenticated,
+    enabled: isAuthenticated,
   });
 
-  if (isLoading || adminAuth.isLoading || (!isAuthenticated && !adminAuth.isAuthenticated)) {
+  if (isLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
