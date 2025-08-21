@@ -54,6 +54,30 @@ export default function Dashboard() {
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
+  // Setup bypass token automatically when authenticated (just like test pages)
+  useEffect(() => {
+    const setupBypassToken = async () => {
+      if (!localStorage.getItem('bypass-token')) {
+        try {
+          const response = await fetch("/api/auth/browser-bypass", {
+            method: "POST",
+            credentials: "include",
+          });
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('bypass-token', data.token);
+          }
+        } catch (error) {
+          // Silent fail - will use normal authentication
+        }
+      }
+    };
+
+    if (isAuthenticated && !isLoading) {
+      setupBypassToken();
+    }
+  }, [isAuthenticated, isLoading]);
+
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

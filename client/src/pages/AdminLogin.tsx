@@ -31,6 +31,20 @@ export default function AdminLogin() {
       });
 
       if (response.ok) {
+        // Automatically setup bypass token after successful login (makes production work like test pages)
+        try {
+          const bypassResponse = await fetch("/api/auth/browser-bypass", {
+            method: "POST",
+            credentials: "include",
+          });
+          if (bypassResponse.ok) {
+            const data = await bypassResponse.json();
+            localStorage.setItem('bypass-token', data.token);
+          }
+        } catch (error) {
+          // Silent fail - will use normal authentication
+        }
+
         toast({
           title: "Login Successful",
           description: "Welcome to GO 4 Farms & Cattle Admin Portal",
