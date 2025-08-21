@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useMainAuth } from "@/hooks/useMainAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -15,13 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Dashboard() {
   const { toast } = useToast();
-  const auth = useAuth();
-  const adminAuth = useAdminAuth();
-  
-  // Check both auth systems - prefer admin auth if available
-  const isAuthenticated = adminAuth.isAuthenticated || auth.isAuthenticated;
-  const isLoading = auth.isLoading || adminAuth.isLoading;
-  const user = adminAuth.user || auth.user;
+  const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "invoicing">("loads");
 
@@ -58,9 +51,14 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     try {
-      // Try admin logout first
-      if (adminAuth.isAuthenticated) {
+      if (authType === 'admin') {
         await fetch("/api/auth/admin-logout", {
+          method: "POST",
+          credentials: "include"
+        });
+        setLocation("/");
+      } else if (authType === 'driver') {
+        await fetch("/api/auth/driver-logout", {
           method: "POST",
           credentials: "include"
         });
@@ -113,11 +111,11 @@ export default function Dashboard() {
               <div className="flex items-center space-x-2">
                 <img 
                   className="h-8 w-8 rounded-full bg-primary" 
-                  src={user?.profileImageUrl || `https://ui-avatars.io/api/?name=${((adminAuth.user as any)?.firstName || user?.firstName)}+${((adminAuth.user as any)?.lastName || user?.lastName)}&background=1976D2&color=fff`}
+                  src={user?.profileImageUrl || `https://ui-avatars.io/api/?name=${user?.firstName || 'User'}+${user?.lastName || 'User'}&background=1976D2&color=fff`}
                   alt="User avatar" 
                 />
                 <span className="text-sm font-medium text-secondary">
-                  {(adminAuth.user as any)?.firstName || user?.firstName} {(adminAuth.user as any)?.lastName || user?.lastName}
+                  {user?.firstName || 'User'} {user?.lastName || ''}
                 </span>
               </div>
               <Button variant="outline" size="sm" onClick={handleLogout}>

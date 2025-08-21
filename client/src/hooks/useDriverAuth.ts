@@ -13,6 +13,8 @@ export function useDriverAuth() {
       return response.json();
     },
     retry: false,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
