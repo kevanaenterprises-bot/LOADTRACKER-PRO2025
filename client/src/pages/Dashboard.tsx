@@ -52,6 +52,7 @@ export default function Dashboard() {
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
+  const [debugLog, setDebugLog] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
   // Setup bypass token automatically when authenticated (just like test pages)
@@ -131,13 +132,18 @@ export default function Dashboard() {
   // Mutations
   const createDriverMutation = useMutation({
     mutationFn: async (data: any) => {
-      console.log("🚀 Dashboard driver creation starting...");
-      console.log("📝 Driver data:", JSON.stringify(data, null, 2));
-      console.log("🔑 Bypass token in localStorage:", !!localStorage.getItem('bypass-token'));
+      setDebugLog(prev => [...prev, "🚀 Starting driver creation..."]);
+      setDebugLog(prev => [...prev, `📝 Data: ${JSON.stringify(data, null, 2)}`]);
+      setDebugLog(prev => [...prev, `🔑 Bypass token: ${!!localStorage.getItem('bypass-token')}`]);
       
-      const result = await apiRequest("/api/drivers", "POST", data);
-      console.log("✅ Dashboard driver creation successful:", result);
-      return result;
+      try {
+        const result = await apiRequest("/api/drivers", "POST", data);
+        setDebugLog(prev => [...prev, "✅ SUCCESS! Driver created"]);
+        return result;
+      } catch (error: any) {
+        setDebugLog(prev => [...prev, `💥 ERROR: ${error.message}`]);
+        throw error;
+      }
     },
     onSuccess: (result) => {
       console.log("🎉 Driver mutation onSuccess triggered:", result);
@@ -334,6 +340,24 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Dashboard Stats */}
         <StatsCards stats={stats as any} isLoading={statsLoading} />
+        
+        {/* Debug Log Display - Mobile Friendly */}
+        {debugLog.length > 0 && (
+          <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-yellow-800 mb-2">Debug Log:</h3>
+            <div className="text-xs font-mono space-y-1 max-h-32 overflow-y-auto">
+              {debugLog.map((log, idx) => (
+                <div key={idx} className="text-yellow-700">{log}</div>
+              ))}
+            </div>
+            <button 
+              onClick={() => setDebugLog([])}
+              className="mt-2 text-xs text-yellow-600 underline"
+            >
+              Clear Log
+            </button>
+          </div>
+        )}
         
         {/* Driver Debug Button - Always Visible */}
         <div className="mt-4 flex justify-center">
