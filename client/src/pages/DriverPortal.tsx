@@ -19,7 +19,7 @@ export default function DriverPortal() {
   const isAuthenticated = driverAuth.isAuthenticated || 
     (officeAuth.isAuthenticated && officeAuth.user?.role === "office") ||
     adminAuth.isAuthenticated;
-  const isLoading = driverAuth.isLoading && officeAuth.isLoading && adminAuth.isLoading;
+  const isLoading = driverAuth.isLoading || officeAuth.isLoading || adminAuth.isLoading;
   const user = driverAuth.user || officeAuth.user || adminAuth.user;
 
   // Redirect to login if not authenticated
@@ -38,7 +38,7 @@ export default function DriverPortal() {
   }, [isAuthenticated, isLoading, toast]);
 
   const { data: loads = [], isLoading: loadsLoading } = useQuery({
-    queryKey: ["/api/loads"],
+    queryKey: ["/api/driver/loads"],
     enabled: isAuthenticated,
   });
 

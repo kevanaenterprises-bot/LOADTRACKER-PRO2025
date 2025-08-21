@@ -261,7 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Loads
+  // Loads for admin/office users
   app.get("/api/loads", isAdminAuthenticated, async (req, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub;
@@ -278,6 +278,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching loads:", error);
       res.status(500).json({ message: "Failed to fetch loads" });
+    }
+  });
+
+  // Driver-specific loads endpoint  
+  app.get("/api/driver/loads", (req, res, next) => {
+    if ((req.session as any)?.driverAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Driver not authenticated" });
+    }
+  }, async (req, res) => {
+    try {
+      const driverUserId = (req.session as any)?.driverAuth?.userId;
+      if (!driverUserId) {
+        return res.status(401).json({ message: "Driver not authenticated" });
+      }
+      
+      console.log("Fetching loads for driver:", driverUserId);
+      const loads = await storage.getLoadsByDriver(driverUserId);
+      console.log("Found", loads.length, "loads for driver");
+      res.json(loads);
+    } catch (error) {
+      console.error("Error fetching driver loads:", error);
+      res.status(500).json({ message: "Failed to fetch driver loads" });
     }
   });
 
