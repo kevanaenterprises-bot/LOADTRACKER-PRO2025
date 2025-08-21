@@ -1038,6 +1038,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Load tracking endpoint for real-time map - moved to avoid conflicts
+  app.get("/api/tracking/loads", isAdminAuthenticated, async (req, res) => {
+    console.log("Tracking endpoint reached");
+    try {
+      const trackingLoads = await storage.getLoadsWithTracking();
+      console.log("Found tracking loads:", trackingLoads.length);
+      res.json(trackingLoads);
+    } catch (error) {
+      console.error("Error fetching tracking loads:", error);
+      res.status(500).json({ message: "Failed to fetch tracking data" });
+    }
+  });
+
   // OCR Routes for Wright Con processing
   app.post('/api/ocr/extract', upload.single('image'), async (req, res) => {
     try {

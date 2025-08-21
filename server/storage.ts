@@ -47,6 +47,7 @@ export interface IStorage {
   updateLoadBOLDocument(id: string, bolDocumentPath: string): Promise<Load>;
   updateLoadPOD(id: string, podDocumentPath: string): Promise<Load>;
   getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]>;
+  getLoadsWithTracking(): Promise<LoadWithDetails[]>;
 
   // BOL operations
   checkBOLExists(bolNumber: string): Promise<boolean>;
@@ -358,6 +359,34 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .where(eq(loads.driverId, driverId))
       .orderBy(desc(loads.createdAt));
+
+    return result.map(row => ({
+      ...row.load,
+      driver: row.driver || undefined,
+      location: row.location || undefined,
+      invoice: row.invoice || undefined,
+    }));
+  }
+
+  async getLoadsWithTracking(): Promise<LoadWithDetails[]> {
+    const result = await db
+      .select({
+        load: loads,
+        driver: users,
+        location: locations,
+        invoice: invoices,
+      })
+      .from(loads)
+      .leftJoin(users, eq(loads.driverId, users.id))
+      .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(invoices, eq(loads.id, invoices.loadId))
+      .where(and(
+        eq(loads.trackingEnabled, true),
+        sql`${loads.currentLatitude} IS NOT NULL`,
+        sql`${loads.currentLongitude} IS NOT NULL`,
+        sql`${loads.status} IN ('confirmed', 'en_route_pickup', 'at_shipper', 'left_shipper', 'en_route_receiver', 'at_receiver')`
+      ))
+      .orderBy(desc(loads.updatedAt));
 
     return result.map(row => ({
       ...row.load,
