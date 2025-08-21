@@ -23,6 +23,7 @@ import QuickInvoiceTest from "@/pages/QuickInvoiceTest";
 import AdminInvoiceTest from "@/pages/AdminInvoiceTest";
 import SimpleInvoiceTest from "@/pages/SimpleInvoiceTest";
 import DebugInvoice from "@/pages/DebugInvoice";
+import AdminTestPage from "@/pages/AdminTestPage";
 import NotFound from "@/pages/not-found";
 
 function Router() {
