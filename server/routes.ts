@@ -494,7 +494,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loads/:id/status", isAuthenticated, async (req, res) => {
+  app.patch("/api/loads/:id/status", isAdminAuthenticated, async (req, res) => {
     try {
       const { status } = req.body;
       const load = await storage.updateLoadStatus(req.params.id, status);
@@ -502,6 +502,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating load status:", error);
       res.status(500).json({ message: "Failed to update load status" });
+    }
+  });
+
+  // Assign driver to load
+  app.patch("/api/loads/:id/assign-driver", isAdminAuthenticated, async (req, res) => {
+    try {
+      const { driverId } = req.body;
+      const loadId = req.params.id;
+      
+      if (!driverId) {
+        return res.status(400).json({ message: "Driver ID is required" });
+      }
+
+      // Get the load first
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      // Update the load with driver assignment
+      const updatedLoad = await storage.updateLoad(loadId, { driverId });
+
+      // Send SMS to driver if they have a phone number
+      try {
+        const driver = await storage.getUser(driverId);
+        if (driver?.phoneNumber) {
+          const location = load.location;
+          await sendSMSToDriver(
+            driver.phoneNumber,
+            `New load assigned: ${load.number109}. Pickup: 1800 East Plano Parkway. Delivery: ${location?.name || 'See details'}. Est. miles: ${load.estimatedMiles || 'TBD'}`
+          );
+        }
+      } catch (smsError) {
+        console.error("Failed to send SMS:", smsError);
+        // Don't fail the assignment if SMS fails
+      }
+
+      res.json(updatedLoad);
+    } catch (error) {
+      console.error("Error assigning driver to load:", error);
+      res.status(500).json({ message: "Failed to assign driver to load" });
     }
   });
 

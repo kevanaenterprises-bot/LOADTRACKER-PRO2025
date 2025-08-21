@@ -41,6 +41,7 @@ export interface IStorage {
   createLoad(load: InsertLoad): Promise<Load>;
   getLoads(): Promise<LoadWithDetails[]>;
   getLoad(id: string): Promise<LoadWithDetails | undefined>;
+  updateLoad(id: string, updates: Partial<Load>): Promise<Load>;
   updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load>;
   updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load>;
   updateLoadBOLDocument(id: string, bolDocumentPath: string): Promise<Load>;
@@ -274,6 +275,16 @@ export class DatabaseStorage implements IStorage {
 
     // Add status history
     await this.addStatusHistory(id, status);
+
+    return updatedLoad;
+  }
+
+  async updateLoad(id: string, updates: Partial<Load>): Promise<Load> {
+    const [updatedLoad] = await db
+      .update(loads)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(loads.id, id))
+      .returning();
 
     return updatedLoad;
   }
