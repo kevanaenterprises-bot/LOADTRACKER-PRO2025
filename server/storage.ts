@@ -134,8 +134,9 @@ export class DatabaseStorage implements IStorage {
 
   async getDriverByUsername(username: string): Promise<User | undefined> {
     try {
+      // Use case-insensitive search by converting to lowercase
       const [user] = await db.select().from(users).where(and(
-        eq(users.username, username),
+        sql`LOWER(${users.username}) = LOWER(${username})`,
         eq(users.role, "driver")
       ));
       return user;
