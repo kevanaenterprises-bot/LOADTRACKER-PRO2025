@@ -507,7 +507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Invoices
-  app.get("/api/invoices", isAuthenticated, async (req, res) => {
+  app.get("/api/invoices", isAdminAuthenticated, async (req, res) => {
     try {
       const invoices = await storage.getInvoices();
       res.json(invoices);
@@ -518,7 +518,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Mark invoice as printed
-  app.patch("/api/invoices/:id/print", isAuthenticated, async (req, res) => {
+  app.patch("/api/invoices/:id/print", isAdminAuthenticated, async (req, res) => {
     try {
       const invoice = await storage.markInvoicePrinted(req.params.id);
       res.json(invoice);

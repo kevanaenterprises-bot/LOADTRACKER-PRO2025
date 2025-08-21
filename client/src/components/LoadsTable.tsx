@@ -88,10 +88,28 @@ export default function LoadsTable() {
         <div className="flex items-center justify-between">
           <CardTitle>Active Loads</CardTitle>
           <div className="flex space-x-2">
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                toast({
+                  title: "Filter Feature",
+                  description: "Filter options will be implemented to sort loads by status, driver, or date.",
+                });
+              }}
+            >
               <i className="fas fa-filter mr-2"></i>Filter
             </Button>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                toast({
+                  title: "Export Feature",
+                  description: "Load data will be exported to CSV/Excel format for reporting.",
+                });
+              }}
+            >
               <i className="fas fa-download mr-2"></i>Export
             </Button>
           </div>

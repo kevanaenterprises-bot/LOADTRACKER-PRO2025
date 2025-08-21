@@ -219,7 +219,16 @@ export default function Dashboard() {
                   <p className="text-gray-600 mb-4">
                     Register new drivers to assign loads and enable mobile access to the driver portal.
                   </p>
-                  <Button className="w-full">
+                  <Button 
+                    className="w-full"
+                    onClick={() => {
+                      toast({
+                        title: "Add Driver Feature",
+                        description: "This will open a form to add a new driver to the system.",
+                      });
+                      // TODO: Implement add driver modal or redirect to form
+                    }}
+                  >
                     <i className="fas fa-plus mr-2"></i>
                     Add Driver
                   </Button>
