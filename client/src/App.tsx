@@ -15,6 +15,7 @@ import DebugUpload from "@/pages/DebugUpload";
 import UploadTest from "@/pages/UploadTest";
 import QuickUploadPage from "@/pages/QuickUploadPage";
 import InvoiceTestPage from "@/pages/InvoiceTestPage";
+import TestNavigation from "@/components/TestNavigation";
 import SimpleUploadTest from "@/pages/SimpleUploadTest";
 import AdminLogin from "@/pages/AdminLogin";
 import NotFound from "@/pages/not-found";
@@ -59,6 +60,9 @@ function Router() {
       
       {/* Invoice test page */}
       <Route path="/invoice-test" component={InvoiceTestPage} />
+      
+      {/* Test navigation */}
+      <Route path="/test" component={TestNavigation} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (

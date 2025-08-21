@@ -23,15 +23,19 @@ export default function InvoiceTestPage() {
     retry: false,
   });
 
+  // Type the data as arrays
+  const loadsList = Array.isArray(loads) ? loads : [];
+  const invoicesList = Array.isArray(invoices) ? invoices : [];
+
   const triggerInvoiceGeneration = async (loadId: string) => {
     setLoading(true);
     try {
       // First add both BOL and POD documents to trigger invoice generation
-      await apiRequest("PATCH", `/api/loads/${loadId}/pod`, {
+      await apiRequest(`/api/loads/${loadId}/pod`, "PATCH", {
         podDocumentURL: "https://storage.googleapis.com/test/sample-pod.pdf"
       });
 
-      await apiRequest("PATCH", `/api/loads/${loadId}/bol-document`, {
+      await apiRequest(`/api/loads/${loadId}/bol-document`, "PATCH", {
         bolDocumentURL: "https://storage.googleapis.com/test/sample-bol.pdf"
       });
 
@@ -57,7 +61,7 @@ export default function InvoiceTestPage() {
   const completeLoad = async (loadId: string) => {
     setLoading(true);
     try {
-      await apiRequest("POST", `/api/loads/${loadId}/complete`, {});
+      await apiRequest(`/api/loads/${loadId}/complete`, "POST", {});
       
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
@@ -89,7 +93,7 @@ export default function InvoiceTestPage() {
             <div>
               <h3 className="text-lg font-semibold mb-3">Available Loads</h3>
               <div className="space-y-2">
-                {loads.map((load: any) => (
+                {loadsList.map((load: any) => (
                   <Card key={load.id} className="p-3">
                     <div className="flex items-center justify-between">
                       <div>
@@ -129,12 +133,12 @@ export default function InvoiceTestPage() {
             <div>
               <h3 className="text-lg font-semibold mb-3">Generated Invoices</h3>
               <div className="space-y-2">
-                {invoices.length === 0 ? (
+                {invoicesList.length === 0 ? (
                   <Card className="p-3 text-center text-gray-500">
                     No invoices yet. Complete a load to generate an invoice.
                   </Card>
                 ) : (
-                  invoices.map((invoice: any) => (
+                  invoicesList.map((invoice: any) => (
                     <Card key={invoice.id} className="p-3">
                       <div className="flex items-center justify-between">
                         <div>

@@ -97,6 +97,13 @@ export default function Landing() {
                   Driver Login
                 </Button>
               </div>
+              
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <Button onClick={() => setLocation('/test')} variant="ghost" size="lg" className="px-8 py-3 text-lg">
+                  <i className="fas fa-cog mr-2"></i>
+                  Testing & Development Tools
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
