@@ -16,6 +16,7 @@ import ProductionDebug from "@/pages/ProductionDebug";
 import QuickDebugAccess from "@/pages/QuickDebugAccess";
 import SimpleLoadTest from "@/pages/SimpleLoadTest";
 import EmergencyLoadTest from "@/pages/EmergencyLoadTest";
+import DriverTestDebug from "@/pages/DriverTestDebug";
 import UploadTest from "@/pages/UploadTest";
 import QuickUploadPage from "@/pages/QuickUploadPage";
 import InvoiceTestPage from "@/pages/InvoiceTestPage";
@@ -115,6 +116,9 @@ function Router() {
       
       {/* Emergency load test - always accessible */}
       <Route path="/emergency-load-test" component={EmergencyLoadTest} />
+      
+      {/* Driver debug test - always accessible */}
+      <Route path="/driver-debug-test" component={DriverTestDebug} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (
