@@ -1,10 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 export function useAdminAuth() {
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/admin-user"],
-    queryFn: () => apiRequest("/api/auth/admin-user", "GET"),
+    queryFn: async () => {
+      const response = await fetch("/api/auth/admin-user", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Not authenticated");
+      }
+      return response.json();
+    },
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -12,6 +19,6 @@ export function useAdminAuth() {
   return {
     user,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !error,
   };
 }
