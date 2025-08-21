@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ObjectUploader } from "@/components/ObjectUploader";
@@ -16,6 +17,14 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const [selectedLoadId, setSelectedLoadId] = useState<string | null>(null);
+  const driverAuth = useDriverAuth();
+  
+  // Debug authentication status
+  console.log("QuickBOLUpload: Auth status:", {
+    isAuthenticated: driverAuth.isAuthenticated,
+    isLoading: driverAuth.isLoading,
+    user: driverAuth.user
+  });
 
   // Find loads that have BOL numbers but no BOL documents
   const loadsNeedingBOL = allLoads.filter(load => 
@@ -85,9 +94,23 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
   const handleGetUploadParameters = async () => {
     try {
       console.log("QuickBOLUpload: Getting upload parameters...");
+      console.log("QuickBOLUpload: Current auth state:", {
+        isAuthenticated: driverAuth.isAuthenticated,
+        user: driverAuth.user
+      });
+      
+      // First check if we're authenticated
+      if (!driverAuth.isAuthenticated) {
+        console.error("QuickBOLUpload: Not authenticated as driver");
+        throw new Error("Not authenticated as driver. Please log in first.");
+      }
+      
       const response = await fetch("/api/objects/upload", {
         method: "POST",
         credentials: "include",
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       console.log("QuickBOLUpload: Upload URL response status:", response.status);
@@ -130,6 +153,28 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
     console.log("QuickBOLUpload: Upload started");
     setUploading(true);
   };
+
+  // Show authentication status for debugging
+  if (!driverAuth.isAuthenticated) {
+    return (
+      <Card className="material-card border-l-4 border-l-red-500">
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <i className="fas fa-exclamation-triangle text-red-500 text-2xl mb-2"></i>
+            <p className="text-sm font-medium text-red-700">Not Logged In</p>
+            <p className="text-xs text-gray-600 mt-1">You must be logged in as a driver to upload BOL documents</p>
+            <Button 
+              className="mt-3 text-xs" 
+              size="sm"
+              onClick={() => window.location.href = "/driver-login"}
+            >
+              Go to Driver Login
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (loadsNeedingBOL.length === 0) {
     return (
