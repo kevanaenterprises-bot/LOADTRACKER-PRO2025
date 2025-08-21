@@ -40,7 +40,7 @@ export default function DriverLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: DriverLoginForm) => {
-      const response = await fetch("/api/auth/driver-login", {
+      const response = await fetch("/api/driver/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DirectUploader } from "@/components/DirectUploader";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { Check } from "lucide-react";
 
 interface QuickBOLUploadProps {
   currentLoad?: any;
@@ -269,15 +270,29 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
               </div>
             </div>
           ) : (
-            <DirectUploader
-              accept="image/*,.pdf"
-              maxFileSize={10485760} // 10MB
-              onUploadComplete={(uploadUrl) => {
-                console.log("QuickBOLUpload: DirectUploader completed with URL:", uploadUrl);
-                updateBOLDocumentMutation.mutate(uploadUrl);
-              }}
-              className="w-full"
-            />
+            <div className="space-y-3">
+              <DirectUploader
+                accept="image/*,.pdf"
+                maxFileSize={10485760} // 10MB
+                onUploadComplete={(uploadUrl) => {
+                  console.log("QuickBOLUpload: DirectUploader completed with URL:", uploadUrl);
+                  updateBOLDocumentMutation.mutate(uploadUrl);
+                }}
+                className="w-full"
+              />
+              {updateBOLDocumentMutation.isPending && (
+                <div className="text-sm text-blue-600 flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  <span>Updating load record...</span>
+                </div>
+              )}
+              {updateBOLDocumentMutation.isSuccess && (
+                <div className="text-sm text-green-600 flex items-center space-x-2">
+                  <Check className="h-4 w-4" />
+                  <span>BOL document saved successfully!</span>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </CardContent>
