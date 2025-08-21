@@ -45,6 +45,18 @@ export default function Landing() {
           <i className="fas fa-truck mr-3 text-xl"></i>
           Driver Login
         </Button>
+        
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <Button 
+            onClick={() => setLocation("/quick-assign")} 
+            variant="outline" 
+            size="sm" 
+            className="w-full bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+          >
+            <i className="fas fa-vial mr-2"></i>
+            Test Driver Assignment
+          </Button>
+        </div>
       </div>
     </div>
   );
