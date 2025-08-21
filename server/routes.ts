@@ -506,7 +506,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Assign driver to load
-  app.patch("/api/loads/:id/assign-driver", isAdminAuthenticated, async (req, res) => {
+  app.patch("/api/loads/:id/assign-driver", (req, res, next) => {
+    // Allow admin, Replit auth, or driver auth for load assignment
+    if ((req.session as any)?.adminAuth || req.user || (req.session as any)?.driverAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const { driverId } = req.body;
       const loadId = req.params.id;
@@ -1038,8 +1045,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Load tracking endpoint for real-time map - temporarily without auth for testing
-  app.get("/api/tracking/loads", async (req, res) => {
+  // Load tracking endpoint for real-time map
+  app.get("/api/tracking/loads", (req, res, next) => {
+    // Allow admin, Replit auth, or driver auth for tracking data
+    if ((req.session as any)?.adminAuth || req.user || (req.session as any)?.driverAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     console.log("Tracking endpoint reached");
     try {
       const trackingLoads = await storage.getLoadsWithTracking();
