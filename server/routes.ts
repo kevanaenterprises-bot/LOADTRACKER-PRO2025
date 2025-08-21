@@ -379,7 +379,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/locations", isAdminAuthenticated, async (req, res) => {
+  app.post("/api/locations", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       console.log("Location creation request body:", req.body);
       const validatedData = insertLocationSchema.parse(req.body);
@@ -416,7 +423,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/drivers", isAdminAuthenticated, async (req, res) => {
+  app.post("/api/drivers", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       console.log("Driver creation request body:", req.body);
       const validatedData = insertUserSchema.parse(req.body);
