@@ -12,8 +12,24 @@ export async function apiRequest(
   method: string,
   data?: unknown | undefined,
 ): Promise<any> {
-  // Add bypass token if available
-  const bypassToken = localStorage.getItem('bypass-token');
+  // Always try to get bypass token first if not available
+  let bypassToken = localStorage.getItem('bypass-token');
+  if (!bypassToken) {
+    try {
+      const response = await fetch("/api/auth/browser-bypass", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        const tokenData = await response.json();
+        localStorage.setItem('bypass-token', tokenData.token);
+        bypassToken = tokenData.token;
+      }
+    } catch (error) {
+      // Continue without bypass token
+    }
+  }
+  
   const headers: any = data ? { "Content-Type": "application/json" } : {};
   
   if (bypassToken) {
