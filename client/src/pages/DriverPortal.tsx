@@ -101,7 +101,7 @@ export default function DriverPortal() {
       <div className="p-4">
         {/* Quick BOL Upload - Always at the top */}
         <div className="mb-6">
-          <QuickBOLUpload currentLoad={currentLoad} />
+          <QuickBOLUpload currentLoad={currentLoad} allLoads={loads} />
         </div>
 
         {/* Current Load Card */}

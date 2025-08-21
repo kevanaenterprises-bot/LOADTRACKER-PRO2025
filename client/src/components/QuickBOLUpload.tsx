@@ -8,20 +8,34 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 
 interface QuickBOLUploadProps {
   currentLoad?: any;
+  allLoads?: any[];
 }
 
-export default function QuickBOLUpload({ currentLoad }: QuickBOLUploadProps) {
+export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLUploadProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
+  const [selectedLoadId, setSelectedLoadId] = useState<string | null>(null);
+
+  // Find loads that have BOL numbers but no BOL documents
+  const loadsNeedingBOL = allLoads.filter(load => 
+    load.bolNumber && !load.bolDocumentPath
+  );
+
+  // If there's a current load that needs BOL, prioritize it
+  const priorityLoad = currentLoad && loadsNeedingBOL.find(load => load.id === currentLoad.id);
+  const defaultLoadId = priorityLoad?.id || loadsNeedingBOL[0]?.id || null;
+
+  const activeLoadId = selectedLoadId || defaultLoadId;
+  const activeLoad = allLoads.find(load => load.id === activeLoadId);
 
   const updateBOLDocumentMutation = useMutation({
     mutationFn: async (uploadURL: string) => {
-      if (!currentLoad?.id) {
-        throw new Error("No active load found");
+      if (!activeLoadId) {
+        throw new Error("No load selected");
       }
       
-      const response = await fetch(`/api/loads/${currentLoad.id}/bol-document`, {
+      const response = await fetch(`/api/loads/${activeLoadId}/bol-document`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -44,6 +58,7 @@ export default function QuickBOLUpload({ currentLoad }: QuickBOLUploadProps) {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
       setUploading(false);
+      setSelectedLoadId(null); // Reset selection
     },
     onError: (error: Error) => {
       if (isUnauthorizedError(error)) {
@@ -95,26 +110,14 @@ export default function QuickBOLUpload({ currentLoad }: QuickBOLUploadProps) {
     setUploading(true);
   };
 
-  if (!currentLoad) {
-    return (
-      <Card className="material-card border-l-4 border-l-yellow-500">
-        <CardContent className="pt-6">
-          <div className="text-center">
-            <i className="fas fa-info-circle text-yellow-500 text-2xl mb-2"></i>
-            <p className="text-sm text-gray-600">No active loads - BOL upload not available</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (currentLoad.bolDocumentPath) {
+  if (loadsNeedingBOL.length === 0) {
     return (
       <Card className="material-card border-l-4 border-l-green-500">
         <CardContent className="pt-6">
           <div className="text-center">
             <i className="fas fa-check-circle text-green-500 text-2xl mb-2"></i>
-            <p className="text-sm font-medium text-green-700">BOL document uploaded for Load #{currentLoad.loadNumber}</p>
+            <p className="text-sm font-medium text-green-700">All BOL documents uploaded!</p>
+            <p className="text-xs text-gray-600 mt-1">No loads need BOL photos</p>
           </div>
         </CardContent>
       </Card>
@@ -126,15 +129,47 @@ export default function QuickBOLUpload({ currentLoad }: QuickBOLUploadProps) {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center">
           <i className="fas fa-camera mr-2 text-blue-500"></i>
-          Upload BOL for Load #{currentLoad.loadNumber}
+          Upload BOL Document ({loadsNeedingBOL.length} load{loadsNeedingBOL.length !== 1 ? 's' : ''} need BOL photos)
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600">
-            <strong>{currentLoad.pickupLocation}</strong> → <strong>{currentLoad.deliveryLocation}</strong>
-          </p>
+        <div className="space-y-4">
+          {/* Load Selection Dropdown (if multiple loads) */}
+          {loadsNeedingBOL.length > 1 && (
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Select Load:
+              </label>
+              <select 
+                value={activeLoadId || ''} 
+                onChange={(e) => setSelectedLoadId(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md bg-white text-sm"
+              >
+                {loadsNeedingBOL.map((load) => (
+                  <option key={load.id} value={load.id}>
+                    Load #{load.loadNumber || load.number109} - BOL: {load.bolNumber}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Active Load Info */}
+          {activeLoad && (
+            <div className="bg-gray-50 p-3 rounded-md">
+              <div className="text-sm font-medium text-gray-900">
+                Load #{activeLoad.loadNumber || activeLoad.number109}
+              </div>
+              <div className="text-sm text-gray-600">
+                BOL: <strong>{activeLoad.bolNumber}</strong>
+              </div>
+              <div className="text-sm text-gray-600">
+                <strong>{activeLoad.pickupLocation}</strong> → <strong>{activeLoad.deliveryLocation}</strong>
+              </div>
+            </div>
+          )}
           
+          {/* Upload Section */}
           {uploading || updateBOLDocumentMutation.isPending ? (
             <div className="text-center py-4">
               <div className="flex items-center justify-center space-x-3">
