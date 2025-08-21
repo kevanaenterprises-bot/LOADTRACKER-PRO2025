@@ -153,6 +153,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/admin-user", async (req, res) => {
     try {
       const adminUser = (req.session as any)?.adminAuth;
+      console.log("Admin user check:", { 
+        hasSession: !!req.session, 
+        hasAdminAuth: !!adminUser,
+        sessionId: req.sessionID
+      });
+      
       if (adminUser) {
         res.json(adminUser);
       } else {
@@ -175,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Dashboard stats
-  app.get("/api/dashboard/stats", isAuthenticated, async (req, res) => {
+  app.get("/api/dashboard/stats", isAdminAuthenticated, async (req, res) => {
     try {
       const stats = await storage.getDashboardStats();
       res.json(stats);

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 
 export default function AdminLogin() {
   const [, setLocation] = useLocation();
@@ -34,8 +35,14 @@ export default function AdminLogin() {
           title: "Login Successful",
           description: "Welcome to GO 4 Farms & Cattle Admin Portal",
         });
-        // Force reload to refresh authentication state
-        window.location.href = "/";
+        
+        // Invalidate auth queries to refresh the state
+        await queryClient.invalidateQueries({ queryKey: ["/api/auth/admin-user"] });
+        await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+        
+        // Navigate to dashboard
+        setLocation("/dashboard");
       } else {
         const data = await response.json();
         toast({
