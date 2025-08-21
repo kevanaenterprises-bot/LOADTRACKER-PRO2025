@@ -224,6 +224,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/drivers", isAdminAuthenticated, async (req, res) => {
+    try {
+      const validatedData = insertUserSchema.parse(req.body);
+      const driver = await storage.createUser({
+        ...validatedData,
+        role: "driver",
+        email: validatedData.email || null,
+      });
+      res.status(201).json(driver);
+    } catch (error) {
+      console.error("Error creating driver:", error);
+      res.status(400).json({ message: "Invalid driver data" });
+    }
+  });
+
   app.get("/api/drivers/available", isAdminAuthenticated, async (req, res) => {
     try {
       const drivers = await storage.getAvailableDrivers();
@@ -485,7 +500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Rates
-  app.get("/api/rates", isAuthenticated, async (req, res) => {
+  app.get("/api/rates", isAdminAuthenticated, async (req, res) => {
     try {
       const rates = await storage.getRates();
       res.json(rates);
@@ -495,7 +510,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/rates", isAuthenticated, async (req, res) => {
+  app.post("/api/rates", isAdminAuthenticated, async (req, res) => {
     try {
       const validatedData = insertRateSchema.parse(req.body);
       const rate = await storage.createRate(validatedData);

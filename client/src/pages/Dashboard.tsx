@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useMainAuth } from "@/hooks/useMainAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import StatsCards from "@/components/StatsCards";
 import LoadForm from "@/components/LoadForm";
@@ -11,12 +15,41 @@ import InvoiceInbox from "@/components/InvoiceInbox";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Form schemas
+const driverSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
+  username: z.string().min(1, "Username is required"),
+});
+
+const locationSchema = z.object({
+  name: z.string().min(1, "Location name is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(2, "State is required").max(2, "Use 2-letter state code"),
+  zipCode: z.string().min(5, "ZIP code is required"),
+});
+
+const rateSchema = z.object({
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(2, "State is required").max(2, "Use 2-letter state code"),
+  flatRate: z.coerce.number().min(0, "Rate must be non-negative"),
+});
 
 export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "invoicing">("loads");
+  const [driverDialogOpen, setDriverDialogOpen] = useState(false);
+  const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+  const [rateDialogOpen, setRateDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -36,6 +69,103 @@ export default function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
     enabled: isAuthenticated && !isLoading,
+  });
+
+  // Form handlers
+  const driverForm = useForm({
+    resolver: zodResolver(driverSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      username: "",
+    },
+  });
+
+  const locationForm = useForm({
+    resolver: zodResolver(locationSchema),
+    defaultValues: {
+      name: "",
+      city: "",
+      state: "",
+      zipCode: "",
+    },
+  });
+
+  const rateForm = useForm({
+    resolver: zodResolver(rateSchema),
+    defaultValues: {
+      city: "",
+      state: "",
+      flatRate: 0,
+    },
+  });
+
+  // Mutations
+  const createDriverMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("POST", "/api/drivers", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Driver Added",
+        description: "New driver has been successfully registered.",
+      });
+      driverForm.reset();
+      setDriverDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/drivers/available"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add driver. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createLocationMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("POST", "/api/locations", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Location Added",
+        description: "New location has been successfully created.",
+      });
+      locationForm.reset();
+      setLocationDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add location. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const createRateMutation = useMutation({
+    mutationFn: async (data: any) => {
+      return await apiRequest("POST", "/api/rates", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Rate Added",
+        description: "New rate has been successfully created.",
+      });
+      rateForm.reset();
+      setRateDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/rates"] });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add rate. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading || !isAuthenticated) {
@@ -207,7 +337,7 @@ export default function Dashboard() {
 
           {/* Driver Management Tab */}
           <TabsContent value="drivers" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -219,19 +349,78 @@ export default function Dashboard() {
                   <p className="text-gray-600 mb-4">
                     Register new drivers to assign loads and enable mobile access to the driver portal.
                   </p>
-                  <Button 
-                    className="w-full"
-                    onClick={() => {
-                      toast({
-                        title: "Add Driver Feature",
-                        description: "This will open a form to add a new driver to the system.",
-                      });
-                      // TODO: Implement add driver modal or redirect to form
-                    }}
-                  >
-                    <i className="fas fa-plus mr-2"></i>
-                    Add Driver
-                  </Button>
+                  <Dialog open={driverDialogOpen} onOpenChange={setDriverDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full">
+                        <i className="fas fa-plus mr-2"></i>
+                        Add Driver
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Driver</DialogTitle>
+                      </DialogHeader>
+                      <Form {...driverForm}>
+                        <form onSubmit={driverForm.handleSubmit((data) => createDriverMutation.mutate(data))} className="space-y-4">
+                          <FormField
+                            control={driverForm.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>First Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="John" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={driverForm.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Last Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Smith" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={driverForm.control}
+                            name="phoneNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Phone Number</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="1234567890" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={driverForm.control}
+                            name="username"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Username (for driver login)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="john_smith" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button type="submit" disabled={createDriverMutation.isPending}>
+                            {createDriverMutation.isPending ? "Adding..." : "Add Driver"}
+                          </Button>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
 
@@ -250,6 +439,167 @@ export default function Dashboard() {
                     <i className="fas fa-eye mr-2"></i>
                     View Driver Portal
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* Add Location Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-map-marker-alt text-primary"></i>
+                    Add Location
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 mb-4">
+                    Register new delivery locations for load assignments and rate calculations.
+                  </p>
+                  <Dialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full">
+                        <i className="fas fa-plus mr-2"></i>
+                        Add Location
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Location</DialogTitle>
+                      </DialogHeader>
+                      <Form {...locationForm}>
+                        <form onSubmit={locationForm.handleSubmit((data) => createLocationMutation.mutate(data))} className="space-y-4">
+                          <FormField
+                            control={locationForm.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Location Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Miami Distribution Center" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={locationForm.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>City</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Miami" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={locationForm.control}
+                            name="state"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>State</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="FL" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={locationForm.control}
+                            name="zipCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>ZIP Code</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="33101" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button type="submit" disabled={createLocationMutation.isPending}>
+                            {createLocationMutation.isPending ? "Adding..." : "Add Location"}
+                          </Button>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
+                </CardContent>
+              </Card>
+
+              {/* Add Rate Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-dollar-sign text-primary"></i>
+                    Add Rate
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 mb-4">
+                    Set flat rates for city/state combinations to automatically calculate load payments.
+                  </p>
+                  <Dialog open={rateDialogOpen} onOpenChange={setRateDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full">
+                        <i className="fas fa-plus mr-2"></i>
+                        Add Rate
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Rate</DialogTitle>
+                      </DialogHeader>
+                      <Form {...rateForm}>
+                        <form onSubmit={rateForm.handleSubmit((data) => createRateMutation.mutate(data))} className="space-y-4">
+                          <FormField
+                            control={rateForm.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>City</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Miami" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={rateForm.control}
+                            name="state"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>State</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="FL" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={rateForm.control}
+                            name="flatRate"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Flat Rate ($)</FormLabel>
+                                <FormControl>
+                                  <Input type="number" placeholder="2500.00" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button type="submit" disabled={createRateMutation.isPending}>
+                            {createRateMutation.isPending ? "Adding..." : "Add Rate"}
+                          </Button>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             </div>
