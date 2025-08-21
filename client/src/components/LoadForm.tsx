@@ -43,7 +43,7 @@ export default function LoadForm() {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      number109: `109-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}`,
+      number109: "109",
       locationId: "",
       driverId: "",
       estimatedMiles: 0,
@@ -74,7 +74,7 @@ export default function LoadForm() {
         description: "Load created successfully and driver notified!",
       });
       form.reset({
-        number109: `109-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}`,
+        number109: "109",
         locationId: "",
         driverId: "",
         estimatedMiles: 0,
