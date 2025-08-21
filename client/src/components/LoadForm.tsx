@@ -61,7 +61,12 @@ export default function LoadForm() {
 
   const createLoadMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      await apiRequest("/api/loads", "POST", data);
+      console.log("Load creation data being sent:", data);
+      console.log("Available locations:", locations);
+      if (!data.locationId) {
+        throw new Error("Please select a location");
+      }
+      return await apiRequest("/api/loads", "POST", data);
     },
     onSuccess: () => {
       toast({
@@ -140,11 +145,17 @@ export default function LoadForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {locations.map((location: any) => (
-                        <SelectItem key={location.id} value={location.id}>
-                          {location.name} - {location.city}, {location.state}
+                      {locations.length > 0 ? (
+                        locations.map((location: any) => (
+                          <SelectItem key={location.id} value={location.id}>
+                            {location.name} - {location.city}, {location.state}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="no-locations" disabled>
+                          No locations available - Add locations first
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

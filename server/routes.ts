@@ -362,7 +362,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Locations
-  app.get("/api/locations", isAdminAuthenticated, async (req, res) => {
+  app.get("/api/locations", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const locations = await storage.getLocations();
       res.json(locations);
@@ -569,6 +576,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     try {
       console.log("Load creation - validating request body:", JSON.stringify(req.body));
+      
+      // Validate location exists if provided
+      if (req.body.locationId) {
+        const location = await storage.getLocation(req.body.locationId);
+        if (!location) {
+          console.log("Load creation failed - location not found:", req.body.locationId);
+          return res.status(400).json({ message: "Selected location does not exist. Please add the location first." });
+        }
+        console.log("Location validated:", location.name);
+      }
+      
       const validatedData = insertLoadSchema.parse(req.body);
       console.log("Load creation - validation successful, creating load:", validatedData);
       
@@ -609,6 +627,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error?.name === 'ZodError') {
         console.error("Zod validation errors:", error.errors);
         res.status(400).json({ message: "Invalid load data", errors: error.errors });
+      } else if (error?.code === '23503') {
+        // Foreign key constraint violation
+        console.error("Foreign key constraint violation:", error.detail);
+        res.status(400).json({ message: "Selected location or driver does not exist. Please refresh and try again." });
       } else {
         res.status(400).json({ message: error?.message || "Invalid load data" });
       }

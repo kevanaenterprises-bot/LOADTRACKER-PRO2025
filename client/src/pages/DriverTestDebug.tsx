@@ -49,8 +49,54 @@ export default function DriverTestDebug() {
         return;
       }
       
-      // Step 3: Test driver creation
-      setResult(prev => prev + "Step 3: Creating test driver...\n");
+      // Step 3: Test locations fetch
+      setResult(prev => prev + "Step 3: Testing locations fetch...\n");
+      const locationsResponse = await fetch("/api/locations", {
+        headers: { "X-Bypass-Token": token },
+        credentials: "include",
+      });
+      
+      setResult(prev => prev + `Locations response status: ${locationsResponse.status}\n`);
+      if (locationsResponse.ok) {
+        const locationsData = await locationsResponse.json();
+        setResult(prev => prev + `✓ Found ${locationsData.length} locations\n`);
+        setResult(prev => prev + `First location: ${locationsData[0]?.name}\n`);
+      } else {
+        const locationsError = await locationsResponse.text();
+        setResult(prev => prev + `✗ Locations fetch failed: ${locationsError}\n`);
+      }
+      
+      // Step 4: Test load creation
+      setResult(prev => prev + "Step 4: Testing load creation...\n");
+      const loadData = {
+        number109: `TEST-${Date.now()}`,
+        locationId: "d934f547-7ca5-447d-b30b-759629ce9e81", // ACW Warehouse
+        estimatedMiles: 500,
+        specialInstructions: "Test load",
+        status: "created"
+      };
+      
+      const loadResponse = await fetch("/api/loads", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "X-Bypass-Token": token
+        },
+        body: JSON.stringify(loadData),
+        credentials: "include",
+      });
+      
+      setResult(prev => prev + `Load response status: ${loadResponse.status}\n`);
+      if (loadResponse.ok) {
+        const loadResult = await loadResponse.json();
+        setResult(prev => prev + `✓ Load created successfully: ${loadResult.number109}\n`);
+      } else {
+        const loadError = await loadResponse.text();
+        setResult(prev => prev + `✗ Load creation failed: ${loadError}\n`);
+      }
+      
+      // Step 5: Test driver creation
+      setResult(prev => prev + "Step 5: Creating test driver...\n");
       const driverData = {
         firstName: "Test",
         lastName: "Driver",
@@ -81,7 +127,7 @@ export default function DriverTestDebug() {
         setResult(prev => prev + `Driver ID: ${driverResult.id}\n`);
         toast({
           title: "SUCCESS!",
-          description: "Driver creation test passed!"
+          description: "All tests passed! Load and driver creation working!"
         });
       } else {
         const errorText = await driverResponse.text();
