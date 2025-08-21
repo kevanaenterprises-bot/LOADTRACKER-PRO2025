@@ -75,28 +75,36 @@ export default function AdminTestPage() {
   const testDriverAssignment = async () => {
     try {
       const token = bypassToken || localStorage.getItem('bypass-token');
+      
+      if (!token) {
+        toast({ title: "No Token", description: "Please get auth token first", variant: "destructive" });
+        return;
+      }
+
       const headers: any = {
         "Content-Type": "application/json",
+        "X-Bypass-Token": token,
       };
-      
-      if (token) {
-        headers['X-Bypass-Token'] = token;
-      }
+
+      console.log("Making assignment request with token:", token.substring(0, 10) + "...");
 
       const response = await fetch("/api/loads/5fac985a-8dc7-49ee-b207-164e32a08da3/assign-driver", {
         method: "PATCH",
         headers,
         credentials: "include",
-        body: JSON.stringify({ driverId: "3d695e14-15c8-47df-9d09-2d458738b4c4" }),
+        body: JSON.stringify({ driverId: "56bc6d44-74d9-4966-beb8-696f20dc18b6" }),
       });
 
       const result = await response.json();
+      console.log("Assignment response:", { status: response.status, result });
+      
       if (response.ok) {
-        toast({ title: "Driver assigned", description: "Assignment successful" });
+        toast({ title: "Driver assigned successfully", description: `${result.driver?.firstName || 'Driver'} assigned to load ${result.number109}` });
       } else {
-        toast({ title: "Assignment failed", description: result.message, variant: "destructive" });
+        toast({ title: "Assignment failed", description: result.message || "Unknown error", variant: "destructive" });
       }
     } catch (error) {
+      console.error("Assignment error:", error);
       toast({ title: "Error", description: "Assignment request failed", variant: "destructive" });
     }
   };
@@ -132,8 +140,8 @@ export default function AdminTestPage() {
           <div className="flex gap-2 flex-wrap">
             <Button onClick={testLogin}>Login</Button>
             <Button onClick={checkSession} variant="outline">Check Session</Button>
-            <Button onClick={activateBrowserBypass} variant="default" className="bg-orange-600 hover:bg-orange-700">
-              Browser Bypass
+            <Button onClick={activateBrowserBypass} className="bg-green-500 hover:bg-green-600 text-white">
+              Get Auth Token
             </Button>
             <Button onClick={testDriverAssignment} variant="secondary">Test Assignment</Button>
           </div>
