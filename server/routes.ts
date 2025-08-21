@@ -445,7 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const updatedInvoice = await storage.updateInvoice(invoiceId, {
-        printedAt: new Date().toISOString(),
+        printedAt: new Date(),
       });
 
       res.json({ message: "Invoice marked as printed", invoice: updatedInvoice });
