@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import DriverLoadCard from "@/components/DriverLoadCard";
 import BOLEntryForm from "@/components/BOLEntryForm";
+import QuickBOLUpload from "@/components/QuickBOLUpload";
 import { Button } from "@/components/ui/button";
 
 export default function DriverPortal() {
@@ -98,6 +99,11 @@ export default function DriverPortal() {
       </div>
 
       <div className="p-4">
+        {/* Quick BOL Upload - Always at the top */}
+        <div className="mb-6">
+          <QuickBOLUpload currentLoad={currentLoad} />
+        </div>
+
         {/* Current Load Card */}
         {currentLoad ? (
           <DriverLoadCard load={currentLoad} />

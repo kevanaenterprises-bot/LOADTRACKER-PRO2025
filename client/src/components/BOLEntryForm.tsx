@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
-import { ObjectUploader } from "@/components/ObjectUploader";
+
 import { z } from "zod";
 import {
   Form,
@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ObjectUploader } from "@/components/ObjectUploader";
 
 const bolFormSchema = z.object({
   bolNumber: z.string().min(1, "BOL Number is required"),
@@ -34,7 +35,7 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [podUploaded, setPodUploaded] = useState(false);
-  const [bolUploaded, setBolUploaded] = useState(false);
+
 
   const form = useForm<BOLFormData>({
     resolver: zodResolver(bolFormSchema),
@@ -120,37 +121,6 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
     },
   });
 
-  const updateBOLDocumentMutation = useMutation({
-    mutationFn: async (bolDocumentURL: string) => {
-      await apiRequest("PATCH", `/api/loads/${load.id}/bol-document`, { bolDocumentURL });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "BOL document uploaded successfully!",
-      });
-      setBolUploaded(true);
-      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
-    },
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Error",
-        description: "Failed to upload BOL document",
-        variant: "destructive",
-      });
-    },
-  });
 
   const updatePODMutation = useMutation({
     mutationFn: async (podDocumentURL: string) => {
@@ -248,12 +218,7 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
     };
   };
 
-  const handleBOLUploadComplete = (result: any) => {
-    if (result.successful && result.successful[0]) {
-      const uploadURL = result.successful[0].uploadURL;
-      updateBOLDocumentMutation.mutate(uploadURL);
-    }
-  };
+
 
   const handlePODUploadComplete = (result: any) => {
     if (result.successful && result.successful[0]) {
@@ -369,44 +334,7 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
         </CardContent>
       </Card>
 
-      {/* BOL Document Upload Section */}
-      <Card className="material-card">
-        <CardHeader>
-          <CardTitle>Upload BOL Photo/Document</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {load.bolDocumentPath || bolUploaded ? (
-            <div className="text-center py-6">
-              <i className="fas fa-check-circle text-success text-4xl mb-4"></i>
-              <p className="text-success font-medium">BOL document uploaded successfully!</p>
-            </div>
-          ) : (
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">Take a photo or upload BOL document</p>
-              <ObjectUploader
-                maxNumberOfFiles={1}
-                maxFileSize={10485760} // 10MB
-                onGetUploadParameters={handleGetUploadParameters}
-                onComplete={handleBOLUploadComplete}
-                buttonClassName="w-full"
-              >
-                <div className="flex items-center justify-center">
-                  <i className="fas fa-camera mr-2"></i>
-                  Take Photo / Upload BOL
-                </div>
-              </ObjectUploader>
-              {updateBOLDocumentMutation.isPending && (
-                <div className="mt-4">
-                  <div className="flex items-center justify-center space-x-3">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                    <span className="text-sm text-gray-600">Uploading BOL document...</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
 
       {/* POD Upload Section */}
       {canShowPODUpload && (
