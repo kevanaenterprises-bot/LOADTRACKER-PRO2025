@@ -42,7 +42,7 @@ export default function AdminLogin() {
         await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
         
         // Navigate to dashboard
-        setLocation("/admin-test");
+        setLocation("/dashboard");
       } else {
         const data = await response.json();
         toast({
