@@ -434,8 +434,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Manual invoice generation endpoint
-  app.post("/api/loads/:id/generate-invoice", isAdminAuthenticated, async (req, res) => {
+  // Manual invoice generation endpoint - Support multiple auth methods
+  app.post("/api/loads/:id/generate-invoice", (req, res, next) => {
+    // Check for any valid authentication: Replit Auth, Admin Auth, or Driver Auth
+    const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
+    const hasAdminAuth = (req.session as any)?.adminAuth;
+    const hasDriverAuth = (req.session as any)?.driverAuth;
+    
+    console.log("Manual invoice generation auth check:", {
+      hasReplitAuth,
+      hasAdminAuth: !!hasAdminAuth,
+      hasDriverAuth: !!hasDriverAuth,
+      sessionId: req.sessionID?.slice(0, 8)
+    });
+    
+    if (!hasReplitAuth && !hasAdminAuth && !hasDriverAuth) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    next();
+  }, async (req, res) => {
     try {
       const loadId = req.params.id;
       const load = await storage.getLoad(loadId);

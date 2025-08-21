@@ -85,7 +85,7 @@ export default function LoadsTable() {
   // Manual invoice generation mutation
   const generateInvoiceMutation = useMutation({
     mutationFn: async (loadId: string) => {
-      return await apiRequest(`/api/loads/${loadId}/generate-invoice`, "POST", {});
+      return await apiRequest("/api/loads/" + loadId + "/generate-invoice", "POST", {});
     },
     onSuccess: (data: any) => {
       toast({
@@ -97,20 +97,18 @@ export default function LoadsTable() {
       setDialogOpen(false);
     },
     onError: (error: any) => {
+      console.error("Invoice generation error:", error);
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: "Authentication Required",
+          description: "Please log in as admin or driver to generate invoices.",
           variant: "destructive",
         });
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 500);
         return;
       }
       toast({
-        title: "Error",
-        description: error.message || "Failed to generate invoice.",
+        title: "Invoice Generation Failed",
+        description: error.message || "Unable to generate invoice. Check if load has destination and rates are configured.",
         variant: "destructive",
       });
     },

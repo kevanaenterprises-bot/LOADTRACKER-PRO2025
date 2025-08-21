@@ -108,6 +108,10 @@ export default function Landing() {
                     <i className="fas fa-mouse-pointer mr-2"></i>
                     Test Load Clicks
                   </Button>
+                  <Button onClick={() => setLocation('/quick-invoice')} variant="ghost" size="lg" className="px-8 py-3 text-lg">
+                    <i className="fas fa-file-invoice mr-2"></i>
+                    Quick Invoice Test
+                  </Button>
                 </div>
               </div>
             </CardContent>
