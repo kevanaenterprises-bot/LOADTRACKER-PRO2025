@@ -10,11 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-**August 21, 2025 - Implemented OCR Wright Con Scanner**
+**August 21, 2025 - Implemented OCR Wright Con Scanner with Edit Capability**
 - ✅ Added Anthropic Claude 4.0 Sonnet OCR service for reading rate confirmation images
 - ✅ Created Wright Con Scanner tab in Dashboard for image upload and processing
 - ✅ Auto-extracts: load numbers, PO numbers, appointment times, company names, pickup/delivery addresses
-- ✅ Automatically generates loads from extracted Wright Con data with confidence scoring
+- ✅ **Edit functionality** - Users can review and correct extracted data before creating loads
+- ✅ Toggle between read-only view and editable form for data verification
+- ✅ Automatically generates loads from corrected Wright Con data with confidence scoring
 - ✅ Updated database schema with OCR fields: poNumber, appointmentTime, pickupAddress, deliveryAddress, companyName
 - ✅ Added multer file upload support for image processing (10MB limit, image files only)
 

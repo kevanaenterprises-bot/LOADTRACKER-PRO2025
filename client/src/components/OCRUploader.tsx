@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileText, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Upload, FileText, Loader2, CheckCircle, AlertCircle, Edit3 } from "lucide-react";
 
 interface ExtractedData {
   loadNumber?: string;
@@ -19,12 +25,36 @@ interface ExtractedData {
   rawText?: string;
 }
 
+// Form schema for editing extracted data
+const extractedDataSchema = z.object({
+  loadNumber: z.string().optional(),
+  poNumber: z.string().optional(),
+  appointmentTime: z.string().optional(),
+  companyName: z.string().optional(),
+  pickupAddress: z.string().optional(),
+  deliveryAddress: z.string().optional(),
+});
+
 export function OCRUploader() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Form for editing extracted data
+  const form = useForm<z.infer<typeof extractedDataSchema>>({
+    resolver: zodResolver(extractedDataSchema),
+    defaultValues: {
+      loadNumber: "",
+      poNumber: "",
+      appointmentTime: "",
+      companyName: "",
+      pickupAddress: "",
+      deliveryAddress: "",
+    },
+  });
 
   const extractDataMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -44,9 +74,18 @@ export function OCRUploader() {
     },
     onSuccess: (data) => {
       setExtractedData(data);
+      // Update form with extracted data
+      form.reset({
+        loadNumber: data.loadNumber || "",
+        poNumber: data.poNumber || "",
+        appointmentTime: data.appointmentTime || "",
+        companyName: data.companyName || "",
+        pickupAddress: data.pickupAddress || "",
+        deliveryAddress: data.deliveryAddress || "",
+      });
       toast({
         title: "Data Extracted",
-        description: `Found data with ${Math.round(data.confidence * 100)}% confidence`,
+        description: `Found data with ${Math.round(data.confidence * 100)}% confidence. Review and edit if needed.`,
       });
     },
     onError: (error) => {
@@ -60,8 +99,13 @@ export function OCRUploader() {
   });
 
   const generateLoadMutation = useMutation({
-    mutationFn: async (extractedData: ExtractedData) => {
-      return await apiRequest('/api/ocr/generate-load', 'POST', extractedData);
+    mutationFn: async (formData: z.infer<typeof extractedDataSchema>) => {
+      // Combine form data with original confidence score
+      const dataToSend = {
+        ...formData,
+        confidence: extractedData?.confidence || 0.8, // Use original confidence or default
+      };
+      return await apiRequest('/api/ocr/generate-load', 'POST', dataToSend);
     },
     onSuccess: (data) => {
       toast({
@@ -69,9 +113,11 @@ export function OCRUploader() {
         description: `Load ${data.number109} created successfully`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
-      // Reset the form
+      // Reset the form and states
       setSelectedFile(null);
       setExtractedData(null);
+      setIsEditing(false);
+      form.reset();
     },
     onError: (error) => {
       console.error("Load generation failed:", error);
@@ -190,59 +236,173 @@ export function OCRUploader() {
           </div>
         )}
 
-        {/* Extracted Data */}
+        {/* Extracted Data - Editable Form */}
         {extractedData && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Extracted Data</h3>
-              <Badge className={getConfidenceColor(extractedData.confidence)}>
-                {Math.round(extractedData.confidence * 100)}% Confidence
-              </Badge>
+              <h3 className="text-lg font-semibold">
+                {isEditing ? "Edit Extracted Data" : "Extracted Data"}
+              </h3>
+              <div className="flex items-center gap-2">
+                <Badge className={getConfidenceColor(extractedData.confidence)}>
+                  {Math.round(extractedData.confidence * 100)}% Confidence
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="ml-2"
+                >
+                  <Edit3 className="h-4 w-4 mr-1" />
+                  {isEditing ? "Cancel" : "Edit"}
+                </Button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {extractedData.loadNumber && (
-                <div className="p-3 bg-gray-50 rounded">
-                  <div className="text-sm text-gray-600">Load Number</div>
-                  <div className="font-medium">{extractedData.loadNumber}</div>
-                </div>
-              )}
-              
-              {extractedData.poNumber && (
-                <div className="p-3 bg-gray-50 rounded">
-                  <div className="text-sm text-gray-600">PO Number</div>
-                  <div className="font-medium">{extractedData.poNumber}</div>
-                </div>
-              )}
-              
-              {extractedData.appointmentTime && (
-                <div className="p-3 bg-gray-50 rounded">
-                  <div className="text-sm text-gray-600">Appointment Time</div>
-                  <div className="font-medium">{extractedData.appointmentTime}</div>
-                </div>
-              )}
-              
-              {extractedData.companyName && (
-                <div className="p-3 bg-gray-50 rounded">
-                  <div className="text-sm text-gray-600">Company</div>
-                  <div className="font-medium">{extractedData.companyName}</div>
-                </div>
-              )}
-              
-              {extractedData.pickupAddress && (
-                <div className="p-3 bg-gray-50 rounded md:col-span-2">
-                  <div className="text-sm text-gray-600">Pickup Address</div>
-                  <div className="font-medium">{extractedData.pickupAddress}</div>
-                </div>
-              )}
-              
-              {extractedData.deliveryAddress && (
-                <div className="p-3 bg-gray-50 rounded md:col-span-2">
-                  <div className="text-sm text-gray-600">Delivery Address</div>
-                  <div className="font-medium">{extractedData.deliveryAddress}</div>
-                </div>
-              )}
-            </div>
+            {/* Toggle between read-only view and edit form */}
+            {isEditing ? (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit((data) => generateLoadMutation.mutate(data))} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="loadNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Load Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter load number" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="poNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>PO Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter PO number" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="appointmentTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Appointment Time</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter appointment time" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="companyName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Company Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter company name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="pickupAddress"
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel>Pickup Address</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Enter pickup address" 
+                              rows={2}
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="deliveryAddress"
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel>Delivery Address</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="Enter delivery address" 
+                              rows={2}
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </form>
+              </Form>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {extractedData.loadNumber && (
+                  <div className="p-3 bg-gray-50 rounded">
+                    <div className="text-sm text-gray-600">Load Number</div>
+                    <div className="font-medium">{extractedData.loadNumber}</div>
+                  </div>
+                )}
+                
+                {extractedData.poNumber && (
+                  <div className="p-3 bg-gray-50 rounded">
+                    <div className="text-sm text-gray-600">PO Number</div>
+                    <div className="font-medium">{extractedData.poNumber}</div>
+                  </div>
+                )}
+                
+                {extractedData.appointmentTime && (
+                  <div className="p-3 bg-gray-50 rounded">
+                    <div className="text-sm text-gray-600">Appointment Time</div>
+                    <div className="font-medium">{extractedData.appointmentTime}</div>
+                  </div>
+                )}
+                
+                {extractedData.companyName && (
+                  <div className="p-3 bg-gray-50 rounded">
+                    <div className="text-sm text-gray-600">Company</div>
+                    <div className="font-medium">{extractedData.companyName}</div>
+                  </div>
+                )}
+                
+                {extractedData.pickupAddress && (
+                  <div className="p-3 bg-gray-50 rounded md:col-span-2">
+                    <div className="text-sm text-gray-600">Pickup Address</div>
+                    <div className="font-medium">{extractedData.pickupAddress}</div>
+                  </div>
+                )}
+                
+                {extractedData.deliveryAddress && (
+                  <div className="p-3 bg-gray-50 rounded md:col-span-2">
+                    <div className="text-sm text-gray-600">Delivery Address</div>
+                    <div className="font-medium">{extractedData.deliveryAddress}</div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {extractedData.confidence < 0.6 && (
               <Alert>
@@ -254,33 +414,66 @@ export function OCRUploader() {
             )}
 
             <div className="flex gap-2 pt-4">
-              <Button
-                onClick={() => generateLoadMutation.mutate(extractedData)}
-                disabled={generateLoadMutation.isPending}
-                className="flex-1"
-              >
-                {generateLoadMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Creating Load...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Create Load
-                  </>
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSelectedFile(null);
-                  setExtractedData(null);
-                }}
-              >
-                Clear
-              </Button>
+              {isEditing ? (
+                <>
+                  <Button
+                    onClick={() => form.handleSubmit((data) => generateLoadMutation.mutate(data))()}
+                    disabled={generateLoadMutation.isPending}
+                    className="flex-1"
+                  >
+                    {generateLoadMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Creating Load...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Save & Create Load
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditing(false)}
+                    disabled={generateLoadMutation.isPending}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={() => generateLoadMutation.mutate(form.getValues())}
+                    disabled={generateLoadMutation.isPending}
+                    className="flex-1"
+                  >
+                    {generateLoadMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Creating Load...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Create Load
+                      </>
+                    )}
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setExtractedData(null);
+                      setIsEditing(false);
+                      form.reset();
+                    }}
+                  >
+                    Clear
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
