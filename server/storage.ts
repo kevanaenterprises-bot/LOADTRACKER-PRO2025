@@ -4,6 +4,7 @@ import {
   loads,
   bolNumbers,
   rates,
+  invoiceCounter,
   invoices,
   loadStatusHistory,
   type User,
@@ -61,6 +62,7 @@ export interface IStorage {
   getInvoice(invoiceId: string): Promise<Invoice | undefined>;
   updateInvoice(invoiceId: string, updates: Partial<Invoice>): Promise<Invoice>;
   markInvoicePrinted(invoiceId: string): Promise<Invoice>;
+  getNextInvoiceNumber(): Promise<string>;
 
   // Statistics
   getDashboardStats(): Promise<{
@@ -498,6 +500,33 @@ export class DatabaseStorage implements IStorage {
       .where(eq(invoices.id, invoiceId))
       .returning();
     return updatedInvoice;
+  }
+
+  async getNextInvoiceNumber(): Promise<string> {
+    // Try to get current counter, create if doesn't exist
+    const [counter] = await db.select().from(invoiceCounter).limit(1);
+    
+    let nextNumber: number;
+    if (!counter) {
+      // Initialize counter starting at 6000
+      const [newCounter] = await db
+        .insert(invoiceCounter)
+        .values({ currentNumber: 6000 })
+        .returning();
+      nextNumber = newCounter.currentNumber;
+    } else {
+      // Increment counter
+      nextNumber = counter.currentNumber + 1;
+      await db
+        .update(invoiceCounter)
+        .set({ 
+          currentNumber: nextNumber,
+          lastUpdated: new Date()
+        })
+        .where(eq(invoiceCounter.id, counter.id));
+    }
+    
+    return `GO${nextNumber}`;
   }
 }
 

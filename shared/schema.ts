@@ -101,6 +101,13 @@ export const rates = pgTable("rates", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Invoice counter for sequential numbering
+export const invoiceCounter = pgTable("invoice_counter", {
+  id: serial("id").primaryKey(),
+  currentNumber: integer("current_number").notNull().default(6000),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
 // Invoices table
 export const invoices = pgTable("invoices", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
