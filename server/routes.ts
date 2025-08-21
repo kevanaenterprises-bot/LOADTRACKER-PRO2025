@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, getSession } from "./replitAuth";
 import { ObjectStorageService } from "./objectStorage";
 import { sendSMSToDriver } from "./smsService";
 import { processRateConfirmationImage } from "./ocrService";
@@ -19,7 +19,7 @@ import {
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
+  // Auth middleware (includes session setup)
   await setupAuth(app);
   
   // Configure multer for file uploads
