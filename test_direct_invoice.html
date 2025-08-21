@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Invoice Test</title>
+</head>
+<body>
+    <h1>Direct Invoice Generation Test</h1>
+    <button onclick="testInvoice()">Generate Invoice for TEST002</button>
+    <div id="result"></div>
+
+    <script>
+    async function testInvoice() {
+        try {
+            const response = await fetch('/api/loads/5e48ebca-3a18-4c4c-b09e-c8f8cc3c6bf1/generate-invoice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            });
+            
+            const result = await response.text();
+            document.getElementById('result').innerHTML = `
+                <h3>Response Status: ${response.status}</h3>
+                <pre>${result}</pre>
+            `;
+        } catch (error) {
+            document.getElementById('result').innerHTML = `
+                <h3>Error:</h3>
+                <pre>${error.message}</pre>
+            `;
+        }
+    }
+    </script>
+</body>
+</html>

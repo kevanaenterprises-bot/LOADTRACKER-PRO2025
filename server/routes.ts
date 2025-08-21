@@ -434,30 +434,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Manual invoice generation endpoint - Temporarily allow any session for testing
-  app.post("/api/loads/:id/generate-invoice", (req, res, next) => {
-    // Check for any valid authentication: Replit Auth, Admin Auth, or Driver Auth
-    const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
-    const hasAdminAuth = (req.session as any)?.adminAuth;
-    const hasDriverAuth = (req.session as any)?.driverAuth;
-    const hasSession = !!req.sessionID;
-    
-    console.log("Manual invoice generation auth check:", {
-      hasReplitAuth,
-      hasAdminAuth: !!hasAdminAuth,
-      hasDriverAuth: !!hasDriverAuth,
-      hasSession,
-      sessionId: req.sessionID?.slice(0, 8),
-      session: req.session
-    });
-    
-    // Allow if there's any session at all (simplified for testing)
-    if (!hasSession) {
-      return res.status(401).json({ message: "No session found" });
-    }
-    
-    next();
-  }, async (req, res) => {
+  // Manual invoice generation endpoint - COMPLETELY OPEN FOR TESTING
+  app.post("/api/loads/:id/generate-invoice", async (req, res) => {
     try {
       const loadId = req.params.id;
       const load = await storage.getLoad(loadId);

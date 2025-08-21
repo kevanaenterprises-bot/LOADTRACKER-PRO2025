@@ -85,7 +85,19 @@ export default function LoadsTable() {
   // Manual invoice generation mutation
   const generateInvoiceMutation = useMutation({
     mutationFn: async (loadId: string) => {
-      return await apiRequest("/api/loads/" + loadId + "/generate-invoice", "POST", {});
+      const response = await fetch("/api/loads/" + loadId + "/generate-invoice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`${response.status}: ${errorText}`);
+      }
+      
+      return await response.json();
     },
     onSuccess: (data: any) => {
       toast({
