@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import DriverLoadCard from "@/components/DriverLoadCard";
 import BOLEntryForm from "@/components/BOLEntryForm";
 import QuickBOLUpload from "@/components/QuickBOLUpload";
+import GPSTracker from "@/components/GPSTracker";
 import { Button } from "@/components/ui/button";
 
 export default function DriverPortal() {
@@ -104,9 +105,12 @@ export default function DriverPortal() {
           <QuickBOLUpload currentLoad={currentLoad} allLoads={loads as any[]} />
         </div>
 
-        {/* Current Load Card */}
+        {/* Current Load Card with GPS Tracking */}
         {currentLoad ? (
-          <DriverLoadCard load={currentLoad} />
+          <div className="space-y-4">
+            <GPSTracker load={currentLoad} driverId={user?.id || ''} />
+            <DriverLoadCard load={currentLoad} />
+          </div>
         ) : (
           <div className="bg-white rounded-lg shadow-material p-6 mb-6">
             <div className="text-center">

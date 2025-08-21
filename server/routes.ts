@@ -5,6 +5,7 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { ObjectStorageService } from "./objectStorage";
 import { sendSMSToDriver } from "./smsService";
 import { processRateConfirmationImage } from "./ocrService";
+import { GPSService } from "./gpsService";
 import multer from 'multer';
 import {
   insertLoadSchema,
@@ -384,6 +385,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching driver loads:", error);
       res.status(500).json({ message: "Failed to fetch driver loads" });
+    }
+  });
+
+  // GPS Tracking API endpoints
+
+  // Confirm load and enable GPS tracking
+  app.post("/api/loads/:id/confirm", (req, res, next) => {
+    if ((req.session as any)?.driverAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Driver not authenticated" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      const driverUserId = (req.session as any)?.driverAuth?.userId;
+      
+      // Update load to confirmed status and enable tracking
+      const updatedLoad = await storage.confirmLoad(loadId, driverUserId);
+      
+      // Set up geocoded locations for tracking
+      await GPSService.setupLoadLocations(loadId);
+      
+      res.json(updatedLoad);
+    } catch (error) {
+      console.error("Error confirming load:", error);
+      res.status(500).json({ message: "Failed to confirm load" });
+    }
+  });
+
+  // Update driver location for GPS tracking
+  app.put("/api/loads/:id/location", (req, res, next) => {
+    if ((req.session as any)?.driverAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Driver not authenticated" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      const { latitude, longitude, accuracy } = req.body;
+      
+      if (!latitude || !longitude) {
+        return res.status(400).json({ message: "Latitude and longitude required" });
+      }
+      
+      // Update load status based on GPS location
+      await GPSService.updateLoadStatus(loadId, parseFloat(latitude), parseFloat(longitude));
+      
+      res.json({ success: true, message: "Location updated" });
+    } catch (error) {
+      console.error("Error updating location:", error);
+      res.status(500).json({ message: "Failed to update location" });
     }
   });
 

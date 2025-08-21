@@ -278,6 +278,24 @@ export class DatabaseStorage implements IStorage {
     return updatedLoad;
   }
 
+  async confirmLoad(id: string, driverId: string): Promise<Load> {
+    const [updatedLoad] = await db
+      .update(loads)
+      .set({ 
+        status: 'confirmed',
+        trackingEnabled: true,
+        confirmedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(and(eq(loads.id, id), eq(loads.driverId, driverId)))
+      .returning();
+
+    // Add status history
+    await this.addStatusHistory(id, 'confirmed', 'Driver confirmed load receipt');
+
+    return updatedLoad;
+  }
+
   async updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load> {
     const [updatedLoad] = await db
       .update(loads)
