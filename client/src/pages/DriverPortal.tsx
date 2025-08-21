@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 
 export default function DriverPortal() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user } = useDriverAuth();
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function DriverPortal() {
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        window.location.href = "/driver-login";
       }, 500);
       return;
     }
@@ -37,7 +37,7 @@ export default function DriverPortal() {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/login";
+          window.location.href = "/driver-login";
         }, 500);
       }
     },
@@ -62,8 +62,16 @@ export default function DriverPortal() {
     ["completed", "delivered"].includes(load.status)
   ).slice(0, 5) || [];
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/driver-logout", {
+        method: "POST",
+        credentials: "include"
+      });
+      window.location.href = "/";
+    } catch (error) {
+      window.location.href = "/";
+    }
   };
 
   const switchToDashboard = () => {
