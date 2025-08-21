@@ -156,6 +156,14 @@ export default function TroubleshootPage() {
           </Button>
 
           <Button 
+            onClick={() => setLocation("/production-debug")} 
+            className="w-full"
+            variant="destructive"
+          >
+            🔧 Production Debug Tool
+          </Button>
+
+          <Button 
             onClick={() => setLocation("/")} 
             className="w-full"
             variant="ghost"
