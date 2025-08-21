@@ -15,18 +15,20 @@ export default function DriverPortal() {
   const officeAuth = useAuth();
   const adminAuth = useAdminAuth();
   
-  // Determine which auth to use - prioritize driver auth, then allow office/admin access
+  // For driver portal, prioritize driver auth but allow office/admin fallback
   const isAuthenticated = driverAuth.isAuthenticated || 
     (officeAuth.isAuthenticated && officeAuth.user?.role === "office") ||
     adminAuth.isAuthenticated;
-  const isLoading = driverAuth.isLoading || officeAuth.isLoading || adminAuth.isLoading;
+  
+  // Only show loading if we're still checking driver auth and no other auth is available
+  const isLoading = driverAuth.isLoading && !officeAuth.isAuthenticated && !adminAuth.isAuthenticated;
   const user = driverAuth.user || officeAuth.user || adminAuth.user;
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated and not loading
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       toast({
-        title: "Unauthorized",
+        title: "Unauthorized", 
         description: "You are logged out. Logging in again...",
         variant: "destructive",
       });
@@ -39,10 +41,18 @@ export default function DriverPortal() {
 
   const { data: loads = [], isLoading: loadsLoading } = useQuery({
     queryKey: ["/api/driver/loads"],
-    enabled: isAuthenticated,
+    enabled: driverAuth.isAuthenticated, // Only use driver endpoint if driver is authenticated
   });
 
-  if (isLoading || !isAuthenticated) {
+  // Use fallback query for office/admin users
+  const { data: fallbackLoads = [] } = useQuery({
+    queryKey: ["/api/loads"],
+    enabled: !driverAuth.isAuthenticated && (officeAuth.isAuthenticated || adminAuth.isAuthenticated),
+  });
+
+  const actualLoads = driverAuth.isAuthenticated ? loads : fallbackLoads;
+
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -53,11 +63,16 @@ export default function DriverPortal() {
     );
   }
 
-  const currentLoad = Array.isArray(loads) ? loads.find((load: any) => 
+  if (!isAuthenticated) {
+    // Don't show anything, redirect will happen
+    return null;
+  }
+
+  const currentLoad = Array.isArray(actualLoads) ? actualLoads.find((load: any) => 
     !["completed", "delivered"].includes(load.status)
   ) : null;
 
-  const recentLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+  const recentLoads = Array.isArray(actualLoads) ? actualLoads.filter((load: any) => 
     ["completed", "delivered"].includes(load.status)
   ).slice(0, 5) : [];
 
