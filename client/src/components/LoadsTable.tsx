@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from "@/components/ui/dialog";
+import { useState } from "react";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -57,12 +66,71 @@ const getStatusText = (status: string) => {
 
 export default function LoadsTable() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedLoad, setSelectedLoad] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: loads, isLoading } = useQuery({
     queryKey: ["/api/loads"],
     retry: false,
     refetchOnWindowFocus: false,
   });
+
+  const { data: invoices = [] } = useQuery({
+    queryKey: ["/api/invoices"],
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  // Manual invoice generation mutation
+  const generateInvoiceMutation = useMutation({
+    mutationFn: async (loadId: string) => {
+      return await apiRequest(`/api/loads/${loadId}/generate-invoice`, "POST", {});
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Invoice Generated",
+        description: `Invoice ${data.invoiceNumber || 'N/A'} has been created successfully.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      setDialogOpen(false);
+    },
+    onError: (error: any) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate invoice.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLoadClick = (load: any) => {
+    setSelectedLoad(load);
+    setDialogOpen(true);
+  };
+
+  const handleGenerateInvoice = () => {
+    if (selectedLoad) {
+      generateInvoiceMutation.mutate(selectedLoad.id);
+    }
+  };
+
+  // Check if a load already has an invoice
+  const hasInvoice = (loadId: string) => {
+    return Array.isArray(invoices) && invoices.some((invoice: any) => invoice.loadId === loadId);
+  };
 
   if (isLoading) {
     return (
@@ -186,12 +254,29 @@ export default function LoadsTable() {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleLoadClick(load)}
+                          title="View load details"
+                        >
                           <i className="fas fa-eye text-primary"></i>
                         </Button>
-                        <Button variant="ghost" size="sm">
-                          <i className="fas fa-edit text-gray-400"></i>
-                        </Button>
+                        {hasInvoice(load.id) ? (
+                          <Badge variant="secondary" className="text-xs">
+                            Invoice Generated
+                          </Badge>
+                        ) : (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleLoadClick(load)}
+                            title="Generate invoice"
+                            className="text-green-600 hover:text-green-700"
+                          >
+                            <i className="fas fa-file-invoice-dollar"></i>
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -201,6 +286,112 @@ export default function LoadsTable() {
           </div>
         )}
       </CardContent>
+
+      {/* Load Details Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Load Details - {selectedLoad?.number109}</DialogTitle>
+          </DialogHeader>
+          
+          {selectedLoad && (
+            <div className="space-y-6">
+              {/* Load Information */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Load Information</h4>
+                  <div className="space-y-2 text-sm">
+                    <div><strong>109 Number:</strong> {selectedLoad.number109}</div>
+                    <div><strong>Status:</strong> <Badge className={getStatusColor(selectedLoad.status)}>{getStatusText(selectedLoad.status)}</Badge></div>
+                    <div><strong>Created:</strong> {new Date(selectedLoad.createdAt).toLocaleDateString()}</div>
+                    {selectedLoad.bolNumber && <div><strong>BOL Number:</strong> {selectedLoad.bolNumber}</div>}
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold mb-2">Driver & Destination</h4>
+                  <div className="space-y-2 text-sm">
+                    {selectedLoad.driver ? (
+                      <div><strong>Driver:</strong> {selectedLoad.driver.firstName} {selectedLoad.driver.lastName}</div>
+                    ) : (
+                      <div><strong>Driver:</strong> <span className="text-gray-500">Not assigned</span></div>
+                    )}
+                    {selectedLoad.location && (
+                      <div><strong>Destination:</strong> {selectedLoad.location.name}</div>
+                    )}
+                    {selectedLoad.estimatedMiles && (
+                      <div><strong>Miles:</strong> {selectedLoad.estimatedMiles}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Documents Status */}
+              <div>
+                <h4 className="font-semibold mb-2">Documents</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${selectedLoad.bolDocumentPath ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span>BOL Document {selectedLoad.bolDocumentPath ? '✅' : '❌'}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${selectedLoad.podDocumentPath ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span>POD Document {selectedLoad.podDocumentPath ? '✅' : '❌'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Financial Information */}
+              {selectedLoad.location && (
+                <div>
+                  <h4 className="font-semibold mb-2">Financial Details</h4>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div><strong>Flat Rate:</strong> ${selectedLoad.location.flatRate || '0.00'}</div>
+                    <div><strong>Lumper Charge:</strong> ${selectedLoad.lumperCharge || '0.00'}</div>
+                    <div><strong>Extra Stops:</strong> {selectedLoad.extraStops || 0} × $50</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-between pt-4 border-t">
+                <div className="text-sm text-gray-600">
+                  {hasInvoice(selectedLoad.id) ? (
+                    <span className="text-green-600">✅ Invoice already generated for this load</span>
+                  ) : (
+                    <span>No invoice generated yet</span>
+                  )}
+                </div>
+                
+                <div className="space-x-2">
+                  <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                    Close
+                  </Button>
+                  {!hasInvoice(selectedLoad.id) && (
+                    <Button 
+                      onClick={handleGenerateInvoice}
+                      disabled={generateInvoiceMutation.isPending}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      {generateInvoiceMutation.isPending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-file-invoice-dollar mr-2"></i>
+                          Generate Invoice
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

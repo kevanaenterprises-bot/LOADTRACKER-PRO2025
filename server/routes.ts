@@ -434,6 +434,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Manual invoice generation endpoint
+  app.post("/api/loads/:id/generate-invoice", isAdminAuthenticated, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      const load = await storage.getLoad(loadId);
+      
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      if (!load.location) {
+        return res.status(400).json({ message: "Load must have a destination to generate invoice" });
+      }
+
+      // Check if invoice already exists for this load
+      const existingInvoices = await storage.getInvoices();
+      const hasInvoice = existingInvoices.some((inv: any) => inv.loadId === load.id);
+      
+      if (hasInvoice) {
+        return res.status(400).json({ message: "Invoice already exists for this load" });
+      }
+
+      // Get rate for the location
+      const rate = await storage.getRateByLocation(
+        load.location.city, 
+        load.location.state
+      );
+      
+      if (!rate) {
+        return res.status(400).json({ 
+          message: `No rate found for ${load.location.city}, ${load.location.state}. Please add a rate first.` 
+        });
+      }
+
+      // Calculate invoice amount based on flat rate system
+      const flatRate = parseFloat(rate.flatRate.toString());
+      const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
+      const extraStopsCharge = (load.extraStops || 0) * 50;
+      const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+
+      // Generate invoice
+      const invoiceNumber = `INV-${Date.now()}`;
+      const invoice = await storage.createInvoice({
+        loadId: load.id,
+        invoiceNumber,
+        flatRate: rate.flatRate,
+        lumperCharge: load.lumperCharge || "0.00",
+        extraStopsCharge: extraStopsCharge.toString(),
+        extraStopsCount: load.extraStops || 0,
+        totalAmount: totalAmount.toString(),
+        status: "pending",
+      });
+
+      console.log(`Manual invoice ${invoiceNumber} generated for load ${load.number109} by admin`);
+      
+      res.json(invoice);
+    } catch (error) {
+      console.error("Error generating manual invoice:", error);
+      res.status(500).json({ message: "Failed to generate invoice" });
+    }
+  });
+
   // BOL validation and entry
   app.get("/api/bol/check/:bolNumber", isAuthenticated, async (req, res) => {
     try {
