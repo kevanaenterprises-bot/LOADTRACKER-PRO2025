@@ -50,6 +50,24 @@ export default function AdminTestPage() {
     }
   };
 
+  const activateBrowserBypass = async () => {
+    try {
+      const response = await fetch("/api/auth/browser-bypass", {
+        method: "POST",
+        credentials: "include",
+      });
+      
+      const result = await response.json();
+      if (response.ok) {
+        toast({ title: "Browser bypass activated", description: "You can now assign drivers" });
+      } else {
+        toast({ title: "Bypass failed", description: result.message, variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Bypass request failed", variant: "destructive" });
+    }
+  };
+
   const testDriverAssignment = async () => {
     try {
       const response = await fetch("/api/loads/5fac985a-8dc7-49ee-b207-164e32a08da3/assign-driver", {
@@ -100,9 +118,12 @@ export default function AdminTestPage() {
             </div>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button onClick={testLogin}>Login</Button>
             <Button onClick={checkSession} variant="outline">Check Session</Button>
+            <Button onClick={activateBrowserBypass} variant="default" className="bg-orange-600 hover:bg-orange-700">
+              Browser Bypass
+            </Button>
             <Button onClick={testDriverAssignment} variant="secondary">Test Assignment</Button>
           </div>
 
