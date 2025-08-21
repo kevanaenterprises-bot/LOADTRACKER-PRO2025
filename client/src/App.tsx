@@ -14,6 +14,7 @@ import DriverLogin from "@/pages/DriverLogin";
 import DebugUpload from "@/pages/DebugUpload";
 import UploadTest from "@/pages/UploadTest";
 import QuickUploadPage from "@/pages/QuickUploadPage";
+import InvoiceTestPage from "@/pages/InvoiceTestPage";
 import SimpleUploadTest from "@/pages/SimpleUploadTest";
 import AdminLogin from "@/pages/AdminLogin";
 import NotFound from "@/pages/not-found";
@@ -55,6 +56,9 @@ function Router() {
       
       {/* Quick upload page */}
       <Route path="/quick-upload" component={QuickUploadPage} />
+      
+      {/* Invoice test page */}
+      <Route path="/invoice-test" component={InvoiceTestPage} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (
