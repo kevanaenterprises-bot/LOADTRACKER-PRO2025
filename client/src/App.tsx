@@ -11,6 +11,7 @@ import Dashboard from "@/pages/Dashboard";
 import AdminTestDashboard from "@/pages/AdminTestDashboard";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
+import DebugUpload from "@/pages/DebugUpload";
 import AdminLogin from "@/pages/AdminLogin";
 import NotFound from "@/pages/not-found";
 
@@ -39,6 +40,9 @@ function Router() {
       
       {/* Driver login page */}
       <Route path="/driver-login" component={DriverLogin} />
+      
+      {/* Debug upload page */}
+      <Route path="/debug-upload" component={DebugUpload} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (

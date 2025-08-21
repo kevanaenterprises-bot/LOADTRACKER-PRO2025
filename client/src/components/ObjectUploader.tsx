@@ -71,14 +71,14 @@ export function ObjectUploader({
     })
       .use(AwsS3, {
         shouldUseMultipart: false,
-        getUploadParameters: async () => {
+        getUploadParameters: async (file) => {
           try {
-            console.log("Getting upload parameters...");
+            console.log("ObjectUploader: Getting upload parameters for file:", file.name);
             const params = await onGetUploadParameters();
-            console.log("Upload parameters received:", params);
+            console.log("ObjectUploader: Upload parameters received:", params);
             return params;
           } catch (error) {
-            console.error("Failed to get upload parameters:", error);
+            console.error("ObjectUploader: Failed to get upload parameters:", error);
             throw error;
           }
         },

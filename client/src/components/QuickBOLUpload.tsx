@@ -135,17 +135,40 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
 
   const handleUploadComplete = (result: any) => {
     console.log("QuickBOLUpload: Upload complete result:", result);
+    
+    // Show detailed error information
+    if (result.failed && result.failed.length > 0) {
+      console.error("QuickBOLUpload: Failed uploads:", result.failed);
+      result.failed.forEach((failure: any, index: number) => {
+        console.error(`QuickBOLUpload: Failure ${index + 1}:`, {
+          file: failure.file?.name,
+          error: failure.error,
+          response: failure.response
+        });
+      });
+      
+      const errorMessage = result.failed[0]?.error?.message || "Upload failed";
+      toast({
+        title: "Upload Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setUploading(false);
+      return;
+    }
+    
     if (result.successful && result.successful[0]) {
       const uploadURL = result.successful[0].uploadURL;
       console.log("QuickBOLUpload: Updating BOL document with URL:", uploadURL);
       updateBOLDocumentMutation.mutate(uploadURL);
     } else {
-      console.error("QuickBOLUpload: Upload failed or no successful uploads:", result);
+      console.error("QuickBOLUpload: No successful uploads in result:", result);
       toast({
         title: "Error",
         description: "Upload failed - no successful files",
         variant: "destructive",
       });
+      setUploading(false);
     }
   };
 
