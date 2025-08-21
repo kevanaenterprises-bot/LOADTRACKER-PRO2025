@@ -533,17 +533,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Assign driver to load
-  app.patch("/api/loads/:id/assign-driver", async (req, res) => {
-    // Temporarily bypass authentication for testing
-    console.log("Driver assignment attempt - bypassing auth for debugging");
-    console.log("Session state:", {
+  // Assign driver to load - FIXED AUTHENTICATION
+  app.patch("/api/loads/:id/assign-driver", (req, res, next) => {
+    // Check multiple auth methods: admin session, Replit auth, or driver auth
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasDriverAuth = !!(req.session as any)?.driverAuth;
+    
+    console.log("Driver assignment auth check:", {
       hasSession: !!req.session,
       sessionId: req.sessionID,
-      adminAuth: (req.session as any)?.adminAuth,
-      user: !!req.user,
-      driverAuth: (req.session as any)?.driverAuth
+      hasAdminAuth,
+      hasReplitAuth, 
+      hasDriverAuth,
+      adminAuthData: (req.session as any)?.adminAuth,
+      userAuth: !!req.user
     });
+
+    if (hasAdminAuth || hasReplitAuth || hasDriverAuth) {
+      next();
+    } else {
+      console.log("Authentication failed - no valid auth method found");
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const { driverId } = req.body;
       const loadId = req.params.id;

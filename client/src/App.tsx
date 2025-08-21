@@ -85,6 +85,9 @@ function Router() {
       {/* Debug invoice */}
       <Route path="/debug-invoice" component={DebugInvoice} />
       
+      {/* Admin test page - always accessible */}
+      <Route path="/admin-test" component={AdminTestPage} />
+      
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (
         <>
@@ -98,14 +101,12 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
-          <Route path="/admin-test" component={AdminTestDashboard} />
         </>
       ) : (
         <>
           {/* Landing page with options for both admin and Replit login */}
           <Route path="/" component={Landing} />
           <Route path="/dashboard" component={Landing} />
-          <Route path="/admin-test" component={AdminTestDashboard} />
         </>
       )}
       
