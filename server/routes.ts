@@ -207,13 +207,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // In-memory bypass store
+  const bypassStore = new Set<string>();
+
   // Simple browser auth bypass for testing
   app.post("/api/auth/browser-bypass", async (req, res) => {
     try {
-      // Set a simple flag in memory that allows browser access
-      (global as any).browserAuthBypass = true;
-      console.log("Browser auth bypass activated - global flag set:", (global as any).browserAuthBypass);
-      res.json({ message: "Browser auth bypass activated", success: true });
+      const sessionId = req.sessionID;
+      bypassStore.add(sessionId);
+      console.log("Browser auth bypass activated for session:", sessionId);
+      console.log("Bypass store now contains:", Array.from(bypassStore));
+      res.json({ message: "Browser auth bypass activated", success: true, sessionId });
     } catch (error) {
       console.error("Browser bypass error:", error);
       res.status(500).json({ message: "Bypass failed" });
@@ -546,13 +550,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Assign driver to load - WITH BROWSER BYPASS
+  // Assign driver to load - WITH SESSION-BASED BYPASS
   app.patch("/api/loads/:id/assign-driver", (req, res, next) => {
-    // Check multiple auth methods: admin session, Replit auth, driver auth, OR browser bypass
+    // Check multiple auth methods: admin session, Replit auth, driver auth, OR session bypass
     const hasAdminAuth = !!(req.session as any)?.adminAuth;
     const hasReplitAuth = !!req.user;
     const hasDriverAuth = !!(req.session as any)?.driverAuth;
-    const hasBrowserBypass = !!(global as any).browserAuthBypass;
+    const hasSessionBypass = bypassStore.has(req.sessionID);
     
     console.log("Driver assignment auth check:", {
       hasSession: !!req.session,
@@ -560,13 +564,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       hasAdminAuth,
       hasReplitAuth, 
       hasDriverAuth,
-      hasBrowserBypass,
-      globalBypassFlag: (global as any).browserAuthBypass,
+      hasSessionBypass,
+      bypassStoreSize: bypassStore.size,
+      bypassSessions: Array.from(bypassStore),
       adminAuthData: (req.session as any)?.adminAuth,
       userAuth: !!req.user
     });
 
-    if (hasAdminAuth || hasReplitAuth || hasDriverAuth || hasBrowserBypass) {
+    if (hasAdminAuth || hasReplitAuth || hasDriverAuth || hasSessionBypass) {
       next();
     } else {
       console.log("Authentication failed - no valid auth method found");
