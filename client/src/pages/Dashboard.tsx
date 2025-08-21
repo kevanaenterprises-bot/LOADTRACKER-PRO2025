@@ -215,24 +215,29 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     try {
+      console.log("Logout attempt - authType:", authType);
       if (authType === 'admin') {
-        await fetch("/api/auth/admin-logout", {
+        const response = await fetch("/api/auth/admin-logout", {
           method: "POST",
           credentials: "include"
         });
-        setLocation("/");
+        console.log("Admin logout response:", response.status);
+        // Force hard refresh to clear all state
+        window.location.href = "/";
       } else if (authType === 'driver') {
         await fetch("/api/auth/driver-logout", {
-          method: "POST",
+          method: "POST", 
           credentials: "include"
         });
-        setLocation("/");
+        window.location.href = "/";
       } else {
         // Replit logout
+        console.log("Using Replit logout");
         window.location.href = "/api/logout";
       }
     } catch (error) {
-      // Fallback to Replit logout
+      console.error("Logout error:", error);
+      // Force fallback to Replit logout
       window.location.href = "/api/logout";
     }
   };

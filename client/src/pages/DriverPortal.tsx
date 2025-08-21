@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
+import { useAuth } from "@/hooks/useAuth";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -9,7 +11,16 @@ import { Button } from "@/components/ui/button";
 
 export default function DriverPortal() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading, user } = useDriverAuth();
+  const driverAuth = useDriverAuth();
+  const officeAuth = useAuth();
+  const adminAuth = useAdminAuth();
+  
+  // Determine which auth to use - prioritize driver auth, then allow office/admin access
+  const isAuthenticated = driverAuth.isAuthenticated || 
+    (officeAuth.isAuthenticated && officeAuth.user?.role === "office") ||
+    adminAuth.isAuthenticated;
+  const isLoading = driverAuth.isLoading && officeAuth.isLoading && adminAuth.isLoading;
+  const user = driverAuth.user || officeAuth.user || adminAuth.user;
 
   // Redirect to login if not authenticated
   useEffect(() => {
