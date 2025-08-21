@@ -51,7 +51,7 @@ export default function LoadForm() {
     },
   });
 
-  const { data: locations } = useQuery({
+  const { data: locations = [] } = useQuery<any[]>({
     queryKey: ["/api/locations"],
     retry: false,
     refetchOnWindowFocus: false,
@@ -140,7 +140,7 @@ export default function LoadForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(locations || []).map((location: any) => (
+                      {locations.map((location: any) => (
                         <SelectItem key={location.id} value={location.id}>
                           {location.name} - {location.city}, {location.state}
                         </SelectItem>

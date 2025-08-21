@@ -534,10 +534,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/loads", (req, res, next) => {
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    console.log("Load creation auth check:", {
+      hasAdminAuth: !!(req.session as any)?.adminAuth,
+      hasReplitAuth: !!req.user,
+      hasDriverAuth: !!(req.session as any)?.driverAuth,
+      hasTokenBypass: isBypassActive(req),
+      sessionId: req.sessionID
+    });
     if (hasAuth) {
       next();
     } else {
+      console.error("Load creation failed - no authentication found");
       res.status(401).json({ message: "Authentication required" });
     }
   }, async (req, res) => {
