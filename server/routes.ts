@@ -44,7 +44,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Driver login with username/password
+  // Driver login with username/password (both routes for compatibility)
+  app.post('/api/driver/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      console.log("Driver login attempt:", { 
+        username, 
+        usernameLength: username?.length,
+        password: password ? `[LENGTH:${password.length}]` : "[MISSING]",
+        passwordActual: JSON.stringify(password)
+      });
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      // Pass username as-is since getDriverByUsername now handles case-insensitivity
+      const driver = await storage.getDriverByUsername(username);
+      console.log("Driver lookup result:", driver ? "Found" : "Not found", "for username:", username);
+      
+      if (!driver) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+
+      // Check if password matches phone number (driver password should be their phone number)
+      // Normalize phone numbers by removing spaces, dashes, parentheses
+      const normalizePhone = (phone: string) => phone.replace(/[\s\-\(\)]/g, '');
+      const providedPhone = normalizePhone(password);
+      const expectedPhone = normalizePhone(driver.phoneNumber || '');
+      
+      console.log("Password check:", { 
+        provided: password, 
+        expected: driver.phoneNumber,
+        normalizedProvided: providedPhone,
+        normalizedExpected: expectedPhone
+      });
+      
+      if (expectedPhone !== providedPhone) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+
+      // Create session for driver
+      (req.session as any).driverAuth = {
+        userId: driver.id,
+        username: driver.username,
+        role: driver.role
+      };
+
+      res.json({ 
+        message: "Login successful",
+        user: {
+          id: driver.id,
+          username: driver.username,
+          firstName: driver.firstName,
+          lastName: driver.lastName,
+          role: driver.role,
+          phoneNumber: driver.phoneNumber
+        }
+      });
+    } catch (error) {
+      console.error("Driver login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
   app.post('/api/auth/driver-login', async (req, res) => {
     try {
       const { username, password } = req.body;
@@ -409,7 +473,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
     const hasDriverAuth = (req.session as any)?.driverAuth;
     
-
+    console.log("Upload auth check:", {
+      hasReplitAuth,
+      hasDriverAuth,
+      sessionId: req.sessionID,
+      session: req.session,
+      driverAuthData: (req.session as any)?.driverAuth
+    });
     
     if (hasReplitAuth || hasDriverAuth) {
       next();
