@@ -48,6 +48,15 @@ export default function Landing() {
         
         <div className="mt-6 pt-6 border-t border-gray-200 space-y-3">
           <Button 
+            onClick={() => setLocation("/troubleshoot")} 
+            variant="outline" 
+            size="sm" 
+            className="w-full bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+          >
+            <i className="fas fa-wrench mr-2"></i>
+            Fix Problems
+          </Button>
+          <Button 
             onClick={() => setLocation("/how-to-assign")} 
             variant="outline" 
             size="sm" 
