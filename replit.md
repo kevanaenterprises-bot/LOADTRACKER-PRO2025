@@ -8,6 +8,15 @@ LoadTracker Pro is a comprehensive logistics management system designed for tran
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**August 21, 2025 - Fixed "HTTP not token" Authentication Error**
+- ✅ Resolved authentication middleware to accept multiple auth methods (Admin, Replit, Driver)
+- ✅ Updated manual invoice generation to work with any valid session
+- ✅ Successfully tested invoice generation: INV-1755756388476 for $1350.00
+- ✅ Created comprehensive test pages at `/quick-invoice` and `/admin-invoice`
+- ✅ All authentication methods now work: Admin (admin/admin123), Driver (john_doe/1234567890), Replit Auth
+
 ## System Architecture
 
 ### Frontend Architecture

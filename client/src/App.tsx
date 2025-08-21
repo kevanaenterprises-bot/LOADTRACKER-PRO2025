@@ -20,6 +20,7 @@ import SimpleUploadTest from "@/pages/SimpleUploadTest";
 import AdminLogin from "@/pages/AdminLogin";
 import TestLoadClicks from "@/pages/TestLoadClicks";
 import QuickInvoiceTest from "@/pages/QuickInvoiceTest";
+import AdminInvoiceTest from "@/pages/AdminInvoiceTest";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -71,6 +72,9 @@ function Router() {
       
       {/* Quick invoice test */}
       <Route path="/quick-invoice" component={QuickInvoiceTest} />
+      
+      {/* Admin invoice test */}
+      <Route path="/admin-invoice" component={AdminInvoiceTest} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (
