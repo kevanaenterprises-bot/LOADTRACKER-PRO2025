@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ObjectUploader } from "@/components/ObjectUploader";
+import { DirectUploader } from "@/components/DirectUploader";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 interface QuickBOLUploadProps {
@@ -269,19 +269,15 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
               </div>
             </div>
           ) : (
-            <ObjectUploader
-              maxNumberOfFiles={1}
+            <DirectUploader
+              accept="image/*,.pdf"
               maxFileSize={10485760} // 10MB
-              onGetUploadParameters={handleGetUploadParameters}
-              onComplete={handleUploadComplete}
-              onUploadStart={handleUploadStart}
-              buttonClassName="w-full bg-blue-500 hover:bg-blue-600 text-white py-3"
-            >
-              <div className="flex items-center justify-center space-x-2">
-                <i className="fas fa-camera text-lg"></i>
-                <span className="font-medium">Take Photo / Upload BOL</span>
-              </div>
-            </ObjectUploader>
+              onUploadComplete={(uploadUrl) => {
+                console.log("QuickBOLUpload: DirectUploader completed with URL:", uploadUrl);
+                updateBOLDocumentMutation.mutate(uploadUrl);
+              }}
+              className="w-full"
+            />
           )}
         </div>
       </CardContent>
