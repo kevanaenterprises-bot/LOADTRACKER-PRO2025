@@ -374,12 +374,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/locations", isAdminAuthenticated, async (req, res) => {
     try {
+      console.log("Location creation request body:", req.body);
       const validatedData = insertLocationSchema.parse(req.body);
+      console.log("Location validation successful:", validatedData);
       const location = await storage.createLocation(validatedData);
+      console.log("Location created successfully:", location.id);
       res.status(201).json(location);
-    } catch (error) {
-      console.error("Error creating location:", error);
-      res.status(400).json({ message: "Invalid location data" });
+    } catch (error: any) {
+      console.error("Error creating location - full details:", error);
+      if (error?.name === 'ZodError') {
+        console.error("Location validation errors:", error.errors);
+        res.status(400).json({ message: "Invalid location data", errors: error.errors });
+      } else {
+        res.status(400).json({ message: error?.message || "Invalid location data" });
+      }
     }
   });
 
@@ -403,12 +411,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/drivers", isAdminAuthenticated, async (req, res) => {
     try {
+      console.log("Driver creation request body:", req.body);
       const validatedData = insertUserSchema.parse(req.body);
+      console.log("Driver validation successful:", validatedData);
       const driver = await storage.createDriver(validatedData);
+      console.log("Driver created successfully:", driver.id);
       res.status(201).json(driver);
-    } catch (error) {
-      console.error("Error creating driver:", error);
-      res.status(400).json({ message: "Invalid driver data" });
+    } catch (error: any) {
+      console.error("Error creating driver - full details:", error);
+      if (error?.name === 'ZodError') {
+        console.error("Driver validation errors:", error.errors);
+        res.status(400).json({ message: "Invalid driver data", errors: error.errors });
+      } else {
+        res.status(400).json({ message: error?.message || "Invalid driver data" });
+      }
     }
   });
 

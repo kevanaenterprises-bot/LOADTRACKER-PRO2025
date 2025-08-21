@@ -142,10 +142,11 @@ export default function Dashboard() {
       setDriverDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/drivers/available"] });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Driver creation error:", error);
       toast({
         title: "Error",
-        description: "Failed to add driver. Please try again.",
+        description: error?.message || "Failed to add driver. Please try again.",
         variant: "destructive",
       });
     },
@@ -164,10 +165,11 @@ export default function Dashboard() {
       setLocationDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["/api/locations"] });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Location creation error:", error);
       toast({
         title: "Error",
-        description: "Failed to add location. Please try again.",
+        description: error?.message || "Failed to add location. Please try again.",
         variant: "destructive",
       });
     },
