@@ -39,7 +39,7 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
   const form = useForm<BOLFormData>({
     resolver: zodResolver(bolFormSchema),
     defaultValues: {
-      bolNumber: load.bolNumber || "",
+      bolNumber: load.bolNumber?.replace(/^374\s?-\s?/, '') || "",
       tripNumber: load.tripNumber || "",
     },
   });
@@ -218,12 +218,19 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
   const handleValidateBOL = () => {
     const bolNumber = form.getValues("bolNumber");
     if (bolNumber) {
-      validateBOLMutation.mutate(bolNumber);
+      // Add "374-" prefix for validation
+      const fullBolNumber = `374-${bolNumber}`;
+      validateBOLMutation.mutate(fullBolNumber);
     }
   };
 
   const handleBOLSubmit = (data: BOLFormData) => {
-    updateBOLMutation.mutate(data);
+    // Add "374-" prefix before submitting
+    const submissionData = {
+      ...data,
+      bolNumber: `374-${data.bolNumber}`
+    };
+    updateBOLMutation.mutate(submissionData);
   };
 
   const handleGetUploadParameters = async () => {
@@ -279,7 +286,22 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
                   <FormItem>
                     <FormLabel>374 BOL Number</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter 374 BOL number" />
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-700 font-medium pointer-events-none">
+                          374 -
+                        </div>
+                        <Input 
+                          {...field} 
+                          placeholder="Enter BOL number"
+                          className="pl-14"
+                          onChange={(e) => {
+                            // Remove any existing "374 -" prefix before setting the value
+                            const value = e.target.value.replace(/^374\s?-\s?/, '');
+                            field.onChange(value);
+                          }}
+                          value={field.value?.replace(/^374\s?-\s?/, '') || ''}
+                        />
+                      </div>
                     </FormControl>
                     <p className="text-xs text-gray-500">
                       This will be checked against existing BOL numbers
