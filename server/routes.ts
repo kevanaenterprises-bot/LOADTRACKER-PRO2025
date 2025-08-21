@@ -9,6 +9,10 @@ import {
   insertLocationSchema,
   insertBolNumberSchema,
   insertRateSchema,
+  insertUserSchema,
+  type Load,
+  type User,
+  type Location
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
