@@ -32,7 +32,7 @@ const locationSchema = z.object({
   name: z.string().min(1, "Location name is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().min(2, "State is required").max(2, "Use 2-letter state code"),
-  zipCode: z.string().min(5, "ZIP code is required"),
+  flatRate: z.string().min(1, "Rate is required"),
 });
 
 const rateSchema = z.object({
@@ -88,7 +88,7 @@ export default function Dashboard() {
       name: "",
       city: "",
       state: "",
-      zipCode: "",
+      flatRate: "",
     },
   });
 
@@ -167,6 +167,40 @@ export default function Dashboard() {
       });
     },
   });
+
+  // Combined location and rate handler
+  const onSubmitLocationAndRate = async (data: any) => {
+    try {
+      // First create the location
+      const locationData = {
+        name: data.name,
+        city: data.city,
+        state: data.state,
+      };
+      await createLocationMutation.mutateAsync(locationData);
+
+      // Then create the rate for this location
+      const rateData = {
+        city: data.city,
+        state: data.state,
+        flatRate: data.flatRate,
+      };
+      await createRateMutation.mutateAsync(rateData);
+
+      toast({
+        title: "Success",
+        description: "Location and rate have been added successfully.",
+      });
+      locationForm.reset();
+      setLocationDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add location and rate. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (isLoading || !isAuthenticated) {
     return (
@@ -434,45 +468,44 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-gray-600 mb-4">
-                    Register delivery locations and set flat rates for automatic invoice calculations.
+                    Register delivery locations with flat rates for automatic invoice calculations.
                   </p>
                   
-                  <div className="flex space-x-2">
-                    <Dialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button className="flex-1">
-                          <i className="fas fa-plus mr-2"></i>
-                          Add Location
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Add New Location</DialogTitle>
-                        </DialogHeader>
-                        <Form {...locationForm}>
-                          <form onSubmit={locationForm.handleSubmit((data) => createLocationMutation.mutate(data))} className="space-y-4">
-                            <FormField
-                              control={locationForm.control}
-                              name="name"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Location Name</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="Miami Distribution Center" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={locationForm.control}
-                              name="city"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>City</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="Miami" {...field} />
-                                  </FormControl>
+                  <Dialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="w-full">
+                        <i className="fas fa-plus mr-2"></i>
+                        Add Location & Rate
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Add New Location & Rate</DialogTitle>
+                      </DialogHeader>
+                      <Form {...locationForm}>
+                        <form onSubmit={locationForm.handleSubmit(onSubmitLocationAndRate)} className="space-y-4">
+                          <FormField
+                            control={locationForm.control}
+                            name="name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Location Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Miami Distribution Center" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={locationForm.control}
+                            name="city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>City</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Miami" {...field} />
+                                </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -492,66 +525,6 @@ export default function Dashboard() {
                             />
                             <FormField
                               control={locationForm.control}
-                              name="zipCode"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>ZIP Code</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="33101" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <Button type="submit" disabled={createLocationMutation.isPending}>
-                              {createLocationMutation.isPending ? "Adding..." : "Add Location"}
-                            </Button>
-                          </form>
-                        </Form>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog open={rateDialogOpen} onOpenChange={setRateDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button className="flex-1" variant="outline">
-                          <i className="fas fa-dollar-sign mr-2"></i>
-                          Set Rate
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Set Rate for City/State</DialogTitle>
-                        </DialogHeader>
-                        <Form {...rateForm}>
-                          <form onSubmit={rateForm.handleSubmit((data) => createRateMutation.mutate(data))} className="space-y-4">
-                            <FormField
-                              control={rateForm.control}
-                              name="city"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>City</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="Miami" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={rateForm.control}
-                              name="state"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>State</FormLabel>
-                                  <FormControl>
-                                    <Input placeholder="FL" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={rateForm.control}
                               name="flatRate"
                               render={({ field }) => (
                                 <FormItem>
@@ -563,14 +536,13 @@ export default function Dashboard() {
                                 </FormItem>
                               )}
                             />
-                            <Button type="submit" disabled={createRateMutation.isPending}>
-                              {createRateMutation.isPending ? "Adding..." : "Set Rate"}
+                            <Button type="submit" disabled={createLocationMutation.isPending || createRateMutation.isPending}>
+                              {(createLocationMutation.isPending || createRateMutation.isPending) ? "Adding..." : "Add Location & Rate"}
                             </Button>
                           </form>
                         </Form>
                       </DialogContent>
                     </Dialog>
-                  </div>
 
                   <div className="mt-4 pt-4 border-t">
                     <Button variant="outline" className="w-full" onClick={switchToDriverView}>

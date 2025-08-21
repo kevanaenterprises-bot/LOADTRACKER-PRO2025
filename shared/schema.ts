@@ -44,10 +44,9 @@ export const users = pgTable("users", {
 export const locations = pgTable("locations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
-  address: text("address").notNull(),
+  address: text("address"), // Optional
   city: varchar("city").notNull(),
   state: varchar("state").notNull(),
-  zipCode: varchar("zip_code"),
   contactName: varchar("contact_name"),
   contactPhone: varchar("contact_phone"),
   createdAt: timestamp("created_at").defaultNow(),
