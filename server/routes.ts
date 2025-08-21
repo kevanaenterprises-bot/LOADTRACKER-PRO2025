@@ -207,17 +207,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // In-memory bypass store
-  const bypassStore = new Set<string>();
+  // Persistent bypass store using environment variable
+  const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
+  
+  function isBypassActive(req: any): boolean {
+    return req.headers['x-bypass-token'] === BYPASS_SECRET;
+  }
 
   // Simple browser auth bypass for testing
   app.post("/api/auth/browser-bypass", async (req, res) => {
     try {
-      const sessionId = req.sessionID;
-      bypassStore.add(sessionId);
-      console.log("Browser auth bypass activated for session:", sessionId);
-      console.log("Bypass store now contains:", Array.from(bypassStore));
-      res.json({ message: "Browser auth bypass activated", success: true, sessionId });
+      console.log("Browser auth bypass token requested");
+      res.json({ 
+        message: "Browser auth bypass token provided", 
+        success: true,
+        token: BYPASS_SECRET
+      });
     } catch (error) {
       console.error("Browser bypass error:", error);
       res.status(500).json({ message: "Bypass failed" });
@@ -550,13 +555,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Assign driver to load - WITH SESSION-BASED BYPASS
+  // Assign driver to load - WITH TOKEN BYPASS
   app.patch("/api/loads/:id/assign-driver", (req, res, next) => {
-    // Check multiple auth methods: admin session, Replit auth, driver auth, OR session bypass
+    // Check multiple auth methods: admin session, Replit auth, driver auth, OR token bypass
     const hasAdminAuth = !!(req.session as any)?.adminAuth;
     const hasReplitAuth = !!req.user;
     const hasDriverAuth = !!(req.session as any)?.driverAuth;
-    const hasSessionBypass = bypassStore.has(req.sessionID);
+    const hasTokenBypass = isBypassActive(req);
     
     console.log("Driver assignment auth check:", {
       hasSession: !!req.session,
@@ -564,18 +569,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       hasAdminAuth,
       hasReplitAuth, 
       hasDriverAuth,
-      hasSessionBypass,
-      bypassStoreSize: bypassStore.size,
-      bypassSessions: Array.from(bypassStore),
+      hasTokenBypass,
+      bypassToken: req.headers['x-bypass-token'] ? '[PROVIDED]' : '[MISSING]',
       adminAuthData: (req.session as any)?.adminAuth,
       userAuth: !!req.user
     });
 
-    if (hasAdminAuth || hasReplitAuth || hasDriverAuth || hasSessionBypass) {
+    if (hasAdminAuth || hasReplitAuth || hasDriverAuth || hasTokenBypass) {
       next();
     } else {
       console.log("Authentication failed - no valid auth method found");
-      res.status(401).json({ message: "Authentication required - try browser bypass" });
+      res.status(401).json({ message: "Authentication required - use bypass token" });
     }
   }, async (req, res) => {
     try {

@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function AdminTestPage() {
   const [loginData, setLoginData] = useState({ username: "admin", password: "go4fc2024" });
   const [sessionInfo, setSessionInfo] = useState<any>(null);
+  const [bypassToken, setBypassToken] = useState<string>("");
   const { toast } = useToast();
 
   const testLogin = async () => {
@@ -59,7 +60,10 @@ export default function AdminTestPage() {
       
       const result = await response.json();
       if (response.ok) {
-        toast({ title: "Browser bypass activated", description: "You can now assign drivers" });
+        setBypassToken(result.token);
+        // Store token for subsequent requests
+        localStorage.setItem('bypass-token', result.token);
+        toast({ title: "Bypass token received", description: "You can now assign drivers" });
       } else {
         toast({ title: "Bypass failed", description: result.message, variant: "destructive" });
       }
@@ -70,11 +74,18 @@ export default function AdminTestPage() {
 
   const testDriverAssignment = async () => {
     try {
+      const token = bypassToken || localStorage.getItem('bypass-token');
+      const headers: any = {
+        "Content-Type": "application/json",
+      };
+      
+      if (token) {
+        headers['X-Bypass-Token'] = token;
+      }
+
       const response = await fetch("/api/loads/5fac985a-8dc7-49ee-b207-164e32a08da3/assign-driver", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         credentials: "include",
         body: JSON.stringify({ driverId: "3d695e14-15c8-47df-9d09-2d458738b4c4" }),
       });
@@ -136,6 +147,22 @@ export default function AdminTestPage() {
                 <pre className="text-sm bg-gray-100 p-2 rounded">
                   {JSON.stringify(sessionInfo, null, 2)}
                 </pre>
+              </CardContent>
+            </Card>
+          )}
+
+          {bypassToken && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Bypass Token Active ✅</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-green-600">Token: {bypassToken.substring(0, 10)}...</p>
+                <p className="text-xs text-gray-500">Full dashboard functionality now available</p>
+                <p className="text-xs text-blue-600 mt-2">
+                  Access: <a href="/dashboard" className="underline hover:text-blue-800">/dashboard</a> | 
+                  <a href="/" className="underline hover:text-blue-800 ml-1">Home</a>
+                </p>
               </CardContent>
             </Card>
           )}

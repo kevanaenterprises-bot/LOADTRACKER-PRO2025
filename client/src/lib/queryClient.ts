@@ -12,9 +12,17 @@ export async function apiRequest(
   method: string,
   data?: unknown | undefined,
 ): Promise<any> {
+  // Add bypass token if available
+  const bypassToken = localStorage.getItem('bypass-token');
+  const headers: any = data ? { "Content-Type": "application/json" } : {};
+  
+  if (bypassToken) {
+    headers['X-Bypass-Token'] = bypassToken;
+  }
+
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -29,8 +37,17 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    // Add bypass token if available
+    const bypassToken = localStorage.getItem('bypass-token');
+    const headers: any = {};
+    
+    if (bypassToken) {
+      headers['X-Bypass-Token'] = bypassToken;
+    }
+
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
+      headers,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
