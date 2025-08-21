@@ -131,7 +131,7 @@ export default function Dashboard() {
   // Mutations
   const createDriverMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/drivers", data);
+      return await apiRequest("/api/drivers", "POST", data);
     },
     onSuccess: () => {
       toast({
@@ -153,7 +153,7 @@ export default function Dashboard() {
 
   const createLocationMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/locations", data);
+      return await apiRequest("/api/locations", "POST", data);
     },
     onSuccess: () => {
       toast({
@@ -175,7 +175,7 @@ export default function Dashboard() {
 
   const createRateMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/rates", data);
+      return await apiRequest("/api/rates", "POST", data);
     },
     onSuccess: () => {
       toast({
