@@ -220,12 +220,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         username, 
         usernameLength: username?.length,
         password: password ? `[LENGTH:${password.length}]` : "[MISSING]",
-        passwordActual: JSON.stringify(password)
+        passwordActual: JSON.stringify(password),
+        sessionId: req.sessionID,
+        hasSession: !!req.session
       });
       
       // Check for admin credentials (case insensitive, trim whitespace)
       if (username.toLowerCase().trim() === "admin" && password.trim() === "go4fc2024") {
         console.log("Admin credentials matched successfully");
+        
+        // Ensure session exists
+        if (!req.session) {
+          console.error("No session available for admin login");
+          return res.status(500).json({ message: "Session error" });
+        }
+        
         // Create admin user session
         (req.session as any).adminAuth = {
           id: "admin-001",
@@ -235,9 +244,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: "User"
         };
 
-        res.json({ 
-          message: "Login successful", 
-          user: (req.session as any).adminAuth 
+        // Force session save
+        req.session.save((err) => {
+          if (err) {
+            console.error("Session save error:", err);
+            return res.status(500).json({ message: "Session save failed" });
+          }
+          
+          console.log("Session saved successfully, adminAuth:", (req.session as any).adminAuth);
+          res.json({ 
+            message: "Login successful", 
+            user: (req.session as any).adminAuth 
+          });
         });
       } else {
         console.log("Invalid admin credentials provided:", { username, passwordLength: password?.length });
@@ -255,7 +273,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Admin user check:", { 
         hasSession: !!req.session, 
         hasAdminAuth: !!adminUser,
-        sessionId: req.sessionID
+        sessionId: req.sessionID,
+        sessionData: req.session ? Object.keys(req.session) : "no session",
+        adminAuthData: adminUser || "none"
       });
       
       if (adminUser) {

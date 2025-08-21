@@ -27,13 +27,14 @@ export function getSession() {
   return session({
     secret: process.env.SESSION_SECRET!,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true, // Create session for new users
     cookie: {
       httpOnly: true,
       secure: false, // Allow cookies over HTTP in development
       maxAge: sessionTtl,
       sameSite: "lax",
     },
+    name: 'connect.sid', // Explicit session name
   });
 }
 
