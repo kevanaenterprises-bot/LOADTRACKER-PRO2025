@@ -235,6 +235,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 function generateInvoiceHTML(invoice: any, load: any): string {
   const currentDate = new Date().toLocaleDateString();
   
+  // Note: Logo will be displayed in print preview - for now using text header
+  
   return `
     <!DOCTYPE html>
     <html>
@@ -251,10 +253,21 @@ function generateInvoiceHTML(invoice: any, load: any): string {
           line-height: 1.4;
         }
         .header {
-          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           border-bottom: 2px solid #333;
           padding-bottom: 20px;
           margin-bottom: 30px;
+          gap: 20px;
+        }
+        .logo {
+          width: 80px;
+          height: 80px;
+          object-fit: contain;
+        }
+        .company-info-section {
+          text-align: center;
         }
         .company-name {
           font-size: 28px;
@@ -312,11 +325,13 @@ function generateInvoiceHTML(invoice: any, load: any): string {
     </head>
     <body>
       <div class="header">
-        <div class="company-name">GO 4 Farms & Cattle</div>
-        <div class="company-info">
-          123 Farm Road, Agriculture City, TX 75001<br>
-          Phone: (555) 123-4567 • Email: billing@go4farms.com<br>
-          Federal Tax ID: 12-3456789
+        <div class="company-info-section">
+          <div class="company-name">🐄 GO 4 Farms & Cattle 🌾</div>
+          <div class="company-info">
+            Melissa, Texas 75454<br>
+            Phone: (555) 123-4567 • Email: billing@go4farms.com<br>
+            Federal Tax ID: 12-3456789
+          </div>
         </div>
       </div>
 

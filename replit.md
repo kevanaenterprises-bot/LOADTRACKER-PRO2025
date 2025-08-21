@@ -19,6 +19,8 @@ Preferred communication style: Simple, everyday language.
 - ✅ Automatically generates loads from corrected Wright Con data with confidence scoring
 - ✅ Updated database schema with OCR fields: poNumber, appointmentTime, pickupAddress, deliveryAddress, companyName
 - ✅ Added multer file upload support for image processing (10MB limit, image files only)
+- ✅ **Company Branding** - Integrated Go Farms & Cattle logo in dashboard header and invoices
+- ✅ Updated company address to Melissa, Texas in all branding elements
 
 **August 21, 2025 - Fixed "HTTP not token" Authentication Error**
 - ✅ Resolved authentication middleware to accept multiple auth methods (Admin, Replit, Driver)

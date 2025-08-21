@@ -13,6 +13,7 @@ import LoadForm from "@/components/LoadForm";
 import LoadsTable from "@/components/LoadsTable";
 import InvoiceInbox from "@/components/InvoiceInbox";
 import { OCRUploader } from "@/components/OCRUploader";
+import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -250,52 +251,46 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Header */}
-      <header className="bg-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-primary">LoadTracker Pro</h1>
-              <nav className="hidden md:ml-8 md:flex md:space-x-8">
+      {/* Header with Logo */}
+      <Header title="LoadTracker Pro" />
+      
+      {/* Navigation Bar */}
+      <div className="bg-white border-b border-gray-200 px-6 py-3 sticky top-[72px] z-40">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <nav className="flex space-x-8">
+              <button 
+                className="text-blue-600 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-blue-600"
+              >
+                Office Dashboard
+              </button>
+              {user?.role === "office" && (
                 <button 
-                  className="nav-btn text-secondary hover:text-primary px-3 py-2 rounded-md text-sm font-medium border-b-2 border-primary"
+                  onClick={switchToDriverView}
+                  className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Office Dashboard
+                  Driver Portal
                 </button>
-                {user?.role === "office" && (
-                  <button 
-                    onClick={switchToDriverView}
-                    className="nav-btn text-gray-500 hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    Driver Portal
-                  </button>
-                )}
-              </nav>
+              )}
+            </nav>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <img 
+                className="h-8 w-8 rounded-full bg-blue-600" 
+                src={user?.profileImageUrl || `https://ui-avatars.io/api/?name=${user?.firstName || 'User'}+${user?.lastName || 'User'}&background=1976D2&color=fff`}
+                alt="User avatar" 
+              />
+              <span className="text-sm font-medium text-gray-700">
+                {user?.firstName || 'User'} {user?.lastName || ''}
+              </span>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <i className="fas fa-bell text-gray-400 hover:text-primary cursor-pointer text-xl"></i>
-                <span className="absolute -top-1 -right-1 bg-error text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  0
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <img 
-                  className="h-8 w-8 rounded-full bg-primary" 
-                  src={user?.profileImageUrl || `https://ui-avatars.io/api/?name=${user?.firstName || 'User'}+${user?.lastName || 'User'}&background=1976D2&color=fff`}
-                  alt="User avatar" 
-                />
-                <span className="text-sm font-medium text-secondary">
-                  {user?.firstName || 'User'} {user?.lastName || ''}
-                </span>
-              </div>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                <i className="fas fa-sign-out-alt mr-2"></i>
-                Logout
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              Logout
+            </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Dashboard Stats */}
