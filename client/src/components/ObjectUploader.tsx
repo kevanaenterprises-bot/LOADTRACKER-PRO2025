@@ -73,10 +73,16 @@ export function ObjectUploader({
         shouldUseMultipart: false,
         getUploadParameters: async (file) => {
           try {
-            console.log("ObjectUploader: Getting upload parameters for file:", file.name);
+            console.log("ObjectUploader: Getting upload parameters for file:", file.name, file.type, file.size);
             const params = await onGetUploadParameters();
             console.log("ObjectUploader: Upload parameters received:", params);
-            return params;
+            
+            // Return the exact format expected by Uppy
+            return {
+              method: params.method,
+              url: params.url,
+              headers: {},
+            };
           } catch (error) {
             console.error("ObjectUploader: Failed to get upload parameters:", error);
             throw error;
@@ -88,22 +94,59 @@ export function ObjectUploader({
         onUploadStart?.();
       })
       .on("upload-progress", (file, progress) => {
-        console.log("ObjectUploader: Upload progress:", file?.name, progress);
+        console.log("ObjectUploader: Upload progress:", file?.name, `${progress.bytesUploaded}/${progress.bytesTotal} (${Math.round(progress.percentage || 0)}%)`);
       })
       .on("upload-success", (file, response) => {
         console.log("ObjectUploader: Upload success:", file?.name, response);
       })
-      .on("upload-error", (file, error) => {
-        console.error("ObjectUploader: Upload error for file:", file?.name, error);
+      .on("upload-error", (file, error, response) => {
+        console.error("ObjectUploader: Upload error for file:", file?.name);
+        console.error("ObjectUploader: Error details:", error);
+        console.error("ObjectUploader: Response:", response);
+      })
+      .on("restriction-failed", (file, error) => {
+        console.error("ObjectUploader: Restriction failed:", file?.name, error);
       })
       .on("error", (error) => {
         console.error("ObjectUploader: General error:", error);
       })
+      .on("info-visible", () => {
+        console.log("ObjectUploader: Info visible");
+      })
+      .on("info-hidden", () => {
+        console.log("ObjectUploader: Info hidden");
+      })
       .on("complete", (result) => {
-        console.log("ObjectUploader: Upload complete:", result);
+        console.log("ObjectUploader: Upload complete with result:", {
+          successful: result.successful?.length || 0,
+          failed: result.failed?.length || 0,
+          uploadID: result.uploadID
+        });
+        
         if (result.failed && result.failed.length > 0) {
-          console.error("ObjectUploader: Failed uploads:", result.failed);
+          console.error("ObjectUploader: Failed uploads detailed:", result.failed);
+          result.failed.forEach((failure: any, index: number) => {
+            console.error(`ObjectUploader: Failure ${index + 1}:`, {
+              fileName: failure.name,
+              fileSize: failure.size,
+              fileType: failure.type,
+              errorMessage: typeof failure.error === 'string' ? failure.error : failure.error?.message,
+              response: failure.response
+            });
+          });
         }
+        
+        if (result.successful && result.successful.length > 0) {
+          console.log("ObjectUploader: Successful uploads:", result.successful);
+          result.successful.forEach((success: any, index: number) => {
+            console.log(`ObjectUploader: Success ${index + 1}:`, {
+              fileName: success.name,
+              uploadURL: success.uploadURL,
+              response: success.response
+            });
+          });
+        }
+        
         onComplete?.(result);
       })
   );
