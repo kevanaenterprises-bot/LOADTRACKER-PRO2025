@@ -116,6 +116,10 @@ export default function Landing() {
                     <i className="fas fa-user-shield mr-2"></i>
                     Admin Invoice Fix
                   </Button>
+                  <Button onClick={() => setLocation('/simple-invoice')} variant="ghost" size="lg" className="px-8 py-3 text-lg">
+                    <i className="fas fa-cog mr-2"></i>
+                    Simple Invoice Test
+                  </Button>
                 </div>
               </div>
             </CardContent>
