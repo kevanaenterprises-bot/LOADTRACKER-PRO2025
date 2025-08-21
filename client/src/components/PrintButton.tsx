@@ -101,25 +101,48 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const handlePrintBOL = async () => {
     setIsPrinting(true);
     try {
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
+      // Check if BOL document exists as attachment
+      if (load?.bolDocumentPath) {
+        // If BOL document exists, open it for printing
+        const bolUrl = `/objects/${load.bolDocumentPath}`;
+        const printWindow = window.open(bolUrl, '_blank');
+        if (!printWindow) {
+          throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
+        }
+        
+        // Wait for document to load then trigger print
+        printWindow.onload = () => {
+          setTimeout(() => {
+            printWindow.print();
+          }, 1000); // Give it time to load
+        };
+        
+        toast({
+          title: "BOL Document Opened",
+          description: "BOL document attachment has been opened for printing.",
+        });
+      } else {
+        // If no document attachment, print BOL form template
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+          throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
+        }
+
+        const bolHTML = generateBOLHTML(load);
+        
+        printWindow.document.write(bolHTML);
+        printWindow.document.close();
+        
+        printWindow.onload = () => {
+          printWindow.print();
+          printWindow.close();
+        };
+
+        toast({
+          title: "BOL Template Sent to Printer",
+          description: "Bill of Lading template has been prepared for printing.",
+        });
       }
-
-      const bolHTML = generateBOLHTML(load);
-      
-      printWindow.document.write(bolHTML);
-      printWindow.document.close();
-      
-      printWindow.onload = () => {
-        printWindow.print();
-        printWindow.close();
-      };
-
-      toast({
-        title: "BOL Sent to Printer",
-        description: "Bill of Lading has been prepared for printing.",
-      });
       
     } catch (error: any) {
       toast({
@@ -172,7 +195,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-sm text-gray-600">
-                    Load: {load.number_109} • Destination: {load.destination}
+                    Load: {load.number_109 || load.number109} • Destination: {load.destination}
                   </p>
                 </CardContent>
               </Card>
@@ -182,11 +205,22 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                   <CardTitle className="text-sm flex items-center">
                     <FileText className="h-4 w-4 mr-2 text-orange-600" />
                     Bill of Lading (BOL)
+                    {load.bolDocumentPath && (
+                      <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
+                        Document Attached
+                      </span>
+                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-sm text-gray-600">
-                    Load: {load.number_109} • Origin: {load.origin}
+                    Load: {load.number_109 || load.number109} • Origin: {load.origin}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {load.bolDocumentPath ? 
+                      "Will print attached BOL document" : 
+                      "Will print BOL template form"
+                    }
                   </p>
                 </CardContent>
               </Card>
@@ -290,7 +324,9 @@ function generateInvoiceHTML(invoice: any, load: any): string {
         <div>
           <div class="invoice-number">INVOICE ${invoice?.invoiceNumber || 'N/A'}</div>
           <div>Date: ${currentDate}</div>
-          <div>Load: ${load?.number_109 || 'N/A'}</div>
+          <div>Load: ${load?.number_109 || load?.number109 || 'N/A'}</div>
+          <div>BOL: ${load?.bolNumber || '374'}</div>
+          <div>Trip: ${load?.tripNumber || generateTripNumber()}</div>
         </div>
         <div>
           <div><strong>Status:</strong> ${invoice?.status || 'Pending'}</div>
@@ -309,7 +345,7 @@ function generateInvoiceHTML(invoice: any, load: any): string {
         </thead>
         <tbody>
           <tr>
-            <td>Transportation Service - Load ${load?.number_109 || 'N/A'}</td>
+            <td>Transportation Service - Load ${load?.number_109 || load?.number109 || 'N/A'} (BOL: ${load?.bolNumber || '374'}, Trip: ${load?.tripNumber || generateTripNumber()})</td>
             <td>${load?.origin || 'N/A'}</td>
             <td>${load?.destination || 'N/A'}</td>
             <td>$${invoice?.flatRate || '0.00'}</td>
@@ -349,6 +385,11 @@ function generateInvoiceHTML(invoice: any, load: any): string {
     </body>
     </html>
   `;
+}
+
+function generateTripNumber(): string {
+  // Generate a 4-digit trip number based on current timestamp
+  return String(Date.now()).slice(-4);
 }
 
 function generatePODHTML(load: any): string {
@@ -403,7 +444,9 @@ function generatePODHTML(load: any): string {
 
       <div class="load-info">
         <h3>Load Information</h3>
-        <p><strong>Load Number:</strong> ${load?.number_109 || 'N/A'}</p>
+        <p><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</p>
+        <p><strong>BOL Number:</strong> ${load?.bolNumber || '374'}</p>
+        <p><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</p>
         <p><strong>Origin:</strong> ${load?.origin || 'N/A'}</p>
         <p><strong>Destination:</strong> ${load?.destination || 'N/A'}</p>
         <p><strong>Driver:</strong> ${load?.driverId || 'N/A'}</p>
@@ -485,7 +528,7 @@ function generateBOLHTML(load: any): string {
       <table class="bol-table">
         <tr>
           <th>Load Number</th>
-          <td>${load?.number_109 || 'N/A'}</td>
+          <td>${load?.number_109 || load?.number109 || 'N/A'}</td>
           <th>Date</th>
           <td>${currentDate}</td>
         </tr>
