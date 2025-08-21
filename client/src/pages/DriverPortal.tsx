@@ -1,10 +1,7 @@
 import { useEffect } from "react";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
-import { useAuth } from "@/hooks/useAuth";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import DriverLoadCard from "@/components/DriverLoadCard";
 import BOLEntryForm from "@/components/BOLEntryForm";
 import { Button } from "@/components/ui/button";
@@ -12,23 +9,17 @@ import { Button } from "@/components/ui/button";
 export default function DriverPortal() {
   const { toast } = useToast();
   const driverAuth = useDriverAuth();
-  const officeAuth = useAuth();
-  const adminAuth = useAdminAuth();
   
-  // For driver portal, prioritize driver auth but allow office/admin fallback
-  const isAuthenticated = driverAuth.isAuthenticated || 
-    (officeAuth.isAuthenticated && officeAuth.user?.role === "office") ||
-    adminAuth.isAuthenticated;
-  
-  // Only show loading if we're still checking driver auth and no other auth is available
-  const isLoading = driverAuth.isLoading && !officeAuth.isAuthenticated && !adminAuth.isAuthenticated;
-  const user = driverAuth.user || officeAuth.user || adminAuth.user;
+  // Simple authentication check - just like admin portal
+  const isAuthenticated = driverAuth.isAuthenticated;
+  const isLoading = driverAuth.isLoading;
+  const user = driverAuth.user;
 
-  // Redirect to login if not authenticated and not loading
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       toast({
-        title: "Unauthorized", 
+        title: "Unauthorized",
         description: "You are logged out. Logging in again...",
         variant: "destructive",
       });
@@ -41,16 +32,8 @@ export default function DriverPortal() {
 
   const { data: loads = [], isLoading: loadsLoading } = useQuery({
     queryKey: ["/api/driver/loads"],
-    enabled: driverAuth.isAuthenticated, // Only use driver endpoint if driver is authenticated
+    enabled: isAuthenticated,
   });
-
-  // Use fallback query for office/admin users
-  const { data: fallbackLoads = [] } = useQuery({
-    queryKey: ["/api/loads"],
-    enabled: !driverAuth.isAuthenticated && (officeAuth.isAuthenticated || adminAuth.isAuthenticated),
-  });
-
-  const actualLoads = driverAuth.isAuthenticated ? loads : fallbackLoads;
 
   if (isLoading) {
     return (
@@ -68,11 +51,11 @@ export default function DriverPortal() {
     return null;
   }
 
-  const currentLoad = Array.isArray(actualLoads) ? actualLoads.find((load: any) => 
+  const currentLoad = Array.isArray(loads) ? loads.find((load: any) => 
     !["completed", "delivered"].includes(load.status)
   ) : null;
 
-  const recentLoads = Array.isArray(actualLoads) ? actualLoads.filter((load: any) => 
+  const recentLoads = Array.isArray(loads) ? loads.filter((load: any) => 
     ["completed", "delivered"].includes(load.status)
   ).slice(0, 5) : [];
 
@@ -86,10 +69,6 @@ export default function DriverPortal() {
     } catch (error) {
       window.location.href = "/";
     }
-  };
-
-  const switchToDashboard = () => {
-    window.location.href = "/dashboard";
   };
 
   return (
@@ -110,14 +89,8 @@ export default function DriverPortal() {
             </div>
           </div>
         </div>
-        <div className="flex justify-between mt-3">
-          {user?.role === "office" && (
-            <Button variant="secondary" size="sm" onClick={switchToDashboard}>
-              <i className="fas fa-tachometer-alt mr-1"></i>
-              Dashboard
-            </Button>
-          )}
-          <Button variant="secondary" size="sm" onClick={handleLogout} className="ml-auto">
+        <div className="flex justify-end mt-3">
+          <Button variant="secondary" size="sm" onClick={handleLogout}>
             <i className="fas fa-sign-out-alt mr-1"></i>
             Logout
           </Button>
