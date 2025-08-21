@@ -38,7 +38,7 @@ const locationSchema = z.object({
 const rateSchema = z.object({
   city: z.string().min(1, "City is required"),
   state: z.string().min(2, "State is required").max(2, "Use 2-letter state code"),
-  flatRate: z.coerce.number().min(0, "Rate must be non-negative"),
+  flatRate: z.string().min(1, "Rate is required"),
 });
 
 export default function Dashboard() {
@@ -97,7 +97,7 @@ export default function Dashboard() {
     defaultValues: {
       city: "",
       state: "",
-      flatRate: 0,
+      flatRate: "0",
     },
   });
 
@@ -337,7 +337,7 @@ export default function Dashboard() {
 
           {/* Driver Management Tab */}
           <TabsContent value="drivers" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -424,182 +424,160 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <i className="fas fa-mobile-alt text-primary"></i>
-                    Driver Portal Access
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Switch to driver view to see the mobile interface for BOL entry and status updates.
-                  </p>
-                  <Button variant="outline" className="w-full" onClick={switchToDriverView}>
-                    <i className="fas fa-eye mr-2"></i>
-                    View Driver Portal
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Add Location Card */}
+              {/* Location & Rate Management Card */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <i className="fas fa-map-marker-alt text-primary"></i>
-                    Add Location
+                    Location & Rate Management
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <p className="text-gray-600 mb-4">
-                    Register new delivery locations for load assignments and rate calculations.
+                    Register delivery locations and set flat rates for automatic invoice calculations.
                   </p>
-                  <Dialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="w-full">
-                        <i className="fas fa-plus mr-2"></i>
-                        Add Location
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Location</DialogTitle>
-                      </DialogHeader>
-                      <Form {...locationForm}>
-                        <form onSubmit={locationForm.handleSubmit((data) => createLocationMutation.mutate(data))} className="space-y-4">
-                          <FormField
-                            control={locationForm.control}
-                            name="name"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Location Name</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Miami Distribution Center" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={locationForm.control}
-                            name="city"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>City</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Miami" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={locationForm.control}
-                            name="state"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>State</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="FL" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={locationForm.control}
-                            name="zipCode"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>ZIP Code</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="33101" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <Button type="submit" disabled={createLocationMutation.isPending}>
-                            {createLocationMutation.isPending ? "Adding..." : "Add Location"}
-                          </Button>
-                        </form>
-                      </Form>
-                    </DialogContent>
-                  </Dialog>
-                </CardContent>
-              </Card>
+                  
+                  <div className="flex space-x-2">
+                    <Dialog open={locationDialogOpen} onOpenChange={setLocationDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="flex-1">
+                          <i className="fas fa-plus mr-2"></i>
+                          Add Location
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Add New Location</DialogTitle>
+                        </DialogHeader>
+                        <Form {...locationForm}>
+                          <form onSubmit={locationForm.handleSubmit((data) => createLocationMutation.mutate(data))} className="space-y-4">
+                            <FormField
+                              control={locationForm.control}
+                              name="name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Location Name</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Miami Distribution Center" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={locationForm.control}
+                              name="city"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>City</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Miami" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={locationForm.control}
+                              name="state"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>State</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="FL" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={locationForm.control}
+                              name="zipCode"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>ZIP Code</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="33101" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <Button type="submit" disabled={createLocationMutation.isPending}>
+                              {createLocationMutation.isPending ? "Adding..." : "Add Location"}
+                            </Button>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </Dialog>
 
-              {/* Add Rate Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <i className="fas fa-dollar-sign text-primary"></i>
-                    Add Rate
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 mb-4">
-                    Set flat rates for city/state combinations to automatically calculate load payments.
-                  </p>
-                  <Dialog open={rateDialogOpen} onOpenChange={setRateDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="w-full">
-                        <i className="fas fa-plus mr-2"></i>
-                        Add Rate
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Rate</DialogTitle>
-                      </DialogHeader>
-                      <Form {...rateForm}>
-                        <form onSubmit={rateForm.handleSubmit((data) => createRateMutation.mutate(data))} className="space-y-4">
-                          <FormField
-                            control={rateForm.control}
-                            name="city"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>City</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="Miami" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={rateForm.control}
-                            name="state"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>State</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="FL" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={rateForm.control}
-                            name="flatRate"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Flat Rate ($)</FormLabel>
-                                <FormControl>
-                                  <Input type="number" placeholder="2500.00" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <Button type="submit" disabled={createRateMutation.isPending}>
-                            {createRateMutation.isPending ? "Adding..." : "Add Rate"}
-                          </Button>
-                        </form>
-                      </Form>
-                    </DialogContent>
-                  </Dialog>
+                    <Dialog open={rateDialogOpen} onOpenChange={setRateDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="flex-1" variant="outline">
+                          <i className="fas fa-dollar-sign mr-2"></i>
+                          Set Rate
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Set Rate for City/State</DialogTitle>
+                        </DialogHeader>
+                        <Form {...rateForm}>
+                          <form onSubmit={rateForm.handleSubmit((data) => createRateMutation.mutate(data))} className="space-y-4">
+                            <FormField
+                              control={rateForm.control}
+                              name="city"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>City</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Miami" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={rateForm.control}
+                              name="state"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>State</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="FL" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={rateForm.control}
+                              name="flatRate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Flat Rate ($)</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="2500.00" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <Button type="submit" disabled={createRateMutation.isPending}>
+                              {createRateMutation.isPending ? "Adding..." : "Set Rate"}
+                            </Button>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t">
+                    <Button variant="outline" className="w-full" onClick={switchToDriverView}>
+                      <i className="fas fa-eye mr-2"></i>
+                      View Driver Portal
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>
