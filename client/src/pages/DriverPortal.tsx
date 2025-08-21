@@ -37,21 +37,9 @@ export default function DriverPortal() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
-  const { data: loads, isLoading: loadsLoading } = useQuery({
+  const { data: loads = [], isLoading: loadsLoading } = useQuery({
     queryKey: ["/api/loads"],
     enabled: isAuthenticated,
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/driver-login";
-        }, 500);
-      }
-    },
   });
 
   if (isLoading || !isAuthenticated) {
@@ -65,13 +53,13 @@ export default function DriverPortal() {
     );
   }
 
-  const currentLoad = loads?.find((load: any) => 
+  const currentLoad = Array.isArray(loads) ? loads.find((load: any) => 
     !["completed", "delivered"].includes(load.status)
-  );
+  ) : null;
 
-  const recentLoads = loads?.filter((load: any) => 
+  const recentLoads = Array.isArray(loads) ? loads.filter((load: any) => 
     ["completed", "delivered"].includes(load.status)
-  ).slice(0, 5) || [];
+  ).slice(0, 5) : [];
 
   const handleLogout = async () => {
     try {

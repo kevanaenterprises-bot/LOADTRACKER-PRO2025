@@ -60,8 +60,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username and password are required" });
       }
 
-      const driver = await storage.getDriverByUsername(username);
-      console.log("Driver lookup result:", driver ? "Found" : "Not found");
+      // Make username search case-insensitive
+      const driver = await storage.getDriverByUsername(username.toLowerCase());
+      console.log("Driver lookup result:", driver ? "Found" : "Not found", "for username:", username.toLowerCase());
       
       if (!driver) {
         return res.status(401).json({ message: "Invalid username or password" });
