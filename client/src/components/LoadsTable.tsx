@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { PrintButton } from "@/components/PrintButton";
 import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -389,6 +390,15 @@ export default function LoadsTable() {
                   <Button variant="outline" onClick={() => setDialogOpen(false)}>
                     Close
                   </Button>
+                  
+                  {/* Print Button - Always available */}
+                  <PrintButton 
+                    loadId={selectedLoad.id}
+                    load={selectedLoad}
+                    invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id) : undefined}
+                    variant="outline"
+                  />
+                  
                   {!hasInvoice(selectedLoad.id) && (
                     <Button 
                       onClick={handleGenerateInvoice}

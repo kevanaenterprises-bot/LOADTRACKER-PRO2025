@@ -58,6 +58,8 @@ export interface IStorage {
   // Invoice operations
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
   getInvoices(): Promise<Invoice[]>;
+  getInvoice(invoiceId: string): Promise<Invoice | undefined>;
+  updateInvoice(invoiceId: string, updates: Partial<Invoice>): Promise<Invoice>;
   markInvoicePrinted(invoiceId: string): Promise<Invoice>;
 
   // Statistics
@@ -482,6 +484,20 @@ export class DatabaseStorage implements IStorage {
       status,
       notes,
     });
+  }
+
+  async getInvoice(invoiceId: string): Promise<Invoice | undefined> {
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, invoiceId));
+    return invoice;
+  }
+
+  async updateInvoice(invoiceId: string, updates: Partial<Invoice>): Promise<Invoice> {
+    const [updatedInvoice] = await db
+      .update(invoices)
+      .set(updates)
+      .where(eq(invoices.id, invoiceId))
+      .returning();
+    return updatedInvoice;
   }
 }
 

@@ -434,6 +434,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mark invoice as printed
+  app.patch("/api/invoices/:id/mark-printed", async (req, res) => {
+    try {
+      const invoiceId = req.params.id;
+      const invoice = await storage.getInvoice(invoiceId);
+      
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      const updatedInvoice = await storage.updateInvoice(invoiceId, {
+        printedAt: new Date().toISOString(),
+      });
+
+      res.json({ message: "Invoice marked as printed", invoice: updatedInvoice });
+    } catch (error) {
+      console.error("Error marking invoice as printed:", error);
+      res.status(500).json({ message: "Failed to mark invoice as printed" });
+    }
+  });
+
   // Manual invoice generation endpoint - COMPLETELY OPEN FOR TESTING
   app.post("/api/loads/:id/generate-invoice", async (req, res) => {
     try {
