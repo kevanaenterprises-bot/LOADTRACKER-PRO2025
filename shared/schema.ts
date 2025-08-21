@@ -67,6 +67,12 @@ export const loads = pgTable("loads", {
   podDocumentPath: varchar("pod_document_path"),
   extraStops: integer("extra_stops").default(0), // Number of extra stops
   lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"), // Lumper charge amount
+  // OCR-extracted fields from Wright Con
+  poNumber: varchar("po_number"),
+  appointmentTime: varchar("appointment_time"),
+  pickupAddress: text("pickup_address"),
+  deliveryAddress: text("delivery_address"),
+  companyName: varchar("company_name"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   // Timestamps for tracking

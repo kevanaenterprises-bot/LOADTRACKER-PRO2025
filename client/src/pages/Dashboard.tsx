@@ -12,6 +12,7 @@ import StatsCards from "@/components/StatsCards";
 import LoadForm from "@/components/LoadForm";
 import LoadsTable from "@/components/LoadsTable";
 import InvoiceInbox from "@/components/InvoiceInbox";
+import { OCRUploader } from "@/components/OCRUploader";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,7 +46,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "invoicing">("loads");
+  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "invoicing" | "ocr">("loads");
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
@@ -344,10 +345,14 @@ export default function Dashboard() {
 
         {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-8">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="loads" className="flex items-center gap-2">
               <i className="fas fa-truck"></i>
               Load Management
+            </TabsTrigger>
+            <TabsTrigger value="ocr" className="flex items-center gap-2">
+              <i className="fas fa-camera"></i>
+              Wright Con Scanner
             </TabsTrigger>
             <TabsTrigger value="drivers" className="flex items-center gap-2">
               <i className="fas fa-users"></i>
@@ -371,6 +376,20 @@ export default function Dashboard() {
               <div className="lg:col-span-2">
                 <LoadsTable />
               </div>
+            </div>
+          </TabsContent>
+
+          {/* OCR Wright Con Scanner Tab */}
+          <TabsContent value="ocr" className="mt-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-2">Wright Con Scanner</h2>
+                <p className="text-gray-600">
+                  Upload rate confirmation images to automatically extract load details and generate new loads.
+                  The system will read load numbers, PO numbers, appointment times, company names, and addresses.
+                </p>
+              </div>
+              <OCRUploader />
             </div>
           </TabsContent>
 

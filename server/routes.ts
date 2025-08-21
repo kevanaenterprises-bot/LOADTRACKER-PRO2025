@@ -4,6 +4,8 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { ObjectStorageService } from "./objectStorage";
 import { sendSMSToDriver } from "./smsService";
+import { processRateConfirmationImage } from "./ocrService";
+import multer from 'multer';
 import {
   insertLoadSchema,
   insertLocationSchema,
@@ -18,6 +20,21 @@ import {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   await setupAuth(app);
+  
+  // Configure multer for file uploads
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB limit
+    },
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'));
+      }
+    },
+  });
 
   // Admin authentication middleware
   const isAdminAuthenticated = (req: any, res: any, next: any) => {
@@ -923,6 +940,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error accessing object:", error);
       return res.sendStatus(404);
+    }
+  });
+
+  // OCR Routes for Wright Con processing
+  app.post('/api/ocr/extract', upload.single('image'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No image file provided' });
+      }
+
+      console.log("Processing image for OCR:", req.file.originalname, req.file.size);
+      
+      const extractedData = await processRateConfirmationImage(req.file.buffer);
+      
+      res.json(extractedData);
+    } catch (error) {
+      console.error('OCR extraction error:', error);
+      res.status(500).json({ 
+        message: 'Failed to extract data from image',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  app.post('/api/ocr/generate-load', async (req, res) => {
+    try {
+      const extractedData = req.body;
+      
+      if (!extractedData || extractedData.confidence < 0.3) {
+        return res.status(400).json({ 
+          message: 'Insufficient data or low confidence to generate load' 
+        });
+      }
+
+      // Generate a 109 number
+      const timestamp = Date.now();
+      const number109 = `109-${timestamp.toString().slice(-8)}`;
+
+      // Create the load with extracted data
+      const loadData = {
+        number109,
+        status: 'created' as const,
+        // Use extracted data if available, otherwise set to null
+        bolNumber: extractedData.loadNumber || null,
+        poNumber: extractedData.poNumber || null,
+        appointmentTime: extractedData.appointmentTime || null,
+        pickupAddress: extractedData.pickupAddress || null,
+        deliveryAddress: extractedData.deliveryAddress || null,
+        companyName: extractedData.companyName || null,
+        // Default values for required fields
+        extraStops: 0,
+        lumperCharge: "0.00",
+        estimatedMiles: null,
+        driverId: null,
+        locationId: null,
+        bolDocumentPath: null,
+        podDocumentPath: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const newLoad = await storage.createLoad(loadData);
+      
+      console.log("Generated load from OCR:", newLoad.number109);
+      
+      res.json({
+        ...newLoad,
+        message: `Load ${newLoad.number109} created from Wright Con data`,
+        extractedData
+      });
+      
+    } catch (error) {
+      console.error('Load generation error:', error);
+      res.status(500).json({ 
+        message: 'Failed to generate load from extracted data',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
