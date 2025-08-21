@@ -415,6 +415,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/loads/:id/bol-document", isAuthenticated, async (req, res) => {
+    try {
+      const { bolDocumentURL } = req.body;
+      
+      if (!bolDocumentURL) {
+        return res.status(400).json({ message: "BOL document URL is required" });
+      }
+
+      const userId = (req.user as any)?.claims?.sub;
+      const objectStorageService = new ObjectStorageService();
+      
+      // Set ACL policy for the uploaded document
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        bolDocumentURL,
+        {
+          owner: userId,
+          visibility: "private", // BOL documents should be private
+        }
+      );
+
+      // Update load with BOL document path
+      const load = await storage.updateLoadBOLDocument(req.params.id, objectPath);
+      
+      res.json(load);
+    } catch (error) {
+      console.error("Error updating load BOL document:", error);
+      res.status(500).json({ message: "Failed to update BOL document" });
+    }
+  });
+
   app.patch("/api/loads/:id/pod", isAuthenticated, async (req, res) => {
     try {
       const { podDocumentURL } = req.body;

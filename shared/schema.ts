@@ -63,6 +63,7 @@ export const loads = pgTable("loads", {
   status: varchar("status").notNull().default("created"), // created, en_route_pickup, at_shipper, left_shipper, en_route_receiver, at_receiver, delivered, completed
   bolNumber: varchar("bol_number"),
   tripNumber: varchar("trip_number"),
+  bolDocumentPath: varchar("bol_document_path"),
   podDocumentPath: varchar("pod_document_path"),
   extraStops: integer("extra_stops").default(0), // Number of extra stops
   lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"), // Lumper charge amount

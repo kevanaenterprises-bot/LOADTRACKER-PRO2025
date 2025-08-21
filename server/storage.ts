@@ -42,6 +42,7 @@ export interface IStorage {
   getLoad(id: string): Promise<LoadWithDetails | undefined>;
   updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load>;
   updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load>;
+  updateLoadBOLDocument(id: string, bolDocumentPath: string): Promise<Load>;
   updateLoadPOD(id: string, podDocumentPath: string): Promise<Load>;
   getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]>;
 
@@ -287,6 +288,16 @@ export class DatabaseStorage implements IStorage {
       loadId: id,
     });
 
+    return updatedLoad;
+  }
+
+  async updateLoadBOLDocument(id: string, bolDocumentPath: string): Promise<Load> {
+    const [updatedLoad] = await db
+      .update(loads)
+      .set({ bolDocumentPath, updatedAt: new Date() })
+      .where(eq(loads.id, id))
+      .returning();
+    
     return updatedLoad;
   }
 
