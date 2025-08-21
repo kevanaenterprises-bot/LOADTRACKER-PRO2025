@@ -83,30 +83,51 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
   });
 
   const handleGetUploadParameters = async () => {
-    const response = await fetch("/api/objects/upload", {
-      method: "POST",
-      credentials: "include",
-    });
+    try {
+      console.log("QuickBOLUpload: Getting upload parameters...");
+      const response = await fetch("/api/objects/upload", {
+        method: "POST",
+        credentials: "include",
+      });
 
-    if (!response.ok) {
-      throw new Error("Failed to get upload URL");
+      console.log("QuickBOLUpload: Upload URL response status:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("QuickBOLUpload: Failed to get upload URL:", response.status, errorText);
+        throw new Error(`Failed to get upload URL: ${response.status} ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log("QuickBOLUpload: Upload parameters received:", data);
+      return {
+        method: "PUT" as const,
+        url: data.uploadURL,
+      };
+    } catch (error) {
+      console.error("QuickBOLUpload: Error in handleGetUploadParameters:", error);
+      throw error;
     }
-
-    const data = await response.json();
-    return {
-      method: "PUT" as const,
-      url: data.uploadURL,
-    };
   };
 
   const handleUploadComplete = (result: any) => {
+    console.log("QuickBOLUpload: Upload complete result:", result);
     if (result.successful && result.successful[0]) {
       const uploadURL = result.successful[0].uploadURL;
+      console.log("QuickBOLUpload: Updating BOL document with URL:", uploadURL);
       updateBOLDocumentMutation.mutate(uploadURL);
+    } else {
+      console.error("QuickBOLUpload: Upload failed or no successful uploads:", result);
+      toast({
+        title: "Error",
+        description: "Upload failed - no successful files",
+        variant: "destructive",
+      });
     }
   };
 
   const handleUploadStart = () => {
+    console.log("QuickBOLUpload: Upload started");
     setUploading(true);
   };
 

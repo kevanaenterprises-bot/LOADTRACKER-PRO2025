@@ -84,14 +84,26 @@ export function ObjectUploader({
         },
       })
       .on("upload", () => {
-        console.log("Upload started");
+        console.log("ObjectUploader: Upload started");
         onUploadStart?.();
       })
+      .on("upload-progress", (file, progress) => {
+        console.log("ObjectUploader: Upload progress:", file?.name, progress);
+      })
+      .on("upload-success", (file, response) => {
+        console.log("ObjectUploader: Upload success:", file?.name, response);
+      })
       .on("upload-error", (file, error) => {
-        console.error("Upload error:", error);
+        console.error("ObjectUploader: Upload error for file:", file?.name, error);
+      })
+      .on("error", (error) => {
+        console.error("ObjectUploader: General error:", error);
       })
       .on("complete", (result) => {
-        console.log("Upload complete:", result);
+        console.log("ObjectUploader: Upload complete:", result);
+        if (result.failed && result.failed.length > 0) {
+          console.error("ObjectUploader: Failed uploads:", result.failed);
+        }
         onComplete?.(result);
       })
   );
