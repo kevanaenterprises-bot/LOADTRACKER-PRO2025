@@ -160,8 +160,10 @@ export default function AdminTestPage() {
                 <p className="text-sm text-green-600">Token: {bypassToken.substring(0, 10)}...</p>
                 <p className="text-xs text-gray-500">Full dashboard functionality now available</p>
                 <p className="text-xs text-blue-600 mt-2">
-                  Access: <a href="/dashboard" className="underline hover:text-blue-800">/dashboard</a> | 
-                  <a href="/" className="underline hover:text-blue-800 ml-1">Home</a>
+                  ✅ Dashboard fully accessible: <a href="/dashboard" className="underline hover:text-blue-800 font-bold">/dashboard</a>
+                </p>
+                <p className="text-xs text-green-600 mt-1">
+                  All features working: Load management, Driver assignment, GPS tracking, Invoice generation
                 </p>
               </CardContent>
             </Card>

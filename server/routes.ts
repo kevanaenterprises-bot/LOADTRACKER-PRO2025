@@ -211,7 +211,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
   
   function isBypassActive(req: any): boolean {
-    return req.headers['x-bypass-token'] === BYPASS_SECRET;
+    const token = req.headers['x-bypass-token'];
+    const isActive = token === BYPASS_SECRET;
+    console.log("Bypass check:", { token: token ? '[PROVIDED]' : '[MISSING]', expected: BYPASS_SECRET, isActive });
+    return isActive;
   }
 
   // Simple browser auth bypass for testing
@@ -331,8 +334,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Dashboard stats - WITH TOKEN BYPASS
   app.get("/api/dashboard/stats", (req, res, next) => {
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
-    if (hasAuth) {
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasTokenBypass = isBypassActive(req);
+    
+    console.log("Dashboard stats auth check:", {
+      hasAdminAuth,
+      hasReplitAuth,
+      hasTokenBypass,
+      headers: Object.keys(req.headers),
+      bypassToken: req.headers['x-bypass-token'] ? '[PROVIDED]' : '[MISSING]'
+    });
+    
+    if (hasAdminAuth || hasReplitAuth || hasTokenBypass) {
       next();
     } else {
       res.status(401).json({ message: "Authentication required" });
