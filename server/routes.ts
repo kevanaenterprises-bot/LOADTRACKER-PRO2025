@@ -540,7 +540,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       hasReplitAuth: !!req.user,
       hasDriverAuth: !!(req.session as any)?.driverAuth,
       hasTokenBypass: isBypassActive(req),
-      sessionId: req.sessionID
+      sessionId: req.sessionID,
+      requestBody: JSON.stringify(req.body).substring(0, 200),
+      headers: Object.keys(req.headers)
     });
     if (hasAuth) {
       next();
@@ -550,16 +552,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, async (req, res) => {
     try {
+      console.log("Load creation - validating request body:", JSON.stringify(req.body));
       const validatedData = insertLoadSchema.parse(req.body);
+      console.log("Load creation - validation successful, creating load:", validatedData);
       
       // Check if 109 number already exists
       const existingLoads = await storage.getLoads();
       const exists = existingLoads.some(load => load.number109 === validatedData.number109);
       if (exists) {
+        console.log("Load creation failed - 109 number already exists:", validatedData.number109);
         return res.status(400).json({ message: "109 number already exists" });
       }
 
       const load = await storage.createLoad(validatedData);
+      console.log("Load creation successful:", load.id);
 
       // Send SMS to driver if assigned
       if (validatedData.driverId) {
@@ -582,9 +588,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       res.status(201).json(load);
-    } catch (error) {
-      console.error("Error creating load:", error);
-      res.status(400).json({ message: "Invalid load data" });
+    } catch (error: any) {
+      console.error("Error creating load - full details:", error);
+      if (error?.name === 'ZodError') {
+        console.error("Zod validation errors:", error.errors);
+        res.status(400).json({ message: "Invalid load data", errors: error.errors });
+      } else {
+        res.status(400).json({ message: error?.message || "Invalid load data" });
+      }
     }
   });
 

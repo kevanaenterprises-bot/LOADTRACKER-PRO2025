@@ -61,7 +61,7 @@ export default function LoadForm() {
 
   const createLoadMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      await apiRequest("POST", "/api/loads", data);
+      await apiRequest("/api/loads", "POST", data);
     },
     onSuccess: () => {
       toast({
