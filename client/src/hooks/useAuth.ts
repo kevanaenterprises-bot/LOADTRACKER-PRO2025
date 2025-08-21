@@ -8,7 +8,7 @@ export function useAuth() {
     refetchInterval: false,
     refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    enabled: true, // Always enabled for now
+    enabled: true,
   });
 
   return {

@@ -8,6 +8,7 @@ import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
+import AdminTestDashboard from "@/pages/AdminTestDashboard";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
@@ -49,12 +50,14 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/admin-test" component={AdminTestDashboard} />
         </>
       ) : (
         <>
           {/* Landing page with options for both admin and Replit login */}
           <Route path="/" component={Landing} />
           <Route path="/dashboard" component={Landing} />
+          <Route path="/admin-test" component={AdminTestDashboard} />
         </>
       )}
       

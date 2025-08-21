@@ -35,7 +35,7 @@ export default function Dashboard() {
 
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && !isLoading,
   });
 
   if (isLoading || !isAuthenticated) {
