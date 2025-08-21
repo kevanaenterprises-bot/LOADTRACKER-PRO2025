@@ -60,18 +60,8 @@ export default function LoadsTable() {
 
   const { data: loads, isLoading } = useQuery({
     queryKey: ["/api/loads"],
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      }
-    },
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {
@@ -90,7 +80,7 @@ export default function LoadsTable() {
   }
 
   // Filter out completed loads for the main table
-  const activeLoads = loads?.filter((load: any) => load.status !== "completed") || [];
+  const activeLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status !== "completed") : [];
 
   return (
     <Card className="material-card">
