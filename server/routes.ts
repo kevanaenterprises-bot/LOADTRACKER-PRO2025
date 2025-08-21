@@ -403,8 +403,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POD upload
-  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+  // POD upload - Support both admin and driver authentication
+  app.post("/api/objects/upload", (req, res, next) => {
+    // Check for either Replit Auth or Driver Auth
+    const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
+    const hasDriverAuth = (req.session as any)?.driverAuth;
+    
+
+    
+    if (hasReplitAuth || hasDriverAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Unauthorized" });
+    }
+  }, async (req, res) => {
     try {
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
@@ -415,7 +427,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loads/:id/bol-document", isAuthenticated, async (req, res) => {
+  app.patch("/api/loads/:id/bol-document", (req, res, next) => {
+    // Check for either Replit Auth or Driver Auth
+    const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
+    const hasDriverAuth = (req.session as any)?.driverAuth;
+    
+    if (hasReplitAuth || hasDriverAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Unauthorized" });
+    }
+  }, async (req, res) => {
     try {
       const { bolDocumentURL } = req.body;
       
@@ -423,7 +445,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "BOL document URL is required" });
       }
 
-      const userId = (req.user as any)?.claims?.sub;
+      // Get user ID from either auth system
+      const userId = (req.user as any)?.claims?.sub || (req.session as any)?.driverAuth?.userId;
       const objectStorageService = new ObjectStorageService();
       
       // Set ACL policy for the uploaded document
