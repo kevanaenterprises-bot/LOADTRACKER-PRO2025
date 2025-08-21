@@ -329,8 +329,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard stats
-  app.get("/api/dashboard/stats", isAdminAuthenticated, async (req, res) => {
+  // Dashboard stats - WITH TOKEN BYPASS
+  app.get("/api/dashboard/stats", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const stats = await storage.getDashboardStats();
       res.json(stats);
@@ -362,8 +369,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Drivers
-  app.get("/api/drivers", isAuthenticated, async (req, res) => {
+  // Drivers - WITH TOKEN BYPASS
+  app.get("/api/drivers", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const drivers = await storage.getDrivers();
       res.json(drivers);
@@ -384,7 +398,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/drivers/available", isAdminAuthenticated, async (req, res) => {
+  app.get("/api/drivers/available", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const drivers = await storage.getAvailableDrivers();
       res.json(drivers);
@@ -394,8 +415,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Loads for admin/office users
-  app.get("/api/loads", isAdminAuthenticated, async (req, res) => {
+  // Loads for admin/office users - WITH TOKEN BYPASS
+  app.get("/api/loads", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const userId = (req.user as any)?.claims?.sub;
       const user = await storage.getUser(userId);
@@ -491,7 +519,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/loads", isAdminAuthenticated, async (req, res) => {
+  app.post("/api/loads", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const validatedData = insertLoadSchema.parse(req.body);
       
