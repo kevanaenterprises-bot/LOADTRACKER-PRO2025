@@ -445,13 +445,14 @@ export default function Dashboard() {
                   <p className="text-gray-600 mb-4">
                     Register new drivers to assign loads and enable mobile access to the driver portal.
                   </p>
-                  <Dialog open={driverDialogOpen} onOpenChange={setDriverDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="w-full">
-                        <i className="fas fa-plus mr-2"></i>
-                        Add Driver
-                      </Button>
-                    </DialogTrigger>
+                  <div className="space-y-2">
+                    <Dialog open={driverDialogOpen} onOpenChange={setDriverDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="w-full">
+                          <i className="fas fa-plus mr-2"></i>
+                          Add Driver
+                        </Button>
+                      </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>Add New Driver</DialogTitle>
@@ -516,7 +517,16 @@ export default function Dashboard() {
                         </form>
                       </Form>
                     </DialogContent>
-                  </Dialog>
+                    </Dialog>
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full" 
+                      onClick={() => window.open('/driver-debug-test', '_blank')}
+                    >
+                      🔧 Debug Driver Creation
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 
