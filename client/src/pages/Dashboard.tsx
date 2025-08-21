@@ -238,7 +238,7 @@ export default function Dashboard() {
   };
 
   const switchToDriverView = () => {
-    window.location.href = "/driver";
+    window.location.href = "/driver-portal";
   };
 
   return (

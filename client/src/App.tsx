@@ -41,9 +41,8 @@ function Router() {
       <Route path="/driver-login" component={DriverLogin} />
       
       {/* Driver portal - for authenticated drivers */}
-      {driverAuth.isAuthenticated && (
-        <Route path="/driver-portal" component={DriverPortal} />
-      )}
+      <Route path="/driver-portal" component={DriverPortal} />
+      <Route path="/driver" component={DriverPortal} />
       
       {/* Admin/Office routes - Check admin auth OR Replit auth (but not drivers) */}
       {adminAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role !== "driver") ? (

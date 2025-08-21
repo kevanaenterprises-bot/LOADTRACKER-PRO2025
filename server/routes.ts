@@ -68,8 +68,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if password matches phone number (driver password should be their phone number)
-      console.log("Password check:", { provided: password, expected: driver.phoneNumber });
-      if (driver.phoneNumber !== password) {
+      // Normalize phone numbers by removing spaces, dashes, parentheses
+      const normalizePhone = (phone: string) => phone.replace(/[\s\-\(\)]/g, '');
+      const providedPhone = normalizePhone(password);
+      const expectedPhone = normalizePhone(driver.phoneNumber || '');
+      
+      console.log("Password check:", { 
+        provided: password, 
+        expected: driver.phoneNumber,
+        normalizedProvided: providedPhone,
+        normalizedExpected: expectedPhone
+      });
+      
+      if (expectedPhone !== providedPhone) {
         return res.status(401).json({ message: "Invalid username or password" });
       }
 
