@@ -30,9 +30,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
   locationId: z.string().min(1, "Location is required"),
-  driverId: z.string().min(1, "Driver is required"),
+  // Remove driverId requirement - will be assigned after creation
   estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
-});
+}).omit({ driverId: true });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -45,7 +45,6 @@ export default function LoadForm() {
     defaultValues: {
       number109: "109",
       locationId: "",
-      driverId: "",
       estimatedMiles: 0,
       specialInstructions: "",
       status: "created",
@@ -58,11 +57,7 @@ export default function LoadForm() {
     refetchOnWindowFocus: false,
   });
 
-  const { data: drivers } = useQuery({
-    queryKey: ["/api/drivers/available"],
-    retry: false,
-    refetchOnWindowFocus: false,
-  });
+  // Removed drivers query - no longer needed for load creation
 
   const createLoadMutation = useMutation({
     mutationFn: async (data: FormData) => {
@@ -70,13 +65,12 @@ export default function LoadForm() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Load created successfully and driver notified!",
+        title: "Success", 
+        description: "Load created successfully! You can now assign a driver from the loads table.",
       });
       form.reset({
         number109: "109",
         locationId: "",
-        driverId: "",
         estimatedMiles: 0,
         specialInstructions: "",
         status: "created",
@@ -146,7 +140,7 @@ export default function LoadForm() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {locations?.map((location: any) => (
+                      {(locations || []).map((location: any) => (
                         <SelectItem key={location.id} value={location.id}>
                           {location.name} - {location.city}, {location.state}
                         </SelectItem>
@@ -158,30 +152,13 @@ export default function LoadForm() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="driverId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Assign Driver</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Driver" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {drivers?.map((driver: any) => (
-                        <SelectItem key={driver.id} value={driver.id}>
-                          {driver.firstName} {driver.lastName} (Available)
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Driver assignment removed - will be done after load creation */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-700">
+                <strong>Note:</strong> Driver assignment has been moved to after load creation.
+                Once you create this load, you can assign a driver from the loads table.
+              </p>
+            </div>
 
             <FormField
               control={form.control}
@@ -206,6 +183,7 @@ export default function LoadForm() {
                   <FormControl>
                     <Textarea 
                       {...field} 
+                      value={field.value || ""}
                       rows={3}
                       placeholder="Any special delivery instructions..."
                     />
@@ -228,7 +206,7 @@ export default function LoadForm() {
               ) : (
                 <>
                   <i className="fas fa-plus mr-2"></i>
-                  Create Load & Notify Driver
+                  Create Load
                 </>
               )}
             </Button>
