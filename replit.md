@@ -31,6 +31,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Mobile-Optimized Interface** - GPS tracker component shows status, location accuracy, and automatic updates
 - ✅ **Background Processing** - Continuous location monitoring with automatic server-side status calculations
 
+**August 21, 2025 - Fixed Driver Assignment Authentication Error**
+- ✅ **Resolved "HTTP not token" error** - Changed `isAuthenticated` to `isAdminAuthenticated` for admin operations
+- ✅ **Added dedicated driver assignment endpoint** - `/api/loads/:id/assign-driver` with proper admin auth
+- ✅ **Enhanced storage interface** - Added `updateLoad` method for partial load updates
+- ✅ **SMS notifications on assignment** - Drivers receive text messages when loads are assigned
+- ✅ **Comprehensive testing** - Successfully assigned driver (John Smith) to load TEST002
+- ✅ **Consistent authentication** - All admin operations now use proper admin middleware
+
 **August 21, 2025 - Fixed "HTTP not token" Authentication Error**
 - ✅ Resolved authentication middleware to accept multiple auth methods (Admin, Replit, Driver)
 - ✅ Updated manual invoice generation to work with any valid session
