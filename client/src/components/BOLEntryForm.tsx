@@ -47,13 +47,7 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
 
   const validateBOLMutation = useMutation({
     mutationFn: async (bolNumber: string) => {
-      const response = await fetch(`/api/bol/check/${bolNumber}`, {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to validate BOL");
-      }
-      return response.json();
+      return await apiRequest(`/api/bol/check/${bolNumber}`, "GET");
     },
     onSuccess: (data, bolNumber) => {
       if (data.exists) {
