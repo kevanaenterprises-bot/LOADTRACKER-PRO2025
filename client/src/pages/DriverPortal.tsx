@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import DriverLoadCard from "@/components/DriverLoadCard";
 import BOLEntryForm from "@/components/BOLEntryForm";
-import QuickBOLUpload from "@/components/QuickBOLUpload";
+import StandaloneBOLUpload from "@/components/StandaloneBOLUpload";
 import GPSTracker from "@/components/GPSTracker";
 import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import { Button } from "@/components/ui/button";
@@ -147,9 +147,9 @@ export default function DriverPortal() {
       <div className="p-4">
 
 
-        {/* Quick BOL Upload - Always at the top */}
+        {/* Standalone BOL Upload - Always available */}
         <div className="mb-6">
-          <QuickBOLUpload currentLoad={currentLoad} allLoads={loads as any[]} />
+          <StandaloneBOLUpload />
         </div>
 
         {/* Current Load Card with GPS Tracking */}

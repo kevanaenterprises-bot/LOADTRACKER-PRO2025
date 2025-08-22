@@ -661,6 +661,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get load by number - FOR STANDALONE BOL UPLOAD
+  app.get("/api/loads/by-number/:number", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const load = await storage.getLoadByNumber(req.params.number);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      res.json(load);
+    } catch (error) {
+      console.error("Error fetching load by number:", error);
+      res.status(500).json({ message: "Failed to fetch load" });
+    }
+  });
+
   // Driver-specific loads endpoint  
   app.get("/api/driver/loads", (req, res, next) => {
     if ((req.session as any)?.driverAuth) {

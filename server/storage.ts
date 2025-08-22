@@ -42,6 +42,7 @@ export interface IStorage {
   createLoad(load: InsertLoad): Promise<Load>;
   getLoads(): Promise<LoadWithDetails[]>;
   getLoad(id: string): Promise<LoadWithDetails | undefined>;
+  getLoadByNumber(number: string): Promise<LoadWithDetails | undefined>;
   updateLoad(id: string, updates: Partial<Load>): Promise<Load>;
   updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load>;
   updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load>;
@@ -234,6 +235,30 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(locations, eq(loads.locationId, locations.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .where(eq(loads.id, id));
+
+    if (!result) return undefined;
+
+    return {
+      ...result.load,
+      driver: result.driver || undefined,
+      location: result.location || undefined,
+      invoice: result.invoice || undefined,
+    };
+  }
+
+  async getLoadByNumber(number: string): Promise<LoadWithDetails | undefined> {
+    const [result] = await db
+      .select({
+        load: loads,
+        driver: users,
+        location: locations,
+        invoice: invoices,
+      })
+      .from(loads)
+      .leftJoin(users, eq(loads.driverId, users.id))
+      .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(invoices, eq(loads.id, invoices.loadId))
+      .where(eq(loads.number109, number));
 
     if (!result) return undefined;
 
