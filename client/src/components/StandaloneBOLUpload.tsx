@@ -12,8 +12,8 @@ import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import { apiRequest } from "@/lib/queryClient";
 
 const bolUploadSchema = z.object({
-  loadNumber: z.string().min(1, "109 number is required"),
-  bolNumber: z.string().min(1, "374 number is required"), 
+  loadNumber: z.string().min(1, "Load number is required"),
+  bolNumber: z.string().min(1, "BOL number is required"), 
   tripNumber: z.string().min(1, "Trip number is required"),
 });
 
@@ -114,7 +114,7 @@ export default function StandaloneBOLUpload() {
           {!readyForUpload ? (
             <>
               <p className="text-sm text-gray-600 mb-4">
-                Enter your load details to upload a BOL photo:
+                Enter your load details to upload a BOL photo. Fields default to 109-/374- format but can be typed over for other brokers:
               </p>
               
               <Form {...form}>
@@ -124,18 +124,17 @@ export default function StandaloneBOLUpload() {
                     name="loadNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>109 Number</FormLabel>
+                        <FormLabel>Load Number</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="109-36205" 
+                            placeholder="109-36205 (or custom for other brokers)" 
                             {...field}
                             className="text-sm"
-                            onChange={(e) => {
-                              let value = e.target.value;
-                              if (!value.startsWith("109-")) {
-                                value = "109-" + value.replace("109-", "");
+                            onFocus={(e) => {
+                              // If field only contains default prefix, select all for easy override
+                              if (e.target.value === "109-") {
+                                e.target.select();
                               }
-                              field.onChange(value);
                             }}
                           />
                         </FormControl>
@@ -149,18 +148,17 @@ export default function StandaloneBOLUpload() {
                     name="bolNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>374 Number</FormLabel>
+                        <FormLabel>BOL Number</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="374-22222" 
+                            placeholder="374-22222 (or custom for other brokers)" 
                             {...field}
                             className="text-sm"
-                            onChange={(e) => {
-                              let value = e.target.value;
-                              if (!value.startsWith("374-")) {
-                                value = "374-" + value.replace("374-", "");
+                            onFocus={(e) => {
+                              // If field only contains default prefix, select all for easy override
+                              if (e.target.value === "374-") {
+                                e.target.select();
                               }
-                              field.onChange(value);
                             }}
                           />
                         </FormControl>

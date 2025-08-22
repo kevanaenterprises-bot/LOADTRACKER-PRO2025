@@ -439,12 +439,12 @@ export class DatabaseStorage implements IStorage {
 
   async checkBOLExistsForDifferentLoad(bolNumber: string, excludeLoadId?: string): Promise<boolean> {
     // Check if BOL number exists in loads table (for BOL photo uploads)
-    let whereCondition = eq(loads.bolNumber, bolNumber);
+    const baseCondition = eq(loads.bolNumber, bolNumber);
     
     // If we're updating a specific load, exclude it from the check
-    if (excludeLoadId) {
-      whereCondition = and(eq(loads.bolNumber, bolNumber), not(eq(loads.id, excludeLoadId)));
-    }
+    const whereCondition = excludeLoadId 
+      ? and(baseCondition, not(eq(loads.id, excludeLoadId)))
+      : baseCondition;
     
     const [existing] = await db
       .select({ count: sql<number>`count(*)` })
