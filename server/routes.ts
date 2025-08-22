@@ -275,6 +275,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Serve static debug HTML file
+  app.get("/debug-mobile", (req, res) => {
+    res.sendFile(__dirname + '/../debug-mobile.html');
+  });
+
   // Server-side test page for mobile debugging
   app.get("/mobile-test", (req, res) => {
     res.send(`
