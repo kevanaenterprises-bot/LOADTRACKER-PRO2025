@@ -416,24 +416,24 @@ export default function Dashboard() {
         {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-8">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 h-auto gap-1">
-            <TabsTrigger value="loads" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto">
-              <i className="fas fa-truck text-lg md:text-base"></i>
+            <TabsTrigger value="loads" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-blue-700 hover:text-blue-900 font-semibold">
+              <i className="fas fa-truck text-lg md:text-base text-blue-600"></i>
               <span className="text-center leading-tight">Load Management</span>
             </TabsTrigger>
-            <TabsTrigger value="tracking" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto">
-              <i className="fas fa-map text-lg md:text-base"></i>
+            <TabsTrigger value="tracking" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-green-700 hover:text-green-900 font-semibold">
+              <i className="fas fa-map text-lg md:text-base text-green-600"></i>
               <span className="text-center leading-tight">Real-Time Tracking</span>
             </TabsTrigger>
-            <TabsTrigger value="ocr" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto">
-              <i className="fas fa-camera text-lg md:text-base"></i>
+            <TabsTrigger value="ocr" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-purple-700 hover:text-purple-900 font-semibold">
+              <i className="fas fa-camera text-lg md:text-base text-purple-600"></i>
               <span className="text-center leading-tight">Wright Con Scanner</span>
             </TabsTrigger>
-            <TabsTrigger value="drivers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto">
-              <i className="fas fa-users text-lg md:text-base"></i>
+            <TabsTrigger value="drivers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-orange-700 hover:text-orange-900 font-semibold">
+              <i className="fas fa-users text-lg md:text-base text-orange-600"></i>
               <span className="text-center leading-tight">Driver Management</span>
             </TabsTrigger>
-            <TabsTrigger value="invoicing" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto">
-              <i className="fas fa-file-invoice-dollar text-lg md:text-base"></i>
+            <TabsTrigger value="invoicing" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-red-700 hover:text-red-900 font-semibold">
+              <i className="fas fa-file-invoice-dollar text-lg md:text-base text-red-600"></i>
               <span className="text-center leading-tight">Automated Invoicing</span>
             </TabsTrigger>
           </TabsList>
