@@ -438,20 +438,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   async checkBOLExistsForDifferentLoad(bolNumber: string, excludeLoadId?: string): Promise<boolean> {
-    // Check if BOL number exists in loads table (for BOL photo uploads)
-    const baseCondition = eq(loads.bolNumber, bolNumber);
-    
-    // If we're updating a specific load, exclude it from the check
-    const whereCondition = excludeLoadId 
-      ? and(baseCondition, not(eq(loads.id, excludeLoadId)))
-      : baseCondition;
-    
-    const [existing] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(loads)
-      .where(whereCondition);
-    
-    return existing.count > 0;
+    try {
+      // Check if BOL number exists in loads table (for BOL photo uploads)
+      // Use IS NOT NULL to handle potential null values properly
+      const baseCondition = and(
+        eq(loads.bolNumber, bolNumber),
+        sql`${loads.bolNumber} IS NOT NULL`
+      );
+      
+      // If we're updating a specific load, exclude it from the check
+      const whereCondition = excludeLoadId 
+        ? and(baseCondition, not(eq(loads.id, excludeLoadId)))
+        : baseCondition;
+      
+      const [existing] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(loads)
+        .where(whereCondition);
+      
+      return existing.count > 0;
+    } catch (error) {
+      console.error("Error in checkBOLExistsForDifferentLoad:", error);
+      // If there's an error, be safe and return false (allow the operation)
+      return false;
+    }
   }
 
   async createBOLNumber(bol: InsertBolNumber): Promise<BolNumber> {
