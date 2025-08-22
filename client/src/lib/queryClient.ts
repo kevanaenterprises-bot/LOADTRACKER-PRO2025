@@ -12,10 +12,13 @@ export async function apiRequest(
   method: string,
   data?: unknown | undefined,
 ): Promise<any> {
-  // Always try to get bypass token first if not available
+  // Always ensure bypass token is available - retry up to 3 times
   let bypassToken = localStorage.getItem('bypass-token');
-  if (!bypassToken) {
+  let retries = 0;
+  
+  while (!bypassToken && retries < 3) {
     try {
+      console.log(`🔄 Attempting to get bypass token (attempt ${retries + 1})`);
       const response = await fetch("/api/auth/browser-bypass", {
         method: "POST",
         credentials: "include",
@@ -24,9 +27,17 @@ export async function apiRequest(
         const tokenData = await response.json();
         localStorage.setItem('bypass-token', tokenData.token);
         bypassToken = tokenData.token;
+        console.log("✅ Bypass token obtained successfully");
+        break;
+      } else {
+        console.warn(`⚠️ Bypass token request failed with status: ${response.status}`);
       }
     } catch (error) {
-      // Continue without bypass token
+      console.warn(`⚠️ Bypass token request error:`, error);
+    }
+    retries++;
+    if (retries < 3) {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between retries
     }
   }
   
@@ -34,6 +45,9 @@ export async function apiRequest(
   
   if (bypassToken) {
     headers['X-Bypass-Token'] = bypassToken;
+    console.log("🔑 Using bypass token for API request");
+  } else {
+    console.warn("⚠️ No bypass token available - API request may fail");
   }
 
   const res = await fetch(url, {
@@ -53,10 +67,27 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    // Add bypass token if available
-    const bypassToken = localStorage.getItem('bypass-token');
-    const headers: any = {};
+    // Ensure bypass token is available - retry if needed
+    let bypassToken = localStorage.getItem('bypass-token');
+    if (!bypassToken) {
+      try {
+        console.log("🔄 Query function getting bypass token");
+        const response = await fetch("/api/auth/browser-bypass", {
+          method: "POST",
+          credentials: "include",
+        });
+        if (response.ok) {
+          const tokenData = await response.json();
+          localStorage.setItem('bypass-token', tokenData.token);
+          bypassToken = tokenData.token;
+          console.log("✅ Query function bypass token obtained");
+        }
+      } catch (error) {
+        console.warn("⚠️ Query function bypass token failed:", error);
+      }
+    }
     
+    const headers: any = {};
     if (bypassToken) {
       headers['X-Bypass-Token'] = bypassToken;
     }
