@@ -65,19 +65,7 @@ export default function Landing() {
             <i className="fas fa-book mr-2"></i>
             How to Assign Drivers
           </Button>
-          <a 
-            href="/debug-mobile"
-            className="inline-block w-full"
-          >
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="w-full bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-            >
-              <i className="fas fa-vial mr-2"></i>
-              API Debug Test
-            </Button>
-          </a>
+
         </div>
       </div>
     </div>

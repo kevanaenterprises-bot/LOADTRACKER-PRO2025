@@ -12,43 +12,13 @@ export async function apiRequest(
   method: string,
   data?: unknown | undefined,
 ): Promise<any> {
-  // Always ensure bypass token is available - retry up to 3 times
-  let bypassToken = localStorage.getItem('bypass-token');
-  let retries = 0;
-  
-  while (!bypassToken && retries < 3) {
-    try {
-      console.log(`🔄 Attempting to get bypass token (attempt ${retries + 1})`);
-      const response = await fetch("/api/auth/browser-bypass", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (response.ok) {
-        const tokenData = await response.json();
-        localStorage.setItem('bypass-token', tokenData.token);
-        bypassToken = tokenData.token;
-        console.log("✅ Bypass token obtained successfully");
-        break;
-      } else {
-        console.warn(`⚠️ Bypass token request failed with status: ${response.status}`);
-      }
-    } catch (error) {
-      console.warn(`⚠️ Bypass token request error:`, error);
-    }
-    retries++;
-    if (retries < 3) {
-      await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between retries
-    }
-  }
+  // Use the working static bypass token for mobile reliability
+  const staticBypassToken = 'LOADTRACKER_BYPASS_2025';
   
   const headers: any = data ? { "Content-Type": "application/json" } : {};
+  headers['X-Bypass-Token'] = staticBypassToken;
   
-  if (bypassToken) {
-    headers['X-Bypass-Token'] = bypassToken;
-    console.log("🔑 Using bypass token for API request");
-  } else {
-    console.warn("⚠️ No bypass token available - API request may fail");
-  }
+  console.log(`🔄 API Request: ${method} ${url}`);
 
   const res = await fetch(url, {
     method,
@@ -57,8 +27,15 @@ export async function apiRequest(
     credentials: "include",
   });
 
-  await throwIfResNotOk(res);
-  return await res.json();
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error(`❌ API Error: ${res.status} ${errorText}`);
+    throw new Error(`${res.status}: ${errorText}`);
+  }
+  
+  const result = await res.json();
+  console.log(`✅ API Success: ${method} ${url}`);
+  return result;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";

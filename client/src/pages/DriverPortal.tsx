@@ -127,17 +127,7 @@ export default function DriverPortal() {
       </div>
 
       <div className="p-4">
-        {/* Debug Test Link */}
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-xs text-yellow-800 mb-2">API Test (Temporary Debug):</p>
-          <a 
-            href="/mobile-test" 
-            className="inline-block bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700"
-            target="_blank"
-          >
-            Open Test Page
-          </a>
-        </div>
+
 
         {/* Quick BOL Upload - Always at the top */}
         <div className="mb-6">
