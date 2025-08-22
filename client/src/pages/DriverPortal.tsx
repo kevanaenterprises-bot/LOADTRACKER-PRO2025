@@ -1,16 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import DriverLoadCard from "@/components/DriverLoadCard";
 import BOLEntryForm from "@/components/BOLEntryForm";
 import QuickBOLUpload from "@/components/QuickBOLUpload";
 import GPSTracker from "@/components/GPSTracker";
+import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function DriverPortal() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const driverAuth = useDriverAuth();
+  const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<any>(null);
   
   // Simple authentication check - just like admin portal
   const isAuthenticated = driverAuth.isAuthenticated;
@@ -159,28 +164,87 @@ export default function DriverPortal() {
             <h3 className="text-lg font-semibold text-secondary mb-4">Recent Loads</h3>
             <div className="space-y-3">
               {recentLoads.map((load: any) => (
-                <div key={load.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <div className="text-sm font-medium text-secondary">{load.number109}</div>
-                    <div className="text-xs text-gray-500">
-                      {load.status === "completed" ? "Completed" : "Delivered"} •{" "}
-                      {new Date(load.updatedAt).toLocaleDateString()}
+                <div key={load.id} className="p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div>
+                      <div className="text-sm font-medium text-secondary">{load.number109}</div>
+                      <div className="text-xs text-gray-500">
+                        {load.status === "completed" ? "Completed" : "Delivered"} •{" "}
+                        {new Date(load.updatedAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-success">
+                        {load.location?.name || "Unknown Location"}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {load.estimatedMiles || 0} miles
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium text-success">
-                      {load.location?.name || "Unknown Location"}
+                  
+                  {/* BOL Upload for completed loads that need BOL documents */}
+                  {(load.status === "completed" || load.status === "delivered") && 
+                   load.bolNumber && !load.bolDocumentPath && (
+                    <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-yellow-800">
+                            BOL Photo Needed
+                          </p>
+                          <p className="text-xs text-yellow-600">
+                            BOL #{load.bolNumber} - Upload required
+                          </p>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          className="bg-yellow-600 hover:bg-yellow-700"
+                          onClick={() => setSelectedLoadForBOL(load)}
+                        >
+                          Upload BOL
+                        </Button>
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {load.estimatedMiles || 0} miles
-                    </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         )}
       </div>
+
+      {/* BOL Upload Modal for Completed Loads */}
+      {selectedLoadForBOL && (
+        <Dialog open={!!selectedLoadForBOL} onOpenChange={() => setSelectedLoadForBOL(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Upload BOL Photo</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm font-medium text-blue-800">
+                  Load: {selectedLoadForBOL.number109}
+                </p>
+                <p className="text-xs text-blue-600">
+                  BOL Number: {selectedLoadForBOL.bolNumber}
+                </p>
+              </div>
+              
+              <SimpleFileUpload
+                loadId={selectedLoadForBOL.id}
+                onUploadComplete={(uploadURL) => {
+                  toast({
+                    title: "Success",
+                    description: "BOL photo uploaded successfully!",
+                  });
+                  queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
+                  setSelectedLoadForBOL(null);
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
