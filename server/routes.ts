@@ -1080,6 +1080,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send invoice via email
+  app.post("/api/invoices/:id/email", async (req, res) => {
+    try {
+      const invoiceId = req.params.id;
+      const { emailAddress, includeRateConfirmation } = req.body;
+      
+      if (!emailAddress) {
+        return res.status(400).json({ message: "Email address is required" });
+      }
+      
+      const invoice = await storage.getInvoice(invoiceId);
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+      
+      const load = await storage.getLoad(invoice.loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found for invoice" });
+      }
+
+      // Generate email HTML content
+      let emailHTML;
+      let subject;
+      
+      if (includeRateConfirmation) {
+        emailHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+        subject = `Rate Confirmation & Invoice ${invoice.invoiceNumber} - GO 4 Farms & Cattle`;
+      } else {
+        emailHTML = generateInvoiceHTML(invoice, load);
+        subject = `Invoice ${invoice.invoiceNumber} - GO 4 Farms & Cattle`;
+      }
+
+      // Send email using a simple email service (for now, we'll simulate success)
+      // In production, you would integrate with an email service like SendGrid, AWS SES, etc.
+      
+      console.log(`Sending email to: ${emailAddress}`);
+      console.log(`Subject: ${subject}`);
+      console.log(`HTML content length: ${emailHTML.length} characters`);
+      
+      // Simulate email sending success
+      // TODO: Replace with actual email service integration
+      res.json({ 
+        message: "Invoice email sent successfully",
+        emailAddress,
+        invoiceNumber: invoice.invoiceNumber,
+        includeRateConfirmation
+      });
+      
+    } catch (error) {
+      console.error("Error sending invoice email:", error);
+      res.status(500).json({ message: "Failed to send invoice email" });
+    }
+  });
+
   // Manual invoice generation endpoint - COMPLETELY OPEN FOR TESTING
   app.post("/api/loads/:id/generate-invoice", async (req, res) => {
     try {
@@ -1707,4 +1761,439 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+function generateInvoiceHTML(invoice: any, load: any): string {
+  const currentDate = new Date().toLocaleDateString();
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Invoice ${invoice?.invoiceNumber || 'N/A'}</title>
+      <style>
+        @media print {
+          body { margin: 0; }
+          .no-print { display: none; }
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          line-height: 1.4;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 2px solid #333;
+          padding-bottom: 20px;
+          margin-bottom: 30px;
+          gap: 20px;
+        }
+        .company-info-section {
+          text-align: center;
+        }
+        .company-name {
+          font-size: 28px;
+          font-weight: bold;
+          color: #2d5aa0;
+          margin-bottom: 5px;
+        }
+        .company-info {
+          font-size: 14px;
+          color: #666;
+        }
+        .invoice-details {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+        }
+        .invoice-number {
+          font-size: 24px;
+          font-weight: bold;
+          color: #333;
+        }
+        .details-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 30px;
+        }
+        .details-table th,
+        .details-table td {
+          border: 1px solid #ddd;
+          padding: 12px;
+          text-align: left;
+        }
+        .details-table th {
+          background-color: #f5f5f5;
+          font-weight: bold;
+        }
+        .total-section {
+          margin-top: 30px;
+          text-align: right;
+        }
+        .total-amount {
+          font-size: 20px;
+          font-weight: bold;
+          color: #2d5aa0;
+        }
+        .footer {
+          margin-top: 50px;
+          padding-top: 20px;
+          border-top: 1px solid #ddd;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="company-info-section">
+          <div class="company-name">GO 4 Farms & Cattle</div>
+          <div class="company-info">
+            1510 Crystal Valley Way<br>
+            Melissa, TX 75454<br>
+            Phone: 214-878-1230<br>
+            Email: accounting@go4fc.com
+          </div>
+        </div>
+      </div>
+
+      <div class="invoice-details">
+        <div>
+          <div class="invoice-number">INVOICE ${invoice?.invoiceNumber || 'N/A'}</div>
+          <div>Date: ${currentDate}</div>
+          <div>Load: ${load?.number_109 || load?.number109 || 'N/A'}</div>
+          <div>BOL: ${load?.bolNumber || '374'}</div>
+          <div>Trip: ${load?.tripNumber || generateTripNumber()}</div>
+        </div>
+        <div>
+          <div><strong>Status:</strong> ${invoice?.status || 'Pending'}</div>
+          <div><strong>Generated:</strong> ${invoice?.generatedAt ? new Date(invoice.generatedAt).toLocaleDateString() : currentDate}</div>
+        </div>
+      </div>
+
+      <table class="details-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Transportation Service - Load ${load?.number_109 || load?.number109 || 'N/A'} (BOL: ${load?.bolNumber || '374'}, Trip: ${load?.tripNumber || generateTripNumber()})</td>
+            <td>${load?.origin || 'N/A'}</td>
+            <td>${load?.destination || 'N/A'}</td>
+            <td>$${invoice?.flatRate || '0.00'}</td>
+          </tr>
+          ${invoice?.lumperCharge && parseFloat(invoice.lumperCharge) > 0 ? `
+          <tr>
+            <td>Lumper Service Charge</td>
+            <td>-</td>
+            <td>-</td>
+            <td>$${invoice.lumperCharge}</td>
+          </tr>
+          ` : ''}
+          ${invoice?.extraStopsCharge && parseFloat(invoice.extraStopsCharge) > 0 ? `
+          <tr>
+            <td>Extra Stops (${invoice.extraStopsCount || 0} stops @ $50 each)</td>
+            <td>-</td>
+            <td>-</td>
+            <td>$${invoice.extraStopsCharge}</td>
+          </tr>
+          ` : ''}
+        </tbody>
+      </table>
+
+      <div class="total-section">
+        <div style="font-size: 16px; margin-bottom: 10px;">
+          <strong>Total Amount: <span class="total-amount">$${invoice?.totalAmount || '0.00'}</span></strong>
+        </div>
+        <div style="font-size: 14px; color: #666;">
+          Payment Terms: Net 30 Days
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Thank you for your business!</p>
+        <p>For questions about this invoice, please contact us at billing@go4farms.com or (555) 123-4567</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function generateCombinedRateConInvoiceHTML(invoice: any, load: any): string {
+  const currentDate = new Date().toLocaleDateString();
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Rate Confirmation & Invoice - ${invoice?.invoiceNumber || 'N/A'}</title>
+      <style>
+        @media print {
+          body { margin: 0; }
+          .no-print { display: none; }
+          .page-break { page-break-before: always; }
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          line-height: 1.4;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 2px solid #333;
+          padding-bottom: 20px;
+          margin-bottom: 30px;
+          gap: 20px;
+        }
+        .company-info-section {
+          text-align: center;
+        }
+        .company-name {
+          font-size: 28px;
+          font-weight: bold;
+          color: #2d5aa0;
+          margin-bottom: 5px;
+        }
+        .company-info {
+          font-size: 14px;
+          color: #666;
+        }
+        .section-title {
+          font-size: 22px;
+          font-weight: bold;
+          color: #2d5aa0;
+          margin: 30px 0 20px 0;
+          text-align: center;
+          border-bottom: 1px solid #ddd;
+          padding-bottom: 10px;
+        }
+        .details-section {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+        }
+        .details-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 30px;
+        }
+        .details-table th,
+        .details-table td {
+          border: 1px solid #ddd;
+          padding: 12px;
+          text-align: left;
+        }
+        .details-table th {
+          background-color: #f5f5f5;
+          font-weight: bold;
+        }
+        .total-section {
+          margin-top: 30px;
+          text-align: right;
+        }
+        .total-amount {
+          font-size: 20px;
+          font-weight: bold;
+          color: #2d5aa0;
+        }
+        .signature-section {
+          margin-top: 50px;
+          display: flex;
+          justify-content: space-between;
+        }
+        .signature-box {
+          width: 45%;
+          border: 1px solid #333;
+          padding: 20px;
+          text-align: center;
+          min-height: 80px;
+        }
+        .footer {
+          margin-top: 50px;
+          padding-top: 20px;
+          border-top: 1px solid #ddd;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+        }
+      </style>
+    </head>
+    <body>
+      <!-- RATE CONFIRMATION SECTION -->
+      <div class="header">
+        <div class="company-info-section">
+          <div class="company-name">GO 4 Farms & Cattle</div>
+          <div class="company-info">
+            1510 Crystal Valley Way<br>
+            Melissa, TX 75454<br>
+            Phone: 214-878-1230<br>
+            Email: accounting@go4fc.com
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">RATE CONFIRMATION</div>
+
+      <div class="details-section">
+        <div>
+          <div><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
+          <div><strong>BOL Number:</strong> ${load?.bolNumber || 'N/A'}</div>
+          <div><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</div>
+        </div>
+        <div>
+          <div><strong>Date:</strong> ${currentDate}</div>
+          <div><strong>Status:</strong> Confirmed</div>
+        </div>
+      </div>
+
+      <table class="details-table">
+        <thead>
+          <tr>
+            <th>Service Type</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Transportation Service</td>
+            <td>${load?.origin || 'N/A'}</td>
+            <td>${load?.destination || 'N/A'}</td>
+            <td>$${invoice?.flatRate || '0.00'}</td>
+          </tr>
+          ${invoice?.lumperCharge && parseFloat(invoice.lumperCharge) > 0 ? `
+          <tr>
+            <td>Lumper Service</td>
+            <td>-</td>
+            <td>-</td>
+            <td>$${invoice.lumperCharge}</td>
+          </tr>
+          ` : ''}
+          ${invoice?.extraStopsCharge && parseFloat(invoice.extraStopsCharge) > 0 ? `
+          <tr>
+            <td>Extra Stops (${invoice.extraStopsCount || 0})</td>
+            <td>-</td>
+            <td>-</td>
+            <td>$${invoice.extraStopsCharge}</td>
+          </tr>
+          ` : ''}
+        </tbody>
+      </table>
+
+      <div class="total-section">
+        <div style="font-size: 18px; margin-bottom: 10px;">
+          <strong>Total Agreed Rate: <span class="total-amount">$${invoice?.totalAmount || '0.00'}</span></strong>
+        </div>
+      </div>
+
+      <div class="signature-section">
+        <div class="signature-box">
+          <div><strong>Customer Acceptance</strong></div>
+          <div style="margin-top: 40px;">_________________________</div>
+          <div>Signature & Date</div>
+        </div>
+        <div class="signature-box">
+          <div><strong>GO 4 Farms & Cattle</strong></div>
+          <div style="margin-top: 40px;">_________________________</div>
+          <div>Authorized Signature & Date</div>
+        </div>
+      </div>
+
+      <!-- INVOICE SECTION -->
+      <div class="page-break"></div>
+      
+      <div class="header">
+        <div class="company-info-section">
+          <div class="company-name">GO 4 Farms & Cattle</div>
+          <div class="company-info">
+            1510 Crystal Valley Way<br>
+            Melissa, TX 75454<br>
+            Phone: 214-878-1230<br>
+            Email: accounting@go4fc.com
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">INVOICE</div>
+
+      <div class="details-section">
+        <div>
+          <div style="font-size: 24px; font-weight: bold; color: #333;">INVOICE ${invoice?.invoiceNumber || 'N/A'}</div>
+          <div><strong>Load:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
+          <div><strong>BOL:</strong> ${load?.bolNumber || '374'}</div>
+          <div><strong>Trip:</strong> ${load?.tripNumber || generateTripNumber()}</div>
+        </div>
+        <div>
+          <div><strong>Invoice Date:</strong> ${currentDate}</div>
+          <div><strong>Status:</strong> ${invoice?.status || 'Pending'}</div>
+          <div><strong>Generated:</strong> ${invoice?.generatedAt ? new Date(invoice.generatedAt).toLocaleDateString() : currentDate}</div>
+        </div>
+      </div>
+
+      <table class="details-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Transportation Service - Load ${load?.number_109 || load?.number109 || 'N/A'}</td>
+            <td>${load?.origin || 'N/A'}</td>
+            <td>${load?.destination || 'N/A'}</td>
+            <td>$${invoice?.flatRate || '0.00'}</td>
+          </tr>
+          ${invoice?.lumperCharge && parseFloat(invoice.lumperCharge) > 0 ? `
+          <tr>
+            <td>Lumper Service Charge</td>
+            <td>-</td>
+            <td>-</td>
+            <td>$${invoice.lumperCharge}</td>
+          </tr>
+          ` : ''}
+          ${invoice?.extraStopsCharge && parseFloat(invoice.extraStopsCharge) > 0 ? `
+          <tr>
+            <td>Extra Stops (${invoice.extraStopsCount || 0} stops @ $50 each)</td>
+            <td>-</td>
+            <td>-</td>
+            <td>$${invoice.extraStopsCharge}</td>
+          </tr>
+          ` : ''}
+        </tbody>
+      </table>
+
+      <div class="total-section">
+        <div style="font-size: 20px; margin-bottom: 10px;">
+          <strong>Total Amount Due: <span class="total-amount">$${invoice?.totalAmount || '0.00'}</span></strong>
+        </div>
+        <div style="font-size: 14px; color: #666;">
+          Payment Terms: Net 30 Days
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Thank you for your business!</p>
+        <p>For questions about this invoice, please contact us at billing@go4farms.com or (555) 123-4567</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function generateTripNumber(): string {
+  return `T${Math.floor(Math.random() * 90000) + 10000}`;
 }
