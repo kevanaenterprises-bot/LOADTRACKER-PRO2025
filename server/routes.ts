@@ -922,7 +922,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Assign driver to load - WITH TOKEN BYPASS
+  // Assign driver to load - WITH TOKEN BYPASS (both endpoints for compatibility)
+  app.patch("/api/loads/:id/assign", (req, res, next) => {
+    // Check multiple auth methods: admin session, Replit auth, driver auth, OR token bypass
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasDriverAuth = !!(req.session as any)?.driverAuth;
+    const hasTokenBypass = isBypassActive(req);
+    
+    console.log("Driver assignment auth check:", {
+      hasSession: !!req.session,
+      sessionId: req.sessionID,
+      hasAdminAuth,
+      hasReplitAuth, 
+      hasDriverAuth,
+      hasTokenBypass,
+      bypassToken: req.headers['x-bypass-token'] ? '[PROVIDED]' : '[MISSING]',
+      adminAuthData: (req.session as any)?.adminAuth,
+      userAuth: !!req.user
+    });
+
+    if (hasAdminAuth || hasReplitAuth || hasDriverAuth || hasTokenBypass) {
+      next();
+    } else {
+      console.log("Authentication failed - no valid auth method found");
+      res.status(401).json({ message: "Authentication required - use bypass token" });
+    }
+  }, async (req, res) => {
+    try {
+      const { driverId } = req.body;
+      const loadId = req.params.id;
+      
+      if (!driverId) {
+        return res.status(400).json({ message: "Driver ID is required" });
+      }
+
+      // Get the load first
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      // Update the load with driver assignment
+      const updatedLoad = await storage.updateLoad(loadId, { driverId });
+
+      // Send SMS to driver if they have a phone number
+      try {
+        const driver = await storage.getUser(driverId);
+        if (driver?.phoneNumber) {
+          const location = load.location;
+          await sendSMSToDriver(
+            driver.phoneNumber,
+            `New load assigned: ${load.number109}. Pickup: 1800 East Plano Parkway. Delivery: ${location?.name || 'See details'}. Est. miles: ${load.estimatedMiles || 'TBD'}`
+          );
+        }
+      } catch (smsError) {
+        console.error("Failed to send SMS:", smsError);
+        // Don't fail the assignment if SMS fails
+      }
+
+      res.json(updatedLoad);
+    } catch (error) {
+      console.error("Error assigning driver to load:", error);
+      res.status(500).json({ message: "Failed to assign driver to load" });
+    }
+  });
+
   app.patch("/api/loads/:id/assign-driver", (req, res, next) => {
     // Check multiple auth methods: admin session, Replit auth, driver auth, OR token bypass
     const hasAdminAuth = !!(req.session as any)?.adminAuth;

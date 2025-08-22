@@ -155,19 +155,28 @@ export default function LoadsTable() {
   // Driver assignment mutation
   const assignDriverMutation = useMutation({
     mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
-      return apiRequest(`/api/loads/${loadId}/assign-driver`, "PATCH", { driverId });
+      console.log("🚀 Starting driver assignment:", { loadId, driverId });
+      try {
+        const result = await apiRequest(`/api/loads/${loadId}/assign-driver`, "PATCH", { driverId });
+        console.log("✅ Driver assignment API success:", result);
+        return result;
+      } catch (error) {
+        console.error("❌ Driver assignment API error:", error);
+        throw error;
+      }
     },
     onSuccess: (data: any) => {
+      console.log("🎉 Driver assignment mutation success:", data);
       toast({
         title: "Driver Assigned Successfully",
-        description: `${data.driver?.firstName || 'Driver'} assigned to load ${data.number109}`,
+        description: `Driver assigned to load ${data.number109}`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       setSelectedLoad(data); // Update the dialog with new data
       setAssigningDriver(false);
     },
     onError: (error: any) => {
-      console.error("Driver assignment error:", error);
+      console.error("💥 Driver assignment mutation error:", error);
       if (isUnauthorizedError(error)) {
         toast({
           title: "Authentication Required",

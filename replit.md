@@ -40,6 +40,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Foreign Key Validation** - Implemented proper location validation to prevent database constraint violations
 - ✅ **Production Ready** - All core functionality confirmed working: load creation, driver management, BOL validation
 
+**August 22, 2025 - Enhanced Standalone BOL Upload System**
+- ✅ **Permanent Prefixes** - 109 and 374 fields now pre-filled with "109-" and "374-" that cannot be removed
+- ✅ **Smart Input Handling** - Automatically maintains prefixes if user tries to delete them
+- ✅ **BOL Duplicate Validation** - System checks if 374 numbers have been used before and prevents duplicates
+- ✅ **Always Available Upload** - Replaced complex conditional logic with simple 3-field form always accessible
+- ✅ **Enhanced UX** - Cleaner workflow: enter numbers → validate → find load → upload photo
+- ✅ **Production Tested** - Confirmed working with real load 109-36205 and driver K Owen
+
 **August 22, 2025 - RESOLVED: Mobile Authentication Issues**
 - ✅ **Mobile API Fixed** - Simplified apiRequest function to use static bypass token for mobile reliability
 - ✅ **BOL Validation Mobile** - Mobile BOL validation now works consistently across all devices
