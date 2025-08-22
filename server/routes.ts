@@ -280,6 +280,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.sendFile(__dirname + '/../debug-mobile.html');
   });
 
+  // Serve mobile auth fix script
+  app.get("/fix-mobile-auth.js", (req, res) => {
+    res.sendFile(__dirname + '/../fix-mobile-auth.js');
+  });
+
   // Server-side test page for mobile debugging
   app.get("/mobile-test", (req, res) => {
     res.send(`
