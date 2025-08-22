@@ -198,7 +198,7 @@ export default function DriverPortal() {
                   
                   {/* BOL Upload for completed loads that need BOL documents */}
                   {(load.status === "completed" || load.status === "delivered") && 
-                   load.bolNumber && !load.bolDocumentPath && (
+                   !load.bolDocumentPath && ( // Show upload button for any completed load without BOL document
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
@@ -206,7 +206,7 @@ export default function DriverPortal() {
                             BOL Photo Needed
                           </p>
                           <p className="text-xs text-yellow-600">
-                            BOL #{load.bolNumber} - Upload required
+                            {load.bolNumber ? `BOL #${load.bolNumber}` : 'BOL Photo'} - Upload required
                           </p>
                         </div>
                         <Button 
