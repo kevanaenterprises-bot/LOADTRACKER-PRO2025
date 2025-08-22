@@ -834,13 +834,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, async (req, res) => {
     try {
+      console.log("MOBILE DEBUG - Status update request:", {
+        loadId: req.params.id,
+        requestBody: req.body,
+        headers: Object.keys(req.headers),
+        contentType: req.headers['content-type'],
+        userAgent: req.headers['user-agent']?.substring(0, 50)
+      });
+      
       const { status } = req.body;
+      
+      if (!status) {
+        console.log("MOBILE DEBUG - Missing status in request body");
+        return res.status(400).json({ message: "Status is required" });
+      }
+      
       console.log(`Updating load ${req.params.id} status to: ${status}`);
       const load = await storage.updateLoadStatus(req.params.id, status);
       console.log(`Load status updated successfully: ${load.status}`);
       res.json(load);
     } catch (error) {
-      console.error("Error updating load status:", error);
+      console.error("MOBILE DEBUG - Error updating load status:", {
+        error: error.message,
+        stack: error.stack,
+        loadId: req.params.id,
+        requestBody: req.body
+      });
       res.status(500).json({ message: "Failed to update load status" });
     }
   });
