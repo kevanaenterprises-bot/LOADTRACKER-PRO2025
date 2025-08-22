@@ -155,6 +155,51 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
     setPrintDialogOpen(false);
   };
 
+  const handlePrintRateConAndInvoice = async () => {
+    setIsPrinting(true);
+    try {
+      // Create a new window for printing
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
+      }
+
+      // Generate combined rate confirmation and invoice HTML
+      const combinedHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+      
+      printWindow.document.write(combinedHTML);
+      printWindow.document.close();
+      
+      // Wait for content to load then print
+      printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close();
+      };
+
+      // Mark invoice as printed if available
+      if (invoiceId) {
+        await fetch(`/api/invoices/${invoiceId}/mark-printed`, {
+          method: 'PATCH',
+          credentials: 'include'
+        });
+      }
+
+      toast({
+        title: "Rate Con & Invoice Sent to Printer",
+        description: "Rate confirmation and invoice have been prepared for printing.",
+      });
+      
+    } catch (error: any) {
+      toast({
+        title: "Print Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+    setIsPrinting(false);
+    setPrintDialogOpen(false);
+  };
+
   return (
     <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
       <DialogTrigger asChild>
@@ -168,12 +213,34 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
           <DialogTitle>Print Documents</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4">
+          {invoice && load && (
+            <Card className="cursor-pointer hover:bg-gray-50 border-2 border-blue-200 bg-blue-50" onClick={handlePrintRateConAndInvoice}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center">
+                  <Printer className="h-4 w-4 mr-2 text-blue-700" />
+                  Rate Confirmation & Invoice Combined
+                  <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded font-semibold">
+                    RECOMMENDED
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-sm text-gray-700 font-medium">
+                  Load {load.number_109 || load.number109} • Invoice {invoice.invoiceNumber} • ${invoice.totalAmount}
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  Print rate confirmation and invoice together - Perfect for customer records
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
           {invoice && (
             <Card className="cursor-pointer hover:bg-gray-50" onClick={handlePrintInvoice}>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center">
                   <FileText className="h-4 w-4 mr-2 text-blue-600" />
-                  Invoice {invoice.invoiceNumber}
+                  Invoice Only ({invoice.invoiceNumber})
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -583,6 +650,336 @@ function generateBOLHTML(load: any): string {
             Date: ____________________________
           </div>
         </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function generateCombinedRateConInvoiceHTML(invoice: any, load: any): string {
+  const currentDate = new Date().toLocaleDateString();
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Rate Confirmation & Invoice - ${load?.number_109 || load?.number109 || 'N/A'}</title>
+      <style>
+        @media print {
+          body { margin: 0; }
+          .no-print { display: none; }
+          .page-break { page-break-before: always; }
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          line-height: 1.4;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 3px solid #2d5aa0;
+          padding-bottom: 20px;
+          margin-bottom: 30px;
+          gap: 20px;
+        }
+        .company-info-section {
+          text-align: center;
+        }
+        .company-name {
+          font-size: 32px;
+          font-weight: bold;
+          color: #2d5aa0;
+          margin-bottom: 5px;
+        }
+        .company-info {
+          font-size: 14px;
+          color: #666;
+        }
+        .section-header {
+          background-color: #2d5aa0;
+          color: white;
+          padding: 15px;
+          text-align: center;
+          font-size: 22px;
+          font-weight: bold;
+          margin: 30px 0 20px 0;
+        }
+        .load-details {
+          background-color: #f8f9fa;
+          padding: 20px;
+          border-radius: 8px;
+          margin-bottom: 30px;
+          border-left: 5px solid #2d5aa0;
+        }
+        .detail-row {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 10px;
+          padding: 8px 0;
+          border-bottom: 1px solid #e9ecef;
+        }
+        .detail-label {
+          font-weight: bold;
+          color: #495057;
+          min-width: 150px;
+        }
+        .detail-value {
+          color: #212529;
+        }
+        .rate-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 20px 0;
+          border: 1px solid #dee2e6;
+        }
+        .rate-table th,
+        .rate-table td {
+          border: 1px solid #dee2e6;
+          padding: 15px;
+          text-align: left;
+        }
+        .rate-table th {
+          background-color: #e9ecef;
+          font-weight: bold;
+          color: #495057;
+        }
+        .rate-table .amount {
+          text-align: right;
+          font-weight: bold;
+          color: #28a745;
+        }
+        .invoice-section {
+          margin-top: 40px;
+          border-top: 2px solid #2d5aa0;
+          padding-top: 30px;
+        }
+        .invoice-details {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+          background-color: #f8f9fa;
+          padding: 20px;
+          border-radius: 8px;
+        }
+        .invoice-number {
+          font-size: 24px;
+          font-weight: bold;
+          color: #2d5aa0;
+        }
+        .total-section {
+          background-color: #2d5aa0;
+          color: white;
+          padding: 20px;
+          border-radius: 8px;
+          text-align: center;
+          margin: 20px 0;
+        }
+        .total-amount {
+          font-size: 28px;
+          font-weight: bold;
+        }
+        .signature-section {
+          margin-top: 50px;
+          display: flex;
+          justify-content: space-between;
+          gap: 30px;
+        }
+        .signature-box {
+          border: 2px solid #dee2e6;
+          padding: 20px;
+          border-radius: 8px;
+          width: 45%;
+          height: 120px;
+          background-color: #f8f9fa;
+        }
+        .footer {
+          margin-top: 50px;
+          padding-top: 20px;
+          border-top: 1px solid #dee2e6;
+          text-align: center;
+          font-size: 12px;
+          color: #6c757d;
+        }
+      </style>
+    </head>
+    <body>
+      <!-- Header -->
+      <div class="header">
+        <div class="company-info-section">
+          <div class="company-name">🐄 GO 4 Farms & Cattle 🌾</div>
+          <div class="company-info">
+            Melissa, Texas 75454<br>
+            Phone: (555) 123-4567 • Email: billing@go4farms.com<br>
+            Federal Tax ID: 12-3456789
+          </div>
+        </div>
+      </div>
+
+      <!-- Rate Confirmation Section -->
+      <div class="section-header">RATE CONFIRMATION</div>
+      
+      <div class="load-details">
+        <div class="detail-row">
+          <span class="detail-label">Load Number:</span>
+          <span class="detail-value">${load?.number_109 || load?.number109 || 'N/A'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">BOL Number:</span>
+          <span class="detail-value">${load?.bolNumber || '374'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Trip Number:</span>
+          <span class="detail-value">${load?.tripNumber || generateTripNumber()}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Pickup Location:</span>
+          <span class="detail-value">${load?.origin || 'N/A'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Delivery Location:</span>
+          <span class="detail-value">${load?.destination || 'N/A'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Driver:</span>
+          <span class="detail-value">${load?.driver?.firstName ? `${load.driver.firstName} ${load.driver.lastName}` : load?.driverId || 'TBD'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Estimated Miles:</span>
+          <span class="detail-value">${load?.estimatedMiles || 'TBD'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status:</span>
+          <span class="detail-value">${load?.status || 'Created'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Date Created:</span>
+          <span class="detail-value">${load?.createdAt ? new Date(load.createdAt).toLocaleDateString() : currentDate}</span>
+        </div>
+        ${load?.specialInstructions ? `
+        <div class="detail-row">
+          <span class="detail-label">Special Instructions:</span>
+          <span class="detail-value">${load.specialInstructions}</span>
+        </div>
+        ` : ''}
+      </div>
+
+      <table class="rate-table">
+        <thead>
+          <tr>
+            <th>Service Description</th>
+            <th>Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Transportation Service</td>
+            <td class="amount">$${invoice?.flatRate || '0.00'}</td>
+          </tr>
+          ${invoice?.lumperCharge && parseFloat(invoice.lumperCharge) > 0 ? `
+          <tr>
+            <td>Lumper Service Charge</td>
+            <td class="amount">$${invoice.lumperCharge}</td>
+          </tr>
+          ` : ''}
+          ${invoice?.extraStopsCharge && parseFloat(invoice.extraStopsCharge) > 0 ? `
+          <tr>
+            <td>Extra Stops (${invoice.extraStopsCount || 0} stops @ $50 each)</td>
+            <td class="amount">$${invoice.extraStopsCharge}</td>
+          </tr>
+          ` : ''}
+        </tbody>
+      </table>
+
+      <div class="total-section">
+        <div style="font-size: 18px; margin-bottom: 10px;">AGREED TOTAL RATE</div>
+        <div class="total-amount">$${invoice?.totalAmount || '0.00'}</div>
+        <div style="font-size: 14px; margin-top: 10px;">Payment Terms: Net 30 Days</div>
+      </div>
+
+      <!-- Invoice Section -->
+      <div class="invoice-section">
+        <div class="section-header">INVOICE</div>
+        
+        <div class="invoice-details">
+          <div>
+            <div class="invoice-number">INVOICE ${invoice?.invoiceNumber || 'N/A'}</div>
+            <div>Invoice Date: ${invoice?.generatedAt ? new Date(invoice.generatedAt).toLocaleDateString() : currentDate}</div>
+            <div>Load: ${load?.number_109 || load?.number109 || 'N/A'}</div>
+            <div>BOL: ${load?.bolNumber || '374'}</div>
+          </div>
+          <div>
+            <div><strong>Status:</strong> ${invoice?.status || 'Pending'}</div>
+            <div><strong>Due Date:</strong> ${invoice?.generatedAt ? 
+              new Date(new Date(invoice.generatedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString() : 
+              new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
+            }</div>
+          </div>
+        </div>
+
+        <table class="rate-table">
+          <thead>
+            <tr>
+              <th>Service Description</th>
+              <th>Origin</th>
+              <th>Destination</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Transportation Service - Load ${load?.number_109 || load?.number109 || 'N/A'}</td>
+              <td>${load?.origin || 'N/A'}</td>
+              <td>${load?.destination || 'N/A'}</td>
+              <td class="amount">$${invoice?.flatRate || '0.00'}</td>
+            </tr>
+            ${invoice?.lumperCharge && parseFloat(invoice.lumperCharge) > 0 ? `
+            <tr>
+              <td>Lumper Service Charge</td>
+              <td>-</td>
+              <td>-</td>
+              <td class="amount">$${invoice.lumperCharge}</td>
+            </tr>
+            ` : ''}
+            ${invoice?.extraStopsCharge && parseFloat(invoice.extraStopsCharge) > 0 ? `
+            <tr>
+              <td>Extra Stops (${invoice.extraStopsCount || 0} stops @ $50 each)</td>
+              <td>-</td>
+              <td>-</td>
+              <td class="amount">$${invoice.extraStopsCharge}</td>
+            </tr>
+            ` : ''}
+          </tbody>
+        </table>
+
+        <div class="total-section">
+          <div style="font-size: 18px; margin-bottom: 10px;">TOTAL AMOUNT DUE</div>
+          <div class="total-amount">$${invoice?.totalAmount || '0.00'}</div>
+          <div style="font-size: 14px; margin-top: 10px;">Payment Terms: Net 30 Days</div>
+        </div>
+      </div>
+
+      <!-- Signature Section -->
+      <div class="signature-section">
+        <div class="signature-box">
+          <strong>Customer Acceptance</strong><br><br>
+          <div style="border-bottom: 2px solid #333; margin: 15px 0;"></div>
+          Print Name: ________________________<br>
+          Date: ____________________________
+        </div>
+        <div class="signature-box">
+          <strong>GO 4 Farms & Cattle</strong><br><br>
+          <div style="border-bottom: 2px solid #333; margin: 15px 0;"></div>
+          Authorized Signature<br>
+          Date: ____________________________
+        </div>
+      </div>
+
+      <div class="footer">
+        <p><strong>Thank you for your business!</strong></p>
+        <p>For questions about this rate confirmation or invoice, please contact us at billing@go4farms.com or (555) 123-4567</p>
+        <p>This document serves as both rate confirmation and invoice for the transportation services described above.</p>
       </div>
     </body>
     </html>

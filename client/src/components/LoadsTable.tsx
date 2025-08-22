@@ -339,9 +339,13 @@ export default function LoadsTable() {
                           <i className="fas fa-eye text-primary"></i>
                         </Button>
                         {hasInvoice(load.id) ? (
-                          <Badge variant="secondary" className="text-xs">
-                            Invoice Generated
-                          </Badge>
+                          <PrintButton 
+                            loadId={load.id}
+                            load={load}
+                            invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === load.id) : undefined}
+                            variant="ghost"
+                            size="sm"
+                          />
                         ) : (
                           <Button 
                             variant="ghost" 
@@ -488,47 +492,57 @@ export default function LoadsTable() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex justify-between pt-4 border-t">
-                <div className="text-sm text-gray-600">
-                  {hasInvoice(selectedLoad.id) ? (
-                    <span className="text-green-600">✅ Invoice already generated for this load</span>
-                  ) : (
-                    <span>No invoice generated yet</span>
-                  )}
-                </div>
+              <div className="pt-4 border-t space-y-4">
+                {/* Print Button - Always prominently available */}
+                {hasInvoice(selectedLoad.id) && (
+                  <div className="text-center">
+                    <PrintButton 
+                      loadId={selectedLoad.id}
+                      load={selectedLoad}
+                      invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id) : undefined}
+                      variant="default"
+                      size="lg"
+                    />
+                    <p className="text-xs text-gray-600 mt-2">
+                      Print rate confirmation & invoice together • Can be printed multiple times
+                    </p>
+                  </div>
+                )}
                 
-                <div className="space-x-2">
-                  <Button variant="outline" onClick={() => setDialogOpen(false)}>
-                    Close
-                  </Button>
+                <div className="flex justify-between">
+                  <div className="text-sm text-gray-600">
+                    {hasInvoice(selectedLoad.id) ? (
+                      <span className="text-green-600">✅ Invoice generated for this load</span>
+                    ) : (
+                      <span>No invoice generated yet</span>
+                    )}
+                  </div>
                   
-                  {/* Print Button - Always available */}
-                  <PrintButton 
-                    loadId={selectedLoad.id}
-                    load={selectedLoad}
-                    invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id) : undefined}
-                    variant="outline"
-                  />
-                  
-                  {!hasInvoice(selectedLoad.id) && (
-                    <Button 
-                      onClick={handleGenerateInvoice}
-                      disabled={generateInvoiceMutation.isPending}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      {generateInvoiceMutation.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <i className="fas fa-file-invoice-dollar mr-2"></i>
-                          Generate Invoice
-                        </>
-                      )}
+                  <div className="space-x-2">
+                    <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                      Close
                     </Button>
-                  )}
+                  
+                    {!hasInvoice(selectedLoad.id) && (
+                      <Button 
+                        onClick={handleGenerateInvoice}
+                        disabled={generateInvoiceMutation.isPending}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        {generateInvoiceMutation.isPending ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-file-invoice-dollar mr-2"></i>
+                            Generate Invoice
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
