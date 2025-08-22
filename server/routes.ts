@@ -250,6 +250,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Direct production debug endpoint
+  app.get("/api/debug/production", (req, res) => {
+    const driverAuth = (req.session as any)?.driverAuth;
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    
+    console.log("PRODUCTION DEBUG:", {
+      sessionId: req.sessionID,
+      hasDriverAuth: !!driverAuth,
+      driverData: driverAuth || 'none',
+      hasTokenBypass,
+      bypassToken: bypassToken ? '[PROVIDED]' : '[MISSING]',
+      headers: Object.keys(req.headers),
+      userAgent: req.headers['user-agent']
+    });
+    
+    res.json({
+      sessionActive: !!driverAuth,
+      bypassActive: hasTokenBypass,
+      userId: driverAuth?.userId || 'none',
+      username: driverAuth?.username || 'none',
+      timestamp: new Date().toISOString()
+    });
+  });
+
   // Admin authentication routes
   app.post("/api/auth/admin-login", async (req, res) => {
     try {

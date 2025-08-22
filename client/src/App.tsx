@@ -32,6 +32,7 @@ import DriverAssignmentGuide from "@/pages/DriverAssignmentGuide";
 import TroubleshootPage from "@/pages/TroubleshootPage";
 import DebugInvoice from "@/pages/DebugInvoice";
 import AdminTestPage from "@/pages/AdminTestPage";
+import SimpleDriverTest from "@/pages/SimpleDriverTest";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -119,6 +120,9 @@ function Router() {
       
       {/* Driver debug test - always accessible */}
       <Route path="/driver-debug-test" component={DriverTestDebug} />
+      
+      {/* Simple driver test - always accessible */}
+      <Route path="/simple-test" component={SimpleDriverTest} />
       
       {/* Driver portal - for authenticated drivers OR office users accessing it */}
       {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (
