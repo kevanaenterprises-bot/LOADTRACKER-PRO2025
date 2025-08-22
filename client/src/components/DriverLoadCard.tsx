@@ -77,9 +77,20 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
 
   const updateStatusMutation = useMutation({
     mutationFn: async (status: string) => {
-      await apiRequest("PATCH", `/api/loads/${load.id}/status`, { status });
+      console.log("🚀 Status update starting:", { loadId: load.id, status });
+      console.log("🔑 Bypass token available:", !!localStorage.getItem('bypass-token'));
+      
+      try {
+        const result = await apiRequest(`/api/loads/${load.id}/status`, "PATCH", { status });
+        console.log("✅ Status update successful:", result);
+        return result;
+      } catch (error) {
+        console.error("💥 Status update failed:", error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      console.log("🎉 Status update onSuccess:", result);
       toast({
         title: "Status Updated",
         description: "Load status has been updated successfully!",
@@ -87,6 +98,7 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
     },
     onError: (error: Error) => {
+      console.error("🚨 Status update onError:", error);
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -99,8 +111,8 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
         return;
       }
       toast({
-        title: "Error",
-        description: "Failed to update status",
+        title: "Status Update Error",
+        description: `Failed to update status: ${error.message}`,
         variant: "destructive",
       });
     },

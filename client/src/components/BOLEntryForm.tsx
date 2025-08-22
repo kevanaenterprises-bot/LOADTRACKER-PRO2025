@@ -47,9 +47,20 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
 
   const validateBOLMutation = useMutation({
     mutationFn: async (bolNumber: string) => {
-      return await apiRequest(`/api/bol/check/${bolNumber}`, "GET");
+      console.log("🔍 BOL validation starting for:", bolNumber);
+      console.log("🔑 Bypass token available:", !!localStorage.getItem('bypass-token'));
+      
+      try {
+        const result = await apiRequest(`/api/bol/check/${bolNumber}`, "GET");
+        console.log("✅ BOL validation successful:", result);
+        return result;
+      } catch (error) {
+        console.error("💥 BOL validation failed:", error);
+        throw error;
+      }
     },
     onSuccess: (data, bolNumber) => {
+      console.log("🎉 BOL validation onSuccess:", { data, bolNumber });
       if (data.exists) {
         toast({
           title: "Duplicate BOL",
@@ -65,6 +76,7 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
       }
     },
     onError: (error: Error) => {
+      console.error("🚨 BOL validation onError:", error);
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -77,8 +89,8 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
         return;
       }
       toast({
-        title: "Error",
-        description: "Failed to validate BOL number",
+        title: "BOL Validation Error",
+        description: `Failed to validate BOL: ${error.message}`,
         variant: "destructive",
       });
     },
