@@ -275,6 +275,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Server-side test page for mobile debugging
+  app.get("/mobile-test", (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mobile Test - LoadTracker</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+          .container { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+          input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 4px; border: 1px solid #ddd; }
+          button { background: #007bff; color: white; cursor: pointer; font-size: 16px; }
+          button:disabled { background: #ccc; }
+          .result { margin: 10px 0; padding: 10px; border-radius: 4px; font-size: 14px; }
+          .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+          .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+          h1 { color: #333; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Mobile API Test</h1>
+          <input type="text" id="bolInput" placeholder="Enter BOL number" value="5469">
+          <button onclick="testBOL()">Test BOL Validation</button>
+          <button onclick="testStatus()">Test Status Update</button>
+          <div id="result"></div>
+        </div>
+        
+        <script>
+          function showResult(message, isSuccess) {
+            const result = document.getElementById('result');
+            result.innerHTML = message;
+            result.className = 'result ' + (isSuccess ? 'success' : 'error');
+          }
+          
+          async function testBOL() {
+            const bolNumber = document.getElementById('bolInput').value;
+            if (!bolNumber) {
+              showResult('Please enter a BOL number', false);
+              return;
+            }
+            
+            try {
+              console.log('Testing BOL:', bolNumber);
+              const response = await fetch('/api/bol/check/' + bolNumber, {
+                headers: { 'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025' }
+              });
+              
+              console.log('BOL Response status:', response.status);
+              
+              if (response.ok) {
+                const data = await response.json();
+                console.log('BOL Success:', data);
+                showResult('BOL Check SUCCESS: ' + (data.exists ? 'BOL exists' : 'BOL not found'), true);
+              } else {
+                const error = await response.text();
+                console.log('BOL Error:', error);
+                showResult('BOL Check ERROR (' + response.status + '): ' + error, false);
+              }
+            } catch (error) {
+              console.error('BOL Exception:', error);
+              showResult('BOL Check EXCEPTION: ' + error.message, false);
+            }
+          }
+          
+          async function testStatus() {
+            try {
+              console.log('Testing status update');
+              const response = await fetch('/api/loads/1d4df59c-1f72-4e3d-8812-472ae3414453/status', {
+                method: 'PATCH',
+                headers: { 
+                  'Content-Type': 'application/json',
+                  'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025' 
+                },
+                body: JSON.stringify({ status: 'at_shipper' })
+              });
+              
+              console.log('Status Response status:', response.status);
+              
+              if (response.ok) {
+                const data = await response.json();
+                console.log('Status Success:', data);
+                showResult('Status Update SUCCESS: Updated to ' + data.status, true);
+              } else {
+                const error = await response.text();
+                console.log('Status Error:', error);
+                showResult('Status Update ERROR (' + response.status + '): ' + error, false);
+              }
+            } catch (error) {
+              console.error('Status Exception:', error);
+              showResult('Status Update EXCEPTION: ' + error.message, false);
+            }
+          }
+          
+          // Auto-test BOL on load
+          setTimeout(() => {
+            console.log('Page loaded, ready for tests');
+          }, 1000);
+        </script>
+      </body>
+      </html>
+    `);
+  });
+
   // Admin authentication routes
   app.post("/api/auth/admin-login", async (req, res) => {
     try {
