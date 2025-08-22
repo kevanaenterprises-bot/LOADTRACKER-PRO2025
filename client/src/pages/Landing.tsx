@@ -66,7 +66,7 @@ export default function Landing() {
             How to Assign Drivers
           </Button>
           <Button 
-            onClick={() => setLocation("/quick-assign")} 
+            onClick={() => window.location.href = "/debug-mobile"} 
             variant="outline" 
             size="sm" 
             className="w-full bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
