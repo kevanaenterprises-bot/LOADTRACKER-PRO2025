@@ -17,23 +17,25 @@ export default function DriverPortal() {
   const isLoading = driverAuth.isLoading;
   const user = driverAuth.user;
 
-  // Setup bypass token automatically when authenticated (same as Dashboard)
+  // Enhanced bypass token setup with force refresh capability
   useEffect(() => {
     const setupBypassToken = async () => {
-      if (!localStorage.getItem('bypass-token')) {
-        try {
-          const response = await fetch("/api/auth/browser-bypass", {
-            method: "POST",
-            credentials: "include",
-          });
-          if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('bypass-token', data.token);
-            console.log("Driver portal bypass token setup successful");
-          }
-        } catch (error) {
-          console.log("Driver portal bypass token setup failed:", error);
+      try {
+        console.log("🚀 PRODUCTION: Setting up bypass token for driver portal");
+        const response = await fetch("/api/auth/browser-bypass", {
+          method: "POST",
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('bypass-token', data.token);
+          console.log("✅ PRODUCTION: Driver portal bypass token setup successful");
+          console.log("🔑 PRODUCTION: Token stored:", !!localStorage.getItem('bypass-token'));
+        } else {
+          console.error("❌ PRODUCTION: Bypass token request failed:", response.status);
         }
+      } catch (error) {
+        console.error("❌ PRODUCTION: Bypass token setup error:", error);
       }
     };
 
