@@ -478,7 +478,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRateByLocation(city: string, state: string): Promise<Rate | undefined> {
-    const [rate] = await db
+    console.log("Rate lookup attempting for:", { city, state });
+    
+    // Try exact match first
+    let [rate] = await db
       .select()
       .from(rates)
       .where(and(
@@ -487,6 +490,20 @@ export class DatabaseStorage implements IStorage {
         eq(rates.isActive, true)
       ));
     
+    // If no exact match, try case-insensitive match
+    if (!rate) {
+      console.log("No exact match found, trying case-insensitive search");
+      [rate] = await db
+        .select()
+        .from(rates)
+        .where(and(
+          sql`LOWER(${rates.city}) = LOWER(${city})`,
+          sql`LOWER(${rates.state}) = LOWER(${state})`,
+          eq(rates.isActive, true)
+        ));
+    }
+    
+    console.log("Rate lookup result:", { found: !!rate, rate: rate || "none" });
     return rate;
   }
 

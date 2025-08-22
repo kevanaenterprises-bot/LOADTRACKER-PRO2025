@@ -1156,15 +1156,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invoice already exists for this load" });
       }
 
+      // Debug: Log load and location data
+      console.log("Invoice generation debug:", {
+        loadId: load.id,
+        loadNumber: load.number109,
+        locationData: load.location,
+        hasLocation: !!load.location,
+        city: load.location?.city,
+        state: load.location?.state
+      });
+
       // Get rate for the location
       const rate = await storage.getRateByLocation(
         load.location.city, 
         load.location.state
       );
       
+      // Debug: Log rate lookup result
+      console.log("Rate lookup result:", {
+        lookupCity: load.location.city,
+        lookupState: load.location.state,
+        rateFound: !!rate,
+        rateData: rate
+      });
+      
       if (!rate) {
+        // Get all available rates for debugging
+        const allRates = await storage.getRates();
+        console.log("Available rates in database:", allRates.map(r => ({ city: r.city, state: r.state, flatRate: r.flatRate })));
+        
         return res.status(400).json({ 
-          message: `No rate found for ${load.location.city}, ${load.location.state}. Please add a rate first.` 
+          message: `No rate found for ${load.location.city}, ${load.location.state}. Please add a rate first.`,
+          availableRates: allRates.map(r => `${r.city}, ${r.state}`)
         });
       }
 
