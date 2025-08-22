@@ -232,6 +232,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test endpoint to verify bypass token
+  app.get("/api/test/bypass", (req, res) => {
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    
+    console.log("Bypass test endpoint:", {
+      bypassToken: bypassToken ? '[PROVIDED]' : '[MISSING]',
+      expectedToken: BYPASS_SECRET,
+      hasTokenBypass
+    });
+    
+    if (hasTokenBypass) {
+      res.json({ message: "Bypass token working!", success: true });
+    } else {
+      res.status(401).json({ message: "Bypass token failed" });
+    }
+  });
+
   // Admin authentication routes
   app.post("/api/auth/admin-login", async (req, res) => {
     try {
@@ -824,10 +842,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // BOL validation and entry
-  app.get("/api/bol/check/:bolNumber", isAuthenticated, async (req, res) => {
+  // BOL validation and entry - WITH FLEXIBLE AUTHENTICATION
+  app.get("/api/bol/check/:bolNumber", (req, res, next) => {
+    // Manual bypass check
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || hasTokenBypass;
+    
+    console.log("BOL validation auth check:", {
+      hasAdminAuth: !!(req.session as any)?.adminAuth,
+      hasReplitAuth: !!req.user,
+      hasDriverAuth: !!(req.session as any)?.driverAuth,
+      hasTokenBypass,
+      bypassToken: bypassToken ? '[PROVIDED]' : '[MISSING]',
+      expectedToken: BYPASS_SECRET,
+      finalAuth: hasAuth
+    });
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
+      console.log(`BOL validation request for: ${req.params.bolNumber}`);
       const exists = await storage.checkBOLExists(req.params.bolNumber);
+      console.log(`BOL ${req.params.bolNumber} exists: ${exists}`);
       res.json({ exists });
     } catch (error) {
       console.error("Error checking BOL:", error);
@@ -835,7 +876,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/loads/:id/bol", isAuthenticated, async (req, res) => {
+  app.patch("/api/loads/:id/bol", (req, res, next) => {
+    // Manual bypass check - same pattern as BOL validation
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || hasTokenBypass;
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const { bolNumber, tripNumber } = req.body;
       
