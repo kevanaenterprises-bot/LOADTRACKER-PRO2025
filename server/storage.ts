@@ -458,7 +458,7 @@ export class DatabaseStorage implements IStorage {
       
       return existing.count > 0;
     } catch (error) {
-      console.error("Error in checkBOLExistsForDifferentLoad:", error);
+      console.error("❌ Error in checkBOLExistsForDifferentLoad:", error);
       // If there's an error, be safe and return false (allow the operation)
       return false;
     }
