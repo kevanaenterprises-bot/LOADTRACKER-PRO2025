@@ -93,6 +93,19 @@ export default function DriverPortal() {
     ["completed", "delivered"].includes(load.status)
   ).slice(0, 5) : [];
 
+  // Debug logging for BOL upload visibility
+  console.log("🔍 BOL Upload Debug:");
+  console.log("Total loads:", Array.isArray(loads) ? loads.length : 'Not array');
+  console.log("Recent loads:", recentLoads.length);
+  recentLoads.forEach((load: any) => {
+    console.log(`Load ${load.number109}:`, {
+      status: load.status,
+      bolNumber: load.bolNumber,
+      bolDocumentPath: load.bolDocumentPath,
+      needsBOL: load.bolNumber && !load.bolDocumentPath
+    });
+  });
+
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/driver-logout", {
