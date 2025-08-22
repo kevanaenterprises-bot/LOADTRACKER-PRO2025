@@ -98,9 +98,20 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
 
   const updateBOLMutation = useMutation({
     mutationFn: async (data: BOLFormData) => {
-      await apiRequest("PATCH", `/api/loads/${load.id}/bol`, data);
+      console.log("💾 BOL save starting:", { loadId: load.id, data });
+      console.log("🔑 Bypass token available:", !!localStorage.getItem('bypass-token'));
+      
+      try {
+        const result = await apiRequest(`/api/loads/${load.id}/bol`, "PATCH", data);
+        console.log("✅ BOL save successful:", result);
+        return result;
+      } catch (error) {
+        console.error("💥 BOL save failed:", error);
+        throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      console.log("🎉 BOL save onSuccess:", result);
       toast({
         title: "Success",
         description: "BOL information updated successfully!",
@@ -108,6 +119,7 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
     },
     onError: (error: Error) => {
+      console.error("🚨 BOL save onError:", error);
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -120,8 +132,8 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
         return;
       }
       toast({
-        title: "Error",
-        description: error.message || "Failed to update BOL information",
+        title: "BOL Save Error",
+        description: `Failed to save BOL: ${error.message}`,
         variant: "destructive",
       });
     },
