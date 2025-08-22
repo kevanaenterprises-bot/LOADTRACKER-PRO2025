@@ -344,7 +344,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           async function testStatus() {
             try {
-              console.log('Testing status update');
+              console.log('Testing status update - attempting request...');
+              
+              // First, let's test if we can reach the endpoint at all
+              const testResponse = await fetch('/api/test/bypass', {
+                headers: { 'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025' }
+              });
+              console.log('Bypass test response:', testResponse.status);
+              
+              // Now try the actual status update
               const response = await fetch('/api/loads/1d4df59c-1f72-4e3d-8812-472ae3414453/status', {
                 method: 'PATCH',
                 headers: { 
@@ -355,6 +363,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
               
               console.log('Status Response status:', response.status);
+              console.log('Status Response headers:', Array.from(response.headers.entries()));
               
               if (response.ok) {
                 const data = await response.json();
@@ -362,11 +371,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 showResult('Status Update SUCCESS: Updated to ' + data.status, true);
               } else {
                 const error = await response.text();
-                console.log('Status Error:', error);
+                console.log('Status Error Response Body:', error);
                 showResult('Status Update ERROR (' + response.status + '): ' + error, false);
               }
             } catch (error) {
-              console.error('Status Exception:', error);
+              console.error('Status Exception Details:', error);
               showResult('Status Update EXCEPTION: ' + error.message, false);
             }
           }
@@ -855,8 +864,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(load);
     } catch (error) {
       console.error("MOBILE DEBUG - Error updating load status:", {
-        error: error.message,
-        stack: error.stack,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : 'No stack trace',
         loadId: req.params.id,
         requestBody: req.body
       });
