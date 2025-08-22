@@ -23,7 +23,7 @@ import {
   type LoadStatusHistoryEntry,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, and, sql, not } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -53,6 +53,7 @@ export interface IStorage {
 
   // BOL operations
   checkBOLExists(bolNumber: string): Promise<boolean>;
+  checkBOLExistsForDifferentLoad(bolNumber: string, excludeLoadId?: string): Promise<boolean>;
   createBOLNumber(bol: InsertBolNumber): Promise<BolNumber>;
 
   // Rate operations
@@ -432,6 +433,23 @@ export class DatabaseStorage implements IStorage {
       .select({ count: sql<number>`count(*)` })
       .from(bolNumbers)
       .where(eq(bolNumbers.bolNumber, bolNumber));
+    
+    return existing.count > 0;
+  }
+
+  async checkBOLExistsForDifferentLoad(bolNumber: string, excludeLoadId?: string): Promise<boolean> {
+    // Check if BOL number exists in loads table (for BOL photo uploads)
+    let whereCondition = eq(loads.bolNumber, bolNumber);
+    
+    // If we're updating a specific load, exclude it from the check
+    if (excludeLoadId) {
+      whereCondition = and(eq(loads.bolNumber, bolNumber), not(eq(loads.id, excludeLoadId)));
+    }
+    
+    const [existing] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(loads)
+      .where(whereCondition);
     
     return existing.count > 0;
   }

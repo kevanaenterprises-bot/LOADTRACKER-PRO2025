@@ -671,7 +671,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, async (req, res) => {
     try {
-      const exists = await storage.checkBOLExists(req.params.bolNumber);
+      const bolNumber = req.params.bolNumber;
+      const excludeLoadId = req.query.excludeLoadId as string;
+      
+      // Use the smarter check that can exclude a specific load
+      const exists = await storage.checkBOLExistsForDifferentLoad(bolNumber, excludeLoadId);
       res.json({ exists });
     } catch (error) {
       console.error("Error checking BOL number:", error);

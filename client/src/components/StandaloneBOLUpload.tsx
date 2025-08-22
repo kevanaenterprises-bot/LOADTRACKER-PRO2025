@@ -37,18 +37,21 @@ export default function StandaloneBOLUpload() {
 
   const findLoadMutation = useMutation({
     mutationFn: async (data: BOLUploadData) => {
-      // Check if 374 number already exists
-      const bolCheckResponse = await apiRequest(`/api/bol/check/${data.bolNumber}`, "GET");
-      
-      if (bolCheckResponse?.exists) {
-        throw new Error(`BOL number ${data.bolNumber} has already been used`);
-      }
-
       // First, find the load by 109 number
       const loadResponse = await apiRequest(`/api/loads/by-number/${data.loadNumber}`, "GET");
       
       if (!loadResponse) {
         throw new Error(`Load ${data.loadNumber} not found`);
+      }
+
+      // Check if 374 number already exists for OTHER loads (exclude current load)
+      const bolCheckResponse = await apiRequest(
+        `/api/bol/check/${data.bolNumber}?excludeLoadId=${loadResponse.id}`, 
+        "GET"
+      );
+      
+      if (bolCheckResponse?.exists) {
+        throw new Error(`BOL number ${data.bolNumber} has already been used by another load`);
       }
 
       // Update the load with BOL information
