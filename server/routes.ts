@@ -661,6 +661,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check if BOL number exists - FOR DUPLICATE VALIDATION
+  app.get("/api/bol/check/:bolNumber", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const exists = await storage.checkBOLExists(req.params.bolNumber);
+      res.json({ exists });
+    } catch (error) {
+      console.error("Error checking BOL number:", error);
+      res.status(500).json({ message: "Failed to check BOL number" });
+    }
+  });
+
   // Get load by number - FOR STANDALONE BOL UPLOAD
   app.get("/api/loads/by-number/:number", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);

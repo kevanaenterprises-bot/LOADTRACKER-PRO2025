@@ -13,7 +13,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 const bolUploadSchema = z.object({
   loadNumber: z.string().min(1, "109 number is required"),
-  bolNumber: z.string().min(1, "BOL number is required"), 
+  bolNumber: z.string().min(1, "374 number is required"), 
   tripNumber: z.string().min(1, "Trip number is required"),
 });
 
@@ -29,14 +29,21 @@ export default function StandaloneBOLUpload() {
   const form = useForm<BOLUploadData>({
     resolver: zodResolver(bolUploadSchema),
     defaultValues: {
-      loadNumber: "",
-      bolNumber: "",
+      loadNumber: "109-",
+      bolNumber: "374-",
       tripNumber: "",
     },
   });
 
   const findLoadMutation = useMutation({
     mutationFn: async (data: BOLUploadData) => {
+      // Check if 374 number already exists
+      const bolCheckResponse = await apiRequest(`/api/bol/check/${data.bolNumber}`, "GET");
+      
+      if (bolCheckResponse?.exists) {
+        throw new Error(`BOL number ${data.bolNumber} has already been used`);
+      }
+
       // First, find the load by 109 number
       const loadResponse = await apiRequest(`/api/loads/by-number/${data.loadNumber}`, "GET");
       
@@ -80,8 +87,12 @@ export default function StandaloneBOLUpload() {
     });
     queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
     
-    // Reset form
-    form.reset();
+    // Reset form with prefixes
+    form.reset({
+      loadNumber: "109-",
+      bolNumber: "374-",
+      tripNumber: "",
+    });
     setReadyForUpload(false);
     setLoadId(null);
     setUploading(false);
@@ -116,6 +127,13 @@ export default function StandaloneBOLUpload() {
                             placeholder="109-36205" 
                             {...field}
                             className="text-sm"
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              if (!value.startsWith("109-")) {
+                                value = "109-" + value.replace("109-", "");
+                              }
+                              field.onChange(value);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -128,12 +146,19 @@ export default function StandaloneBOLUpload() {
                     name="bolNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>BOL Number (374-XXXXX)</FormLabel>
+                        <FormLabel>374 Number</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="374-22222" 
                             {...field}
                             className="text-sm"
+                            onChange={(e) => {
+                              let value = e.target.value;
+                              if (!value.startsWith("374-")) {
+                                value = "374-" + value.replace("374-", "");
+                              }
+                              field.onChange(value);
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -198,7 +223,11 @@ export default function StandaloneBOLUpload() {
                 onClick={() => {
                   setReadyForUpload(false);
                   setLoadId(null);
-                  form.reset();
+                  form.reset({
+                    loadNumber: "109-",
+                    bolNumber: "374-",
+                    tripNumber: "",
+                  });
                 }}
                 className="w-full"
               >
