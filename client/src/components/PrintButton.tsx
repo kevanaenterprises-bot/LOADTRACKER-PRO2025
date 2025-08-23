@@ -227,8 +227,13 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 
     setIsEmailing(true);
     try {
+      // Use invoice number instead of ID if available, fallback to ID
+      const invoiceIdentifier = invoice?.invoiceNumber || invoiceId;
+      
+      console.log("🔍 Using invoice identifier:", invoiceIdentifier);
+      
       // Send complete document package - invoice + POD/BOL + rate confirmation (if available)
-      await apiRequest(`/api/invoices/${invoiceId}/email-complete-package`, "POST", {
+      await apiRequest(`/api/invoices/${invoiceIdentifier}/email-complete-package`, "POST", {
         emailAddress,
         loadId: loadId,
       });
