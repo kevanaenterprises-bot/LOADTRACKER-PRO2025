@@ -2,7 +2,7 @@ import {
   users,
   locations,
   loads,
-  podNumbers,
+  bolNumbers,
   rates,
   invoiceCounter,
   invoices,
@@ -14,8 +14,8 @@ import {
   type Load,
   type InsertLoad,
   type LoadWithDetails,
-  type PodNumber,
-  type InsertPodNumber,
+  type BolNumber,
+  type InsertBolNumber,
   type Rate,
   type InsertRate,
   type Invoice,
@@ -45,16 +45,16 @@ export interface IStorage {
   getLoadByNumber(number: string): Promise<LoadWithDetails | undefined>;
   updateLoad(id: string, updates: Partial<Load>): Promise<Load>;
   updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load>;
-  updateLoadPOD(id: string, podNumber: string, tripNumber: string): Promise<Load>;
-  updateLoadPODDocument(id: string, podDocumentPath: string): Promise<Load>;
+  updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load>;
+  updateLoadBOLDocument(id: string, bolDocumentPath: string): Promise<Load>;
   updateLoadPOD(id: string, podDocumentPath: string): Promise<Load>;
   getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]>;
   getLoadsWithTracking(): Promise<LoadWithDetails[]>;
 
-  // POD operations
-  checkPODExists(podNumber: string): Promise<boolean>;
-  checkPODExistsForDifferentLoad(podNumber: string, excludeLoadId?: string): Promise<boolean>;
-  createPODNumber(pod: InsertPodNumber): Promise<PodNumber>;
+  // BOL operations
+  checkBOLExists(bolNumber: string): Promise<boolean>;
+  checkBOLExistsForDifferentLoad(bolNumber: string, excludeLoadId?: string): Promise<boolean>;
+  createBOLNumber(bol: InsertBolNumber): Promise<BolNumber>;
 
   // Rate operations
   getRates(): Promise<Rate[]>;
@@ -340,16 +340,16 @@ export class DatabaseStorage implements IStorage {
     return updatedLoad;
   }
 
-  async updateLoadPOD(id: string, podNumber: string, tripNumber: string): Promise<Load> {
+  async updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load> {
     const [updatedLoad] = await db
       .update(loads)
-      .set({ podNumber, tripNumber, updatedAt: new Date() })
+      .set({ bolNumber, tripNumber, updatedAt: new Date() })
       .where(eq(loads.id, id))
       .returning();
 
-    // Create POD record for duplicate tracking
-    await this.createPODNumber({
-      podNumber,
+    // Create BOL record for duplicate tracking
+    await this.createBOLNumber({
+      bolNumber,
       tripNumber,
       loadId: id,
     });
@@ -357,10 +357,10 @@ export class DatabaseStorage implements IStorage {
     return updatedLoad;
   }
 
-  async updateLoadPODDocument(id: string, podDocumentPath: string): Promise<Load> {
+  async updateLoadBOLDocument(id: string, bolDocumentPath: string): Promise<Load> {
     const [updatedLoad] = await db
       .update(loads)
-      .set({ podDocumentPath, updatedAt: new Date() })
+      .set({ bolDocumentPath, updatedAt: new Date() })
       .where(eq(loads.id, id))
       .returning();
     
@@ -419,22 +419,22 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async checkPODExists(podNumber: string): Promise<boolean> {
+  async checkBOLExists(bolNumber: string): Promise<boolean> {
     const [existing] = await db
       .select({ count: sql<number>`count(*)` })
-      .from(podNumbers)
-      .where(eq(podNumbers.podNumber, podNumber));
+      .from(bolNumbers)
+      .where(eq(bolNumbers.bolNumber, bolNumber));
     
     return existing.count > 0;
   }
 
-  async checkPODExistsForDifferentLoad(podNumber: string, excludeLoadId?: string): Promise<boolean> {
+  async checkBOLExistsForDifferentLoad(bolNumber: string, excludeLoadId?: string): Promise<boolean> {
     try {
-      // Check if POD number exists in loads table (for POD photo uploads)
+      // Check if BOL number exists in loads table (for BOL photo uploads)
       // Use IS NOT NULL to handle potential null values properly
       const baseCondition = and(
-        eq(loads.podNumber, podNumber),
-        sql`${loads.podNumber} IS NOT NULL`
+        eq(loads.bolNumber, bolNumber),
+        sql`${loads.bolNumber} IS NOT NULL`
       );
       
       // If we're updating a specific load, exclude it from the check
@@ -449,15 +449,15 @@ export class DatabaseStorage implements IStorage {
       
       return existing.count > 0;
     } catch (error) {
-      console.error("❌ Error in checkPODExistsForDifferentLoad:", error);
+      console.error("❌ Error in checkBOLExistsForDifferentLoad:", error);
       // If there's an error, be safe and return false (allow the operation)
       return false;
     }
   }
 
-  async createPODNumber(pod: InsertPodNumber): Promise<PodNumber> {
-    const [newPod] = await db.insert(podNumbers).values(pod).returning();
-    return newPod;
+  async createBOLNumber(bol: InsertBolNumber): Promise<BolNumber> {
+    const [newBol] = await db.insert(bolNumbers).values(bol).returning();
+    return newBol;
   }
 
   async getRates(): Promise<Rate[]> {
