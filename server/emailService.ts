@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import puppeteer from 'puppeteer';
 
 // Create Outlook SMTP transporter
 const createTransporter = () => {
@@ -29,9 +30,14 @@ interface EmailOptions {
   html: string;
   cc?: string[];
   bcc?: string[];
+  attachments?: Array<{
+    filename: string;
+    content: Buffer;
+    contentType: string;
+  }>;
 }
 
-export async function sendEmail({ to, subject, html, cc = [], bcc = [] }: EmailOptions) {
+export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachments = [] }: EmailOptions) {
   try {
     const transporter = createTransporter();
     
@@ -45,6 +51,7 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [] }: EmailO
       bcc: bcc.length > 0 ? bcc.join(', ') : undefined,
       subject,
       html,
+      attachments: attachments.length > 0 ? attachments : undefined,
     };
 
     const result = await transporter.sendMail(mailOptions);
@@ -68,6 +75,34 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [] }: EmailO
     console.error('Error code:', (error as any)?.code);
     console.error('Error response:', (error as any)?.response);
     throw new Error(`Failed to send email: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+// Generate PDF from HTML using Puppeteer
+export async function generatePDF(html: string): Promise<Buffer> {
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+  
+  try {
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '0.5in',
+        right: '0.5in',
+        bottom: '0.5in',
+        left: '0.5in',
+      },
+    });
+    
+    return Buffer.from(pdf);
+  } finally {
+    await browser.close();
   }
 }
 

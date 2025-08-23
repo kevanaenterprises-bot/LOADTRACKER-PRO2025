@@ -1204,7 +1204,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const availableDocuments = {
         invoice: true, // Always available
         rateConfirmation: true, // Always include with invoice
-        bolDocument: !!load.bolDocumentPath,
         podDocument: !!load.podDocumentPath
       };
 
@@ -1221,7 +1220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         emailLength: process.env.OUTLOOK_EMAIL?.length || 0
       });
       
-      const { sendEmail, testEmailConnection } = await import('./emailService');
+      const { sendEmail, testEmailConnection, generatePDF } = await import('./emailService');
       
       // Test connection first
       console.log("🔍 Testing email connection...");
@@ -1230,10 +1229,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("Email server connection failed - please check credentials");
       }
       
+      // Generate PDF attachments
+      console.log("🔍 Generating PDF attachments...");
+      const attachments = [];
+      
+      // Generate invoice PDF
+      const invoiceHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+      const invoicePDF = await generatePDF(invoiceHTML);
+      attachments.push({
+        filename: `Invoice-${invoice.invoiceNumber}.pdf`,
+        content: invoicePDF,
+        contentType: 'application/pdf'
+      });
+      
+      // Generate POD PDF if available
+      if (load.podDocumentPath) {
+        const podHTML = generatePODHTML(load);
+        const podPDF = await generatePDF(podHTML);
+        attachments.push({
+          filename: `POD-${load.number109}.pdf`,
+          content: podPDF,
+          contentType: 'application/pdf'
+        });
+      }
+      
+      console.log(`🔍 Generated ${attachments.length} PDF attachments`);
+      
       const emailResult = await sendEmail({
         to: emailAddress,
         subject,
-        html: emailHTML
+        html: emailHTML,
+        attachments
       });
       
       res.json({ 
@@ -2349,6 +2375,94 @@ function generateCombinedRateConInvoiceHTML(invoice: any, load: any): string {
 
 function generateTripNumber(): string {
   return `T${Math.floor(Math.random() * 90000) + 10000}`;
+}
+
+function generatePODHTML(load: any): string {
+  const currentDate = new Date().toLocaleDateString();
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Proof of Delivery - Load ${load?.number_109 || load?.number109 || 'N/A'}</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          line-height: 1.4;
+        }
+        .header {
+          text-align: center;
+          border-bottom: 2px solid #333;
+          padding-bottom: 20px;
+          margin-bottom: 30px;
+        }
+        .company-name {
+          font-size: 28px;
+          font-weight: bold;
+          color: #2d5aa0;
+          margin-bottom: 5px;
+        }
+        .company-info {
+          font-size: 14px;
+          color: #666;
+        }
+        .pod-details {
+          margin-bottom: 30px;
+        }
+        .signature-section {
+          margin-top: 50px;
+          display: flex;
+          justify-content: space-between;
+        }
+        .signature-box {
+          width: 45%;
+          border: 1px solid #333;
+          padding: 20px;
+          text-align: center;
+          min-height: 100px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="company-name">GO 4 Farms & Cattle</div>
+        <div class="company-info">
+          1510 Crystal Valley Way<br>
+          Melissa, TX 75454<br>
+          Phone: 214-878-1230<br>
+          Email: accounting@go4fc.com
+        </div>
+        <h2>PROOF OF DELIVERY</h2>
+      </div>
+
+      <div class="pod-details">
+        <div><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
+        <div><strong>POD Number:</strong> ${load?.bolNumber || 'N/A'}</div>
+        <div><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</div>
+        <div><strong>Driver:</strong> ${load?.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'N/A'}</div>
+        <div><strong>Origin:</strong> ${load?.origin || 'N/A'}</div>
+        <div><strong>Destination:</strong> ${load?.destination || 'N/A'}</div>
+        <div><strong>Delivery Date:</strong> ${currentDate}</div>
+      </div>
+
+      <div class="signature-section">
+        <div class="signature-box">
+          <div><strong>Driver Signature</strong></div>
+          <div style="margin-top: 60px;">_________________________</div>
+          <div>Print Name: _______________</div>
+          <div>Date: _______________</div>
+        </div>
+        <div class="signature-box">
+          <div><strong>Receiver Signature</strong></div>
+          <div style="margin-top: 60px;">_________________________</div>
+          <div>Print Name: _______________</div>
+          <div>Date: _______________</div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
 }
 
 // Generate complete package email HTML with all available documents

@@ -73,45 +73,11 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const handlePrintPOD = async () => {
     setIsPrinting(true);
     try {
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
-      }
-
-      const podHTML = generatePODHTML(load);
-      
-      printWindow.document.write(podHTML);
-      printWindow.document.close();
-      
-      printWindow.onload = () => {
-        printWindow.print();
-        printWindow.close();
-      };
-
-      toast({
-        title: "POD Sent to Printer",
-        description: "Proof of Delivery document has been prepared for printing.",
-      });
-      
-    } catch (error: any) {
-      toast({
-        title: "Print Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-    setIsPrinting(false);
-    setPrintDialogOpen(false);
-  };
-
-  const handlePrintBOL = async () => {
-    setIsPrinting(true);
-    try {
-      // Check if BOL document exists as attachment
-      if (load?.bolDocumentPath) {
-        // If BOL document exists, open it for printing
-        const bolUrl = `/objects/${load.bolDocumentPath}`;
-        const printWindow = window.open(bolUrl, '_blank');
+      // Check if POD document exists as attachment
+      if (load?.podDocumentPath) {
+        // If POD document exists, open it for printing
+        const podUrl = `/objects/${load.podDocumentPath}`;
+        const printWindow = window.open(podUrl, '_blank');
         if (!printWindow) {
           throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
         }
@@ -124,19 +90,19 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         };
         
         toast({
-          title: "BOL Document Opened",
-          description: "BOL document attachment has been opened for printing.",
+          title: "POD Document Opened",
+          description: "POD document attachment has been opened for printing.",
         });
       } else {
-        // If no document attachment, print BOL form template
+        // If no document attachment, print POD form template
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
           throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
         }
 
-        const bolHTML = generateBOLHTML(load);
+        const podHTML = generatePODHTML(load);
         
-        printWindow.document.write(bolHTML);
+        printWindow.document.write(podHTML);
         printWindow.document.close();
         
         printWindow.onload = () => {
@@ -145,8 +111,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         };
 
         toast({
-          title: "BOL Template Sent to Printer",
-          description: "Bill of Lading template has been prepared for printing.",
+          title: "POD Template Sent to Printer",
+          description: "Proof of Delivery template has been prepared for printing.",
         });
       }
       
@@ -233,8 +199,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 
       // Count available documents
       let documentsIncluded = ["Invoice", "Rate Confirmation"];
-      if (load?.bolDocumentPath) {
-        documentsIncluded.push("BOL Document");
+      if (load?.podDocumentPath) {
+        documentsIncluded.push("POD Document");
       }
       if (load?.podDocumentPath) {
         documentsIncluded.push("POD Document");
@@ -288,7 +254,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                     Email all available documents together
                   </p>
                   <p className="text-xs text-gray-600 mt-1">
-                    Invoice + Rate Confirmation + BOL/POD (if available) - Complete delivery package
+                    Invoice + Rate Confirmation + POD (if available) - Complete delivery package
                   </p>
                   <div className="mt-3 p-3 bg-gray-50 rounded">
                     <p className="text-xs text-gray-700">
@@ -612,7 +578,7 @@ function generatePODHTML(load: any): string {
 
       <div class="pod-details">
         <div><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
-        <div><strong>BOL Number:</strong> ${load?.bolNumber || 'N/A'}</div>
+        <div><strong>POD Number:</strong> ${load?.bolNumber || 'N/A'}</div>
         <div><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</div>
         <div><strong>Driver:</strong> ${load?.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'N/A'}</div>
         <div><strong>Origin:</strong> ${load?.origin || 'N/A'}</div>
@@ -715,7 +681,7 @@ function generateBOLHTML(load: any): string {
 
       <div class="bol-details">
         <div><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
-        <div><strong>BOL Number:</strong> ${load?.bolNumber || 'N/A'}</div>
+        <div><strong>POD Number:</strong> ${load?.bolNumber || 'N/A'}</div>
         <div><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</div>
         <div><strong>Driver:</strong> ${load?.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'N/A'}</div>
         <div><strong>Date:</strong> ${currentDate}</div>
@@ -882,7 +848,7 @@ function generateCombinedRateConInvoiceHTML(invoice: any, load: any): string {
       <div class="details-section">
         <div>
           <div><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
-          <div><strong>BOL Number:</strong> ${load?.bolNumber || 'N/A'}</div>
+          <div><strong>POD Number:</strong> ${load?.bolNumber || 'N/A'}</div>
           <div><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</div>
         </div>
         <div>

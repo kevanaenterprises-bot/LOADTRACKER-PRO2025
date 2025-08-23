@@ -61,9 +61,8 @@ export const loads = pgTable("loads", {
   estimatedMiles: integer("estimated_miles"),
   specialInstructions: text("special_instructions"),
   status: varchar("status").notNull().default("created"), // created, confirmed, en_route_pickup, at_shipper, left_shipper, en_route_receiver, at_receiver, delivered, completed
-  bolNumber: varchar("bol_number"),
+  podNumber: varchar("pod_number"),
   tripNumber: varchar("trip_number"),
-  bolDocumentPath: varchar("bol_document_path"),
   podDocumentPath: varchar("pod_document_path"),
   extraStops: integer("extra_stops").default(0), // Number of extra stops
   lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"), // Lumper charge amount
@@ -94,10 +93,10 @@ export const loads = pgTable("loads", {
   completedAt: timestamp("completed_at"),
 });
 
-// BOL tracking table for duplicate prevention
-export const bolNumbers = pgTable("bol_numbers", {
+// POD tracking table for duplicate prevention
+export const podNumbers = pgTable("pod_numbers", {
   id: serial("id").primaryKey(),
-  bolNumber: varchar("bol_number").notNull().unique(),
+  podNumber: varchar("pod_number").notNull().unique(),
   tripNumber: varchar("trip_number").notNull(),
   loadId: varchar("load_id").references(() => loads.id),
   createdAt: timestamp("created_at").defaultNow(),
@@ -177,7 +176,7 @@ export const insertLoadSchema = createInsertSchema(loads).omit({
   completedAt: true,
 });
 
-export const insertBolNumberSchema = createInsertSchema(bolNumbers).omit({
+export const insertPodNumberSchema = createInsertSchema(podNumbers).omit({
   id: true,
   createdAt: true,
 });
@@ -200,8 +199,8 @@ export type InsertLocation = z.infer<typeof insertLocationSchema>;
 export type Location = typeof locations.$inferSelect;
 export type InsertLoad = z.infer<typeof insertLoadSchema>;
 export type Load = typeof loads.$inferSelect;
-export type InsertBolNumber = z.infer<typeof insertBolNumberSchema>;
-export type BolNumber = typeof bolNumbers.$inferSelect;
+export type InsertPodNumber = z.infer<typeof insertPodNumberSchema>;
+export type PodNumber = typeof podNumbers.$inferSelect;
 export type InsertRate = z.infer<typeof insertRateSchema>;
 export type Rate = typeof rates.$inferSelect;
 export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
