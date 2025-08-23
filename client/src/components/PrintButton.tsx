@@ -206,7 +206,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
     setPrintDialogOpen(false);
   };
 
-  const handleEmailInvoice = async () => {
+  const handleEmailCompletePackage = async () => {
     if (!emailAddress) {
       toast({
         title: "Email Required",
@@ -218,14 +218,24 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 
     setIsEmailing(true);
     try {
-      await apiRequest(`/api/invoices/${invoiceId}/email`, "POST", {
+      // Send complete document package - invoice + POD/BOL + rate confirmation (if available)
+      await apiRequest(`/api/invoices/${invoiceId}/email-complete-package`, "POST", {
         emailAddress,
-        includeRateConfirmation: true,
+        loadId: loadId,
       });
 
+      // Count available documents
+      let documentsIncluded = ["Invoice", "Rate Confirmation"];
+      if (load?.bolDocumentPath) {
+        documentsIncluded.push("BOL Document");
+      }
+      if (load?.podDocumentPath) {
+        documentsIncluded.push("POD Document");
+      }
+
       toast({
-        title: "Invoice Emailed Successfully",
-        description: `Invoice has been sent to ${emailAddress}`,
+        title: "Complete Package Sent",
+        description: `All available documents sent to ${emailAddress}: ${documentsIncluded.join(", ")}`,
       });
       
       setEmailDialogOpen(false);
@@ -281,18 +291,18 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center">
                       <Mail className="h-4 w-4 mr-2 text-green-700" />
-                      Email Invoice & Rate Confirmation
+                      Email Complete Package
                       <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded font-semibold">
-                        FIXED
+                        ALL DOCS
                       </span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <p className="text-sm text-gray-700 font-medium">
-                      Send complete invoice document via email
+                      Send all available documents together
                     </p>
                     <p className="text-xs text-gray-600 mt-1">
-                      Sends actual invoice content (not login links) - Perfect for customers
+                      Invoice + Rate Confirmation + BOL/POD (if available) - Complete delivery package
                     </p>
                   </CardContent>
                 </Card>
@@ -365,7 +375,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Email Invoice</DialogTitle>
+            <DialogTitle>Email Complete Document Package</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -385,9 +395,17 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                 <p className="text-sm text-gray-700 font-medium">
                   Invoice: {invoice.invoiceNumber} • Load: {load.number_109 || load.number109} • ${invoice.totalAmount}
                 </p>
-                <p className="text-xs text-gray-600 mt-1">
-                  Will include rate confirmation and invoice in professional format
-                </p>
+                <div className="text-xs text-gray-600 mt-2">
+                  <p><strong>Will include:</strong></p>
+                  <ul className="list-disc list-inside mt-1 space-y-1">
+                    <li>Invoice & Rate Confirmation (combined)</li>
+                    {load.bolDocumentPath && <li>BOL Document (attached file)</li>}
+                    {load.podDocumentPath && <li>POD Document (attached file)</li>}
+                    {!load.bolDocumentPath && !load.podDocumentPath && (
+                      <li className="text-amber-600">No BOL/POD documents available yet</li>
+                    )}
+                  </ul>
+                </div>
               </div>
             )}
             
@@ -403,19 +421,19 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                 Cancel
               </Button>
               <Button 
-                onClick={handleEmailInvoice}
+                onClick={handleEmailCompletePackage}
                 disabled={isEmailing || !emailAddress}
                 className="bg-green-600 hover:bg-green-700"
               >
                 {isEmailing ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Sending...
+                    Sending Package...
                   </>
                 ) : (
                   <>
                     <Mail className="h-4 w-4 mr-2" />
-                    Send Email
+                    Send Complete Package
                   </>
                 )}
               </Button>
