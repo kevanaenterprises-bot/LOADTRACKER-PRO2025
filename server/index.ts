@@ -52,14 +52,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check endpoint for deployment readiness
-app.get('/health', (_req, res) => {
+// Health check endpoint for deployment readiness (use /api/health to avoid conflicts)
+app.get('/api/health', (_req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Root endpoint health check
-app.get('/', (_req, res) => {
-  res.status(200).json({ status: 'LoadTracker API running', timestamp: new Date().toISOString() });
 });
 
 (async () => {

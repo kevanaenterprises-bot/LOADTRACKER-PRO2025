@@ -707,7 +707,7 @@ export default function Dashboard() {
                   }
                 } catch (error) {
                   console.error("Email test error:", error);
-                  alert("❌ Email test failed: " + error.message);
+                  alert("❌ Email test failed: " + (error instanceof Error ? error.message : String(error)));
                 }
               }}
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -740,7 +740,7 @@ export default function Dashboard() {
                   }
                 } catch (error) {
                   console.error("Invoice email test error:", error);
-                  alert("❌ Invoice email test failed: " + error.message);
+                  alert("❌ Invoice email test failed: " + (error instanceof Error ? error.message : String(error)));
                 }
               }}
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
