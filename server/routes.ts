@@ -1145,6 +1145,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Email complete document package - WITH FLEXIBLE AUTHENTICATION
   app.post("/api/invoices/:id/email-complete-package", (req, res, next) => {
+    console.log("🔍 EMAIL ROUTE HIT - Starting email process");
+    console.log("🔍 Request params:", req.params);
+    console.log("🔍 Request body:", req.body);
+    
     // Manual bypass check
     const bypassToken = req.headers['x-bypass-token'];
     const hasTokenBypass = bypassToken === BYPASS_SECRET;
@@ -1874,6 +1878,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: 'Failed to generate load from extracted data',
         error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Simple email test endpoint
+  app.post("/api/test-email", async (req, res) => {
+    console.log("🔍 TEST EMAIL ENDPOINT HIT");
+    try {
+      const { testEmailConnection, sendEmail } = await import('./emailService');
+      
+      console.log("🔍 Testing email connection...");
+      const connectionTest = await testEmailConnection();
+      
+      if (!connectionTest) {
+        return res.status(500).json({ message: "Email connection failed" });
+      }
+      
+      const result = await sendEmail({
+        to: "test@example.com",
+        subject: "Test Email from LoadTracker",
+        html: "<h1>Test Email</h1><p>This is a test email from your LoadTracker system.</p>"
+      });
+      
+      res.json({ message: "Test email sent successfully", result });
+      
+    } catch (error) {
+      console.error("❌ Test email failed:", error);
+      res.status(500).json({ 
+        message: "Test email failed", 
+        error: error instanceof Error ? error.message : 'Unknown error' 
       });
     }
   });
