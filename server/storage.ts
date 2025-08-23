@@ -367,6 +367,16 @@ export class DatabaseStorage implements IStorage {
     return updatedLoad;
   }
 
+  async updateLoadPOD(id: string, podDocumentPath: string): Promise<Load> {
+    const [updatedLoad] = await db
+      .update(loads)
+      .set({ podDocumentPath, updatedAt: new Date() })
+      .where(eq(loads.id, id))
+      .returning();
+    
+    return updatedLoad;
+  }
+
 
   async getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]> {
     const result = await db
