@@ -339,7 +339,11 @@ export default function Dashboard() {
 
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {/* Dashboard Stats */}
-        <StatsCards stats={stats as any} isLoading={statsLoading} />
+        <StatsCards 
+          stats={stats as any} 
+          isLoading={statsLoading} 
+          onActiveLoadsClick={() => setActiveTab("loads")}
+        />
         
         {/* Debug Log Display - Mobile Friendly */}
         {debugLog.length > 0 && (

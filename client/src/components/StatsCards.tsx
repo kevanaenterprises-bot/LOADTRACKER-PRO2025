@@ -8,9 +8,10 @@ interface StatsCardsProps {
     revenueToday: string;
   };
   isLoading: boolean;
+  onActiveLoadsClick?: () => void;
 }
 
-export default function StatsCards({ stats, isLoading }: StatsCardsProps) {
+export default function StatsCards({ stats, isLoading, onActiveLoadsClick }: StatsCardsProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -30,7 +31,11 @@ export default function StatsCards({ stats, isLoading }: StatsCardsProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <Card className="material-card">
+      <Card 
+        className="material-card cursor-pointer hover:shadow-lg transition-shadow"
+        onClick={onActiveLoadsClick}
+        data-testid="card-active-loads"
+      >
         <CardContent className="p-6">
           <div className="flex items-center">
             <div className="flex-1">
