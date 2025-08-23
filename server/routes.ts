@@ -1095,6 +1095,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Invoice not found" });
       }
       
+      if (!invoice.loadId) {
+        return res.status(400).json({ message: "Invoice has no associated load" });
+      }
+      
       const load = await storage.getLoad(invoice.loadId);
       if (!load) {
         return res.status(404).json({ message: "Load not found for invoice" });
@@ -1161,7 +1165,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get load data (either from loadId parameter or from invoice)
-      const load = loadId ? await storage.getLoad(loadId) : await storage.getLoad(invoice.loadId);
+      let load;
+      if (loadId) {
+        load = await storage.getLoad(loadId);
+      } else if (invoice.loadId) {
+        load = await storage.getLoad(invoice.loadId);
+      } else {
+        return res.status(400).json({ message: "No load ID available" });
+      }
+      
       if (!load) {
         return res.status(404).json({ message: "Load not found" });
       }
@@ -1183,7 +1195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Generate email with all available documents
-      const subject = `Complete Package - Invoice ${invoice.invoiceNumber} - Load ${load.number109 || load.number_109}`;
+      const subject = `Complete Package - Invoice ${invoice.invoiceNumber} - Load ${load.number109}`;
       
       let emailHTML = generateCompletePackageEmailHTML(invoice, load, availableDocuments);
 
@@ -1197,7 +1209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Complete document package sent successfully",
         emailAddress,
         invoiceNumber: invoice.invoiceNumber,
-        loadNumber: load.number109 || load.number_109,
+        loadNumber: load.number109,
         documentsIncluded: Object.entries(availableDocuments).filter(([, included]) => included).map(([doc]) => doc)
       });
       

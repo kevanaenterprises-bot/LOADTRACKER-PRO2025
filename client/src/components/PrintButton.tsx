@@ -262,110 +262,34 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Print Documents</DialogTitle>
+            <DialogTitle>Email Complete Document Package</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4">
+          <div className="space-y-4">
             {invoice && load && (
-              <>
-                <Card className="cursor-pointer hover:bg-gray-50 border-2 border-blue-200 bg-blue-50" onClick={handlePrintRateConAndInvoice}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center">
-                      <Printer className="h-4 w-4 mr-2 text-blue-700" />
-                      Rate Confirmation & Invoice Combined
-                      <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded font-semibold">
-                        RECOMMENDED
-                      </span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-gray-700 font-medium">
-                      Load {load.number_109 || load.number109} • Invoice {invoice.invoiceNumber} • ${invoice.totalAmount}
-                    </p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Print rate confirmation and invoice together - Perfect for customer records
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="cursor-pointer hover:bg-gray-50 border-2 border-green-200 bg-green-50" onClick={() => setEmailDialogOpen(true)}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center">
-                      <Mail className="h-4 w-4 mr-2 text-green-700" />
-                      Email Complete Package
-                      <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded font-semibold">
-                        ALL DOCS
-                      </span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-gray-700 font-medium">
-                      Send all available documents together
-                    </p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Invoice + Rate Confirmation + BOL/POD (if available) - Complete delivery package
-                    </p>
-                  </CardContent>
-                </Card>
-              </>
-            )}
-
-            {invoice && (
-              <Card className="cursor-pointer hover:bg-gray-50" onClick={handlePrintInvoice}>
+              <Card className="cursor-pointer hover:bg-gray-50 border-2 border-green-200 bg-green-50" onClick={() => setEmailDialogOpen(true)}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center">
-                    <FileText className="h-4 w-4 mr-2 text-blue-600" />
-                    Invoice Only ({invoice.invoiceNumber})
+                    <Mail className="h-4 w-4 mr-2 text-green-700" />
+                    Send Complete Package
+                    <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded font-semibold">
+                      ALL DOCS
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-sm text-gray-600">
-                    Amount: ${invoice.totalAmount} • Status: {invoice.status}
+                  <p className="text-sm text-gray-700 font-medium">
+                    Email all available documents together
                   </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Invoice + Rate Confirmation + BOL/POD (if available) - Complete delivery package
+                  </p>
+                  <div className="mt-3 p-3 bg-gray-50 rounded">
+                    <p className="text-xs text-gray-700">
+                      <strong>Load:</strong> {load.number_109 || load.number109} • <strong>Invoice:</strong> {invoice.invoiceNumber} • <strong>Amount:</strong> ${invoice.totalAmount}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
-            )}
-            
-            {load && (
-              <>
-                <Card className="cursor-pointer hover:bg-gray-50" onClick={handlePrintPOD}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center">
-                      <Package className="h-4 w-4 mr-2 text-green-600" />
-                      Proof of Delivery (POD)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-gray-600">
-                      Load: {load.number_109 || load.number109} • Destination: {load.destination}
-                    </p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="cursor-pointer hover:bg-gray-50" onClick={handlePrintBOL}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center">
-                      <FileText className="h-4 w-4 mr-2 text-orange-600" />
-                      Bill of Lading (BOL)
-                      {load.bolDocumentPath && (
-                        <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded">
-                          Document Attached
-                        </span>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-gray-600">
-                      Load: {load.number_109 || load.number109} • Origin: {load.origin}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {load.bolDocumentPath ? 
-                        "Will print attached BOL document" : 
-                        "Will print BOL template form"
-                      }
-                    </p>
-                  </CardContent>
-                </Card>
-              </>
             )}
           </div>
         </DialogContent>
