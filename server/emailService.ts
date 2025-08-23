@@ -2,14 +2,24 @@ import nodemailer from 'nodemailer';
 
 // Create Outlook SMTP transporter
 const createTransporter = () => {
-  return nodemailer.createTransport({
+  console.log('🔍 Creating transporter with:', {
     host: 'smtp-mail.outlook.com',
     port: 587,
-    secure: false, // Use STARTTLS
+    user: process.env.OUTLOOK_EMAIL,
+    hasPassword: !!process.env.OUTLOOK_PASSWORD
+  });
+  
+  return nodemailer.createTransport({
+    service: 'outlook', // Use service instead of manual config
     auth: {
       user: process.env.OUTLOOK_EMAIL,
       pass: process.env.OUTLOOK_PASSWORD,
     },
+    tls: {
+      rejectUnauthorized: false
+    },
+    debug: true, // Enable debug logging
+    logger: true // Enable logger
   });
 };
 
