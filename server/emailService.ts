@@ -82,7 +82,14 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
 export async function generatePDF(html: string): Promise<Buffer> {
   const browser = await puppeteer.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    executablePath: '/home/runner/.cache/puppeteer/chrome/linux-139.0.7258.138/chrome-linux64/chrome',
+    args: [
+      '--no-sandbox', 
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--disable-gpu'
+    ]
   });
   
   try {
