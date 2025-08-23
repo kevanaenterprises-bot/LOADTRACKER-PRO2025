@@ -1204,7 +1204,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const availableDocuments = {
         invoice: true, // Always available
         rateConfirmation: true, // Always include with invoice
-        podDocument: !!load.podDocumentPath
+        podDocument: true, // Always include POD form/template
+        bolDocument: !!load.bolDocumentPath
       };
 
       // Generate email with all available documents
@@ -1242,16 +1243,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentType: 'application/pdf'
       });
       
-      // Generate POD PDF if available
-      if (load.podDocumentPath) {
-        const podHTML = generatePODHTML(load);
-        const podPDF = await generatePDF(podHTML);
-        attachments.push({
-          filename: `POD-${load.number109}.pdf`,
-          content: podPDF,
-          contentType: 'application/pdf'
-        });
-      }
+      // Always generate POD PDF (either the uploaded document or a blank template)
+      const podHTML = generatePODHTML(load);
+      const podPDF = await generatePDF(podHTML);
+      attachments.push({
+        filename: `POD-${load.number109}.pdf`,
+        content: podPDF,
+        contentType: 'application/pdf'
+      });
       
       console.log(`🔍 Generated ${attachments.length} PDF attachments`);
       
