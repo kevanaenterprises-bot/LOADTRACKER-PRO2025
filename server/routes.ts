@@ -1157,23 +1157,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const invoiceIdOrNumber = req.params.id;
       const { emailAddress, loadId } = req.body;
 
-      // Debug logging
-      console.log("🔍 SERVER DEBUG - Email Complete Package:", {
-        invoiceIdOrNumber,
-        emailAddress,
-        loadId,
-        paramId: req.params.id,
-        parameterType: typeof req.params.id,
-        isUndefined: invoiceIdOrNumber === 'undefined',
-        length: invoiceIdOrNumber?.length
-      });
-
       if (!emailAddress) {
         return res.status(400).json({ message: "Email address is required" });
       }
 
       if (invoiceIdOrNumber === 'undefined' || !invoiceIdOrNumber) {
-        console.log("❌ Invoice ID is undefined or null");
         return res.status(400).json({ message: "Invoice ID is required" });
       }
 
@@ -1181,11 +1169,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let invoice;
       if (invoiceIdOrNumber.includes('-') && invoiceIdOrNumber.startsWith('INV-')) {
         // It's an invoice number like INV-1755572280561
-        console.log("🔍 Searching by invoice number:", invoiceIdOrNumber);
         invoice = await storage.getInvoice(invoiceIdOrNumber);
       } else {
         // It's a UUID, need to search by ID field
-        console.log("🔍 Searching by UUID:", invoiceIdOrNumber);
         const [invoiceById] = await db.select().from(invoices).where(eq(invoices.id, invoiceIdOrNumber));
         invoice = invoiceById;
       }
@@ -1216,24 +1202,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         podDocument: !!load.podDocumentPath
       };
 
-      console.log("Email complete package:", {
-        invoiceIdOrNumber,
-        invoiceNumber: invoice.invoiceNumber,
-        loadId: load.id,
-        loadNumber: load.number109,
-        emailAddress,
-        availableDocuments
-      });
-
       // Generate email with all available documents
       const subject = `Complete Package - Invoice ${invoice.invoiceNumber} - Load ${load.number109}`;
       
       let emailHTML = generateCompletePackageEmailHTML(invoice, load, availableDocuments);
-
-      // Log email details
-      console.log(`Sending complete package to: ${emailAddress}`);
-      console.log(`Subject: ${subject}`);
-      console.log(`Documents included:`, Object.entries(availableDocuments).filter(([, included]) => included).map(([doc]) => doc));
       
       // Simulate email sending success (replace with actual email service)
       res.json({ 

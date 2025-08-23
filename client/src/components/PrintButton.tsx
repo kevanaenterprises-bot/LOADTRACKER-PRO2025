@@ -216,21 +216,14 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       return;
     }
 
-    // Debug logging
-    console.log("🔍 DEBUG - Email Package Request:", {
-      invoiceId,
-      invoiceObject: invoice,
-      loadId,
-      loadObject: load,
-      emailAddress
-    });
-
     setIsEmailing(true);
     try {
       // Use invoice number instead of ID if available, fallback to ID
       const invoiceIdentifier = invoice?.invoiceNumber || invoiceId;
       
-      console.log("🔍 Using invoice identifier:", invoiceIdentifier);
+      if (!invoiceIdentifier) {
+        throw new Error("No invoice identifier found. Please try refreshing the page.");
+      }
       
       // Send complete document package - invoice + POD/BOL + rate confirmation (if available)
       await apiRequest(`/api/invoices/${invoiceIdentifier}/email-complete-package`, "POST", {
