@@ -64,8 +64,8 @@ export interface IStorage {
   // Invoice operations
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
   getInvoices(): Promise<Invoice[]>;
-  getInvoice(invoiceId: string): Promise<Invoice | undefined>;
-  updateInvoice(invoiceId: string, updates: Partial<Invoice>): Promise<Invoice>;
+  getInvoice(invoiceNumber: string): Promise<Invoice | undefined>;
+  updateInvoice(invoiceNumber: string, updates: Partial<Invoice>): Promise<Invoice>;
   markInvoicePrinted(invoiceId: string): Promise<Invoice>;
   getNextInvoiceNumber(): Promise<string>;
 
@@ -618,16 +618,16 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
-  async getInvoice(invoiceId: string): Promise<Invoice | undefined> {
-    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, invoiceId));
+  async getInvoice(invoiceNumber: string): Promise<Invoice | undefined> {
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.invoiceNumber, invoiceNumber));
     return invoice;
   }
 
-  async updateInvoice(invoiceId: string, updates: Partial<Invoice>): Promise<Invoice> {
+  async updateInvoice(invoiceNumber: string, updates: Partial<Invoice>): Promise<Invoice> {
     const [updatedInvoice] = await db
       .update(invoices)
       .set(updates)
-      .where(eq(invoices.id, invoiceId))
+      .where(eq(invoices.invoiceNumber, invoiceNumber))
       .returning();
     return updatedInvoice;
   }

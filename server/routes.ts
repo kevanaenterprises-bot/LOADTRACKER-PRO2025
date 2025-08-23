@@ -1062,14 +1062,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mark invoice as printed
   app.patch("/api/invoices/:id/mark-printed", async (req, res) => {
     try {
-      const invoiceId = req.params.id;
-      const invoice = await storage.getInvoice(invoiceId);
+      const invoiceNumber = req.params.id;
+      const invoice = await storage.getInvoice(invoiceNumber);
       
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
 
-      const updatedInvoice = await storage.updateInvoice(invoiceId, {
+      const updatedInvoice = await storage.updateInvoice(invoiceNumber, {
         printedAt: new Date(),
       });
 
@@ -1083,14 +1083,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Send invoice via email
   app.post("/api/invoices/:id/email", async (req, res) => {
     try {
-      const invoiceId = req.params.id;
+      const invoiceNumber = req.params.id;
       const { emailAddress, includeRateConfirmation } = req.body;
       
       if (!emailAddress) {
         return res.status(400).json({ message: "Email address is required" });
       }
       
-      const invoice = await storage.getInvoice(invoiceId);
+      const invoice = await storage.getInvoice(invoiceNumber);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
@@ -1147,7 +1147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   }, async (req, res) => {
     try {
-      const invoiceId = req.params.id;
+      const invoiceNumber = req.params.id;
       const { emailAddress, loadId } = req.body;
 
       if (!emailAddress) {
@@ -1155,7 +1155,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get invoice data
-      const invoice = await storage.getInvoice(invoiceId);
+      const invoice = await storage.getInvoice(invoiceNumber);
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
@@ -1175,7 +1175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       console.log("Email complete package:", {
-        invoiceId,
+        invoiceNumber,
         loadId: load.id,
         loadNumber: load.number109,
         emailAddress,
