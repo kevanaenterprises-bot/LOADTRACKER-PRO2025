@@ -1210,7 +1210,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let emailHTML = generateCompletePackageEmailHTML(invoice, load, availableDocuments);
       
       // Send actual email using Outlook SMTP
-      const { sendEmail } = await import('./emailService');
+      console.log("🔍 Attempting to send email to:", emailAddress);
+      console.log("🔍 Email credentials check:", {
+        hasEmail: !!process.env.OUTLOOK_EMAIL,
+        hasPassword: !!process.env.OUTLOOK_PASSWORD,
+        emailLength: process.env.OUTLOOK_EMAIL?.length || 0
+      });
+      
+      const { sendEmail, testEmailConnection } = await import('./emailService');
+      
+      // Test connection first
+      console.log("🔍 Testing email connection...");
+      const connectionOk = await testEmailConnection();
+      if (!connectionOk) {
+        throw new Error("Email server connection failed - please check credentials");
+      }
       
       const emailResult = await sendEmail({
         to: emailAddress,
@@ -1230,7 +1244,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     } catch (error) {
       console.error("Error sending complete package email:", error);
-      res.status(500).json({ message: "Failed to send complete package email" });
+      console.error("Error details:", error instanceof Error ? error.message : error);
+      console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
+      res.status(500).json({ 
+        message: "Failed to send complete package email",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
