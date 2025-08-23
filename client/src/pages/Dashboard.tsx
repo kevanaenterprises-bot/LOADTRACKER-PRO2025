@@ -680,6 +680,75 @@ export default function Dashboard() {
             <InvoiceInbox />
           </TabsContent>
         </Tabs>
+        
+        {/* Email Test Section - Remove after testing */}
+        <div className="mt-6 p-4 border rounded-lg bg-yellow-50">
+          <h3 className="text-lg font-semibold mb-2">🔧 Email System Test</h3>
+          <p className="text-sm text-gray-600 mb-3">Test the email system to debug the issue</p>
+          <div className="flex flex-col space-y-2">
+            <button 
+              onClick={async () => {
+                try {
+                  console.log("Testing email system...");
+                  const response = await fetch('/api/test-email', { 
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+                    }
+                  });
+                  const result = await response.json();
+                  console.log("Email test result:", result);
+                  
+                  if (response.ok) {
+                    alert("✅ Email test successful! Check console for details.");
+                  } else {
+                    alert("❌ Email test failed: " + result.message);
+                  }
+                } catch (error) {
+                  console.error("Email test error:", error);
+                  alert("❌ Email test failed: " + error.message);
+                }
+              }}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Test Email Connection
+            </button>
+            
+            <button 
+              onClick={async () => {
+                try {
+                  console.log("Testing invoice email directly...");
+                  const response = await fetch('/api/invoices/INV-1755572280561/email-complete-package', { 
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+                    },
+                    body: JSON.stringify({
+                      emailAddress: 'test@example.com',
+                      loadId: '5fac985a-8dc7-49ee-b207-164e32a08da3'
+                    })
+                  });
+                  const result = await response.json();
+                  console.log("Invoice email test result:", result);
+                  
+                  if (response.ok) {
+                    alert("✅ Invoice email test successful!");
+                  } else {
+                    alert("❌ Invoice email test failed: " + result.message);
+                  }
+                } catch (error) {
+                  console.error("Invoice email test error:", error);
+                  alert("❌ Invoice email test failed: " + error.message);
+                }
+              }}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Test Invoice Email Direct
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
