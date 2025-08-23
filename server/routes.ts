@@ -1119,20 +1119,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subject = `Invoice ${invoice.invoiceNumber} - GO 4 Farms & Cattle`;
       }
 
-      // Send email using a simple email service (for now, we'll simulate success)
-      // In production, you would integrate with an email service like SendGrid, AWS SES, etc.
+      // Send actual email using Outlook SMTP
+      const { sendEmail } = await import('./emailService');
       
-      console.log(`Sending email to: ${emailAddress}`);
-      console.log(`Subject: ${subject}`);
-      console.log(`HTML content length: ${emailHTML.length} characters`);
+      const emailResult = await sendEmail({
+        to: emailAddress,
+        subject,
+        html: emailHTML
+      });
       
-      // Simulate email sending success
-      // TODO: Replace with actual email service integration
       res.json({ 
         message: "Invoice email sent successfully",
         emailAddress,
         invoiceNumber: invoice.invoiceNumber,
-        includeRateConfirmation
+        includeRateConfirmation,
+        messageId: emailResult.messageId,
+        recipients: emailResult.recipients
       });
       
     } catch (error) {
@@ -1207,13 +1209,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let emailHTML = generateCompletePackageEmailHTML(invoice, load, availableDocuments);
       
-      // Simulate email sending success (replace with actual email service)
+      // Send actual email using Outlook SMTP
+      const { sendEmail } = await import('./emailService');
+      
+      const emailResult = await sendEmail({
+        to: emailAddress,
+        subject,
+        html: emailHTML
+      });
+      
       res.json({ 
         message: "Complete document package sent successfully",
         emailAddress,
         invoiceNumber: invoice.invoiceNumber,
         loadNumber: load.number109,
-        documentsIncluded: Object.entries(availableDocuments).filter(([, included]) => included).map(([doc]) => doc)
+        documentsIncluded: Object.entries(availableDocuments).filter(([, included]) => included).map(([doc]) => doc),
+        messageId: emailResult.messageId,
+        recipients: emailResult.recipients
       });
       
     } catch (error) {
