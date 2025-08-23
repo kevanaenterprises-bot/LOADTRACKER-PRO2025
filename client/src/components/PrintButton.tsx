@@ -216,6 +216,15 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       return;
     }
 
+    // Debug logging
+    console.log("🔍 DEBUG - Email Package Request:", {
+      invoiceId,
+      invoiceObject: invoice,
+      loadId,
+      loadObject: load,
+      emailAddress
+    });
+
     setIsEmailing(true);
     try {
       // Send complete document package - invoice + POD/BOL + rate confirmation (if available)

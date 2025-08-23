@@ -1157,17 +1157,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const invoiceIdOrNumber = req.params.id;
       const { emailAddress, loadId } = req.body;
 
+      // Debug logging
+      console.log("🔍 SERVER DEBUG - Email Complete Package:", {
+        invoiceIdOrNumber,
+        emailAddress,
+        loadId,
+        paramId: req.params.id,
+        parameterType: typeof req.params.id,
+        isUndefined: invoiceIdOrNumber === 'undefined',
+        length: invoiceIdOrNumber?.length
+      });
+
       if (!emailAddress) {
         return res.status(400).json({ message: "Email address is required" });
+      }
+
+      if (invoiceIdOrNumber === 'undefined' || !invoiceIdOrNumber) {
+        console.log("❌ Invoice ID is undefined or null");
+        return res.status(400).json({ message: "Invoice ID is required" });
       }
 
       // Get invoice data - check if it's UUID (ID) or invoice number
       let invoice;
       if (invoiceIdOrNumber.includes('-') && invoiceIdOrNumber.startsWith('INV-')) {
         // It's an invoice number like INV-1755572280561
+        console.log("🔍 Searching by invoice number:", invoiceIdOrNumber);
         invoice = await storage.getInvoice(invoiceIdOrNumber);
       } else {
         // It's a UUID, need to search by ID field
+        console.log("🔍 Searching by UUID:", invoiceIdOrNumber);
         const [invoiceById] = await db.select().from(invoices).where(eq(invoices.id, invoiceIdOrNumber));
         invoice = invoiceById;
       }
