@@ -15,8 +15,11 @@ import {
   insertUserSchema,
   type Load,
   type User,
-  type Location
+  type Location,
+  invoices
 } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
@@ -1151,15 +1154,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   }, async (req, res) => {
     try {
-      const invoiceNumber = req.params.id;
+      const invoiceIdOrNumber = req.params.id;
       const { emailAddress, loadId } = req.body;
 
       if (!emailAddress) {
         return res.status(400).json({ message: "Email address is required" });
       }
 
-      // Get invoice data
-      const invoice = await storage.getInvoice(invoiceNumber);
+      // Get invoice data - check if it's UUID (ID) or invoice number
+      let invoice;
+      if (invoiceIdOrNumber.includes('-') && invoiceIdOrNumber.startsWith('INV-')) {
+        // It's an invoice number like INV-1755572280561
+        invoice = await storage.getInvoice(invoiceIdOrNumber);
+      } else {
+        // It's a UUID, need to search by ID field
+        const [invoiceById] = await db.select().from(invoices).where(eq(invoices.id, invoiceIdOrNumber));
+        invoice = invoiceById;
+      }
+      
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
@@ -1187,7 +1199,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       console.log("Email complete package:", {
-        invoiceNumber,
+        invoiceIdOrNumber,
+        invoiceNumber: invoice.invoiceNumber,
         loadId: load.id,
         loadNumber: load.number109,
         emailAddress,
