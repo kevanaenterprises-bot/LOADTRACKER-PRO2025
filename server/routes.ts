@@ -1265,8 +1265,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`📋 Document availability for load ${load.number109}:`, availableDocuments);
 
-      // Generate email with all available documents - Use 109 number as primary identifier
-      const subject = `Complete Package - Load ${load.number109} - Invoice ${invoice.invoiceNumber}`;
+      // Generate email with all available documents - Use primary load number as identifier (any format)
+      const primaryLoadNumber = load.number109 || load.number_109 || 'Unknown';
+      const subject = `Complete Package - Load ${primaryLoadNumber} - Invoice ${invoice.invoiceNumber}`;
       
       let emailHTML = generateCompletePackageEmailHTML(invoice, load, availableDocuments);
       
@@ -1302,47 +1303,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Handle POD documents - ALWAYS include if POD was uploaded
       if (load.podDocumentPath) {
-        console.log(`📄 Processing POD documents for load ${load.number109}`);
+        console.log(`📄 Processing POD documents for load ${primaryLoadNumber}`);
         
         if (load.podDocumentPath.includes(',')) {
           // Multiple POD documents - add each as separate attachment  
           const podPaths = load.podDocumentPath.split(',').map((path: string) => path.trim());
-          console.log(`📄 Found ${podPaths.length} POD documents for load ${load.number109}`);
+          console.log(`📄 Found ${podPaths.length} POD documents for load ${primaryLoadNumber}`);
           
           for (let i = 0; i < podPaths.length; i++) {
             const podHTML = generatePODHTML(load, `Page ${i + 1} of ${podPaths.length}`);
             const podPDF = await generatePDF(podHTML);
             attachments.push({
-              filename: `POD-${load.number109}-Page${i + 1}.pdf`,
+              filename: `POD-${primaryLoadNumber}-Page${i + 1}.pdf`,
               content: podPDF,
               contentType: 'application/pdf'
             });
-            console.log(`✅ Generated POD attachment: POD-${load.number109}-Page${i + 1}.pdf`);
+            console.log(`✅ Generated POD attachment: POD-${primaryLoadNumber}-Page${i + 1}.pdf`);
           }
         } else {
           // Single POD document
-          console.log(`📄 Generating single POD document for load ${load.number109}`);
+          console.log(`📄 Generating single POD document for load ${primaryLoadNumber}`);
           const podHTML = generatePODHTML(load);
           const podPDF = await generatePDF(podHTML);
           attachments.push({
-            filename: `POD-${load.number109}.pdf`,
+            filename: `POD-${primaryLoadNumber}.pdf`,
             content: podPDF,
             contentType: 'application/pdf'
           });
-          console.log(`✅ Generated POD attachment: POD-${load.number109}.pdf`);
+          console.log(`✅ Generated POD attachment: POD-${primaryLoadNumber}.pdf`);
         }
       } else {
-        console.log(`⚠️  No POD document uploaded for load ${load.number109} - skipping POD attachment`);
+        console.log(`⚠️  No POD document uploaded for load ${primaryLoadNumber} - skipping POD attachment`);
       }
 
       // Include BOL document if available
       if (load.bolDocumentPath) {
-        console.log(`📄 Including BOL document for load ${load.number109}`);
+        console.log(`📄 Including BOL document for load ${primaryLoadNumber}`);
         // Note: BOL is usually an image/PDF that was uploaded, so we include a reference
         // The actual BOL file would need to be fetched from object storage if needed
       }
       
-      console.log(`🔍 Generated ${attachments.length} PDF attachments for load ${load.number109}:`);
+      console.log(`🔍 Generated ${attachments.length} PDF attachments for load ${primaryLoadNumber}:`);
       attachments.forEach(att => console.log(`  - ${att.filename}`));
       
       const emailResult = await sendEmail({

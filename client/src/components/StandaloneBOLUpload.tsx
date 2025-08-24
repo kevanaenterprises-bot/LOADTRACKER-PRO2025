@@ -29,22 +29,22 @@ export default function StandaloneBOLUpload() {
   const form = useForm<BOLUploadData>({
     resolver: zodResolver(bolUploadSchema),
     defaultValues: {
-      loadNumber: "109-",
-      bolNumber: "374-",
+      loadNumber: "", // Start empty - drivers can enter any format
+      bolNumber: "374-", // Keep 374- default but allow override
       tripNumber: "",
     },
   });
 
   const findLoadMutation = useMutation({
     mutationFn: async (data: BOLUploadData) => {
-      // First, find the load by 109 number
+      // Find the load by primary load number (works with any format: 109-12345, ABC-5678, etc.)
       const loadResponse = await apiRequest(`/api/loads/by-number/${data.loadNumber}`, "GET");
       
       if (!loadResponse) {
         throw new Error(`Load ${data.loadNumber} not found`);
       }
 
-      // Check if 374 number already exists for OTHER loads (exclude current load)
+      // Check if BOL number already exists for OTHER loads (exclude current load)
       const bolCheckResponse = await apiRequest(
         `/api/bol/check/${data.bolNumber}?excludeLoadId=${loadResponse.id}`, 
         "GET"
@@ -114,7 +114,7 @@ export default function StandaloneBOLUpload() {
           {!readyForUpload ? (
             <>
               <p className="text-sm text-gray-600 mb-4">
-                Enter your load details to upload a BOL photo. Fields default to 109-/374- format but can be typed over for other brokers:
+                Enter your load details to upload a BOL photo. Works with any load number format (109-12345, ABC-5678, etc.):
               </p>
               
               <Form {...form}>
@@ -124,18 +124,12 @@ export default function StandaloneBOLUpload() {
                     name="loadNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Load Number</FormLabel>
+                        <FormLabel>Load Number (Primary ID)</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="109-36205 (or custom for other brokers)" 
+                            placeholder="109-36205, ABC-5678, XYZ-999, etc." 
                             {...field}
                             className="text-sm"
-                            onFocus={(e) => {
-                              // If field only contains default prefix, select all for easy override
-                              if (e.target.value === "109-") {
-                                e.target.select();
-                              }
-                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -151,7 +145,7 @@ export default function StandaloneBOLUpload() {
                         <FormLabel>BOL Number</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="374-22222 (or custom for other brokers)" 
+                            placeholder="374-22222, BOL-5678, etc." 
                             {...field}
                             className="text-sm"
                             onFocus={(e) => {

@@ -40,6 +40,14 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Foreign Key Validation** - Implemented proper location validation to prevent database constraint violations
 - ✅ **Production Ready** - All core functionality confirmed working: load creation, driver management, BOL validation
 
+**August 24, 2025 - Universal Load Number System**
+- ✅ **Flexible Load Numbers** - System now works with ANY load number format (109-12345, ABC-5678, XYZ-999, etc.)
+- ✅ **Primary Load Identifier** - Uses whatever is in the load number field as primary ID across all processes
+- ✅ **Universal BOL Validation** - BOL upload works with any broker's numbering system
+- ✅ **Smart Email Generation** - Email subjects and attachments use primary load number regardless of format
+- ✅ **Enhanced POD Attachment Fix** - Fixed missing POD attachments in complete package emails
+- ✅ **Broker-Agnostic System** - No longer limited to 109/374 format, supports any customer/broker numbering
+
 **August 22, 2025 - Enhanced Standalone BOL Upload System**
 - ✅ **Permanent Prefixes** - 109 and 374 fields now pre-filled with "109-" and "374-" that cannot be removed
 - ✅ **Smart Input Handling** - Automatically maintains prefixes if user tries to delete them
