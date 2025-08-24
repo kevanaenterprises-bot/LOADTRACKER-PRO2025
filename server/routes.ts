@@ -1260,7 +1260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         invoice: true, // Always available
         rateConfirmation: true, // Always include with invoice
         podDocument: !!load.podDocumentPath && load.podDocumentPath !== 'test-pod-document.pdf', // Only true if real POD was uploaded
-        bolDocument: !!load.bolDocumentPath
+        bolDocument: !!load.bolDocumentPath && load.bolDocumentPath !== 'test-bol-document.pdf'
       };
       
       console.log(`📋 Document availability for load ${load.number109}:`, availableDocuments);
@@ -1378,11 +1378,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`⚠️  No POD document uploaded for load ${primaryLoadNumber} - skipping POD attachment`);
       }
 
-      // Include BOL document if available
+      // Handle BOL documents - Attach ONLY the actual uploaded files (same logic as POD)
       if (load.bolDocumentPath) {
-        console.log(`📄 Including BOL document for load ${primaryLoadNumber}`);
-        // Note: BOL is usually an image/PDF that was uploaded, so we include a reference
-        // The actual BOL file would need to be fetched from object storage if needed
+        console.log(`📄 Processing uploaded BOL documents for load ${primaryLoadNumber}`);
+        console.log(`📄 BOL path: ${load.bolDocumentPath}`);
+        
+        // Skip test data that's not real object storage paths
+        if (load.bolDocumentPath === 'test-bol-document.pdf') {
+          console.log(`⚠️  Skipping test BOL data - no real file uploaded for load ${primaryLoadNumber}`);
+        } else {
+          // Handle real uploaded BOL files (same logic as POD)
+          if (load.bolDocumentPath.includes(',')) {
+            // Multiple BOL documents - fetch each actual file  
+            const bolPaths = load.bolDocumentPath.split(',').map((path: string) => path.trim());
+            console.log(`📄 Found ${bolPaths.length} uploaded BOL documents for load ${primaryLoadNumber}`);
+            
+            for (let i = 0; i < bolPaths.length; i++) {
+              const bolPath = bolPaths[i];
+              try {
+                console.log(`📄 Fetching BOL document ${i + 1}/${bolPaths.length} for load ${primaryLoadNumber}`);
+                const bolUrl = bolPath.startsWith('/objects/') ? bolPath : `/objects/${bolPath}`;
+                const response = await fetch(`http://localhost:5000${bolUrl}`, {
+                  headers: { 'x-bypass-token': BYPASS_SECRET }
+                });
+                
+                if (response.ok) {
+                  const buffer = await response.arrayBuffer();
+                  const contentType = response.headers.get('content-type') || 'application/pdf';
+                  
+                  attachments.push({
+                    filename: `BOL-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(contentType)}`,
+                    content: Buffer.from(buffer),
+                    contentType: contentType
+                  });
+                  console.log(`✅ Attached actual BOL file: BOL-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(contentType)}`);
+                } else {
+                  console.error(`❌ Failed to fetch BOL document ${bolPath}: HTTP ${response.status} - ${await response.text()}`);
+                }
+              } catch (error) {
+                console.error(`❌ Failed to fetch BOL document ${bolPaths[i]}:`, error);
+              }
+            }
+          } else {
+            // Single BOL document - fetch the actual file
+            try {
+              console.log(`📄 Fetching single uploaded BOL document for load ${primaryLoadNumber}`);
+              const bolUrl = load.bolDocumentPath.startsWith('/objects/') ? load.bolDocumentPath : `/objects/${load.bolDocumentPath}`;
+              const response = await fetch(`http://localhost:5000${bolUrl}`, {
+                headers: { 'x-bypass-token': BYPASS_SECRET }
+              });
+              
+              if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                const contentType = response.headers.get('content-type') || 'application/pdf';
+                
+                attachments.push({
+                  filename: `BOL-${primaryLoadNumber}.${getFileExtension(contentType)}`,
+                  content: Buffer.from(buffer),
+                  contentType: contentType
+                });
+                console.log(`✅ Attached actual BOL file: BOL-${primaryLoadNumber}.${getFileExtension(contentType)}`);
+              } else {
+                console.error(`❌ Failed to fetch BOL document ${load.bolDocumentPath}: HTTP ${response.status} - ${await response.text()}`);
+              }
+            } catch (error) {
+              console.error(`❌ Failed to fetch BOL document ${load.bolDocumentPath}:`, error);
+            }
+          }
+        }
+      } else {
+        console.log(`⚠️  No BOL document uploaded for load ${primaryLoadNumber} - skipping BOL attachment`);
       }
       
       console.log(`🔍 Generated ${attachments.length} PDF attachments for load ${primaryLoadNumber}:`);
