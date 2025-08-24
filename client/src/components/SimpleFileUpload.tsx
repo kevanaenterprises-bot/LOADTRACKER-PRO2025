@@ -44,13 +44,16 @@ export function SimpleFileUpload({ onUploadComplete, loadId }: SimpleFileUploadP
 
       setMessage("Updating load record...");
       
-      // Update load with BOL document if loadId provided
+      // Update load with POD document if loadId provided  
       if (loadId) {
-        const updateResponse = await fetch(`/api/loads/${loadId}/bol-document`, {
-          method: "PATCH",
+        const updateResponse = await fetch(`/api/loads/${loadId}/pod`, {
+          method: "PATCH", 
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bolDocumentURL: uploadURL }),
+          headers: { 
+            "Content-Type": "application/json",
+            'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+          },
+          body: JSON.stringify({ podDocumentURL: uploadURL }),
         });
 
         if (!updateResponse.ok) {

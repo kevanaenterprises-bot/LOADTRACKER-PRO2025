@@ -195,17 +195,17 @@ export default function DriverPortal() {
                     </div>
                   </div>
                   
-                  {/* BOL Upload for completed loads that need BOL documents */}
+                  {/* POD Upload for completed loads that need POD documents */}
                   {(load.status === "completed" || load.status === "delivered") && 
-                   !load.bolDocumentPath && ( // Show upload button for any completed load without BOL document
+                   !load.podDocumentPath && ( // Show upload button for any completed load without POD document
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium text-yellow-800">
-                            BOL Photo Needed
+                            POD Photo Needed
                           </p>
                           <p className="text-xs text-yellow-600">
-                            {load.bolNumber ? `BOL #${load.bolNumber}` : 'BOL Photo'} - Upload required
+                            {load.bolNumber ? `BOL #${load.bolNumber}` : 'Signed Delivery Receipt'} - Upload required
                           </p>
                         </div>
                         <Button 
@@ -213,7 +213,7 @@ export default function DriverPortal() {
                           className="bg-yellow-600 hover:bg-yellow-700"
                           onClick={() => setSelectedLoadForBOL(load)}
                         >
-                          Upload BOL
+                          Upload POD
                         </Button>
                       </div>
                     </div>
@@ -225,12 +225,12 @@ export default function DriverPortal() {
         )}
       </div>
 
-      {/* BOL Upload Modal for Completed Loads */}
+      {/* POD Upload Modal for Completed Loads */}
       {selectedLoadForBOL && (
         <Dialog open={!!selectedLoadForBOL} onOpenChange={() => setSelectedLoadForBOL(null)}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Upload BOL Photo</DialogTitle>
+              <DialogTitle>Upload POD Photo</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -238,7 +238,7 @@ export default function DriverPortal() {
                   Load: {selectedLoadForBOL.number109}
                 </p>
                 <p className="text-xs text-blue-600">
-                  BOL Number: {selectedLoadForBOL.bolNumber}
+                  Signed Delivery Receipt - BOL #{selectedLoadForBOL.bolNumber}
                 </p>
               </div>
               
@@ -247,7 +247,7 @@ export default function DriverPortal() {
                 onUploadComplete={(uploadURL) => {
                   toast({
                     title: "Success",
-                    description: "BOL photo uploaded successfully!",
+                    description: "POD photo uploaded successfully!",
                   });
                   queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
                   setSelectedLoadForBOL(null);

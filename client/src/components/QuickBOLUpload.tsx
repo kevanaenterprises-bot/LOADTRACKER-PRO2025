@@ -82,15 +82,15 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
         throw new Error(`Failed to update BOL info: ${bolResponse.status}`);
       }
       
-      // Then update BOL document
-      const response = await fetch(`/api/loads/${activeLoadId}/bol-document`, {
-        method: "PUT",
+      // Then update POD document (signed delivery receipt)
+      const response = await fetch(`/api/loads/${activeLoadId}/pod`, {
+        method: "PATCH", 
         headers: {
           "Content-Type": "application/json",
           'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
         },
         credentials: "include",
-        body: JSON.stringify({ bolDocumentURL: uploadURL }),
+        body: JSON.stringify({ podDocumentURL: uploadURL }),
       });
 
       if (!response.ok) {
@@ -102,8 +102,8 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "BOL document uploaded successfully!",
+        title: "Success", 
+        description: "POD document uploaded successfully!",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
       setUploading(false);
@@ -256,7 +256,7 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center">
           <i className="fas fa-camera mr-2 text-blue-500"></i>
-          Upload BOL Document ({loadsNeedingBOL.length} load{loadsNeedingBOL.length !== 1 ? 's' : ''} need BOL photos)
+          Upload POD Document ({loadsNeedingBOL.length} load{loadsNeedingBOL.length !== 1 ? 's' : ''} need POD photos)
         </CardTitle>
       </CardHeader>
       <CardContent>
