@@ -906,7 +906,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/loads/:id", isAuthenticated, async (req, res) => {
+  app.get("/api/loads/:id", (req, res, next) => {
+    // Support both authenticated users and bypass token
+    const hasAuth = req.isAuthenticated() || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const load = await storage.getLoad(req.params.id);
       if (!load) {
