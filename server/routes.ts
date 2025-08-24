@@ -1301,12 +1301,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentType: 'application/pdf'
       });
       
-      // Handle POD documents - Attach the ACTUAL uploaded files, not templates
+      // Handle POD documents - Attach ONLY the actual uploaded files
       if (load.podDocumentPath) {
         console.log(`📄 Processing uploaded POD documents for load ${primaryLoadNumber}`);
-        
-        const { ObjectStorageService } = await import('./objectStorage');
-        const objectStorageService = new ObjectStorageService();
+        console.log(`📄 POD path: ${load.podDocumentPath}`);
         
         if (load.podDocumentPath.includes(',')) {
           // Multiple POD documents - fetch each actual file  
@@ -1315,54 +1313,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           for (let i = 0; i < podPaths.length; i++) {
             try {
-              // Get the actual uploaded POD file
+              // For testing: Create a direct URL to the POD file
               const podPath = podPaths[i];
-              const objectFile = await objectStorageService.getObjectEntityFile(`/objects/${podPath}`);
-              const [fileBuffer] = await objectFile.download();
-              const [metadata] = await objectFile.getMetadata();
+              const podUrl = `/objects/${podPath}`;
               
-              attachments.push({
-                filename: `POD-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(metadata.contentType)}`,
-                content: fileBuffer,
-                contentType: metadata.contentType || 'application/pdf'
+              // Fetch the actual file directly
+              const response = await fetch(`http://localhost:5000${podUrl}`, {
+                headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
               });
-              console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(metadata.contentType)}`);
+              
+              if (response.ok) {
+                const fileBuffer = Buffer.from(await response.arrayBuffer());
+                const contentType = response.headers.get('content-type') || 'application/pdf';
+                
+                attachments.push({
+                  filename: `POD-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(contentType)}`,
+                  content: fileBuffer,
+                  contentType: contentType
+                });
+                console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(contentType)}`);
+              } else {
+                console.error(`❌ Failed to fetch POD document ${podPath}: HTTP ${response.status}`);
+              }
             } catch (error) {
               console.error(`❌ Failed to fetch POD document ${podPaths[i]}:`, error);
-              // Fallback to template if file fetch fails
-              const podHTML = generatePODHTML(load, `Page ${i + 1} of ${podPaths.length}`);
-              const podPDF = await generatePDF(podHTML);
-              attachments.push({
-                filename: `POD-${primaryLoadNumber}-Template-Page${i + 1}.pdf`,
-                content: podPDF,
-                contentType: 'application/pdf'
-              });
             }
           }
         } else {
           // Single POD document - fetch the actual file
           try {
             console.log(`📄 Fetching single uploaded POD document for load ${primaryLoadNumber}`);
-            const objectFile = await objectStorageService.getObjectEntityFile(`/objects/${load.podDocumentPath}`);
-            const [fileBuffer] = await objectFile.download();
-            const [metadata] = await objectFile.getMetadata();
+            const podUrl = `/objects/${load.podDocumentPath}`;
             
-            attachments.push({
-              filename: `POD-${primaryLoadNumber}.${getFileExtension(metadata.contentType)}`,
-              content: fileBuffer,
-              contentType: metadata.contentType || 'application/pdf'
+            // Fetch the actual file directly  
+            const response = await fetch(`http://localhost:5000${podUrl}`, {
+              headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
             });
-            console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}.${getFileExtension(metadata.contentType)}`);
+            
+            if (response.ok) {
+              const fileBuffer = Buffer.from(await response.arrayBuffer());
+              const contentType = response.headers.get('content-type') || 'application/pdf';
+              
+              attachments.push({
+                filename: `POD-${primaryLoadNumber}.${getFileExtension(contentType)}`,
+                content: fileBuffer,
+                contentType: contentType
+              });
+              console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}.${getFileExtension(contentType)}`);
+            } else {
+              console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}: HTTP ${response.status}`);
+            }
           } catch (error) {
             console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}:`, error);
-            // Fallback to template if file fetch fails
-            const podHTML = generatePODHTML(load);
-            const podPDF = await generatePDF(podHTML);
-            attachments.push({
-              filename: `POD-${primaryLoadNumber}-Template.pdf`,
-              content: podPDF,
-              contentType: 'application/pdf'
-            });
           }
         }
       } else {
@@ -2531,93 +2533,7 @@ function getFileExtension(contentType?: string): string {
   return mimeToExt[contentType.toLowerCase()] || 'pdf';
 }
 
-function generatePODHTML(load: any, pageTitle?: string): string {
-  const currentDate = new Date().toLocaleDateString();
-  
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Proof of Delivery - Load ${load?.number_109 || load?.number109 || 'N/A'}</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-          line-height: 1.4;
-        }
-        .header {
-          text-align: center;
-          border-bottom: 2px solid #333;
-          padding-bottom: 20px;
-          margin-bottom: 30px;
-        }
-        .company-name {
-          font-size: 28px;
-          font-weight: bold;
-          color: #2d5aa0;
-          margin-bottom: 5px;
-        }
-        .company-info {
-          font-size: 14px;
-          color: #666;
-        }
-        .pod-details {
-          margin-bottom: 30px;
-        }
-        .signature-section {
-          margin-top: 50px;
-          display: flex;
-          justify-content: space-between;
-        }
-        .signature-box {
-          width: 45%;
-          border: 1px solid #333;
-          padding: 20px;
-          text-align: center;
-          min-height: 100px;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <div class="company-name">GO 4 Farms & Cattle</div>
-        <div class="company-info">
-          1510 Crystal Valley Way<br>
-          Melissa, TX 75454<br>
-          Phone: 214-878-1230<br>
-          Email: accounting@go4fc.com
-        </div>
-        <h2>PROOF OF DELIVERY${pageTitle ? ` - ${pageTitle}` : ''}</h2>
-      </div>
-
-      <div class="pod-details">
-        <div><strong>Load Number:</strong> ${load?.number109 || 'N/A'}</div>
-        <div><strong>POD Number:</strong> ${load?.bolNumber || 'N/A'}</div>
-        <div><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</div>
-        <div><strong>Driver:</strong> ${load?.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'N/A'}</div>
-        <div><strong>Origin:</strong> ${load?.origin || 'N/A'}</div>
-        <div><strong>Destination:</strong> ${load?.destination || 'N/A'}</div>
-        <div><strong>Delivery Date:</strong> ${currentDate}</div>
-      </div>
-
-      <div class="signature-section">
-        <div class="signature-box">
-          <div><strong>Driver Signature</strong></div>
-          <div style="margin-top: 60px;">_________________________</div>
-          <div>Print Name: _______________</div>
-          <div>Date: _______________</div>
-        </div>
-        <div class="signature-box">
-          <div><strong>Receiver Signature</strong></div>
-          <div style="margin-top: 60px;">_________________________</div>
-          <div>Print Name: _______________</div>
-          <div>Date: _______________</div>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
-}
+// POD template generation removed - only actual uploaded POD files are used for email attachments
 
 // Generate complete package email HTML with all available documents
 function generateCompletePackageEmailHTML(invoice: any, load: any, availableDocuments: any): string {
