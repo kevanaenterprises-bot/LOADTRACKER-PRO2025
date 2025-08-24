@@ -1255,11 +1255,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         podType: load.podDocumentPath ? (load.podDocumentPath.includes(',') ? 'multiple' : 'single') : 'none'
       });
 
-      // Determine what documents are available
+      // Determine what documents are available - exclude test data
       const availableDocuments = {
         invoice: true, // Always available
         rateConfirmation: true, // Always include with invoice
-        podDocument: !!load.podDocumentPath, // Only true if POD was actually uploaded
+        podDocument: !!load.podDocumentPath && load.podDocumentPath !== 'test-pod-document.pdf', // Only true if real POD was uploaded
         bolDocument: !!load.bolDocumentPath
       };
       
