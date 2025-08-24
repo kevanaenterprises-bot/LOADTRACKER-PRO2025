@@ -1642,21 +1642,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // POD upload - Support both admin and driver authentication
+  // POD upload - Support admin, driver, and bypass token authentication
   app.post("/api/objects/upload", (req, res, next) => {
-    // Check for either Replit Auth or Driver Auth
+    // Check for Replit Auth, Driver Auth, or Bypass Token
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
     const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
     const hasDriverAuth = (req.session as any)?.driverAuth;
+    const hasAuth = hasReplitAuth || hasDriverAuth || hasTokenBypass;
     
     console.log("Upload auth check:", {
       hasReplitAuth,
       hasDriverAuth,
+      hasTokenBypass,
       sessionId: req.sessionID,
       session: req.session,
-      driverAuthData: (req.session as any)?.driverAuth
+      driverAuthData: (req.session as any)?.driverAuth,
+      finalAuth: hasAuth
     });
     
-    if (hasReplitAuth || hasDriverAuth) {
+    if (hasAuth) {
       next();
     } else {
       res.status(401).json({ message: "Unauthorized" });
