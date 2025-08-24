@@ -375,47 +375,6 @@ export default function Dashboard() {
           </Button>
         </div>
 
-        {/* Test Data Button (Development) */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="mt-4 flex justify-center">
-            <Button 
-              onClick={async () => {
-                try {
-                  const response = await fetch("/api/test/create-sample-loads", {
-                    method: "POST",
-                    credentials: "include"
-                  });
-                  const result = await response.json();
-                  
-                  if (response.ok) {
-                    toast({
-                      title: "Test Data Created",
-                      description: result.message,
-                    });
-                    // Refresh the loads data
-                    window.location.reload();
-                  } else {
-                    toast({
-                      title: "Error",
-                      description: result.message,
-                      variant: "destructive",
-                    });
-                  }
-                } catch (error) {
-                  toast({
-                    title: "Error",
-                    description: "Failed to create test data",
-                    variant: "destructive",
-                  });
-                }
-              }}
-              variant="outline"
-              className="bg-yellow-50 border-yellow-200 text-yellow-800 hover:bg-yellow-100"
-            >
-              🧪 Create Test Loads for Demo
-            </Button>
-          </div>
-        )}
 
         {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-8">

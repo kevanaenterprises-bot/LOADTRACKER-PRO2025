@@ -1715,7 +1715,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Test data endpoint (development only)
-  if (process.env.NODE_ENV === "development") {
+  if (false && process.env.NODE_ENV === "development") {
     app.post("/api/test/create-sample-loads", isAdminAuthenticated, async (req, res) => {
       try {
         // Get test driver
