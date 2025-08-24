@@ -1305,6 +1305,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (load.podDocumentPath) {
         console.log(`📄 Processing uploaded POD documents for load ${primaryLoadNumber}`);
         console.log(`📄 POD path: ${load.podDocumentPath}`);
+        console.log(`📄 POD path details:`, {
+          type: typeof load.podDocumentPath,
+          length: load.podDocumentPath.length,
+          startsWith: load.podDocumentPath.substring(0, 20),
+          isTestData: load.podDocumentPath === 'test-pod-document.pdf'
+        });
         
         // Skip test data that's not real object storage paths
         if (load.podDocumentPath === 'test-pod-document.pdf') {
