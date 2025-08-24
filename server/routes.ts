@@ -1173,13 +1173,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get invoice data - check if it's UUID (ID) or invoice number
       let invoice;
-      if (invoiceIdOrNumber.includes('-') && invoiceIdOrNumber.startsWith('INV-')) {
-        // It's an invoice number like INV-1755572280561
-        invoice = await storage.getInvoice(invoiceIdOrNumber);
-      } else {
-        // It's a UUID, need to search by ID field
+      if (invoiceIdOrNumber.includes('-') && invoiceIdOrNumber.length === 36) {
+        // It's a UUID like 165aa75a-b9f9-4ba7-94dd-a1b011ea8c4a
         const [invoiceById] = await db.select().from(invoices).where(eq(invoices.id, invoiceIdOrNumber));
         invoice = invoiceById;
+      } else {
+        // It's an invoice number like GO6000, INV-1755572280561, etc.
+        invoice = await storage.getInvoice(invoiceIdOrNumber);
       }
       
       if (!invoice) {
