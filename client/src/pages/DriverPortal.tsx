@@ -168,8 +168,7 @@ export default function DriverPortal() {
           </div>
         )}
 
-        {/* BOL Entry Section (only show if there's a current load) */}
-        {currentLoad && <BOLEntryForm load={currentLoad} />}
+        {/* BOL Entry Section removed - now integrated with StandaloneBOLUpload */}
 
         {/* Recent Loads */}
         {recentLoads.length > 0 && (

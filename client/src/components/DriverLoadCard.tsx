@@ -5,6 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface DriverLoadCardProps {
   load: any;
@@ -74,6 +75,42 @@ const getProgressSteps = (currentStatus: string) => {
 export default function DriverLoadCard({ load }: DriverLoadCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Driver unassign mutation
+  const unassignMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/loads/${load.id}/unassign`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+        }
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to unassign from load");
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Successfully Unassigned",
+        description: `You have been unassigned from load ${load.number109}. The load is now available for other drivers.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/drivers"] });
+    },
+    onError: (error: any) => {
+      console.error("Unassign error:", error);
+      toast({
+        title: "Unassign Failed",
+        description: error.message || "Failed to unassign from load. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
 
   const updateStatusMutation = useMutation({
     mutationFn: async (status: string) => {
@@ -195,25 +232,62 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
           </div>
         </div>
 
-        {nextAction && (
-          <Button 
-            className="w-full mt-6"
-            onClick={handleStatusUpdate}
-            disabled={updateStatusMutation.isPending}
-          >
-            {updateStatusMutation.isPending ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Updating...
-              </>
-            ) : (
-              <>
-                <i className={`fas ${nextAction.icon} mr-2`}></i>
-                Update Status: {nextAction.text}
-              </>
-            )}
-          </Button>
-        )}
+        <div className="flex gap-2 mt-6">
+          {nextAction && (
+            <Button 
+              className="flex-1"
+              onClick={handleStatusUpdate}
+              disabled={updateStatusMutation.isPending}
+            >
+              {updateStatusMutation.isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <i className={`fas ${nextAction.icon} mr-2`}></i>
+                  Update Status: {nextAction.text}
+                </>
+              )}
+            </Button>
+          )}
+          
+          {/* Unassign from Load Button */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="destructive" 
+                size={nextAction ? "default" : "lg"}
+                className={nextAction ? "px-4" : "w-full"}
+                disabled={unassignMutation.isPending}
+              >
+                <i className="fas fa-times mr-2"></i>
+                {nextAction ? "Unassign" : "Unassign from Load"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Unassign from Load?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to unassign yourself from load {load.number109}? 
+                  This will make the load available for other drivers to pick up.
+                  <br /><br />
+                  <strong>Note:</strong> This is useful when you've dropped your trailer and need to pick up a different load before delivering this one.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => unassignMutation.mutate()}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  {unassignMutation.isPending ? "Unassigning..." : "Yes, Unassign Me"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </CardContent>
     </Card>
   );

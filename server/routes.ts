@@ -997,6 +997,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Driver unassign endpoint  
+  app.post("/api/loads/:id/unassign", (req, res, next) => {
+    // Flexible authentication for driver unassignment
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasDriverAuth = !!(req.session as any)?.driverAuth;
+    const hasTokenBypass = isBypassActive(req);
+    
+    console.log("Driver unassign auth check:", {
+      hasAdminAuth,
+      hasReplitAuth,
+      hasDriverAuth,
+      hasTokenBypass
+    });
+    
+    if (hasAdminAuth || hasReplitAuth || hasDriverAuth || hasTokenBypass) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      
+      console.log(`🚛 Driver unassigning from load: ${loadId}`);
+      
+      // Get current load to verify it exists
+      const currentLoad = await storage.getLoad(loadId);
+      if (!currentLoad) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // Unassign driver from load (set driverId to null)
+      const updatedLoad = await storage.updateLoad(loadId, { driverId: null });
+      
+      console.log(`✅ Driver unassigned from load ${currentLoad.number109}`);
+      
+      res.json({ 
+        success: true, 
+        message: `Unassigned from load ${currentLoad.number109}`,
+        load: updatedLoad 
+      });
+    } catch (error) {
+      console.error("Error unassigning driver from load:", error);
+      res.status(500).json({ message: "Failed to unassign from load" });
+    }
+  });
+
   app.patch("/api/loads/:id/assign-driver", (req, res, next) => {
     // Check multiple auth methods: admin session, Replit auth, driver auth, OR token bypass
     const hasAdminAuth = !!(req.session as any)?.adminAuth;
