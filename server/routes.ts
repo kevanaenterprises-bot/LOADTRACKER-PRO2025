@@ -1243,14 +1243,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentType: 'application/pdf'
       });
       
-      // Always generate POD PDF (either the uploaded document or a blank template)
-      const podHTML = generatePODHTML(load);
-      const podPDF = await generatePDF(podHTML);
-      attachments.push({
-        filename: `POD-${load.number109}.pdf`,
-        content: podPDF,
-        contentType: 'application/pdf'
-      });
+      // Handle multiple POD documents if available
+      if (load.podDocumentPath && load.podDocumentPath.includes(',')) {
+        // Multiple POD documents - add each as separate attachment
+        const podPaths = load.podDocumentPath.split(',').map((path: string) => path.trim());
+        console.log(`📄 Found ${podPaths.length} POD documents for load ${load.number109}`);
+        
+        for (let i = 0; i < podPaths.length; i++) {
+          const podHTML = generatePODHTML(load, `Page ${i + 1} of ${podPaths.length}`);
+          const podPDF = await generatePDF(podHTML);
+          attachments.push({
+            filename: `POD-${load.number109}-Page${i + 1}.pdf`,
+            content: podPDF,
+            contentType: 'application/pdf'
+          });
+        }
+      } else {
+        // Single POD document or blank template
+        const podHTML = generatePODHTML(load);
+        const podPDF = await generatePDF(podHTML);
+        attachments.push({
+          filename: `POD-${load.number109}.pdf`,
+          content: podPDF,
+          contentType: 'application/pdf'
+        });
+      }
       
       console.log(`🔍 Generated ${attachments.length} PDF attachments`);
       
@@ -1561,17 +1578,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = (req.user as any)?.claims?.sub;
       const objectStorageService = new ObjectStorageService();
       
-      // Set ACL policy for the uploaded document
-      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
-        podDocumentURL,
-        {
-          owner: userId,
-          visibility: "private", // POD documents should be private
+      // Handle multiple POD documents (comma-separated URLs)
+      const podUrls = podDocumentURL.split(',').map((url: string) => url.trim());
+      const processedPaths: string[] = [];
+      
+      console.log(`📄 Processing ${podUrls.length} POD document(s) for load ${req.params.id}`);
+      
+      // Set ACL policy for each uploaded document
+      for (const url of podUrls) {
+        if (url) {
+          const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+            url,
+            {
+              owner: userId,
+              visibility: "private", // POD documents should be private
+            }
+          );
+          processedPaths.push(objectPath);
         }
-      );
+      }
 
-      // Update load with POD document path
-      const load = await storage.updateLoadPOD(req.params.id, objectPath);
+      // Store all POD document paths as comma-separated string
+      const finalPodPath = processedPaths.join(',');
+      
+      // Update load with POD document path(s)
+      const load = await storage.updateLoadPOD(req.params.id, finalPodPath);
       
       // Update status to delivered if not already
       if (load.status !== "delivered" && load.status !== "completed") {
@@ -2376,7 +2407,7 @@ function generateTripNumber(): string {
   return `T${Math.floor(Math.random() * 90000) + 10000}`;
 }
 
-function generatePODHTML(load: any): string {
+function generatePODHTML(load: any, pageTitle?: string): string {
   const currentDate = new Date().toLocaleDateString();
   
   return `
@@ -2432,7 +2463,7 @@ function generatePODHTML(load: any): string {
           Phone: 214-878-1230<br>
           Email: accounting@go4fc.com
         </div>
-        <h2>PROOF OF DELIVERY</h2>
+        <h2>PROOF OF DELIVERY${pageTitle ? ` - ${pageTitle}` : ''}</h2>
       </div>
 
       <div class="pod-details">

@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ObjectUploader } from "@/components/ObjectUploader";
+import { BatchPODUpload } from "@/components/BatchPODUpload";
 
 const bolFormSchema = z.object({
   bolNumber: z.string().min(1, "BOL Number is required"),
@@ -356,43 +357,68 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
 
       {/* POD Upload Section */}
       {canShowPODUpload && (
-        <Card className="material-card">
-          <CardHeader>
-            <CardTitle>Upload POD</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {load.podDocumentPath || podUploaded ? (
-              <div className="text-center py-6">
-                <i className="fas fa-check-circle text-success text-4xl mb-4"></i>
-                <p className="text-success font-medium">POD document uploaded successfully!</p>
-              </div>
-            ) : (
-              <div className="text-center">
-                <p className="text-sm text-gray-600 mb-4">Upload signed Proof of Delivery</p>
-                <ObjectUploader
-                  maxNumberOfFiles={1}
-                  maxFileSize={10485760} // 10MB
-                  onGetUploadParameters={handleGetUploadParameters}
-                  onComplete={handlePODUploadComplete}
-                  buttonClassName="w-full"
-                >
-                  <div className="flex items-center justify-center">
-                    <i className="fas fa-cloud-upload-alt mr-2"></i>
-                    Choose POD File
-                  </div>
-                </ObjectUploader>
-                {updatePODMutation.isPending && (
-                  <div className="mt-4">
-                    <div className="flex items-center justify-center space-x-3">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                      <span className="text-sm text-gray-600">Uploading POD document...</span>
+        <div className="space-y-4">
+          {load.podDocumentPath || podUploaded ? (
+            <Card className="material-card">
+              <CardHeader>
+                <CardTitle>POD Upload Complete</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-6">
+                  <i className="fas fa-check-circle text-success text-4xl mb-4"></i>
+                  <p className="text-success font-medium">POD document(s) uploaded successfully!</p>
+                  {load.podDocumentPath && load.podDocumentPath.includes(',') && (
+                    <p className="text-sm text-gray-600 mt-2">
+                      Multiple pages/documents uploaded
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {/* Batch POD Upload (Recommended for multi-page PODs) */}
+              <BatchPODUpload
+                loadId={load.id}
+                loadNumber={load.number109}
+                onUploadComplete={() => {
+                  setPodUploaded(true);
+                  queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+                }}
+              />
+
+              {/* Single POD Upload (Legacy option) */}
+              <Card className="material-card border-gray-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-gray-700">Single File Upload</CardTitle>
+                  <p className="text-xs text-gray-500">Use this for single-page POD documents only</p>
+                </CardHeader>
+                <CardContent>
+                  <ObjectUploader
+                    maxNumberOfFiles={1}
+                    maxFileSize={10485760} // 10MB
+                    onGetUploadParameters={handleGetUploadParameters}
+                    onComplete={handlePODUploadComplete}
+                    buttonClassName="w-full"
+                  >
+                    <div className="flex items-center justify-center">
+                      <i className="fas fa-file-upload mr-2"></i>
+                      Single POD File
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  </ObjectUploader>
+                  {updatePODMutation.isPending && (
+                    <div className="mt-4">
+                      <div className="flex items-center justify-center space-x-3">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                        <span className="text-sm text-gray-600">Uploading POD document...</span>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
       )}
 
       {/* Complete Load Button */}

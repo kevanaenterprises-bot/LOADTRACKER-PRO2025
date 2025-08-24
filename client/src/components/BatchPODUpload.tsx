@@ -1,0 +1,307 @@
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { X, Upload, FileImage, FileText } from "lucide-react";
+
+interface BatchPODUploadProps {
+  loadId: string;
+  loadNumber: string;
+  onUploadComplete: () => void;
+}
+
+interface UploadedFile {
+  file: File;
+  url?: string;
+  status: 'pending' | 'uploading' | 'success' | 'error';
+  progress: number;
+  id: string;
+}
+
+export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPODUploadProps) {
+  const { toast } = useToast();
+  const [files, setFiles] = useState<UploadedFile[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files || []);
+    
+    if (selectedFiles.length === 0) return;
+    
+    // Validate file types (images and PDFs)
+    const validFiles = selectedFiles.filter(file => {
+      const isValid = file.type.startsWith('image/') || file.type === 'application/pdf';
+      if (!isValid) {
+        toast({
+          title: "Invalid File Type",
+          description: `${file.name} is not a valid image or PDF file`,
+          variant: "destructive",
+        });
+      }
+      return isValid;
+    });
+
+    // Create upload file objects
+    const newFiles: UploadedFile[] = validFiles.map(file => ({
+      file,
+      status: 'pending',
+      progress: 0,
+      id: `${file.name}-${Date.now()}-${Math.random()}`
+    }));
+
+    setFiles(prev => [...prev, ...newFiles]);
+    
+    toast({
+      title: "Files Added",
+      description: `${validFiles.length} file(s) ready for upload`,
+    });
+  };
+
+  const removeFile = (fileId: string) => {
+    setFiles(prev => prev.filter(f => f.id !== fileId));
+  };
+
+  const uploadFile = async (fileItem: UploadedFile): Promise<string> => {
+    try {
+      // Update file status
+      setFiles(prev => prev.map(f => 
+        f.id === fileItem.id ? { ...f, status: 'uploading', progress: 10 } : f
+      ));
+
+      // Get upload URL
+      const urlResponse = await fetch("/api/objects/upload", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!urlResponse.ok) {
+        throw new Error(`Failed to get upload URL: ${urlResponse.status}`);
+      }
+
+      const { uploadURL } = await urlResponse.json();
+      
+      // Update progress
+      setFiles(prev => prev.map(f => 
+        f.id === fileItem.id ? { ...f, progress: 30 } : f
+      ));
+
+      // Upload file
+      const uploadResponse = await fetch(uploadURL, {
+        method: "PUT",
+        body: fileItem.file,
+        headers: { "Content-Type": fileItem.file.type },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed: ${uploadResponse.status}`);
+      }
+
+      // Update progress
+      setFiles(prev => prev.map(f => 
+        f.id === fileItem.id ? { ...f, progress: 80, url: uploadURL } : f
+      ));
+
+      return uploadURL;
+    } catch (error) {
+      setFiles(prev => prev.map(f => 
+        f.id === fileItem.id ? { ...f, status: 'error', progress: 0 } : f
+      ));
+      throw error;
+    }
+  };
+
+  const uploadAllFiles = async () => {
+    if (files.length === 0) {
+      toast({
+        title: "No Files Selected",
+        description: "Please select POD files to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const uploadPromises = files.map(uploadFile);
+      const uploadedUrls = await Promise.all(uploadPromises);
+      
+      // Update all files as successful
+      setFiles(prev => prev.map(f => ({ ...f, status: 'success', progress: 100 })));
+      setUploadProgress(60);
+
+      // Update load with all POD documents (combine URLs)
+      const podDocumentPath = uploadedUrls.join(','); // Store as comma-separated URLs
+      
+      const updateResponse = await fetch(`/api/loads/${loadId}/pod`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ podDocumentURL: podDocumentPath }),
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error(`Failed to update load: ${updateResponse.status}`);
+      }
+
+      setUploadProgress(100);
+      
+      toast({
+        title: "Upload Successful!",
+        description: `${files.length} POD document(s) uploaded for load ${loadNumber}`,
+      });
+
+      // Auto-invoke generation and refresh
+      setTimeout(() => {
+        onUploadComplete();
+      }, 1000);
+
+    } catch (error) {
+      console.error("Batch upload error:", error);
+      toast({
+        title: "Upload Failed",
+        description: `Error uploading POD documents: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const getFileIcon = (file: File) => {
+    if (file.type.startsWith('image/')) {
+      return <FileImage className="h-4 w-4" />;
+    } else if (file.type === 'application/pdf') {
+      return <FileText className="h-4 w-4" />;
+    }
+    return <FileText className="h-4 w-4" />;
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Upload className="h-5 w-5" />
+          Batch POD Upload - Load {loadNumber}
+        </CardTitle>
+        <p className="text-sm text-gray-600">
+          Upload multiple pages/documents for this POD. Supports images and PDF files.
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* File Selection */}
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+          <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+          <label htmlFor="pod-files" className="cursor-pointer">
+            <span className="text-sm font-medium text-blue-600 hover:text-blue-500">
+              Click to select POD files
+            </span>
+            <span className="text-sm text-gray-500 block">or drag and drop</span>
+            <span className="text-xs text-gray-400 block mt-1">
+              Images (JPG, PNG, etc.) and PDF files only
+            </span>
+          </label>
+          <Input
+            id="pod-files"
+            type="file"
+            multiple
+            accept="image/*,.pdf"
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={isUploading}
+          />
+        </div>
+
+        {/* File List */}
+        {files.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="font-medium">Selected Files ({files.length})</h4>
+            {files.map((fileItem) => (
+              <div key={fileItem.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                <div className="flex-shrink-0">
+                  {getFileIcon(fileItem.file)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {fileItem.file.name}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {formatFileSize(fileItem.file.size)}
+                  </p>
+                  {fileItem.status === 'uploading' && fileItem.progress > 0 && (
+                    <Progress value={fileItem.progress} className="h-1 mt-1" />
+                  )}
+                </div>
+                <div className="flex-shrink-0 flex items-center gap-2">
+                  <Badge variant={
+                    fileItem.status === 'success' ? 'default' :
+                    fileItem.status === 'error' ? 'destructive' :
+                    fileItem.status === 'uploading' ? 'secondary' : 'outline'
+                  }>
+                    {fileItem.status === 'success' ? '✓' :
+                     fileItem.status === 'error' ? '✗' :
+                     fileItem.status === 'uploading' ? '⏳' : '⏸'}
+                  </Badge>
+                  {!isUploading && fileItem.status !== 'success' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeFile(fileItem.id)}
+                      className="h-6 w-6 p-0"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Upload Progress */}
+        {isUploading && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Uploading POD documents...</span>
+              <span>{uploadProgress}%</span>
+            </div>
+            <Progress value={uploadProgress} />
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-4 border-t">
+          <Button 
+            onClick={uploadAllFiles}
+            disabled={files.length === 0 || isUploading}
+            className="flex-1"
+          >
+            {isUploading ? 'Uploading...' : `Upload ${files.length} POD Document(s)`}
+          </Button>
+          {files.length > 0 && !isUploading && (
+            <Button 
+              variant="outline" 
+              onClick={() => setFiles([])}
+              className="px-6"
+            >
+              Clear All
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
