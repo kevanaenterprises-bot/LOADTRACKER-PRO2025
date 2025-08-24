@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,6 +25,30 @@ export default function StandaloneBOLUpload() {
   const [uploading, setUploading] = useState(false);
   const [readyForUpload, setReadyForUpload] = useState(false);
   const [loadId, setLoadId] = useState<string | null>(null);
+
+  // Ensure bypass token is available for mobile
+  React.useEffect(() => {
+    const setupBypassToken = async () => {
+      try {
+        let bypassToken = localStorage.getItem('bypass-token');
+        if (!bypassToken) {
+          console.log("🔑 Getting bypass token for BOL upload");
+          const response = await fetch("/api/auth/browser-bypass", {
+            method: "POST",
+            credentials: "include",
+          });
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('bypass-token', data.token);
+            console.log("✅ BOL Upload: bypass token obtained");
+          }
+        }
+      } catch (error) {
+        console.error("❌ BOL Upload: Failed to get bypass token:", error);
+      }
+    };
+    setupBypassToken();
+  }, []);
 
   const form = useForm<BOLUploadData>({
     resolver: zodResolver(bolUploadSchema),
