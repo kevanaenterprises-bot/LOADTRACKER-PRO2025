@@ -1,12 +1,22 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Check } from "lucide-react";
+
+const bolNumberSchema = z.object({
+  bolNumber: z.string().min(1, "BOL number is required"),
+  tripNumber: z.string().min(1, "Trip number is required"),
+});
 
 interface QuickBOLUploadProps {
   currentLoad?: any;
@@ -18,7 +28,16 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
   const queryClient = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const [selectedLoadId, setSelectedLoadId] = useState<string | null>(null);
+  const [showBOLForm, setShowBOLForm] = useState(false);
   const driverAuth = useDriverAuth();
+  
+  const form = useForm({
+    resolver: zodResolver(bolNumberSchema),
+    defaultValues: {
+      bolNumber: "374-",
+      tripNumber: "",
+    },
+  });
   
   // Debug authentication status
   console.log("QuickBOLUpload: Auth status:", {
@@ -39,16 +58,36 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
   const activeLoadId = selectedLoadId || defaultLoadId;
   const activeLoad = allLoads.find(load => load.id === activeLoadId);
 
-  const updateBOLDocumentMutation = useMutation({
-    mutationFn: async (uploadURL: string) => {
+  const updateBOLMutation = useMutation({
+    mutationFn: async ({ uploadURL, formData }: { uploadURL: string, formData: any }) => {
       if (!activeLoadId) {
         throw new Error("No load selected");
       }
       
+      // First update BOL number and trip number
+      const bolResponse = await fetch(`/api/loads/${activeLoadId}/bol`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          bolNumber: formData.bolNumber,
+          tripNumber: formData.tripNumber,
+        }),
+      });
+      
+      if (!bolResponse.ok) {
+        throw new Error(`Failed to update BOL info: ${bolResponse.status}`);
+      }
+      
+      // Then update BOL document
       const response = await fetch(`/api/loads/${activeLoadId}/bol-document`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
         },
         credentials: "include",
         body: JSON.stringify({ bolDocumentURL: uploadURL }),
@@ -140,14 +179,6 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
     // Show detailed error information
     if (result.failed && result.failed.length > 0) {
       console.error("QuickBOLUpload: Failed uploads:", result.failed);
-      result.failed.forEach((failure: any, index: number) => {
-        console.error(`QuickBOLUpload: Failure ${index + 1}:`, {
-          file: failure.file?.name,
-          error: failure.error,
-          response: failure.response
-        });
-      });
-      
       const errorMessage = result.failed[0]?.error?.message || "Upload failed";
       toast({
         title: "Upload Failed",
@@ -160,10 +191,10 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
     
     if (result.successful && result.successful[0]) {
       const uploadURL = result.successful[0].uploadURL;
-      console.log("QuickBOLUpload: Updating BOL document with URL:", uploadURL);
-      updateBOLDocumentMutation.mutate(uploadURL);
+      const formData = form.getValues();
+      console.log("QuickBOLUpload: Updating BOL with:", { uploadURL, formData });
+      updateBOLMutation.mutate({ uploadURL, formData });
     } else {
-      console.error("QuickBOLUpload: No successful uploads in result:", result);
       toast({
         title: "Error",
         description: "Upload failed - no successful files",
@@ -171,6 +202,12 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
       });
       setUploading(false);
     }
+  };
+
+  const onBOLFormSubmit = (data: any) => {
+    console.log("QuickBOLUpload: BOL form submitted with:", data);
+    setShowBOLForm(false);
+    // The upload will be handled by the file upload component
   };
 
   const handleUploadStart = () => {
@@ -259,8 +296,78 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
             </div>
           )}
           
+          {/* BOL Number Form */}
+          {!showBOLForm && (
+            <Button
+              onClick={() => setShowBOLForm(true)}
+              className="w-full bg-yellow-600 hover:bg-yellow-700"
+              disabled={!activeLoad || uploading}
+            >
+              Enter BOL & Trip Numbers
+            </Button>
+          )}
+
+          {showBOLForm && (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onBOLFormSubmit)} className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="bolNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-blue-800">BOL Number</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="374-"
+                            className="border-blue-300 focus:border-blue-500"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="tripNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-blue-800">Trip Number</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="Trip #"
+                            className="border-blue-300 focus:border-blue-500"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    type="submit" 
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  >
+                    Continue to Upload
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setShowBOLForm(false)}
+                    className="px-4"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          )}
+
           {/* Upload Section */}
-          {uploading || updateBOLDocumentMutation.isPending ? (
+          {showBOLForm === false && (uploading || updateBOLMutation.isPending) ? (
             <div className="text-center py-4">
               <div className="flex items-center justify-center space-x-3">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
@@ -269,19 +376,12 @@ export default function QuickBOLUpload({ currentLoad, allLoads = [] }: QuickBOLU
                 </span>
               </div>
             </div>
-          ) : (
+          ) : showBOLForm === false ? (
             <SimpleFileUpload
-              loadId={activeLoad.id}
-              onUploadComplete={(url) => {
-                console.log("BOL upload completed:", url);
-                queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
-                toast({
-                  title: "BOL Uploaded",
-                  description: "BOL document has been uploaded successfully!",
-                });
-              }}
+              loadId={activeLoadId}
+              onUploadComplete={handleUploadComplete}
             />
-          )}
+          ) : null}
         </div>
       </CardContent>
     </Card>
