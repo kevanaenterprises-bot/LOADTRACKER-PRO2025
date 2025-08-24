@@ -255,6 +255,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Simple load test endpoint for Kevin
+  app.get("/api/test/load-109-38669", (req, res) => {
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    
+    console.log("Load test for 109-38669:", {
+      bypassToken: bypassToken ? '[PROVIDED]' : '[MISSING]',
+      headers: Object.keys(req.headers),
+      userAgent: req.headers['user-agent'],
+      hasTokenBypass
+    });
+    
+    if (hasTokenBypass) {
+      res.json({ 
+        message: "Load 109-38669 found!", 
+        success: true,
+        loadNumber: "109-38669",
+        status: "assigned",
+        driver: "Kevin Owen"
+      });
+    } else {
+      res.status(401).json({ message: "Authentication failed - bypass token missing" });
+    }
+  });
+
   // Direct production debug endpoint
   app.get("/api/debug/production", (req, res) => {
     const driverAuth = (req.session as any)?.driverAuth;
