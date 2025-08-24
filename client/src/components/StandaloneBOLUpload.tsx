@@ -110,7 +110,7 @@ export default function StandaloneBOLUpload() {
   const handleUploadComplete = () => {
     toast({
       title: "Success",
-      description: "BOL photo uploaded successfully!",
+      description: "POD photo uploaded successfully!",
     });
     queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
     
@@ -130,7 +130,7 @@ export default function StandaloneBOLUpload() {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center">
           <i className="fas fa-camera mr-2 text-blue-500"></i>
-          Upload BOL Photo
+          Upload POD Photo
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -138,7 +138,7 @@ export default function StandaloneBOLUpload() {
           {!readyForUpload ? (
             <>
               <p className="text-sm text-gray-600 mb-4">
-                Enter your load details to upload a BOL photo. Works with any load number format (109-12345, ABC-5678, etc.):
+                Enter your load details to upload a POD photo. Works with any load number format (109-12345, ABC-5678, etc.):
               </p>
               
               <Form {...form}>
@@ -217,7 +217,7 @@ export default function StandaloneBOLUpload() {
                     ) : (
                       <>
                         <i className="fas fa-check mr-2"></i>
-                        Validate BOL & Prepare Upload
+                        Validate POD & Prepare Upload
                       </>
                     )}
                   </Button>
@@ -234,14 +234,14 @@ export default function StandaloneBOLUpload() {
                 <p className="text-sm text-green-700 mb-4">
                   Load {form.watch("loadNumber")} found and BOL information updated.
                   <br />
-                  Now upload your BOL photo to complete the process.
+                  Now upload your POD photo to complete the process.
                 </p>
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <h4 className="font-medium text-blue-900 mb-2">📸 Upload BOL Photo</h4>
+                <h4 className="font-medium text-blue-900 mb-2">📸 Upload POD Photo</h4>
                 <p className="text-sm text-blue-700 mb-3">
-                  Take a clear photo of your completed BOL document
+                  Take a clear photo of your signed delivery receipt (POD)
                 </p>
                 <SimpleFileUpload
                   loadId={loadId!}

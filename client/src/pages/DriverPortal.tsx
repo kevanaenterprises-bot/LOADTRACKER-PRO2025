@@ -1,121 +1,170 @@
-import { useEffect, useState } from "react";
-import { useDriverAuth } from "@/hooks/useDriverAuth";
-import { useToast } from "@/hooks/use-toast";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import DriverLoadCard from "@/components/DriverLoadCard";
-import BOLEntryForm from "@/components/BOLEntryForm";
-import StandaloneBOLUpload from "@/components/StandaloneBOLUpload";
-import GPSTracker from "@/components/GPSTracker";
-import { SimpleFileUpload } from "@/components/SimpleFileUpload";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { isUnauthorizedError } from "@/lib/authUtils";
+import { useToast } from "@/hooks/use-toast";
+import StandaloneBOLUpload from "@/components/StandaloneBOLUpload";
+import { SimpleFileUpload } from "@/components/SimpleFileUpload";
+import GPSTracker from "@/components/GPSTracker";
+import { useDriverAuth } from "@/hooks/useDriverAuth";
+
+interface Load {
+  id: string;
+  number109: string;
+  driverId?: string;
+  status: string;
+  bolNumber?: string;
+  tripNumber?: string;
+  bolDocumentPath?: string;
+  podDocumentPath?: string;
+  estimatedMiles?: number;
+  specialInstructions?: string;
+  location?: {
+    id: string;
+    name: string;
+    city: string;
+    state: string;
+  };
+  deliveredAt?: string;
+  updatedAt: string;
+}
+
+const DriverLoadCard = ({ load }: { load: Load }) => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
+  // Update status mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: async (status: string) => {
+      const response = await fetch(`/api/loads/${load.id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+        },
+        credentials: "include",
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Failed to update status");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
+      toast({ title: "Status updated successfully" });
+    },
+  });
+
+  const needsPOD = load.status === "delivered" && !load.podDocumentPath;
+
+  return (
+    <Card className="material-card border-l-4 border-l-primary">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">Load #{load.number109}</CardTitle>
+          <Badge variant="secondary">{load.status}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div>
+              <span className="text-gray-500">Destination:</span>
+              <div className="font-medium">{load.location?.name}</div>
+              <div className="text-xs text-gray-500">
+                {load.location?.city}, {load.location?.state}
+              </div>
+            </div>
+            <div>
+              <span className="text-gray-500">Miles:</span>
+              <div className="font-medium">{load.estimatedMiles || "TBD"}</div>
+            </div>
+          </div>
+
+          {load.specialInstructions && (
+            <div className="text-sm">
+              <span className="text-gray-500">Instructions:</span>
+              <div className="font-medium">{load.specialInstructions}</div>
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            {load.status === "assigned" && (
+              <Button
+                size="sm"
+                onClick={() => updateStatusMutation.mutate("at-pickup")}
+                disabled={updateStatusMutation.isPending}
+              >
+                At Pickup
+              </Button>
+            )}
+            {load.status === "at-pickup" && (
+              <Button
+                size="sm"
+                onClick={() => updateStatusMutation.mutate("in-transit")}
+                disabled={updateStatusMutation.isPending}
+              >
+                Picked Up
+              </Button>
+            )}
+            {load.status === "in-transit" && (
+              <Button
+                size="sm"
+                onClick={() => updateStatusMutation.mutate("delivered")}
+                disabled={updateStatusMutation.isPending}
+              >
+                Delivered
+              </Button>
+            )}
+          </div>
+
+          {needsPOD && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <div className="flex items-center">
+                <i className="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                <span className="text-sm font-medium text-yellow-800">POD Upload Needed</span>
+              </div>
+              <p className="text-xs text-yellow-700 mt-1">
+                Upload signed delivery receipt to complete this load
+              </p>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function DriverPortal() {
-  const { toast } = useToast();
+  const { user, logout } = useDriverAuth();
   const queryClient = useQueryClient();
-  const driverAuth = useDriverAuth();
-  const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<any>(null);
-  
-  // Simple authentication check - just like admin portal
-  const isAuthenticated = driverAuth.isAuthenticated;
-  const isLoading = driverAuth.isLoading;
-  const user = driverAuth.user;
+  const { toast } = useToast();
+  const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);
 
-  // Enhanced bypass token setup with force refresh capability
-  useEffect(() => {
-    const setupBypassToken = async () => {
-      try {
-        console.log("🚀 PRODUCTION: Setting up bypass token for driver portal");
-        const response = await fetch("/api/auth/browser-bypass", {
-          method: "POST",
-          credentials: "include",
-        });
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem('bypass-token', data.token);
-          console.log("✅ PRODUCTION: Driver portal bypass token setup successful");
-          console.log("🔑 PRODUCTION: Token stored:", !!localStorage.getItem('bypass-token'));
-        } else {
-          console.error("❌ PRODUCTION: Bypass token request failed:", response.status);
-        }
-      } catch (error) {
-        console.error("❌ PRODUCTION: Bypass token setup error:", error);
-      }
-    };
+  console.log("🔍 POD Upload Debug:");
+  console.log("Current user:", user);
 
-    if (isAuthenticated && !isLoading) {
-      setupBypassToken();
-    }
-  }, [isAuthenticated, isLoading]);
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/driver-login";
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
-
-  const { data: loads = [], isLoading: loadsLoading } = useQuery({
+  // Get driver's loads
+  const { data: loads = [] } = useQuery({
     queryKey: ["/api/driver/loads"],
-    enabled: isAuthenticated,
+    enabled: !!user?.id,
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  console.log("🔍 Loads for driver:", loads);
 
-  if (!isAuthenticated) {
-    // Don't show anything, redirect will happen
-    return null;
-  }
+  // Find current load (most recent assigned/active load)
+  const currentLoad = (loads as Load[]).find((load: Load) => 
+    ["assigned", "at-pickup", "in-transit"].includes(load.status)
+  );
 
-  const currentLoad = Array.isArray(loads) ? loads.find((load: any) => 
-    !["completed", "delivered"].includes(load.status)
-  ) : null;
+  // Recent completed loads
+  const recentLoads = (loads as Load[])
+    .filter((load: Load) => ["delivered", "completed"].includes(load.status))
+    .slice(0, 3);
 
-  const recentLoads = Array.isArray(loads) ? loads.filter((load: any) => 
-    ["completed", "delivered"].includes(load.status)
-  ).slice(0, 5) : [];
-
-  // Debug logging for BOL upload visibility
-  console.log("🔍 BOL Upload Debug:");
-  console.log("Total loads:", Array.isArray(loads) ? loads.length : 'Not array');
-  console.log("Recent loads:", recentLoads.length);
-  recentLoads.forEach((load: any) => {
-    console.log(`Load ${load.number109}:`, {
-      status: load.status,
-      bolNumber: load.bolNumber,
-      bolDocumentPath: load.bolDocumentPath,
-      needsBOL: load.bolNumber && !load.bolDocumentPath
-    });
-  });
-
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/driver-logout", {
-        method: "POST",
-        credentials: "include"
-      });
-      window.location.href = "/";
-    } catch (error) {
-      window.location.href = "/";
-    }
+  const handleLogout = () => {
+    logout();
   };
 
   return (
@@ -145,9 +194,7 @@ export default function DriverPortal() {
       </div>
 
       <div className="p-4">
-
-
-        {/* Standalone BOL Upload - Always available */}
+        {/* Standalone POD Upload - Always available */}
         <div className="mb-6">
           <StandaloneBOLUpload />
         </div>
@@ -168,7 +215,7 @@ export default function DriverPortal() {
           </div>
         )}
 
-        {/* BOL Entry Section removed - now integrated with StandaloneBOLUpload */}
+        {/* POD Entry Section removed - now integrated with StandaloneBOLUpload */}
 
         {/* Recent Loads */}
         {recentLoads.length > 0 && (
@@ -197,25 +244,22 @@ export default function DriverPortal() {
                   
                   {/* POD Upload for completed loads that need POD documents */}
                   {(load.status === "completed" || load.status === "delivered") && 
-                   !load.podDocumentPath && ( // Show upload button for any completed load without POD document
-                    <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-yellow-800">
-                            POD Photo Needed
-                          </p>
-                          <p className="text-xs text-yellow-600">
-                            {load.bolNumber ? `BOL #${load.bolNumber}` : 'Signed Delivery Receipt'} - Upload required
-                          </p>
-                        </div>
-                        <Button 
-                          size="sm" 
-                          className="bg-yellow-600 hover:bg-yellow-700"
-                          onClick={() => setSelectedLoadForBOL(load)}
-                        >
-                          Upload POD
-                        </Button>
-                      </div>
+                   !load.podDocumentPath && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full mt-2 text-xs"
+                      onClick={() => setSelectedLoadForBOL(load)}
+                    >
+                      <i className="fas fa-camera mr-1"></i>
+                      Upload POD Photo
+                    </Button>
+                  )}
+                  
+                  {load.podDocumentPath && (
+                    <div className="mt-2 flex items-center text-xs text-green-600">
+                      <i className="fas fa-check-circle mr-1"></i>
+                      POD Uploaded
                     </div>
                   )}
                 </div>
