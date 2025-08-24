@@ -1266,7 +1266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`📋 Document availability for load ${load.number109}:`, availableDocuments);
 
       // Generate email with all available documents - Use primary load number as identifier (any format)
-      const primaryLoadNumber = load.number109 || load.number_109 || 'Unknown';
+      const primaryLoadNumber = load.number109 || 'Unknown';
       const subject = `Complete Package - Load ${primaryLoadNumber} - Invoice ${invoice.invoiceNumber}`;
       
       let emailHTML = generateCompletePackageEmailHTML(invoice, load, availableDocuments);
@@ -1301,36 +1301,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
         contentType: 'application/pdf'
       });
       
-      // Handle POD documents - ALWAYS include if POD was uploaded
+      // Handle POD documents - Attach the ACTUAL uploaded files, not templates
       if (load.podDocumentPath) {
-        console.log(`📄 Processing POD documents for load ${primaryLoadNumber}`);
+        console.log(`📄 Processing uploaded POD documents for load ${primaryLoadNumber}`);
+        
+        const { ObjectStorageService } = await import('./objectStorage');
+        const objectStorageService = new ObjectStorageService();
         
         if (load.podDocumentPath.includes(',')) {
-          // Multiple POD documents - add each as separate attachment  
+          // Multiple POD documents - fetch each actual file  
           const podPaths = load.podDocumentPath.split(',').map((path: string) => path.trim());
-          console.log(`📄 Found ${podPaths.length} POD documents for load ${primaryLoadNumber}`);
+          console.log(`📄 Found ${podPaths.length} uploaded POD documents for load ${primaryLoadNumber}`);
           
           for (let i = 0; i < podPaths.length; i++) {
-            const podHTML = generatePODHTML(load, `Page ${i + 1} of ${podPaths.length}`);
+            try {
+              // Get the actual uploaded POD file
+              const podPath = podPaths[i];
+              const objectFile = await objectStorageService.getObjectEntityFile(`/objects/${podPath}`);
+              const [fileBuffer] = await objectFile.download();
+              const [metadata] = await objectFile.getMetadata();
+              
+              attachments.push({
+                filename: `POD-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(metadata.contentType)}`,
+                content: fileBuffer,
+                contentType: metadata.contentType || 'application/pdf'
+              });
+              console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(metadata.contentType)}`);
+            } catch (error) {
+              console.error(`❌ Failed to fetch POD document ${podPaths[i]}:`, error);
+              // Fallback to template if file fetch fails
+              const podHTML = generatePODHTML(load, `Page ${i + 1} of ${podPaths.length}`);
+              const podPDF = await generatePDF(podHTML);
+              attachments.push({
+                filename: `POD-${primaryLoadNumber}-Template-Page${i + 1}.pdf`,
+                content: podPDF,
+                contentType: 'application/pdf'
+              });
+            }
+          }
+        } else {
+          // Single POD document - fetch the actual file
+          try {
+            console.log(`📄 Fetching single uploaded POD document for load ${primaryLoadNumber}`);
+            const objectFile = await objectStorageService.getObjectEntityFile(`/objects/${load.podDocumentPath}`);
+            const [fileBuffer] = await objectFile.download();
+            const [metadata] = await objectFile.getMetadata();
+            
+            attachments.push({
+              filename: `POD-${primaryLoadNumber}.${getFileExtension(metadata.contentType)}`,
+              content: fileBuffer,
+              contentType: metadata.contentType || 'application/pdf'
+            });
+            console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}.${getFileExtension(metadata.contentType)}`);
+          } catch (error) {
+            console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}:`, error);
+            // Fallback to template if file fetch fails
+            const podHTML = generatePODHTML(load);
             const podPDF = await generatePDF(podHTML);
             attachments.push({
-              filename: `POD-${primaryLoadNumber}-Page${i + 1}.pdf`,
+              filename: `POD-${primaryLoadNumber}-Template.pdf`,
               content: podPDF,
               contentType: 'application/pdf'
             });
-            console.log(`✅ Generated POD attachment: POD-${primaryLoadNumber}-Page${i + 1}.pdf`);
           }
-        } else {
-          // Single POD document
-          console.log(`📄 Generating single POD document for load ${primaryLoadNumber}`);
-          const podHTML = generatePODHTML(load);
-          const podPDF = await generatePDF(podHTML);
-          attachments.push({
-            filename: `POD-${primaryLoadNumber}.pdf`,
-            content: podPDF,
-            contentType: 'application/pdf'
-          });
-          console.log(`✅ Generated POD attachment: POD-${primaryLoadNumber}.pdf`);
         }
       } else {
         console.log(`⚠️  No POD document uploaded for load ${primaryLoadNumber} - skipping POD attachment`);
@@ -2330,7 +2363,7 @@ function generateCombinedRateConInvoiceHTML(invoice: any, load: any): string {
 
       <div class="details-section">
         <div>
-          <div><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
+          <div><strong>Load Number:</strong> ${load?.number109 || 'N/A'}</div>
           <div><strong>BOL Number:</strong> ${load?.bolNumber || 'N/A'}</div>
           <div><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</div>
         </div>
@@ -2482,6 +2515,22 @@ function generateTripNumber(): string {
   return `T${Math.floor(Math.random() * 90000) + 10000}`;
 }
 
+// Helper function to get file extension from content type
+function getFileExtension(contentType?: string): string {
+  if (!contentType) return 'pdf';
+  
+  const mimeToExt: { [key: string]: string } = {
+    'image/jpeg': 'jpg',
+    'image/jpg': 'jpg', 
+    'image/png': 'png',
+    'image/gif': 'gif',
+    'image/webp': 'webp',
+    'application/pdf': 'pdf'
+  };
+  
+  return mimeToExt[contentType.toLowerCase()] || 'pdf';
+}
+
 function generatePODHTML(load: any, pageTitle?: string): string {
   const currentDate = new Date().toLocaleDateString();
   
@@ -2542,7 +2591,7 @@ function generatePODHTML(load: any, pageTitle?: string): string {
       </div>
 
       <div class="pod-details">
-        <div><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
+        <div><strong>Load Number:</strong> ${load?.number109 || 'N/A'}</div>
         <div><strong>POD Number:</strong> ${load?.bolNumber || 'N/A'}</div>
         <div><strong>Trip Number:</strong> ${load?.tripNumber || generateTripNumber()}</div>
         <div><strong>Driver:</strong> ${load?.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'N/A'}</div>
@@ -2713,7 +2762,7 @@ function generateCompletePackageEmailHTML(invoice: any, load: any, availableDocu
 
       <div class="details-section">
         <div>
-          <div><strong>Load Number:</strong> ${load?.number_109 || load?.number109 || 'N/A'}</div>
+          <div><strong>Load Number:</strong> ${load?.number109 || 'N/A'}</div>
           <div><strong>BOL Number:</strong> ${load?.bolNumber || 'N/A'}</div>
           <div><strong>Trip Number:</strong> ${load?.tripNumber || 'T' + Math.floor(Math.random() * 90000) + 10000}</div>
           <div><strong>Invoice Number:</strong> ${invoice?.invoiceNumber || 'N/A'}</div>
