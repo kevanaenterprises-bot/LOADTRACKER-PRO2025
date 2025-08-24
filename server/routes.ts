@@ -736,21 +736,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Driver-specific loads endpoint  
   app.get("/api/driver/loads", (req, res, next) => {
-    if ((req.session as any)?.driverAuth) {
+    // Check for driver session auth OR bypass token
+    const hasDriverAuth = (req.session as any)?.driverAuth;
+    const hasBypassToken = isBypassActive(req);
+    
+    if (hasDriverAuth || hasBypassToken) {
       next();
     } else {
       res.status(401).json({ message: "Driver not authenticated" });
     }
   }, async (req, res) => {
     try {
-      const driverUserId = (req.session as any)?.driverAuth?.userId;
-      if (!driverUserId) {
-        return res.status(401).json({ message: "Driver not authenticated" });
+      // For bypass token requests, return all loads (for testing)
+      // For driver session, return only their loads
+      let loads;
+      
+      if (isBypassActive(req)) {
+        console.log("Bypass token active - returning all loads");
+        loads = await storage.getLoads();
+      } else {
+        const driverUserId = (req.session as any)?.driverAuth?.userId;
+        if (!driverUserId) {
+          return res.status(401).json({ message: "Driver not authenticated" });
+        }
+        
+        console.log("Fetching loads for driver:", driverUserId);
+        loads = await storage.getLoadsByDriver(driverUserId);
       }
       
-      console.log("Fetching loads for driver:", driverUserId);
-      const loads = await storage.getLoadsByDriver(driverUserId);
-      console.log("Found", loads.length, "loads for driver");
+      console.log("Found", loads.length, "loads");
       res.json(loads);
     } catch (error) {
       console.error("Error fetching driver loads:", error);
