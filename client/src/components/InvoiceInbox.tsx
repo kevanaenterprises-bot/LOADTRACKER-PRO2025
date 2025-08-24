@@ -254,7 +254,22 @@ export default function InvoiceInbox() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => window.open(invoice.load?.podDocumentPath, '_blank')}
+                            onClick={() => {
+                              // Handle different POD path formats
+                              let podUrl = invoice.load?.podDocumentPath;
+                              if (podUrl) {
+                                // If it's not already a full URL, convert to object endpoint
+                                if (!podUrl.startsWith('http') && !podUrl.startsWith('/objects/')) {
+                                  podUrl = `/objects/uploads/${podUrl}`;
+                                } else if (!podUrl.startsWith('http')) {
+                                  // Already in /objects/ format, use directly
+                                }
+                                
+                                // Open with bypass token for authentication
+                                const url = podUrl.startsWith('http') ? podUrl : `${window.location.origin}${podUrl}?token=LOADTRACKER_BYPASS_2025`;
+                                window.open(url, '_blank');
+                              }
+                            }}
                           >
                             <Eye className="h-4 w-4 mr-1" />
                             View POD
