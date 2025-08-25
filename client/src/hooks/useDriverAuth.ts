@@ -6,8 +6,34 @@ export function useDriverAuth() {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/driver-user"],
     queryFn: async () => {
+      // Get bypass token if available (like the dashboard does)
+      let bypassToken = localStorage.getItem('bypass-token');
+      if (!bypassToken) {
+        try {
+          const authResponse = await fetch("/api/auth/browser-bypass", {
+            method: "POST",
+            credentials: "include",
+          });
+          if (authResponse.ok) {
+            const authData = await authResponse.json();
+            bypassToken = authData.token;
+            if (bypassToken) {
+              localStorage.setItem('bypass-token', bypassToken);
+            }
+          }
+        } catch (error) {
+          // Silent fail - will use normal authentication
+        }
+      }
+
+      const headers: any = { "Content-Type": "application/json" };
+      if (bypassToken) {
+        headers['X-Bypass-Token'] = bypassToken;
+      }
+
       const response = await fetch("/api/auth/driver-user", {
         credentials: "include",
+        headers,
       });
       if (!response.ok) {
         throw new Error("Not authenticated");

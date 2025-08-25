@@ -145,10 +145,29 @@ export default function DriverPortal() {
   console.log("🔍 POD Upload Debug:");
   console.log("Current user:", user);
 
-  // Get driver's loads
+  // Get driver's loads with bypass token support
   const { data: loads = [] } = useQuery({
     queryKey: [`/api/drivers/${user?.id}/loads`],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      let bypassToken = localStorage.getItem('bypass-token');
+      const headers: any = {};
+      if (bypassToken) {
+        headers['X-Bypass-Token'] = bypassToken;
+      }
+
+      const response = await fetch(`/api/drivers/${user.id}/loads`, {
+        credentials: "include",
+        headers,
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch loads");
+      }
+      return response.json();
+    },
     enabled: !!user?.id,
+    staleTime: 10000, // 10 seconds - shorter cache for driver loads
   });
 
   console.log("🔍 Loads for driver:", loads);
