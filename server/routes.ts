@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, getSession } from "./replitAuth";
@@ -25,6 +26,9 @@ import { eq } from "drizzle-orm";
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static files from public directory
+  app.use(express.static('public'));
+  
   // Auth middleware (includes session setup)
   await setupAuth(app);
   
