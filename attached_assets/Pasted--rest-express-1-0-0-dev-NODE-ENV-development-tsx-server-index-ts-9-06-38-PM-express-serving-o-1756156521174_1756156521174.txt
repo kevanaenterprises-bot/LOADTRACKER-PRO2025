@@ -1,0 +1,48 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+9:06:38 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Admin user check: {
+  hasSession: true,
+  hasAdminAuth: false,
+  sessionId: 'sNQlPRIgpDGFahRavGZ4wpN4ITNWAw3V',
+  sessionData: [ 'cookie' ],
+  adminAuthData: 'none'
+}
+9:06:43 PM [express] GET /api/auth/user 401 in 24ms :: {"message":"Unauthorized"}
+9:06:43 PM [express] GET /api/auth/driver-user 304 in 23ms :: {"id":"605889a6-d87b-46c4-880a-7e058ad…
+9:06:43 PM [express] GET /api/auth/admin-user 401 in 27ms :: {"message":"Not authenticated"}
+Admin user check: {
+  hasSession: true,
+  hasAdminAuth: false,
+  sessionId: '10J6njNLYLtA7zbF_BJVvyP3QsJEVtXv',
+  sessionData: [ 'cookie' ],
+  adminAuthData: 'none'
+}
+9:06:43 PM [express] GET /api/auth/user 401 in 25ms :: {"message":"Unauthorized"}
+9:06:43 PM [express] GET /api/auth/driver-user 304 in 23ms :: {"id":"605889a6-d87b-46c4-880a-7e058ad…
+9:06:43 PM [express] GET /api/auth/admin-user 401 in 22ms :: {"message":"Not authenticated"}
+Admin user check: {
+  hasSession: true,
+  hasAdminAuth: false,
+  sessionId: 'zWPxIILOmH64TO4bdm8bO-aJ4tkyNvw5',
+  sessionData: [ 'cookie' ],
+  adminAuthData: 'none'
+}
+9:06:43 PM [express] GET /api/auth/admin-user 401 in 26ms :: {"message":"Not authenticated"}
+9:06:43 PM [express] GET /api/auth/user 401 in 24ms :: {"message":"Unauthorized"}
+9:06:43 PM [express] GET /api/auth/driver-user 304 in 23ms :: {"id":"605889a6-d87b-46c4-880a-7e058ad…
+Admin user check: {
+  hasSession: true,
+  hasAdminAuth: false,
+  sessionId: 'u6iGLPU8_lUS_ULr_std0aYVq_6MpCvX',
+  sessionData: [ 'cookie', 'driverAuth' ],
+  adminAuthData: 'none'
+}
+9:06:43 PM [express] GET /api/auth/user 401 in 42ms :: {"message":"Unauthorized"}
+9:06:44 PM [express] GET /api/auth/driver-user 304 in 45ms :: {"id":"605889a6-d87b-46c4-880a-7e058ad…
+9:06:44 PM [express] GET /api/auth/admin-user 401 in 43ms :: {"message":"Not authenticated"}
