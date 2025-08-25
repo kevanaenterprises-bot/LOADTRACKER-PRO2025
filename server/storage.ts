@@ -382,33 +382,64 @@ export class DatabaseStorage implements IStorage {
     console.log(`🗄️ STORAGE: getLoadsByDriver called with driverId: "${driverId}"`);
     console.log(`🗄️ Driver ID type: ${typeof driverId}, length: ${driverId?.length}`);
     
-    const result = await db
-      .select({
-        load: loads,
-        driver: users,
-        location: locations,
-        invoice: invoices,
-      })
+    // Simplified query - get loads first
+    const loadsResult = await db
+      .select()
       .from(loads)
-      .leftJoin(users, eq(loads.driverId, users.id))
-      .leftJoin(locations, eq(loads.locationId, locations.id))
-      .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .where(eq(loads.driverId, driverId))
       .orderBy(desc(loads.createdAt));
 
-    console.log(`🗄️ QUERY RESULT: Found ${result?.length || 0} rows from database`);
-    console.log(`🗄️ RAW RESULT:`, JSON.stringify(result.slice(0, 2), null, 2)); // Log first 2 results
+    console.log(`🗄️ LOADS QUERY: Found ${loadsResult?.length || 0} loads`);
+    console.log(`🗄️ LOADS RESULT:`, JSON.stringify(loadsResult.slice(0, 2), null, 2));
 
-    const mappedResult = result.map(row => ({
-      ...row.load,
-      driver: row.driver || undefined,
-      location: row.location || undefined,
-      invoice: row.invoice || undefined,
-    }));
+    // Then get related data for each load
+    const resultWithDetails: LoadWithDetails[] = [];
     
-    console.log(`🗄️ MAPPED RESULT: Returning ${mappedResult?.length || 0} loads`);
+    for (const load of loadsResult) {
+      // Get driver details
+      let driver = undefined;
+      if (load.driverId) {
+        const [driverResult] = await db
+          .select()
+          .from(users)
+          .where(eq(users.id, load.driverId))
+          .limit(1);
+        driver = driverResult;
+      }
+
+      // Get location details
+      let location = undefined;
+      if (load.locationId) {
+        const [locationResult] = await db
+          .select()
+          .from(locations)
+          .where(eq(locations.id, load.locationId))
+          .limit(1);
+        location = locationResult;
+      }
+
+      // Get invoice details
+      let invoice = undefined;
+      const [invoiceResult] = await db
+        .select()
+        .from(invoices)
+        .where(eq(invoices.loadId, load.id))
+        .limit(1);
+      if (invoiceResult) {
+        invoice = invoiceResult;
+      }
+
+      resultWithDetails.push({
+        ...load,
+        driver,
+        location,
+        invoice,
+      });
+    }
     
-    return mappedResult;
+    console.log(`🗄️ FINAL RESULT: Returning ${resultWithDetails?.length || 0} loads with details`);
+    
+    return resultWithDetails;
   }
 
   async getLoadsWithTracking(): Promise<LoadWithDetails[]> {
