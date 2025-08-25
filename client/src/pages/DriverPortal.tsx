@@ -51,7 +51,8 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
+      // Use correct query key that matches the main query
+      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${load.driverId}/loads`] });
       toast({ title: "Status updated successfully" });
     },
   });
@@ -167,7 +168,7 @@ export default function DriverPortal() {
       return response.json();
     },
     enabled: !!user?.id,
-    staleTime: 10000, // 10 seconds - shorter cache for driver loads
+    staleTime: 0, // Always allow fresh data for driver loads
   });
 
   console.log("🔍 Loads for driver:", loads);
@@ -312,7 +313,8 @@ export default function DriverPortal() {
                     title: "Success",
                     description: "POD photo uploaded successfully!",
                   });
-                  queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
+                  // Use correct query key that matches the main query  
+                  queryClient.invalidateQueries({ queryKey: [`/api/drivers/${user?.id}/loads`] });
                   setSelectedLoadForBOL(null);
                 }}
               />
