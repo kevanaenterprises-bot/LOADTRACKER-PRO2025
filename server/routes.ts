@@ -1043,7 +1043,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update the load with driver assignment
-      const updatedLoad = await storage.updateLoad(loadId, { driverId });
+      await storage.updateLoad(loadId, { driverId });
+
+      // Get complete load data with driver, location, and invoice details for UI
+      const completeLoad = await storage.getLoad(loadId);
 
       // Send SMS to driver if they have a phone number
       try {
@@ -1060,7 +1063,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Don't fail the assignment if SMS fails
       }
 
-      res.json(updatedLoad);
+      res.json(completeLoad);
     } catch (error) {
       console.error("Error assigning driver to load:", error);
       res.status(500).json({ message: "Failed to assign driver to load" });
