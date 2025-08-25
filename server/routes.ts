@@ -664,6 +664,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get loads for a specific driver (for driver portal)
+  app.get("/api/drivers/:driverId/loads", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const driverId = req.params.driverId;
+      console.log(`🚚 Fetching loads for driver: ${driverId}`);
+      
+      const loads = await storage.getLoadsByDriver(driverId);
+      console.log(`🚚 Found ${loads?.length || 0} loads for driver ${driverId}`);
+      
+      res.json(loads || []);
+    } catch (error) {
+      console.error("Error fetching driver loads:", error);
+      res.status(500).json({ message: "Failed to fetch driver loads" });
+    }
+  });
+
   // Loads for admin/office users - WITH TOKEN BYPASS
   app.get("/api/loads", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
