@@ -150,7 +150,12 @@ export default function DriverPortal() {
   const { data: loads = [], refetch } = useQuery({
     queryKey: [`/api/drivers/${user?.id}/loads`],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id) {
+        console.log("🚫 No user ID available for driver loads");
+        return [];
+      }
+      
+      console.log(`🔄 Fetching loads for driver: ${user.id}`);
       
       let bypassToken = localStorage.getItem('bypass-token');
       const headers: any = {};
@@ -162,14 +167,22 @@ export default function DriverPortal() {
         credentials: "include",
         headers,
       });
+      
+      console.log(`📡 API Response: ${response.status} ${response.statusText}`);
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch loads");
+        const errorText = await response.text();
+        console.error("❌ API Error:", errorText);
+        throw new Error(`Failed to fetch loads: ${response.status} ${errorText}`);
       }
-      return response.json();
+      
+      const data = await response.json();
+      console.log("✅ Received loads data:", data);
+      return data;
     },
     enabled: !!user?.id,
     staleTime: 0, // Always allow fresh data for driver loads
-    refetchInterval: 2000, // Refetch every 2 seconds
+    refetchInterval: 5000, // Refetch every 5 seconds (increased from 2)
     refetchOnWindowFocus: true,
   });
 
@@ -180,12 +193,19 @@ export default function DriverPortal() {
     }
   }, [user?.id, refetch]);
 
-  console.log("🔍 Loads for driver:", loads);
+  console.log("🔍 Driver Portal Debug:", {
+    userId: user?.id,
+    loadsCount: loads?.length || 0,
+    loads: loads,
+    hasLoads: Array.isArray(loads) && loads.length > 0
+  });
 
   // Find current load (most recent assigned/active load)
-  const currentLoad = (loads as Load[]).find((load: Load) => 
-    ["created", "assigned", "at-pickup", "in-transit"].includes(load.status)
-  );
+  const currentLoad = (loads as Load[]).find((load: Load) => {
+    const isActive = ["created", "assigned", "at-pickup", "in-transit"].includes(load.status);
+    console.log(`🔍 Load ${load.number109}: status="${load.status}", isActive=${isActive}`);
+    return isActive;
+  });
 
   // Recent completed loads
   const recentLoads = (loads as Load[])
