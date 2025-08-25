@@ -208,14 +208,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/auth/driver-user', (req, res) => {
     // Check bypass token first (like admin auth does)
     const bypassToken = req.headers['x-bypass-token'];
-    console.log('Driver auth check:', { 
-      bypassToken: bypassToken ? '[PROVIDED]' : '[MISSING]',
-      expectedToken: BYPASS_SECRET,
-      isMatch: bypassToken === BYPASS_SECRET
-    });
     
     if (bypassToken === BYPASS_SECRET) {
-      console.log('✅ Driver auth: Using bypass token for Kevin');
       // Return Kevin's driver data for bypass auth
       return res.json({
         id: "605889a6-d87b-46c4-880a-7e058ad87802",
@@ -228,12 +222,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     // Check session auth
-    console.log('🔒 Driver auth: Checking session auth');
     if ((req.session as any).driverAuth) {
-      console.log('✅ Driver auth: Session auth found');
       res.json((req.session as any).driverAuth);
     } else {
-      console.log('❌ Driver auth: No session or bypass auth found');
       res.status(401).json({ message: "Not authenticated" });
     }
   });
