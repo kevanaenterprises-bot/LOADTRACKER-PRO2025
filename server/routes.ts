@@ -815,10 +815,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Confirm load and enable GPS tracking
   app.post("/api/loads/:id/confirm", (req, res, next) => {
-    if ((req.session as any)?.driverAuth) {
+    // Support bypass token for API testing
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasDriverAuth = !!(req.session as any)?.driverAuth;
+    const hasAuth = hasDriverAuth || hasTokenBypass;
+    
+    console.log("Confirm load auth check:", {
+      hasDriverAuth,
+      hasTokenBypass,
+      hasAuth,
+      bypassToken: bypassToken ? '[PROVIDED]' : 'none',
+      expected: BYPASS_SECRET
+    });
+    
+    if (hasAuth) {
       next();
     } else {
-      res.status(401).json({ message: "Driver not authenticated" });
+      return res.status(401).json({ message: "Driver not authenticated" });
     }
   }, async (req, res) => {
     try {
