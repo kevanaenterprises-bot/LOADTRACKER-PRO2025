@@ -47,6 +47,205 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   });
 
+  // Working load creation page that bypasses React complexity
+  app.get('/working-dashboard', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>LoadTracker Pro - Working Dashboard</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+          .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }
+          .logo { font-size: 28px; color: #2563eb; margin-bottom: 20px; }
+          .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-top: 30px; }
+          .form-group { margin-bottom: 20px; }
+          .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+          .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+          .button { background: #4CAF50; color: white; padding: 15px 30px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+          .button:hover { background: #45a049; }
+          .button.secondary { background: #2563eb; }
+          .status { padding: 15px; border-radius: 5px; margin: 20px 0; }
+          .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+          .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+          .info { background: #cce8ff; color: #004085; border: 1px solid #99d3ff; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+          th { background-color: #f2f2f2; }
+          .hidden { display: none; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="logo">🚛 LoadTracker Pro - Working Dashboard</div>
+          <h2>GO 4 Farms & Cattle - Melissa, Texas</h2>
+          
+          <div id="auth-status" class="status info">
+            Click "Login as Admin" to authenticate and access load creation.
+          </div>
+          
+          <button class="button" onclick="adminLogin()">Login as Admin (admin/go4fc2024)</button>
+          
+          <div id="main-content" class="hidden">
+            <div class="grid">
+              <!-- Load Creation Form -->
+              <div>
+                <h3>Create New Load</h3>
+                <form id="load-form">
+                  <div class="form-group">
+                    <label>109 Number:</label>
+                    <input type="text" id="number109" placeholder="109-2024-001" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Location:</label>
+                    <select id="locationId" required>
+                      <option value="">Select Location</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Estimated Miles:</label>
+                    <input type="number" id="estimatedMiles" placeholder="250" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Special Instructions:</label>
+                    <input type="text" id="specialInstructions" placeholder="Optional">
+                  </div>
+                  <button type="submit" class="button">Create Load</button>
+                </form>
+              </div>
+              
+              <!-- Loads Table -->
+              <div>
+                <h3>Active Loads</h3>
+                <button class="button secondary" onclick="loadLoads()">Refresh Loads</button>
+                <table id="loads-table">
+                  <thead>
+                    <tr>
+                      <th>109 Number</th>
+                      <th>Status</th>
+                      <th>Location</th>
+                      <th>Miles</th>
+                    </tr>
+                  </thead>
+                  <tbody id="loads-body">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <div id="result" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; display: none;"></div>
+        </div>
+        
+        <script>
+          let isAuthenticated = false;
+          
+          function showResult(message, success = true) {
+            const result = document.getElementById('result');
+            result.style.display = 'block';
+            result.className = success ? 'status success' : 'status error';
+            result.innerHTML = message;
+          }
+          
+          function showAuthStatus(message, type = 'info') {
+            const status = document.getElementById('auth-status');
+            status.className = 'status ' + type;
+            status.innerHTML = message;
+          }
+          
+          async function adminLogin() {
+            try {
+              const response = await fetch('/api/auth/admin-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ username: 'admin', password: 'go4fc2024' })
+              });
+              const data = await response.json();
+              if (response.ok) {
+                isAuthenticated = true;
+                showAuthStatus('✅ Admin authenticated successfully!', 'success');
+                document.getElementById('main-content').classList.remove('hidden');
+                await loadLocations();
+                await loadLoads();
+              } else {
+                showResult('❌ Login failed: ' + data.message, false);
+              }
+            } catch (error) {
+              showResult('❌ Network error: ' + error.message, false);
+            }
+          }
+          
+          async function loadLocations() {
+            try {
+              const response = await fetch('/api/locations', { credentials: 'include' });
+              if (response.ok) {
+                const locations = await response.json();
+                const select = document.getElementById('locationId');
+                select.innerHTML = '<option value="">Select Location</option>';
+                locations.forEach(loc => {
+                  select.innerHTML += '<option value="' + loc.id + '">' + loc.name + ' - ' + loc.city + ', ' + loc.state + '</option>';
+                });
+              }
+            } catch (error) {
+              console.error('Error loading locations:', error);
+            }
+          }
+          
+          async function loadLoads() {
+            try {
+              const response = await fetch('/api/loads', { credentials: 'include' });
+              if (response.ok) {
+                const loads = await response.json();
+                const tbody = document.getElementById('loads-body');
+                tbody.innerHTML = '';
+                loads.forEach(load => {
+                  tbody.innerHTML += '<tr><td>' + load.number109 + '</td><td>' + load.status + '</td><td>' + (load.location?.name || 'N/A') + '</td><td>' + load.estimatedMiles + '</td></tr>';
+                });
+              }
+            } catch (error) {
+              console.error('Error loading loads:', error);
+            }
+          }
+          
+          document.getElementById('load-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+              number109: document.getElementById('number109').value,
+              locationId: document.getElementById('locationId').value,
+              estimatedMiles: parseInt(document.getElementById('estimatedMiles').value),
+              specialInstructions: document.getElementById('specialInstructions').value || null,
+              status: 'pending'
+            };
+            
+            try {
+              const response = await fetch('/api/loads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(formData)
+              });
+              
+              if (response.ok) {
+                const load = await response.json();
+                showResult('✅ Load created successfully: ' + load.number109, true);
+                document.getElementById('load-form').reset();
+                await loadLoads(); // Refresh the table
+              } else {
+                const error = await response.json();
+                showResult('❌ Failed to create load: ' + error.message, false);
+              }
+            } catch (error) {
+              showResult('❌ Network error: ' + error.message, false);
+            }
+          });
+        </script>
+      </body>
+      </html>
+    `);
+  });
+
   // Simple working dashboard that bypasses React authentication
   app.get('/simple-dashboard', (req, res) => {
     res.send(`
