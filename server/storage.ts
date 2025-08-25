@@ -398,8 +398,10 @@ export class DatabaseStorage implements IStorage {
       ORDER BY created_at DESC
     `);
 
-    console.log(`🗄️ RAW SQL QUERY: Found ${loadsResult.rows?.length || 0} loads`);
-    console.log(`🗄️ RAW SQL RESULT:`, JSON.stringify(loadsResult.rows?.slice(0, 2), null, 2));
+    console.log(`🗄️ RAW SQL RESULT STRUCTURE:`, typeof loadsResult, Object.keys(loadsResult));
+    console.log(`🗄️ RAW SQL FULL RESULT:`, JSON.stringify(loadsResult, null, 2).slice(0, 500));
+    console.log(`🗄️ RAW SQL QUERY: Found ${loadsResult.rows?.length || loadsResult.length || 'unknown'} loads`);
+    console.log(`🗄️ RAW SQL RESULT:`, JSON.stringify(loadsResult.rows?.slice(0, 2) || loadsResult.slice?.(0, 2) || 'no rows found', null, 2));
 
     // Convert raw SQL results to Load objects and get related data
     const resultWithDetails: LoadWithDetails[] = [];
