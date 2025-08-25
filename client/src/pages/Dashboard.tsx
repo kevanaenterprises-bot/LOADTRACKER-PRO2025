@@ -15,6 +15,7 @@ import InvoiceInbox from "@/components/InvoiceInbox";
 import { OCRUploader } from "@/components/OCRUploader";
 import LoadTrackingMap from "@/components/LoadTrackingMap";
 import { Header } from "@/components/Header";
+import { CacheDebugger } from "@/components/CacheDebugger";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -345,23 +346,8 @@ export default function Dashboard() {
           onActiveLoadsClick={() => setActiveTab("loads")}
         />
         
-        {/* Debug Log Display - Mobile Friendly */}
-        {debugLog.length > 0 && (
-          <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-yellow-800 mb-2">Debug Log:</h3>
-            <div className="text-xs font-mono space-y-1 max-h-32 overflow-y-auto">
-              {debugLog.map((log, idx) => (
-                <div key={idx} className="text-yellow-700">{log}</div>
-              ))}
-            </div>
-            <button 
-              onClick={() => setDebugLog([])}
-              className="mt-2 text-xs text-yellow-600 underline"
-            >
-              Clear Log
-            </button>
-          </div>
-        )}
+        {/* Cache Debugger Component */}
+        <CacheDebugger />
         
         {/* Driver Debug Button - Always Visible */}
         <div className="mt-4 flex justify-center">

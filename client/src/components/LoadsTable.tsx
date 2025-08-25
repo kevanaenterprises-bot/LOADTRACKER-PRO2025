@@ -77,6 +77,7 @@ export default function LoadsTable() {
     queryKey: ["/api/loads"],
     retry: false,
     refetchOnWindowFocus: false,
+    staleTime: 0, // Always consider data stale to allow quick updates
   });
 
   const { data: invoices = [] } = useQuery({
@@ -171,11 +172,19 @@ export default function LoadsTable() {
         title: "Driver Assigned Successfully",
         description: `Driver assigned to load ${data.number109}`,
       });
-      // Invalidate multiple cache keys for comprehensive refresh - force refetch
-      queryClient.invalidateQueries({ queryKey: ["/api/loads"], refetchType: "active" });
-      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${data.driverId}/loads`], refetchType: "active" });
-      queryClient.invalidateQueries({ queryKey: ["/api/drivers/available"], refetchType: "active" });
-      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"], refetchType: "active" });
+      
+      // Force complete cache reset and refetch
+      queryClient.resetQueries({ queryKey: ["/api/loads"] });
+      queryClient.resetQueries({ queryKey: [`/api/drivers/${data.driverId}/loads`] });
+      queryClient.resetQueries({ queryKey: ["/api/drivers/available"] });
+      queryClient.resetQueries({ queryKey: ["/api/dashboard/stats"] });
+      
+      // Also invalidate for good measure
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${data.driverId}/loads`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/drivers/available"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      
       setSelectedLoad(data); // Update the dialog with new data
       setAssigningDriver(false);
     },
