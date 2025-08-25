@@ -147,7 +147,7 @@ export default function DriverPortal() {
   console.log("Current user:", user);
 
   // Get driver's loads with bypass token support
-  const { data: loads = [] } = useQuery({
+  const { data: loads = [], refetch } = useQuery({
     queryKey: [`/api/drivers/${user?.id}/loads`],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -169,13 +169,22 @@ export default function DriverPortal() {
     },
     enabled: !!user?.id,
     staleTime: 0, // Always allow fresh data for driver loads
+    refetchInterval: 2000, // Refetch every 2 seconds
+    refetchOnWindowFocus: true,
   });
+
+  // Force refresh on component mount
+  useEffect(() => {
+    if (user?.id) {
+      refetch();
+    }
+  }, [user?.id, refetch]);
 
   console.log("🔍 Loads for driver:", loads);
 
   // Find current load (most recent assigned/active load)
   const currentLoad = (loads as Load[]).find((load: Load) => 
-    ["assigned", "at-pickup", "in-transit"].includes(load.status)
+    ["created", "assigned", "at-pickup", "in-transit"].includes(load.status)
   );
 
   // Recent completed loads
