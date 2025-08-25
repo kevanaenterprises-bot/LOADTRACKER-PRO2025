@@ -382,20 +382,68 @@ export class DatabaseStorage implements IStorage {
     console.log(`🗄️ STORAGE: getLoadsByDriver called with driverId: "${driverId}"`);
     console.log(`🗄️ Driver ID type: ${typeof driverId}, length: ${driverId?.length}`);
     
-    // Simplified query - get loads first
-    const loadsResult = await db
-      .select()
-      .from(loads)
-      .where(eq(loads.driverId, driverId))
-      .orderBy(desc(loads.createdAt));
+    // Use raw SQL to bypass any Drizzle ORM issues
+    const loadsResult = await db.execute(sql`
+      SELECT 
+        id, number_109, driver_id, location_id, estimated_miles, special_instructions, 
+        status, bol_number, trip_number, bol_document_path, pod_document_path,
+        extra_stops, lumper_charge, po_number, appointment_time, pickup_address,
+        delivery_address, company_name, created_at, updated_at, tracking_enabled,
+        confirmed_at, current_latitude, current_longitude, shipper_latitude,
+        shipper_longitude, receiver_latitude, receiver_longitude, en_route_pickup_at,
+        at_shipper_at, left_shipper_at, en_route_receiver_at, at_receiver_at,
+        delivered_at, completed_at
+      FROM loads 
+      WHERE driver_id = ${driverId}
+      ORDER BY created_at DESC
+    `);
 
-    console.log(`🗄️ LOADS QUERY: Found ${loadsResult?.length || 0} loads`);
-    console.log(`🗄️ LOADS RESULT:`, JSON.stringify(loadsResult.slice(0, 2), null, 2));
+    console.log(`🗄️ RAW SQL QUERY: Found ${loadsResult.rows?.length || 0} loads`);
+    console.log(`🗄️ RAW SQL RESULT:`, JSON.stringify(loadsResult.rows?.slice(0, 2), null, 2));
 
-    // Then get related data for each load
+    // Convert raw SQL results to Load objects and get related data
     const resultWithDetails: LoadWithDetails[] = [];
     
-    for (const load of loadsResult) {
+    for (const row of loadsResult.rows) {
+      // Convert raw row to Load object (map snake_case to camelCase)
+      const load: Load = {
+        id: row.id as string,
+        number109: row.number_109 as string,
+        driverId: row.driver_id as string,
+        locationId: row.location_id as string,
+        estimatedMiles: row.estimated_miles as number,
+        specialInstructions: row.special_instructions as string,
+        status: row.status as string,
+        bolNumber: row.bol_number as string,
+        tripNumber: row.trip_number as string,
+        bolDocumentPath: row.bol_document_path as string,
+        podDocumentPath: row.pod_document_path as string,
+        extraStops: row.extra_stops as number || 0,
+        lumperCharge: row.lumper_charge as string || "0.00",
+        poNumber: row.po_number as string,
+        appointmentTime: row.appointment_time as string,
+        pickupAddress: row.pickup_address as string,
+        deliveryAddress: row.delivery_address as string,
+        companyName: row.company_name as string,
+        createdAt: new Date(row.created_at as string),
+        updatedAt: new Date(row.updated_at as string),
+        trackingEnabled: row.tracking_enabled as boolean || false,
+        confirmedAt: row.confirmed_at ? new Date(row.confirmed_at as string) : null,
+        currentLatitude: row.current_latitude as string,
+        currentLongitude: row.current_longitude as string,
+        shipperLatitude: row.shipper_latitude as string,
+        shipperLongitude: row.shipper_longitude as string,
+        receiverLatitude: row.receiver_latitude as string,
+        receiverLongitude: row.receiver_longitude as string,
+        enRoutePickupAt: row.en_route_pickup_at ? new Date(row.en_route_pickup_at as string) : null,
+        atShipperAt: row.at_shipper_at ? new Date(row.at_shipper_at as string) : null,
+        leftShipperAt: row.left_shipper_at ? new Date(row.left_shipper_at as string) : null,
+        enRouteReceiverAt: row.en_route_receiver_at ? new Date(row.en_route_receiver_at as string) : null,
+        atReceiverAt: row.at_receiver_at ? new Date(row.at_receiver_at as string) : null,
+        deliveredAt: row.delivered_at ? new Date(row.delivered_at as string) : null,
+        completedAt: row.completed_at ? new Date(row.completed_at as string) : null,
+      };
+
       // Get driver details
       let driver = undefined;
       if (load.driverId) {
