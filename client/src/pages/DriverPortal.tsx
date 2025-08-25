@@ -147,7 +147,7 @@ export default function DriverPortal() {
 
   // Get driver's loads
   const { data: loads = [] } = useQuery({
-    queryKey: ["/api/driver/loads"],
+    queryKey: [`/api/drivers/${user?.id}/loads`],
     enabled: !!user?.id,
   });
 

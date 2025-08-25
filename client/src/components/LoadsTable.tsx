@@ -171,7 +171,11 @@ export default function LoadsTable() {
         title: "Driver Assigned Successfully",
         description: `Driver assigned to load ${data.number109}`,
       });
+      // Invalidate multiple cache keys for comprehensive refresh
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${data.driverId}/loads`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/drivers/available"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       setSelectedLoad(data); // Update the dialog with new data
       setAssigningDriver(false);
     },
