@@ -33,6 +33,7 @@ import TroubleshootPage from "@/pages/TroubleshootPage";
 import DebugInvoice from "@/pages/DebugInvoice";
 import AdminTestPage from "@/pages/AdminTestPage";
 import SimpleDriverTest from "@/pages/SimpleDriverTest";
+import QuickLogin from "@/pages/QuickLogin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -57,6 +58,9 @@ function Router() {
     <Switch>
       {/* Admin login page */}
       <Route path="/admin-login" component={AdminLogin} />
+      
+      {/* Quick login page */}
+      <Route path="/quick-login" component={QuickLogin} />
       
       {/* Driver login page */}
       <Route path="/driver-login" component={DriverLogin} />
