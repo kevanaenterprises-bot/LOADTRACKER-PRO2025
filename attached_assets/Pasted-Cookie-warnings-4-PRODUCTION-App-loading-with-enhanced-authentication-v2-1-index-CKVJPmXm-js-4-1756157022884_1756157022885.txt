@@ -1,0 +1,108 @@
+Cookie warnings 4
+🔄 PRODUCTION: App loading with enhanced authentication - v2.1 index-CKVJPmXm.js:416:50574
+🔄 Query function getting bypass token index-CKVJPmXm.js:48:43389
+✅ Query function bypass token obtained index-CKVJPmXm.js:48:43616
+🔍 POD Upload Debug: index-CKVJPmXm.js:336:38445
+Current user: 
+Object { id: "605889a6-d87b-46c4-880a-7e058ad87802", username: "K Owen", firstName: "Kevin ", lastName: "Owen ", role: "driver", phoneNumber: "9038037500" }
+index-CKVJPmXm.js:336:38481
+🔍 Driver Portal Debug: 
+Object { userId: "605889a6-d87b-46c4-880a-7e058ad87802", loadsCount: 0, loads: [], hasLoads: false }
+index-CKVJPmXm.js:336:39323
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔍 POD Upload Debug: index-CKVJPmXm.js:336:38445
+Current user: 
+Object { id: "605889a6-d87b-46c4-880a-7e058ad87802", username: "K Owen", firstName: "Kevin ", lastName: "Owen ", role: "driver", phoneNumber: "9038037500" }
+index-CKVJPmXm.js:336:38481
+🔍 Driver Portal Debug: 
+Object { userId: "605889a6-d87b-46c4-880a-7e058ad87802", loadsCount: 0, loads: [], hasLoads: false }
+index-CKVJPmXm.js:336:39323
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134
+🔄 Fetching loads for driver: 605889a6-d87b-46c4-880a-7e058ad87802 index-CKVJPmXm.js:336:38702
+📡 API Response: 200 index-CKVJPmXm.js:336:38923
+✅ Received loads data: 
+Array []
+index-CKVJPmXm.js:336:39134

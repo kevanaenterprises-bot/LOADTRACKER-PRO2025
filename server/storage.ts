@@ -379,6 +379,9 @@ export class DatabaseStorage implements IStorage {
 
 
   async getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]> {
+    console.log(`🗄️ STORAGE: getLoadsByDriver called with driverId: "${driverId}"`);
+    console.log(`🗄️ Driver ID type: ${typeof driverId}, length: ${driverId?.length}`);
+    
     const result = await db
       .select({
         load: loads,
@@ -393,12 +396,19 @@ export class DatabaseStorage implements IStorage {
       .where(eq(loads.driverId, driverId))
       .orderBy(desc(loads.createdAt));
 
-    return result.map(row => ({
+    console.log(`🗄️ QUERY RESULT: Found ${result?.length || 0} rows from database`);
+    console.log(`🗄️ RAW RESULT:`, JSON.stringify(result.slice(0, 2), null, 2)); // Log first 2 results
+
+    const mappedResult = result.map(row => ({
       ...row.load,
       driver: row.driver || undefined,
       location: row.location || undefined,
       invoice: row.invoice || undefined,
     }));
+    
+    console.log(`🗄️ MAPPED RESULT: Returning ${mappedResult?.length || 0} loads`);
+    
+    return mappedResult;
   }
 
   async getLoadsWithTracking(): Promise<LoadWithDetails[]> {

@@ -1488,14 +1488,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     try {
       const driverId = req.params.driverId;
-      console.log(`🚚 Fetching loads for driver: ${driverId}`);
+      console.log(`🚚 API ENDPOINT: Fetching loads for driver: ${driverId}`);
+      console.log(`🚚 Driver ID type: ${typeof driverId}, length: ${driverId?.length}`);
       
       const loads = await storage.getLoadsByDriver(driverId);
-      console.log(`🚚 Found ${loads?.length || 0} loads for driver ${driverId}`);
+      console.log(`🚚 STORAGE RESULT: Found ${loads?.length || 0} loads for driver ${driverId}`);
+      console.log(`🚚 LOADS DATA:`, JSON.stringify(loads, null, 2));
       
       res.json(loads || []);
     } catch (error) {
-      console.error("Error fetching driver loads:", error);
+      console.error("❌ Error fetching driver loads:", error);
       res.status(500).json({ message: "Failed to fetch driver loads" });
     }
   });
