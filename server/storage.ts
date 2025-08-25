@@ -398,15 +398,15 @@ export class DatabaseStorage implements IStorage {
       ORDER BY created_at DESC
     `);
 
-    console.log(`🗄️ RAW SQL RESULT STRUCTURE:`, typeof loadsResult, Object.keys(loadsResult));
-    console.log(`🗄️ RAW SQL FULL RESULT:`, JSON.stringify(loadsResult, null, 2).slice(0, 500));
-    console.log(`🗄️ RAW SQL QUERY: Found ${loadsResult.rows?.length || loadsResult.length || 'unknown'} loads`);
-    console.log(`🗄️ RAW SQL RESULT:`, JSON.stringify(loadsResult.rows?.slice(0, 2) || loadsResult.slice?.(0, 2) || 'no rows found', null, 2));
+    // Access the actual data - try multiple patterns
+    const actualRows = loadsResult.rows || loadsResult.values || loadsResult || [];
+    console.log(`🗄️ RAW SQL QUERY: Found ${actualRows.length} loads`);
+    console.log(`🗄️ RAW SQL RESULT:`, JSON.stringify(actualRows.slice(0, 2), null, 2));
 
     // Convert raw SQL results to Load objects and get related data
     const resultWithDetails: LoadWithDetails[] = [];
     
-    for (const row of loadsResult.rows) {
+    for (const row of actualRows) {
       // Convert raw row to Load object (map snake_case to camelCase) with safe null handling
       const load: Load = {
         id: row.id as string,
