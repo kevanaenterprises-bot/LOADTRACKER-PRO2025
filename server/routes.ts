@@ -1402,7 +1402,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         // Skip test data that's not real object storage paths
-        if (load.podDocumentPath === 'test-pod-document.pdf') {
+        if (load.podDocumentPath === 'test-pod-document.pdf' || 
+            load.podDocumentPath === 'https://test-pod-document.pdf' ||
+            load.podDocumentPath.includes('test-pod-document')) {
           console.log(`⚠️  Skipping test POD data - no real file uploaded for load ${primaryLoadNumber}`);
         } else {
           // Handle real uploaded POD files
@@ -1479,7 +1481,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`📄 BOL path: ${load.bolDocumentPath}`);
         
         // Skip test data that's not real object storage paths
-        if (load.bolDocumentPath === 'test-bol-document.pdf') {
+        if (load.bolDocumentPath === 'test-bol-document.pdf' || 
+            load.bolDocumentPath === 'https://test-bol-document.pdf' ||
+            load.bolDocumentPath.includes('test-bol-document')) {
           console.log(`⚠️  Skipping test BOL data - no real file uploaded for load ${primaryLoadNumber}`);
         } else {
           // Handle real uploaded BOL files (same logic as POD)
