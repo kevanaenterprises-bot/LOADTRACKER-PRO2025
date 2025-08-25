@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Printer, Eye, DollarSign, Truck, FileText, Calendar } from "lucide-react";
+import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search } from "lucide-react";
 import { format } from "date-fns";
 
 interface Invoice {
@@ -38,6 +39,10 @@ interface Invoice {
 export default function InvoiceInbox() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [previewHTML, setPreviewHTML] = useState("");
+  const [previewInvoice, setPreviewInvoice] = useState<Invoice | null>(null);
+  const [isPreviewing, setIsPreviewing] = useState(false);
 
   const { data: invoicesData, isLoading } = useQuery({
     queryKey: ["/api/invoices"],
@@ -67,6 +72,44 @@ export default function InvoiceInbox() {
 
   const pendingInvoices = invoices.filter((invoice: Invoice) => invoice.status === "pending");
   const printedInvoices = invoices.filter((invoice: Invoice) => invoice.status === "printed");
+
+  // Print preview function - Shows invoice with POD attachments
+  const handlePrintPreview = async (invoice: Invoice) => {
+    if (!invoice.loadId) {
+      toast({
+        title: "Error",
+        description: "No load associated with this invoice",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsPreviewing(true);
+    try {
+      const response = await apiRequest(`/api/invoices/${invoice.invoiceNumber}/print-preview`, "POST", {
+        loadId: invoice.loadId
+      });
+
+      if (response.success) {
+        setPreviewHTML(response.previewHTML);
+        setPreviewInvoice(invoice);
+        setPreviewDialogOpen(true);
+        
+        toast({
+          title: "Preview Generated",
+          description: `${response.podAttachments?.length || 0} POD attachment(s) found`,
+        });
+      }
+    } catch (error: any) {
+      console.error("Print preview error:", error);
+      toast({
+        title: "Preview Failed",
+        description: error.message || "Failed to generate print preview",
+        variant: "destructive",
+      });
+    }
+    setIsPreviewing(false);
+  };
 
   const handlePrint = (invoice: Invoice) => {
     // Create a printable invoice format
@@ -242,6 +285,16 @@ export default function InvoiceInbox() {
                       
                       <div className="flex flex-col gap-2 ml-4">
                         <Button 
+                          onClick={() => handlePrintPreview(invoice)}
+                          variant="outline"
+                          className="flex items-center gap-2"
+                          disabled={isPreviewing}
+                        >
+                          <Search className="h-4 w-4" />
+                          {isPreviewing ? "Loading..." : "Preview with PODs"}
+                        </Button>
+                        
+                        <Button 
                           onClick={() => handlePrint(invoice)}
                           className="flex items-center gap-2"
                           disabled={markPrintedMutation.isPending}
@@ -314,6 +367,76 @@ export default function InvoiceInbox() {
           </CardContent>
         </Card>
       )}
+
+      {/* Print Preview Modal */}
+      <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Print Preview - Invoice {previewInvoice?.invoiceNumber}
+              {previewInvoice?.load?.podDocumentPath && (
+                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                  POD Attached
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {previewHTML && (
+              <div className="border rounded-lg p-4 bg-white">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="text-sm text-gray-600">
+                    Preview shows exactly what will be printed/emailed with POD attachments
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const printWindow = window.open('', '_blank');
+                        if (printWindow) {
+                          printWindow.document.write(previewHTML);
+                          printWindow.document.close();
+                          printWindow.print();
+                        }
+                      }}
+                    >
+                      <Printer className="h-4 w-4 mr-1" />
+                      Print This Preview
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        // Here you could add email functionality using the preview
+                        toast({
+                          title: "Email Feature",
+                          description: "Email functionality coming soon - this preview shows what would be sent",
+                        });
+                      }}
+                    >
+                      <FileText className="h-4 w-4 mr-1" />
+                      Send as Email
+                    </Button>
+                  </div>
+                </div>
+                
+                <div 
+                  className="border border-gray-200 bg-white"
+                  style={{ 
+                    minHeight: '600px',
+                    transform: 'scale(0.8)',
+                    transformOrigin: 'top left',
+                    width: '125%'
+                  }}
+                  dangerouslySetInnerHTML={{ __html: previewHTML }}
+                />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

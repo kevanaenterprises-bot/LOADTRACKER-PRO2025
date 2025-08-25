@@ -1984,7 +1984,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Invoices
-  app.get("/api/invoices", isAdminAuthenticated, async (req, res) => {
+  app.get("/api/invoices", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const invoices = await storage.getInvoices();
       res.json(invoices);
@@ -2223,6 +2230,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("❌ Test email failed:", error);
       res.status(500).json({ 
         message: "Test email failed", 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+
+  // Print preview with POD attachments - NEW ENDPOINT
+  app.post("/api/invoices/:id/print-preview", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const invoiceIdOrNumber = req.params.id;
+      const { loadId } = req.body;
+
+      console.log(`🖨️ Print preview requested for invoice: ${invoiceIdOrNumber}`);
+
+      // Get invoice data - check if it's UUID (ID) or invoice number
+      let invoice;
+      if (invoiceIdOrNumber.includes('-') && invoiceIdOrNumber.length === 36) {
+        const [invoiceById] = await db.select().from(invoices).where(eq(invoices.id, invoiceIdOrNumber));
+        invoice = invoiceById;
+      } else {
+        invoice = await storage.getInvoice(invoiceIdOrNumber);
+      }
+      
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      // Get load data
+      let load;
+      if (loadId) {
+        load = await storage.getLoad(loadId);
+      } else if (invoice.loadId) {
+        load = await storage.getLoad(invoice.loadId);
+      } else {
+        return res.status(400).json({ message: "No load ID available" });
+      }
+      
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      console.log(`🖨️ POD Status for preview:`, {
+        loadNumber: load.number109,
+        podDocumentPath: load.podDocumentPath,
+        hasPOD: !!load.podDocumentPath
+      });
+
+      // Generate the base invoice HTML
+      const baseHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+      
+      // Embed POD images if available
+      let previewHTML = baseHTML;
+      const podAttachments: any[] = [];
+      
+      if (load.podDocumentPath) {
+        try {
+          // Check if it's an object storage path
+          if (load.podDocumentPath.startsWith('/objects/')) {
+            const objectStorageService = new (await import('./objectStorage')).ObjectStorageService();
+            const objectFile = await objectStorageService.getObjectEntityFile(load.podDocumentPath);
+            const [fileBuffer] = await objectFile.download();
+            
+            // Convert to base64 for embedding
+            const base64Data = fileBuffer.toString('base64');
+            const mimeType = load.podDocumentPath.toLowerCase().includes('.pdf') ? 'application/pdf' : 'image/jpeg';
+            
+            podAttachments.push({
+              filename: `POD_${load.number109}.${mimeType === 'application/pdf' ? 'pdf' : 'jpg'}`,
+              content: fileBuffer,
+              contentType: mimeType,
+              base64: base64Data
+            });
+
+            // Embed image in HTML (for images only, not PDFs)
+            if (mimeType.startsWith('image/')) {
+              const podImageHTML = `
+                <div style="page-break-before: always; padding: 20px; text-align: center;">
+                  <h2 style="color: #2d5aa0; margin-bottom: 20px;">Proof of Delivery (POD)</h2>
+                  <p style="margin-bottom: 20px;"><strong>Load:</strong> ${load.number109}</p>
+                  <img src="data:${mimeType};base64,${base64Data}" 
+                       style="max-width: 100%; max-height: 600px; border: 2px solid #ddd; border-radius: 8px;" 
+                       alt="POD Document" />
+                </div>
+              `;
+              previewHTML = previewHTML.replace('</body>', podImageHTML + '</body>');
+            } else {
+              // For PDFs, just show a note
+              const podNoteHTML = `
+                <div style="page-break-before: always; padding: 20px; text-align: center;">
+                  <h2 style="color: #2d5aa0; margin-bottom: 20px;">Proof of Delivery (POD)</h2>
+                  <p style="margin-bottom: 20px;"><strong>Load:</strong> ${load.number109}</p>
+                  <div style="padding: 40px; background: #f0f8ff; border: 2px dashed #2d5aa0; border-radius: 8px;">
+                    <i class="fas fa-file-pdf" style="font-size: 48px; color: #dc3545; margin-bottom: 20px;"></i>
+                    <p style="font-size: 18px; font-weight: bold;">PDF POD Document Attached</p>
+                    <p>Filename: POD_${load.number109}.pdf</p>
+                  </div>
+                </div>
+              `;
+              previewHTML = previewHTML.replace('</body>', podNoteHTML + '</body>');
+            }
+          }
+        } catch (error) {
+          console.error(`❌ Error processing POD for preview:`, error);
+          // Add error note to HTML
+          const errorHTML = `
+            <div style="page-break-before: always; padding: 20px; text-align: center;">
+              <h2 style="color: #dc3545; margin-bottom: 20px;">POD Document Issue</h2>
+              <p style="color: #dc3545;">Error loading POD: ${(error as Error).message}</p>
+            </div>
+          `;
+          previewHTML = previewHTML.replace('</body>', errorHTML + '</body>');
+        }
+      } else {
+        // Show "No POD" message
+        const noPodHTML = `
+          <div style="page-break-before: always; padding: 20px; text-align: center;">
+            <h2 style="color: #ff6b35; margin-bottom: 20px;">No POD Document</h2>
+            <p style="color: #666;">No POD document has been uploaded for load ${load.number109}</p>
+          </div>
+        `;
+        previewHTML = previewHTML.replace('</body>', noPodHTML + '</body>');
+      }
+
+      res.json({
+        success: true,
+        previewHTML,
+        podAttachments: podAttachments.map(att => ({
+          filename: att.filename,
+          contentType: att.contentType,
+          size: att.content.length
+        })),
+        invoice,
+        load
+      });
+
+    } catch (error) {
+      console.error("❌ Error generating print preview:", error);
+      res.status(500).json({ 
+        message: "Failed to generate print preview", 
         error: error instanceof Error ? error.message : 'Unknown error' 
       });
     }
