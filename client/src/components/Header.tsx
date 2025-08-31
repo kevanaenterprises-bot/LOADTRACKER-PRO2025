@@ -1,4 +1,4 @@
-import logoImage from "@assets/generated_images/Go_Farms_Cattle_Texas_Logo_8f26a064.png";
+import logoImage from "../assets/go-farms-logo.png";
 
 interface HeaderProps {
   title?: string;

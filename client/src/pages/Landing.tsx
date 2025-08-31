@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import logoUrl from "@assets/generated_images/Go_Farms_Cattle_Texas_Logo_8f26a064.png";
+import logoUrl from "../assets/go-farms-logo.png";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
