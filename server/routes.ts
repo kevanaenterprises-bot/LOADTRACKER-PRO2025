@@ -31,6 +31,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Auth middleware (includes session setup)
   await setupAuth(app);
+
+  // Direct logo download endpoint for mobile users
+  app.get("/download/logo", (req, res) => {
+    const path = require('path');
+    const logoPath = path.join(process.cwd(), "client/src/assets/go-farms-logo.png");
+    res.download(logoPath, "go-farms-logo.png", (err) => {
+      if (err) {
+        console.error("Logo download error:", err);
+        res.status(404).send("Logo not found");
+      }
+    });
+  });
   
   // API route for working dashboard (bypasses Vite middleware)
   app.get('/api/working-dashboard', (req, res) => {
