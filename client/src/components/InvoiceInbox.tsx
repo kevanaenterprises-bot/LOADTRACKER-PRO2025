@@ -298,64 +298,6 @@ export default function InvoiceInbox() {
                           {isPreviewing ? "Loading..." : "Preview with PODs"}
                         </Button>
                         
-                        <Button 
-                          onClick={() => handlePrint(invoice)}
-                          className="flex items-center gap-2"
-                          disabled={markPrintedMutation.isPending}
-                        >
-                          <Printer className="h-4 w-4" />
-                          Print & Mark Complete
-                        </Button>
-                        
-                        {invoice.load?.podDocumentPath && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={async () => {
-                              // Handle different POD path formats
-                              let podUrl = invoice.load?.podDocumentPath;
-                              if (podUrl) {
-                                // If it's not already a full URL, convert to object endpoint
-                                if (!podUrl.startsWith('http') && !podUrl.startsWith('/objects/')) {
-                                  podUrl = `/objects/uploads/${podUrl}`;
-                                } else if (!podUrl.startsWith('http')) {
-                                  // Already in /objects/ format, use directly
-                                }
-                                
-                                // Fetch with proper headers and create blob URL
-                                try {
-                                  const response = await fetch(podUrl, {
-                                    headers: {
-                                      'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025'
-                                    },
-                                    credentials: 'include'
-                                  });
-                                  
-                                  if (response.ok) {
-                                    const blob = await response.blob();
-                                    const url = URL.createObjectURL(blob);
-                                    window.open(url, '_blank');
-                                  } else {
-                                    toast({
-                                      title: "Access Failed",
-                                      description: "Could not access POD document",
-                                      variant: "destructive"
-                                    });
-                                  }
-                                } catch (error) {
-                                  toast({
-                                    title: "Error",
-                                    description: "Failed to load POD document",
-                                    variant: "destructive"
-                                  });
-                                }
-                              }
-                            }}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            View POD
-                          </Button>
-                        )}
                       </div>
                     </div>
                   </CardContent>
