@@ -506,12 +506,9 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(loads.driverId, users.id))
       .leftJoin(locations, eq(loads.locationId, locations.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
-      .where(and(
-        eq(loads.trackingEnabled, true),
-        sql`${loads.currentLatitude} IS NOT NULL`,
-        sql`${loads.currentLongitude} IS NOT NULL`,
-        sql`${loads.status} IN ('confirmed', 'en_route_pickup', 'at_shipper', 'left_shipper', 'en_route_receiver', 'at_receiver')`
-      ))
+      .where(
+        sql`${loads.status} IN ('in_progress', 'delivered')`
+      )
       .orderBy(desc(loads.updatedAt));
 
     return result.map(row => ({

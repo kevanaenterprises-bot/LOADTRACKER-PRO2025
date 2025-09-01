@@ -154,11 +154,6 @@ export const insertLoadSchema = createInsertSchema(loads).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  enRoutePickupAt: true,
-  atShipperAt: true,
-  leftShipperAt: true,
-  enRouteReceiverAt: true,
-  atReceiverAt: true,
   deliveredAt: true,
   completedAt: true,
 });
