@@ -49,10 +49,27 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
       if (!response.ok) throw new Error("Failed to update status");
       return response.json();
     },
-    onSuccess: () => {
-      // Use correct query key that matches the main query
+    onSuccess: (data) => {
+      // Refresh all driver-related queries
+      queryClient.invalidateQueries({ queryKey: ['/api/driver/loads'] });
       queryClient.invalidateQueries({ queryKey: [`/api/drivers/${load.driverId}/loads`] });
-      toast({ title: "Status updated successfully" });
+      
+      // Show clear success message
+      toast({ 
+        title: "✅ Status Updated!", 
+        description: `Load #${load.number109} is now ${data.status}`,
+        duration: 3000
+      });
+      
+      // Force component re-render
+      window.location.reload();
+    },
+    onError: (error) => {
+      toast({ 
+        title: "❌ Update Failed", 
+        description: error.message || "Could not update status",
+        variant: "destructive"
+      });
     },
   });
 
