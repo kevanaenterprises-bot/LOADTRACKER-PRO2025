@@ -60,7 +60,7 @@ export const loads = pgTable("loads", {
   locationId: varchar("location_id").references(() => locations.id),
   estimatedMiles: integer("estimated_miles"),
   specialInstructions: text("special_instructions"),
-  status: varchar("status").notNull().default("created"), // created, confirmed, en_route_pickup, at_shipper, left_shipper, en_route_receiver, at_receiver, delivered, completed
+  status: varchar("status").notNull().default("created"), // created, in_progress, delivered, completed
   bolNumber: varchar("bol_number"),
   tripNumber: varchar("trip_number"),
   bolDocumentPath: varchar("bol_document_path"),
@@ -75,21 +75,7 @@ export const loads = pgTable("loads", {
   companyName: varchar("company_name"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-  // GPS tracking fields
-  trackingEnabled: boolean("tracking_enabled").default(false),
-  confirmedAt: timestamp("confirmed_at"),
-  currentLatitude: decimal("current_latitude", { precision: 10, scale: 8 }),
-  currentLongitude: decimal("current_longitude", { precision: 11, scale: 8 }),
-  shipperLatitude: decimal("shipper_latitude", { precision: 10, scale: 8 }),
-  shipperLongitude: decimal("shipper_longitude", { precision: 11, scale: 8 }),
-  receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
-  receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
-  // Timestamps for tracking
-  enRoutePickupAt: timestamp("en_route_pickup_at"),
-  atShipperAt: timestamp("at_shipper_at"),
-  leftShipperAt: timestamp("left_shipper_at"),
-  enRouteReceiverAt: timestamp("en_route_receiver_at"),
-  atReceiverAt: timestamp("at_receiver_at"),
+  // Basic timestamps for manual status tracking
   deliveredAt: timestamp("delivered_at"),
   completedAt: timestamp("completed_at"),
 });

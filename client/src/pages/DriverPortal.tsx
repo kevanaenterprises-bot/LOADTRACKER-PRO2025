@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import StandaloneBOLUpload from "@/components/StandaloneBOLUpload";
 import { SimpleFileUpload } from "@/components/SimpleFileUpload";
-import GPSTracker from "@/components/GPSTracker";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 
 interface Load {
@@ -90,33 +89,32 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
             </div>
           )}
 
-          <div className="flex gap-2">
-            {load.status === "assigned" && (
+          {/* Simplified Manual Status Updates */}
+          <div className="flex gap-2 flex-wrap">
+            {load.status === "created" && (
               <Button
                 size="sm"
-                onClick={() => updateStatusMutation.mutate("at-pickup")}
+                onClick={() => updateStatusMutation.mutate("in_progress")}
                 disabled={updateStatusMutation.isPending}
+                className="bg-blue-600 hover:bg-blue-700"
               >
-                At Pickup
+                🚚 Start Trip
               </Button>
             )}
-            {load.status === "at-pickup" && (
-              <Button
-                size="sm"
-                onClick={() => updateStatusMutation.mutate("in-transit")}
-                disabled={updateStatusMutation.isPending}
-              >
-                Picked Up
-              </Button>
-            )}
-            {load.status === "in-transit" && (
+            {load.status === "in_progress" && (
               <Button
                 size="sm"
                 onClick={() => updateStatusMutation.mutate("delivered")}
                 disabled={updateStatusMutation.isPending}
+                className="bg-green-600 hover:bg-green-700"
               >
-                Delivered
+                📦 Mark Delivered
               </Button>
+            )}
+            {load.status === "delivered" && !load.podDocumentPath && (
+              <Badge variant="outline" className="text-amber-600 border-amber-600">
+                📸 POD Document Required
+              </Badge>
             )}
           </div>
 
@@ -248,10 +246,9 @@ export default function DriverPortal() {
           <StandaloneBOLUpload />
         </div>
 
-        {/* Current Load Card with GPS Tracking */}
+        {/* Current Load Card */}
         {currentLoad ? (
           <div className="space-y-4">
-            <GPSTracker load={currentLoad} driverId={user?.id || ''} />
             <DriverLoadCard load={currentLoad} />
           </div>
         ) : (

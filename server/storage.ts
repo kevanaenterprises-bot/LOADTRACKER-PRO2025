@@ -326,16 +326,14 @@ export class DatabaseStorage implements IStorage {
     const [updatedLoad] = await db
       .update(loads)
       .set({ 
-        status: 'confirmed',
-        trackingEnabled: true,
-        confirmedAt: new Date(),
+        status: 'in_progress',
         updatedAt: new Date(),
       })
       .where(and(eq(loads.id, id), eq(loads.driverId, driverId)))
       .returning();
 
     // Add status history
-    await this.addStatusHistory(id, 'confirmed', 'Driver confirmed load receipt');
+    await this.addStatusHistory(id, 'in_progress', 'Driver started trip');
 
     return updatedLoad;
   }
@@ -471,10 +469,6 @@ export class DatabaseStorage implements IStorage {
         companyName: "",
         createdAt: new Date(),
         updatedAt: new Date(),
-        trackingEnabled: false,
-        confirmedAt: null,
-        currentLatitude: null,
-        currentLongitude: null,
         shipperLatitude: null,
         shipperLongitude: null,
         receiverLatitude: null,
