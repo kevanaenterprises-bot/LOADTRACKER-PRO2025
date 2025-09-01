@@ -228,7 +228,7 @@ export default function DriverPortal() {
       }
       
       // If same priority, sort by creation time (oldest first)
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
     });
     
   const currentLoad = sortedActiveLoads[0] || null;
