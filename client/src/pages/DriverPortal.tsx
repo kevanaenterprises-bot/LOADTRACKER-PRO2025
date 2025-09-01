@@ -58,11 +58,8 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
       toast({ 
         title: "✅ Status Updated!", 
         description: `Load #${load.number109} is now ${data.status}`,
-        duration: 3000
+        duration: 5000
       });
-      
-      // Force component re-render
-      window.location.reload();
     },
     onError: (error) => {
       toast({ 

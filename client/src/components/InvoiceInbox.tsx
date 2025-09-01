@@ -176,7 +176,11 @@ export default function InvoiceInbox() {
         </html>
       `);
       printWindow.document.close();
-      printWindow.print();
+      
+      // Wait for content to load before printing
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
       
       // Mark as printed after successful print dialog
       markPrintedMutation.mutate(invoice.id);
@@ -307,7 +311,7 @@ export default function InvoiceInbox() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => {
+                            onClick={async () => {
                               // Handle different POD path formats
                               let podUrl = invoice.load?.podDocumentPath;
                               if (podUrl) {
@@ -318,9 +322,33 @@ export default function InvoiceInbox() {
                                   // Already in /objects/ format, use directly
                                 }
                                 
-                                // Open with bypass token for authentication
-                                const url = podUrl.startsWith('http') ? podUrl : `${window.location.origin}${podUrl}?token=LOADTRACKER_BYPASS_2025`;
-                                window.open(url, '_blank');
+                                // Fetch with proper headers and create blob URL
+                                try {
+                                  const response = await fetch(podUrl, {
+                                    headers: {
+                                      'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025'
+                                    },
+                                    credentials: 'include'
+                                  });
+                                  
+                                  if (response.ok) {
+                                    const blob = await response.blob();
+                                    const url = URL.createObjectURL(blob);
+                                    window.open(url, '_blank');
+                                  } else {
+                                    toast({
+                                      title: "Access Failed",
+                                      description: "Could not access POD document",
+                                      variant: "destructive"
+                                    });
+                                  }
+                                } catch (error) {
+                                  toast({
+                                    title: "Error",
+                                    description: "Failed to load POD document",
+                                    variant: "destructive"
+                                  });
+                                }
                               }
                             }}
                           >
