@@ -203,12 +203,35 @@ export default function DriverPortal() {
     hasLoads: Array.isArray(loads) && loads.length > 0
   });
 
-  // Find current load (most recent assigned/active load)
-  const currentLoad = (loads as Load[]).find((load: Load) => {
-    const isActive = ["created", "assigned", "at-pickup", "in-transit"].includes(load.status);
-    console.log(`🔍 Load ${load.number109}: status="${load.status}", isActive=${isActive}`);
-    return isActive;
-  });
+  // Find current load - prioritize by status hierarchy and creation time
+  const sortedActiveLoads = (loads as Load[])
+    .filter((load: Load) => {
+      const isActive = ["in_progress", "created", "assigned", "at-pickup", "in-transit"].includes(load.status);
+      console.log(`🔍 Load ${load.number109}: status="${load.status}", isActive=${isActive}`);
+      return isActive;
+    })
+    .sort((a, b) => {
+      // Status priority: in_progress = 1, created = 2, assigned = 3, etc.
+      const statusPriority = {
+        "in_progress": 1,
+        "created": 2, 
+        "assigned": 3,
+        "at-pickup": 4,
+        "in-transit": 5
+      };
+      
+      const aPriority = statusPriority[a.status as keyof typeof statusPriority] || 10;
+      const bPriority = statusPriority[b.status as keyof typeof statusPriority] || 10;
+      
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+      
+      // If same priority, sort by creation time (oldest first)
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+    });
+    
+  const currentLoad = sortedActiveLoads[0] || null;
 
   // Recent completed loads
   const recentLoads = (loads as Load[])
