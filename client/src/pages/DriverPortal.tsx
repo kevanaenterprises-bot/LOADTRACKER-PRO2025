@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import StandaloneBOLUpload from "@/components/StandaloneBOLUpload";
 import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
+import { apiRequest } from "@/lib/queryClient";
 
 interface Load {
   id: string;
@@ -37,17 +38,7 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
   // Update status mutation
   const updateStatusMutation = useMutation({
     mutationFn: async (status: string) => {
-      const response = await fetch(`/api/loads/${load.id}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
-        },
-        credentials: "include",
-        body: JSON.stringify({ status }),
-      });
-      if (!response.ok) throw new Error("Failed to update status");
-      return response.json();
+      return await apiRequest(`/api/loads/${load.id}/status`, "PATCH", { status });
     },
     onSuccess: (data) => {
       // Refresh all driver-related queries
