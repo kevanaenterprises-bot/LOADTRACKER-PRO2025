@@ -260,7 +260,15 @@ export default function DriverPortal() {
             </div>
           </div>
         </div>
-        <div className="flex justify-end mt-3">
+        <div className="flex justify-end gap-2 mt-3">
+          <Button variant="outline" size="sm" onClick={() => {
+            localStorage.clear();
+            sessionStorage.clear();
+            queryClient.clear();
+            window.location.reload();
+          }}>
+            🔄 Force Refresh
+          </Button>
           <Button variant="secondary" size="sm" onClick={handleLogout}>
             <i className="fas fa-sign-out-alt mr-1"></i>
             Logout
