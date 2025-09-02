@@ -142,17 +142,6 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
 
 export default function DriverPortal() {
   const { user, logout, isLoading } = useDriverAuth();
-  
-  // Force redirect if stuck loading too long
-  useEffect(() => {
-    if (isLoading) {
-      const timer = setTimeout(() => {
-        console.log("🚨 Portal stuck loading - redirecting to login");
-        window.location.replace('/driver-login');
-      }, 3000); // 3 second timeout
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);

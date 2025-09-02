@@ -4,16 +4,6 @@ import { useEffect } from "react";
 export function useDriverAuth() {
   const queryClient = useQueryClient();
   
-  // Add timeout for infinite loading issues
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      console.log("🚨 Authentication timeout - forcing redirect to login");
-      window.location.replace('/driver-login');
-    }, 5000); // 5 second timeout
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/driver-user"],
     queryFn: async () => {
@@ -55,10 +45,15 @@ export function useDriverAuth() {
       
       // Check if we need to redirect to login
       if (data.requiresLogin) {
-        console.log("🔀 Driver auth requires login - redirecting immediately");
-        // Use replace to prevent back button issues
-        window.location.replace('/driver-login');
-        return null; // Return null instead of throwing to prevent error state
+        console.log("🔀 Driver auth requires login - redirecting once");
+        // Use a flag to prevent multiple redirects
+        if (!sessionStorage.getItem('driver-redirecting')) {
+          sessionStorage.setItem('driver-redirecting', 'true');
+          setTimeout(() => {
+            window.location.replace('/driver-login');
+          }, 100);
+        }
+        throw new Error("Requires login");
       }
       
       return data;
@@ -88,6 +83,13 @@ export function useDriverAuth() {
     // Redirect to login
     window.location.href = "/driver-login";
   };
+
+  // Clear redirect flag when user is authenticated
+  useEffect(() => {
+    if (user && !error) {
+      sessionStorage.removeItem('driver-redirecting');
+    }
+  }, [user, error]);
 
   return {
     user,

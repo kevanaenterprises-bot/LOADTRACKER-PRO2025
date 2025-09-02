@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,6 +26,10 @@ const driverLoginSchema = z.object({
 type DriverLoginForm = z.infer<typeof driverLoginSchema>;
 
 export default function DriverLogin() {
+  // Clear redirect flag when login page loads
+  useEffect(() => {
+    sessionStorage.removeItem('driver-redirecting');
+  }, []);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
