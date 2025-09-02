@@ -52,31 +52,23 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check endpoint for deployment readiness
-app.get('/api/health', (_req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
-    timestamp: new Date().toISOString(),
-    version: '2.1'
-  });
-});
-
-// Readiness check endpoint (Cloud Run specific)
-app.get('/api/ready', (_req, res) => {
-  res.status(200).json({ 
-    status: 'ready', 
-    timestamp: new Date().toISOString(),
-    version: '2.1'
-  });
-});
-
-// Status endpoint for deployment verification (separate from frontend)
-app.get('/api/status', (_req, res) => {
+// Basic root endpoint for deployment verification
+app.get('/', (_req, res) => {
   res.status(200).json({ 
     status: 'LoadTracker Pro is running', 
     timestamp: new Date().toISOString(),
     version: '2.1'
   });
+});
+
+// Health check endpoint for deployment readiness (use /api/health to avoid conflicts)
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Readiness check endpoint (Cloud Run specific)
+app.get('/api/ready', (_req, res) => {
+  res.status(200).json({ status: 'ready', timestamp: new Date().toISOString() });
 });
 
 (async () => {
@@ -123,11 +115,10 @@ app.get('/api/status', (_req, res) => {
       reusePort: true,
     }, () => {
       console.log(`🎉 LoadTracker Pro is running successfully on port ${port}`);
-      console.log(`📍 Available endpoints:`);
-      console.log(`   - GET / (LoadTracker Pro frontend)`);
+      console.log(`📍 Health check endpoints available:`);
+      console.log(`   - GET / (basic status)`);
       console.log(`   - GET /api/health (health check)`);
       console.log(`   - GET /api/ready (readiness check)`);
-      console.log(`   - GET /api/status (server status)`);
       log(`serving on port ${port}`);
     });
 
