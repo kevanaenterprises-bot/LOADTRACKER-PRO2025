@@ -734,24 +734,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Check driver authentication
   app.get('/api/auth/driver-user', (req, res) => {
-    // Check bypass token first (like admin auth does)
+    // Check session auth FIRST - if there's a valid driver session, use it
+    if ((req.session as any).driverAuth) {
+      console.log("✅ DRIVER SESSION FOUND:", (req.session as any).driverAuth);
+      return res.json((req.session as any).driverAuth);
+    }
+    
+    // Only check bypass token if there's no valid session
     const bypassToken = req.headers['x-bypass-token'];
     
     if (bypassToken === BYPASS_SECRET) {
       // For production compatibility, don't return hardcoded driver data but allow the portal to redirect to login
-      console.log("⚠️ BYPASS TOKEN: Redirecting to driver login for proper authentication");
+      console.log("⚠️ BYPASS TOKEN: No session found, redirecting to driver login for proper authentication");
       return res.status(200).json({ 
         requiresLogin: true, 
         message: "Please log in to access your driver portal" 
       });
     }
 
-    // Check session auth
-    if ((req.session as any).driverAuth) {
-      res.json((req.session as any).driverAuth);
-    } else {
-      res.status(401).json({ message: "Not authenticated" });
-    }
+    // No session and no valid bypass token
+    res.status(401).json({ message: "Not authenticated" });
   });
 
   // Use the BYPASS_SECRET already defined above
