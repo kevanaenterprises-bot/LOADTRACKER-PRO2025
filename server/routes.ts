@@ -45,60 +45,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // BYPASS ENDPOINT: Direct database query for Kevin's loads (bypasses caching)
-  app.get("/api/bypass/kevin-loads", async (req, res) => {
+  
+  // BYPASS: Kevin's loads endpoint (bypasses Vite middleware) 
+  app.get('/working-dashboard-kevin', async (req, res) => {
     try {
-      console.log("🆘 BYPASS: Direct Kevin loads query");
-      const result = await db
-        .select()
-        .from(loads)
-        .where(eq(loads.driverId, 'c52245d5-d278-4438-8580-a7f1c3c01901'))
-        .orderBy(desc(loads.createdAt));
-      
-      console.log("🆘 BYPASS: Raw database result:", JSON.stringify(result, null, 2));
-      
-      const transformedResult = result.map(load => ({
-        id: load.id,
-        number109: load.number109,
-        driverId: load.driverId,
-        locationId: load.locationId || "",
-        estimatedMiles: load.estimatedMiles || 0,
-        specialInstructions: load.specialInstructions || "",
-        status: load.status,
-        bolNumber: load.bolNumber || "",
-        tripNumber: load.tripNumber || "",
-        bolDocumentPath: load.bolDocumentPath || "",
-        podDocumentPath: load.podDocumentPath || "",
-        extraStops: load.extraStops || 0,
-        lumperCharge: load.lumperCharge || "0.00",
-        poNumber: load.poNumber || "",
-        appointmentTime: load.appointmentTime || "",
-        pickupAddress: load.pickupAddress || "",
-        deliveryAddress: load.deliveryAddress || "",
-        companyName: load.companyName || "",
-        createdAt: load.createdAt,
-        updatedAt: load.updatedAt,
-        shipperLatitude: load.shipperLatitude,
-        shipperLongitude: load.shipperLongitude,
-        receiverLatitude: load.receiverLatitude,
-        receiverLongitude: load.receiverLongitude,
-        enRoutePickupAt: load.enRoutePickupAt,
-        atShipperAt: load.atShipperAt,
-        leftShipperAt: load.leftShipperAt,
-        enRouteReceiverAt: load.enRouteReceiverAt,
-        atReceiverAt: load.atReceiverAt,
-        deliveredAt: load.deliveredAt,
-        completedAt: load.completedAt,
-      }));
-
-      console.log("🆘 BYPASS: Returning transformed result:", JSON.stringify(transformedResult, null, 2));
-      res.json(transformedResult);
+      console.log("🔥 BYPASS: Direct loads query for Kevin");
+      const result = await storage.getLoadsByDriver('605889a6-d87b-46c4-880a-7e058ad');
+      console.log("🔥 BYPASS: Storage result:", JSON.stringify(result, null, 2));
+      res.json(result);
     } catch (error) {
-      console.error("🆘 BYPASS ERROR:", error);
-      res.status(500).json({ error: "Bypass query failed" });
+      console.error("🔥 BYPASS ERROR:", error);
+      res.status(500).json({ error: "Kevin loads bypass failed" });
     }
   });
-  
+
+  // BYPASS: Load status update (bypasses Vite middleware)
+  app.patch('/api/kevin-status-bypass/:loadId', async (req, res) => {
+    try {
+      console.log("🔥 STATUS BYPASS: Update load", req.params.loadId, "to", req.body.status);
+      const result = await storage.updateLoadStatus(req.params.loadId, req.body.status);
+      console.log("🔥 STATUS BYPASS: Success:", result);
+      res.json(result);
+    } catch (error) {
+      console.error("🔥 STATUS BYPASS ERROR:", error);
+      res.status(500).json({ error: "Status update bypass failed" });
+    }
+  });
+
   // API route for working dashboard (bypasses Vite middleware)
   app.get('/api/working-dashboard', (req, res) => {
     res.send(`
