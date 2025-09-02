@@ -10,6 +10,30 @@ if (accountSid && authToken) {
   twilioClient = twilio(accountSid, authToken);
 }
 
+// Normalize phone number for SMS sending
+function normalizePhoneNumber(phoneNumber: string): string {
+  // Remove all non-digit characters
+  const digits = phoneNumber.replace(/\D/g, '');
+  
+  // If it's 10 digits, assume it's US and add +1
+  if (digits.length === 10) {
+    return `+1${digits}`;
+  }
+  
+  // If it's 11 digits and starts with 1, add +
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return `+${digits}`;
+  }
+  
+  // If it already has +, return as is
+  if (phoneNumber.startsWith('+')) {
+    return phoneNumber;
+  }
+  
+  // Default: assume it needs +1
+  return `+1${digits}`;
+}
+
 export async function sendSMSToDriver(toNumber: string, message: string): Promise<void> {
   if (!twilioClient) {
     console.warn("SMS service not configured. Message:", message);
@@ -21,15 +45,38 @@ export async function sendSMSToDriver(toNumber: string, message: string): Promis
     return;
   }
 
+  // Normalize the phone number
+  const normalizedNumber = normalizePhoneNumber(toNumber);
+
+  // Enhanced logging for debugging
+  console.log(`🚀 SMS SEND ATTEMPT:`, {
+    originalNumber: toNumber,
+    normalizedNumber: normalizedNumber,
+    from: fromNumber,
+    messageLength: message.length,
+    hasClient: !!twilioClient
+  });
+
   try {
     const result = await twilioClient.messages.create({
       body: message,
       from: fromNumber,
-      to: toNumber,
+      to: normalizedNumber,
     });
-    console.log(`SMS sent successfully: ${result.sid}`);
+    console.log(`✅ SMS sent successfully: ${result.sid}`, {
+      to: normalizedNumber,
+      status: result.status,
+      direction: result.direction
+    });
   } catch (error) {
-    console.error("Failed to send SMS:", error);
+    console.error("❌ Failed to send SMS:", {
+      error: error.message,
+      code: error.code,
+      moreInfo: error.moreInfo,
+      originalNumber: toNumber,
+      normalizedNumber: normalizedNumber,
+      from: fromNumber
+    });
     throw error;
   }
 }
