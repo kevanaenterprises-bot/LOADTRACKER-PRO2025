@@ -52,8 +52,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Basic root endpoint for deployment verification
-app.get('/', (_req, res) => {
+// API status endpoint for deployment verification (moved from root to avoid frontend conflicts)
+app.get('/api/status', (_req, res) => {
   res.status(200).json({ 
     status: 'LoadTracker Pro is running', 
     timestamp: new Date().toISOString(),
@@ -61,7 +61,7 @@ app.get('/', (_req, res) => {
   });
 });
 
-// Health check endpoint for deployment readiness (use /api/health to avoid conflicts)
+// Health check endpoint for deployment readiness
 app.get('/api/health', (_req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -116,7 +116,7 @@ app.get('/api/ready', (_req, res) => {
     }, () => {
       console.log(`🎉 LoadTracker Pro is running successfully on port ${port}`);
       console.log(`📍 Health check endpoints available:`);
-      console.log(`   - GET / (basic status)`);
+      console.log(`   - GET /api/status (basic status)`);
       console.log(`   - GET /api/health (health check)`);
       console.log(`   - GET /api/ready (readiness check)`);
       log(`serving on port ${port}`);
