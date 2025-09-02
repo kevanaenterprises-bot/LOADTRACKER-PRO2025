@@ -2325,17 +2325,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Generate PDF attachments
-      console.log("🔍 Generating PDF attachments...");
+      console.log("🔍 Generating combined invoice+POD PDF...");
       const attachments = [];
       
-      // Generate invoice PDF
-      const invoiceHTML = generateCombinedRateConInvoiceHTML(invoice, load);
-      const invoicePDF = await generatePDF(invoiceHTML);
-      attachments.push({
-        filename: `Invoice-${invoice.invoiceNumber}.pdf`,
-        content: invoicePDF,
-        contentType: 'application/pdf'
-      });
+      // Generate combined invoice with POD embedded
+      let combinedHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+      let podImages: Array<{content: Buffer, type: string}> = [];
       
       // Handle POD documents - Attach ONLY the actual uploaded files
       console.log(`🔍 EMAIL DEBUG: Checking POD for load ${primaryLoadNumber}`);
@@ -2411,7 +2406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               console.log(`📄 Final POD URL: "http://localhost:5000${podUrl}"`);
               
-              // Use direct object storage access instead of HTTP fetch to avoid auth issues
+              // Use direct object storage access to get POD for embedding
               try {
                 const { ObjectStorageService } = await import('./objectStorage');
                 const objectStorageService = new ObjectStorageService();
@@ -2423,38 +2418,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 
                 console.log(`📄 POD file metadata: size=${metadata.size}, type=${contentType}`);
                 
-                // Download file content as buffer
+                // Download file content as buffer for embedding
                 const [fileBuffer] = await objectFile.download();
                 
-                console.log(`📄 POD file downloaded: ${fileBuffer.length} bytes`);
+                console.log(`📄 POD file downloaded for embedding: ${fileBuffer.length} bytes`);
                 
-                attachments.push({
-                  filename: `POD-${primaryLoadNumber}.${getFileExtension(contentType)}`,
+                // Store POD for embedding in combined PDF
+                podImages.push({
                   content: fileBuffer,
-                  contentType: contentType
+                  type: contentType
                 });
-                console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}.${getFileExtension(contentType)} (${fileBuffer.length} bytes)`);
+                
+                console.log(`✅ POD prepared for embedding in combined PDF: ${fileBuffer.length} bytes`);
                 
               } catch (storageError) {
                 console.error(`❌ Failed to download POD document ${load.podDocumentPath} from object storage:`, storageError);
-                // Fallback to HTTP fetch as backup
-                console.log(`📄 Trying fallback HTTP fetch for POD...`);
-                const response = await fetch(`http://localhost:5000${podUrl}`, {
-                  headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
-                });
-                
-                if (response.ok) {
-                  const fileBuffer = Buffer.from(await response.arrayBuffer());
-                  const contentType = response.headers.get('content-type') || 'application/pdf';
-                  
-                  attachments.push({
-                    filename: `POD-${primaryLoadNumber}.${getFileExtension(contentType)}`,
-                    content: fileBuffer,
-                    contentType: contentType
+                console.log(`📄 Trying fallback HTTP fetch for POD embedding...`);
+                try {
+                  const response = await fetch(`http://localhost:5000${podUrl}`, {
+                    headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
                   });
-                  console.log(`✅ Attached POD file via fallback: POD-${primaryLoadNumber}.${getFileExtension(contentType)} (${fileBuffer.length} bytes)`);
-                } else {
-                  console.error(`❌ Fallback HTTP fetch also failed: ${response.status} - ${await response.text()}`);
+                  
+                  if (response.ok) {
+                    const fileBuffer = Buffer.from(await response.arrayBuffer());
+                    const contentType = response.headers.get('content-type') || 'application/pdf';
+                    
+                    podImages.push({
+                      content: fileBuffer,
+                      type: contentType
+                    });
+                    console.log(`✅ POD prepared for embedding via fallback: ${fileBuffer.length} bytes`);
+                  } else {
+                    console.error(`❌ Fallback HTTP fetch failed: ${response.status} - ${await response.text()}`);
+                  }
+                } catch (fetchError) {
+                  console.error(`❌ Fallback fetch error:`, fetchError);
                 }
               }
             } catch (error) {
@@ -2463,8 +2461,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       } else {
-        console.log(`⚠️  No POD document uploaded for load ${primaryLoadNumber} - skipping POD attachment`);
+        console.log(`⚠️  No POD document uploaded for load ${primaryLoadNumber} - creating invoice-only PDF`);
       }
+      
+      // Embed POD images into the invoice HTML if available
+      if (podImages.length > 0) {
+        console.log(`🔗 Embedding ${podImages.length} POD image(s) into invoice...`);
+        const podSectionHTML = generatePODSectionHTML(podImages, primaryLoadNumber);
+        combinedHTML = combinedHTML.replace('</body>', `${podSectionHTML}</body>`);
+        console.log(`✅ POD images embedded into combined invoice`);
+      }
+      
+      // Generate single combined PDF
+      console.log(`📄 Generating combined PDF with invoice + ${podImages.length} POD image(s)...`);
+      const combinedPDF = await generatePDF(combinedHTML);
+      attachments.push({
+        filename: `Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf`,
+        content: combinedPDF,
+        contentType: 'application/pdf'
+      });
+      console.log(`✅ Generated combined PDF: Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf`);
 
       // Handle BOL documents - Attach ONLY the actual uploaded files (same logic as POD)
       if (load.bolDocumentPath) {
