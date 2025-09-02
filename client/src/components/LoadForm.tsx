@@ -48,6 +48,12 @@ export default function LoadForm() {
       estimatedMiles: 0,
       specialInstructions: "",
       status: "created",
+      // Financial fields with defaults
+      flatRate: "0.00",
+      lumperCharge: "0.00", 
+      extraStops: 0,
+      // Driver confirmation fields
+      driverConfirmed: false,
     },
   });
 
