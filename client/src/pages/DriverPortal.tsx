@@ -42,7 +42,7 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
     },
     onSuccess: (data) => {
       // Refresh all driver-related queries
-      queryClient.invalidateQueries({ queryKey: ['/api/driver/loads'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
       queryClient.invalidateQueries({ queryKey: [`/api/loads`] });
       
       // Show clear success message
