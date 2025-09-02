@@ -2392,26 +2392,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Single POD document - fetch the actual file
             try {
               console.log(`📄 Fetching single uploaded POD document for load ${primaryLoadNumber}`);
-              // Build the correct object path - it should already be in the format "uploads/uuid"  
-              const podUrl = load.podDocumentPath.startsWith('/objects/') ? load.podDocumentPath : `/objects/${load.podDocumentPath}`;
+              console.log(`📄 Original POD path: "${load.podDocumentPath}"`);
+              
+              // Build the correct object path - handle different formats
+              let podUrl;
+              if (load.podDocumentPath.startsWith('/objects/')) {
+                podUrl = load.podDocumentPath;
+              } else if (load.podDocumentPath.startsWith('uploads/')) {
+                podUrl = `/objects/${load.podDocumentPath}`;
+              } else {
+                podUrl = `/objects/uploads/${load.podDocumentPath}`;
+              }
+              
+              console.log(`📄 Final POD URL: "http://localhost:5000${podUrl}"`);
               
               // Fetch the actual file directly  
               const response = await fetch(`http://localhost:5000${podUrl}`, {
                 headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
               });
               
+              console.log(`📄 POD fetch response: HTTP ${response.status} ${response.statusText}`);
+              console.log(`📄 POD response headers:`, Object.fromEntries(response.headers.entries()));
+              
               if (response.ok) {
                 const fileBuffer = Buffer.from(await response.arrayBuffer());
                 const contentType = response.headers.get('content-type') || 'application/pdf';
+                
+                console.log(`📄 POD file size: ${fileBuffer.length} bytes, content-type: ${contentType}`);
                 
                 attachments.push({
                   filename: `POD-${primaryLoadNumber}.${getFileExtension(contentType)}`,
                   content: fileBuffer,
                   contentType: contentType
                 });
-                console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}.${getFileExtension(contentType)}`);
+                console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}.${getFileExtension(contentType)} (${fileBuffer.length} bytes)`);
               } else {
-                console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}: HTTP ${response.status} - ${await response.text()}`);
+                const errorText = await response.text();
+                console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}:`);
+                console.error(`   HTTP ${response.status} - ${response.statusText}`);
+                console.error(`   Response body: ${errorText}`);
+                console.error(`   Attempted URL: http://localhost:5000${podUrl}`);
               }
             } catch (error) {
               console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}:`, error);
