@@ -56,7 +56,7 @@ export function useDriverAuth() {
     refetchInterval: false,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 0, // Don't cache authentication failures
+    gcTime: 0, // Don't cache authentication failures
   });
 
   const logout = async () => {

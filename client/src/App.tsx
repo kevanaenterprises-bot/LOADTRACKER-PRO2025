@@ -118,19 +118,9 @@ function Router() {
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
       
-      {/* Admin/Office routes - Check admin auth OR Replit auth (but not drivers) */}
-      {adminAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role !== "driver") ? (
-        <>
-          <Route path="/" component={Dashboard} />
-          <Route path="/dashboard" component={Dashboard} />
-        </>
-      ) : (
-        <>
-          {/* Landing page with options for both admin and Replit login */}
-          <Route path="/" component={Landing} />
-          <Route path="/dashboard" component={Landing} />
-        </>
-      )}
+      {/* Landing page by default */}
+      <Route path="/" component={Landing} />
+      <Route path="/dashboard" component={Dashboard} />
       
       <Route component={NotFound} />
     </Switch>
