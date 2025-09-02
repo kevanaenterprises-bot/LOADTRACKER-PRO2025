@@ -52,43 +52,91 @@ app.use((req, res, next) => {
   next();
 });
 
+// Basic root endpoint for deployment verification
+app.get('/', (_req, res) => {
+  res.status(200).json({ 
+    status: 'LoadTracker Pro is running', 
+    timestamp: new Date().toISOString(),
+    version: '2.1'
+  });
+});
+
 // Health check endpoint for deployment readiness (use /api/health to avoid conflicts)
 app.get('/api/health', (_req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-(async () => {
-  try {
-    const server = await registerRoutes(app);
+// Readiness check endpoint (Cloud Run specific)
+app.get('/api/ready', (_req, res) => {
+  res.status(200).json({ status: 'ready', timestamp: new Date().toISOString() });
+});
 
+(async () => {
+  console.log('🚀 Starting LoadTracker Pro server...');
+  
+  try {
+    // Explicit PORT environment variable handling with validation
+    const portEnv = process.env.PORT;
+    const port = parseInt(portEnv || '5000', 10);
+    
+    if (isNaN(port) || port < 1 || port > 65535) {
+      throw new Error(`Invalid PORT value: ${portEnv}. PORT must be a valid number between 1 and 65535.`);
+    }
+    
+    console.log(`🔧 Configuration: PORT=${port}, HOST=0.0.0.0`);
+    console.log(`🔧 Environment: NODE_ENV=${process.env.NODE_ENV || 'development'}`);
+    
+    // Register routes with enhanced error handling
+    console.log('📝 Registering application routes...');
+    const server = await registerRoutes(app);
+    console.log('✅ Routes registered successfully');
+
+    // Global error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
 
       // Log the error but don't throw it to prevent crashes
-      console.error('Express error handler:', err);
+      console.error('❌ Express error handler:', err);
       res.status(status).json({ message });
     });
 
-  // Static serving restored - testing storage fixes
-  serveStatic(app);
+    // Static serving restored - testing storage fixes
+    console.log('📁 Setting up static file serving...');
+    serveStatic(app);
+    console.log('✅ Static file serving configured');
 
-    // ALWAYS serve the app on the port specified in the environment variable PORT
-    // Other ports are firewalled. Default to 5000 if not specified.
-    // this serves both the API and the client.
-    // It is the only port that is not firewalled.
-    const port = parseInt(process.env.PORT || '5000', 10);
+    // Start the server with enhanced logging
+    console.log(`🌐 Starting HTTP server on 0.0.0.0:${port}...`);
     
     server.listen({
       port,
       host: "0.0.0.0",
       reusePort: true,
     }, () => {
+      console.log(`🎉 LoadTracker Pro is running successfully on port ${port}`);
+      console.log(`📍 Health check endpoints available:`);
+      console.log(`   - GET / (basic status)`);
+      console.log(`   - GET /api/health (health check)`);
+      console.log(`   - GET /api/ready (readiness check)`);
       log(`serving on port ${port}`);
+    });
+
+    // Handle server startup errors
+    server.on('error', (error: any) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${port} is already in use. Please check if another process is running on this port.`);
+      } else if (error.code === 'EACCES') {
+        console.error(`❌ Permission denied to bind to port ${port}. Try running with elevated privileges or use a port > 1024.`);
+      } else {
+        console.error(`❌ Server error:`, error);
+      }
+      process.exit(1);
     });
     
   } catch (error) {
-    console.error('Server startup error:', error);
+    console.error('💥 Server startup failed:', error);
+    console.error('Stack trace:', error instanceof Error ? error.stack : error);
     process.exit(1);
   }
 })();
