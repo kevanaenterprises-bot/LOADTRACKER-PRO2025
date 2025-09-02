@@ -1,7 +1,18 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export function useDriverAuth() {
   const queryClient = useQueryClient();
+  
+  // Add timeout for infinite loading issues
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      console.log("🚨 Authentication timeout - forcing redirect to login");
+      window.location.replace('/driver-login');
+    }, 5000); // 5 second timeout
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/driver-user"],
@@ -44,9 +55,10 @@ export function useDriverAuth() {
       
       // Check if we need to redirect to login
       if (data.requiresLogin) {
-        console.log("🔀 Driver auth requires login - redirecting");
-        window.location.href = '/driver-login';
-        throw new Error("Redirecting to login");
+        console.log("🔀 Driver auth requires login - redirecting immediately");
+        // Use replace to prevent back button issues
+        window.location.replace('/driver-login');
+        return null; // Return null instead of throwing to prevent error state
       }
       
       return data;
@@ -55,6 +67,7 @@ export function useDriverAuth() {
     refetchInterval: false,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 0, // Don't cache authentication failures
   });
 
   const logout = async () => {
