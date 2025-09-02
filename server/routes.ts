@@ -1647,7 +1647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       let loads;
-      if (user?.role === "driver") {
+      if (user?.role === "driver" && userId) {
         console.log(`🔥 DRIVER MODE: Getting loads for driver ${userId}`);
         loads = await storage.getLoadsByDriver(userId);
       } else {
