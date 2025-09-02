@@ -1695,6 +1695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
   // SMS webhook endpoint for driver confirmations
   app.post("/api/sms/webhook", async (req, res) => {
     try {
