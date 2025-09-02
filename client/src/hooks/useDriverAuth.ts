@@ -36,11 +36,12 @@ export function useDriverAuth() {
       console.log("✅ Driver authenticated:", data);
       return data;
     },
-    retry: false,
+    retry: 1, // Retry once in case of race condition
     refetchInterval: false,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 0, // Don't cache authentication failures
+    retryDelay: 1000, // Wait 1 second before retry
   });
 
   const logout = async () => {

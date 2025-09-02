@@ -143,12 +143,30 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
 export default function DriverPortal() {
   const { user, logout, isLoading, isAuthenticated } = useDriverAuth();
   
-  // Only redirect if we're sure authentication failed (not just loading)
-  if (!isAuthenticated && !isLoading && user === undefined) {
-    console.log("🔀 Portal: Authentication failed, redirecting to login");
-    window.location.href = '/driver-login';
-    return null;
-  }
+  // Give authentication more time before redirecting (handle race conditions)
+  const [redirectTimer, setRedirectTimer] = useState<NodeJS.Timeout | null>(null);
+  
+  useEffect(() => {
+    if (!isAuthenticated && !isLoading && user === undefined && !redirectTimer) {
+      console.log("🔀 Portal: Authentication may have failed, waiting 2 seconds before redirect...");
+      const timer = setTimeout(() => {
+        console.log("🔀 Portal: Authentication definitely failed, redirecting to login");
+        window.location.href = '/driver-login';
+      }, 2000);
+      setRedirectTimer(timer);
+    } else if (isAuthenticated && redirectTimer) {
+      // Authentication succeeded, cancel redirect
+      console.log("✅ Portal: Authentication succeeded, canceling redirect");
+      clearTimeout(redirectTimer);
+      setRedirectTimer(null);
+    }
+    
+    return () => {
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+      }
+    };
+  }, [isAuthenticated, isLoading, user, redirectTimer]);
   
   // Show loading while authentication is being checked
   if (isLoading || !user) {
