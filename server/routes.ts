@@ -2406,19 +2406,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               console.log(`📄 Final POD URL: "http://localhost:5000${podUrl}"`);
               
-              // Fetch the actual file directly  
-              const response = await fetch(`http://localhost:5000${podUrl}`, {
-                headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
-              });
-              
-              console.log(`📄 POD fetch response: HTTP ${response.status} ${response.statusText}`);
-              console.log(`📄 POD response headers:`, Object.fromEntries(response.headers.entries()));
-              
-              if (response.ok) {
-                const fileBuffer = Buffer.from(await response.arrayBuffer());
-                const contentType = response.headers.get('content-type') || 'application/pdf';
+              // Use direct object storage access instead of HTTP fetch to avoid auth issues
+              try {
+                const { ObjectStorageService } = await import('./objectStorage');
+                const objectStorageService = new ObjectStorageService();
                 
-                console.log(`📄 POD file size: ${fileBuffer.length} bytes, content-type: ${contentType}`);
+                // Get the file directly from object storage
+                const objectFile = await objectStorageService.getObjectEntityFile(podUrl);
+                const [metadata] = await objectFile.getMetadata();
+                const contentType = metadata.contentType || 'application/pdf';
+                
+                console.log(`📄 POD file metadata: size=${metadata.size}, type=${contentType}`);
+                
+                // Download file content as buffer
+                const [fileBuffer] = await objectFile.download();
+                
+                console.log(`📄 POD file downloaded: ${fileBuffer.length} bytes`);
                 
                 attachments.push({
                   filename: `POD-${primaryLoadNumber}.${getFileExtension(contentType)}`,
@@ -2426,12 +2429,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   contentType: contentType
                 });
                 console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}.${getFileExtension(contentType)} (${fileBuffer.length} bytes)`);
-              } else {
-                const errorText = await response.text();
-                console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}:`);
-                console.error(`   HTTP ${response.status} - ${response.statusText}`);
-                console.error(`   Response body: ${errorText}`);
-                console.error(`   Attempted URL: http://localhost:5000${podUrl}`);
+                
+              } catch (storageError) {
+                console.error(`❌ Failed to download POD document ${load.podDocumentPath} from object storage:`, storageError);
+                // Fallback to HTTP fetch as backup
+                console.log(`📄 Trying fallback HTTP fetch for POD...`);
+                const response = await fetch(`http://localhost:5000${podUrl}`, {
+                  headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
+                });
+                
+                if (response.ok) {
+                  const fileBuffer = Buffer.from(await response.arrayBuffer());
+                  const contentType = response.headers.get('content-type') || 'application/pdf';
+                  
+                  attachments.push({
+                    filename: `POD-${primaryLoadNumber}.${getFileExtension(contentType)}`,
+                    content: fileBuffer,
+                    contentType: contentType
+                  });
+                  console.log(`✅ Attached POD file via fallback: POD-${primaryLoadNumber}.${getFileExtension(contentType)} (${fileBuffer.length} bytes)`);
+                } else {
+                  console.error(`❌ Fallback HTTP fetch also failed: ${response.status} - ${await response.text()}`);
+                }
               }
             } catch (error) {
               console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}:`, error);
