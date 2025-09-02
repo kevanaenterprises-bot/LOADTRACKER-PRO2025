@@ -51,13 +51,42 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
       bcc: bcc.length > 0 ? bcc.join(', ') : undefined,
       subject,
       html,
-      attachments: attachments.length > 0 ? attachments : undefined,
+      // Force HTML mode - do not include text version to prevent plain text fallback
+      text: undefined,
+      // Ensure multipart encoding for attachments
+      encoding: 'utf8',
+      headers: {
+        'Content-Type': 'text/html; charset=UTF-8',
+        'MIME-Version': '1.0'
+      },
+      attachments: attachments.length > 0 ? attachments.map(att => ({
+        filename: att.filename,
+        content: att.content,
+        contentType: att.contentType,
+        encoding: 'base64',
+        cid: att.filename.replace(/[^a-zA-Z0-9]/g, '_') // Clean CID for inline attachments
+      })) : undefined,
     };
+
+    // Debug email composition before sending
+    console.log(`📧 Email composition debug:`);
+    console.log(`  - To: ${to}`);
+    console.log(`  - Subject: ${subject}`);
+    console.log(`  - HTML length: ${html.length} characters`);
+    console.log(`  - Attachments: ${attachments.length}`);
+    if (attachments.length > 0) {
+      attachments.forEach((att, index) => {
+        console.log(`    ${index + 1}. ${att.filename} (${att.content.length} bytes, ${att.contentType})`);
+      });
+    }
+    console.log(`  - Headers:`, mailOptions.headers);
+    console.log(`  - Force HTML mode: text=${mailOptions.text}, encoding=${mailOptions.encoding}`);
 
     const result = await transporter.sendMail(mailOptions);
     
     console.log(`✅ Email sent successfully to ${to}, CC: ${ccList.join(', ')}`);
     console.log(`Message ID: ${result.messageId}`);
+    console.log(`📧 Email sent with ${mailOptions.attachments?.length || 0} attachments in HTML mode`);
     
     return {
       success: true,
