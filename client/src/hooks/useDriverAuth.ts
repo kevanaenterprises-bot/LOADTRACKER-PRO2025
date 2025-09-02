@@ -70,10 +70,14 @@ export function useDriverAuth() {
     }
   }, [user, error]);
 
-  return {
+  const authResult = {
     user,
     isLoading,
     isAuthenticated: !!user && !error,
     logout,
   };
+  
+  console.log("🔍 AUTH HOOK RESULT:", authResult);
+  
+  return authResult;
 }
