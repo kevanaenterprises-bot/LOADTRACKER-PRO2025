@@ -738,15 +738,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const bypassToken = req.headers['x-bypass-token'];
     
     if (bypassToken === BYPASS_SECRET) {
-      // Return Kevin's driver data for bypass auth
-      return res.json({
-        id: "605889a6-d87b-46c4-880a-7e058ad87802",
-        username: "K Owen",
-        firstName: "Kevin ",
-        lastName: "Owen ",
-        role: "driver",
-        phoneNumber: "9038037500"
-      });
+      // Bypass should not return hardcoded driver data - this breaks multi-driver support
+      console.log("⚠️ BYPASS TOKEN DETECTED: Should only be used for admin access, not driver portals");
+      return res.status(401).json({ message: "Driver authentication required - bypass not supported for driver portals" });
     }
 
     // Check session auth
@@ -1630,25 +1624,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     console.log("🔥 API LOADS HANDLER CALLED!");
     try {
-      // KEVIN BYPASS FIX: Check bypass token first to force driver mode
+      // Authentication flow - respect actual logged-in driver
       let userId: string | undefined;
       let user: any = null;
       
-      if (isBypassActive(req)) {
-        userId = "605889a6-d87b-46c4-880a-7e058ad87802"; // Kevin's ID
+      // Check for admin authentication first
+      if ((req.session as any)?.adminAuth) {
+        console.log("🔥 ADMIN SESSION DETECTED");
+        user = { role: "admin" };
+      } 
+      // Check for driver authentication
+      else if ((req.session as any)?.driverAuth) {
+        userId = (req.session as any).driverAuth.id;
         user = await storage.getUser(userId);
-        console.log(`🔥 BYPASS ACTIVE: Using Kevin's driver ID ${userId}, user:`, user);
-      } else {
-        // Normal authentication flow
+        console.log(`🔥 DRIVER SESSION: Using driver ID ${userId}`, { 
+          firstName: user?.firstName, 
+          lastName: user?.lastName,
+          username: user?.username 
+        });
+      }
+      // Check Replit authentication
+      else if (req.user) {
         userId = (req.user as any)?.claims?.sub;
         user = userId ? await storage.getUser(userId) : null;
-        
-        // If no Replit user, check for driver authentication
-        if (!user && (req.session as any)?.driverAuth) {
-          userId = (req.session as any).driverAuth.id;
-          user = await storage.getUser(userId);
-          console.log(`🔥 USING DRIVER AUTH: ${userId}, user:`, user);
-        }
+        console.log(`🔥 REPLIT AUTH: ${userId}`);
+      }
+      // Bypass only if no other authentication (for testing only)
+      else if (isBypassActive(req)) {
+        console.log("🔥 BYPASS ACTIVE: No session auth detected, using admin mode");
+        user = { role: "admin" };
       }
       
       let loads;
