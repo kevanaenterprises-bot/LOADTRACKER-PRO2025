@@ -4078,8 +4078,12 @@ function generateInvoiceOnlyHTML(invoice: any, load: any): string {
       <div class="invoice-details">
         <div>
           <div class="invoice-number">INVOICE ${invoice.invoiceNumber}</div>
-          <div>Date: ${currentDate}</div>
-          <div>Load: ${load.number109 || 'N/A'}</div>
+          <div style="margin-top: 10px;">Date: ${currentDate}</div>
+        </div>
+        <div style="text-align: right;">
+          <div><strong>109 Number:</strong> ${load.number109 || 'N/A'}</div>
+          <div><strong>374 Number:</strong> ${load.bolNumber || 'N/A'}</div>
+          <div><strong>Trip Number:</strong> ${load.tripNumber || 'N/A'}</div>
         </div>
       </div>
 
@@ -4094,7 +4098,9 @@ function generateInvoiceOnlyHTML(invoice: any, load: any): string {
         </thead>
         <tbody>
           <tr>
-            <td>Transportation Service - Load ${load.number109 || 'N/A'}</td>
+            <td>Transportation Service<br>
+                <small>109: ${load.number109 || 'N/A'} | 374: ${load.bolNumber || 'N/A'} | Trip: ${load.tripNumber || 'N/A'}</small>
+            </td>
             <td>${load.location?.city || 'N/A'}</td>
             <td>${load.location?.city || 'N/A'}</td>
             <td>$${invoice.totalAmount}</td>
