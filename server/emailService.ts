@@ -11,13 +11,19 @@ const createTransporter = () => {
   });
   
   return nodemailer.createTransport({
-    service: 'outlook', // Use service instead of manual config
+    host: 'smtp-mail.outlook.com',
+    port: 587,
+    secure: false, // Will upgrade to TLS
     auth: {
       user: process.env.OUTLOOK_EMAIL,
       pass: process.env.OUTLOOK_PASSWORD,
     },
     tls: {
       rejectUnauthorized: false
+    },
+    // Force HTML email composition
+    defaults: {
+      encoding: 'utf8'
     },
     debug: true, // Enable debug logging
     logger: true // Enable logger
@@ -51,20 +57,20 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
       bcc: bcc.length > 0 ? bcc.join(', ') : undefined,
       subject,
       html,
-      // Force HTML mode - do not include text version to prevent plain text fallback
-      text: undefined,
-      // Ensure multipart encoding for attachments
-      encoding: 'utf8',
-      headers: {
-        'Content-Type': 'text/html; charset=UTF-8',
-        'MIME-Version': '1.0'
-      },
+      // Critical: Explicitly exclude text version to force HTML-only mode
+      // This prevents email clients from choosing plain text over HTML
+      alternatives: [
+        {
+          contentType: 'text/html; charset=utf-8',
+          content: html
+        }
+      ],
       attachments: attachments.length > 0 ? attachments.map(att => ({
         filename: att.filename,
         content: att.content,
         contentType: att.contentType,
         encoding: 'base64',
-        cid: att.filename.replace(/[^a-zA-Z0-9]/g, '_') // Clean CID for inline attachments
+        disposition: 'attachment'
       })) : undefined,
     };
 
