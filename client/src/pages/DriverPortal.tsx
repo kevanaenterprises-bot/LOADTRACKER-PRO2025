@@ -143,11 +143,28 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
 export default function DriverPortal() {
   const { user, logout, isLoading, isAuthenticated } = useDriverAuth();
   
-  // If not authenticated and not loading, redirect to login
-  if (!isAuthenticated && !isLoading) {
-    console.log("🔀 Portal: Not authenticated, redirecting to login");
+  // Only redirect if we're sure authentication failed (not just loading)
+  if (!isAuthenticated && !isLoading && user === undefined) {
+    console.log("🔀 Portal: Authentication failed, redirecting to login");
     window.location.href = '/driver-login';
     return null;
+  }
+  
+  // Show loading while authentication is being checked
+  if (isLoading || !user) {
+    return (
+      <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
+        <div className="p-4">
+          <div className="bg-white rounded-lg shadow-material p-6 mb-6">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <h3 className="text-lg font-semibold text-secondary mb-2">Loading Your Portal...</h3>
+              <p className="text-gray-600">Verifying your authentication.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
   const queryClient = useQueryClient();
   const { toast } = useToast();

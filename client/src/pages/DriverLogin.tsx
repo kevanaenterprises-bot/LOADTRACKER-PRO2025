@@ -65,9 +65,14 @@ export default function DriverLogin() {
         title: "Login Successful",
         description: "Welcome to the driver portal!",
       });
+      // Clear any redirect flags
+      sessionStorage.removeItem('driver-redirecting');
+      // Invalidate auth cache and wait a moment before redirect
       queryClient.invalidateQueries({ queryKey: ["/api/auth/driver-user"] });
-      // Force reload to refresh authentication state
-      window.location.href = "/driver-portal";
+      // Small delay to ensure session is established
+      setTimeout(() => {
+        window.location.href = "/driver-portal";
+      }, 500);
     },
     onError: (error: any) => {
       toast({
