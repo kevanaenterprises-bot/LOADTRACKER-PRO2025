@@ -143,23 +143,35 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
 export default function DriverPortal() {
   const { user, logout, isLoading, isAuthenticated, error } = useDriverAuth();
   
-  // TEMPORARY: Disable all automatic redirects to debug the issue
   console.log("🔍 PORTAL STATE DEBUG:");
   console.log("- user:", user);
   console.log("- isLoading:", isLoading);
   console.log("- isAuthenticated:", isAuthenticated);
-  console.log("- typeof user:", typeof user);
-  console.log("- user === undefined:", user === undefined);
-  console.log("- user === null:", user === null);
+  console.log("- error:", error);
   
-  // Handle authentication errors properly
+  // Handle authentication errors with immediate redirect
   if (!isLoading && error) {
     console.log("🚨 Authentication error detected, redirecting to login");
-    window.location.href = "/driver-login";
-    return null;
+    // Use a flag to prevent multiple redirects
+    if (!sessionStorage.getItem('driver-redirecting')) {
+      sessionStorage.setItem('driver-redirecting', 'true');
+      window.location.href = "/driver-login";
+    }
+    return (
+      <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
+        <div className="p-4">
+          <div className="bg-white rounded-lg shadow-material p-6">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-red-600">Redirecting to Login</h3>
+              <p className="text-gray-600">Please wait while we redirect you to the login page.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
   
-  // Show loading while authentication is being checked (only during initial load)
+  // Show loading while authentication is being checked
   if (isLoading) {
     return (
       <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
@@ -179,8 +191,23 @@ export default function DriverPortal() {
   // If we get here and user is still not available, redirect to login
   if (!user || !isAuthenticated) {
     console.log("🚨 No authenticated user found, redirecting to login");
-    window.location.href = "/driver-login";
-    return null;
+    // Use a flag to prevent multiple redirects
+    if (!sessionStorage.getItem('driver-redirecting')) {
+      sessionStorage.setItem('driver-redirecting', 'true');
+      window.location.href = "/driver-login";
+    }
+    return (
+      <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
+        <div className="p-4">
+          <div className="bg-white rounded-lg shadow-material p-6">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-red-600">Redirecting to Login</h3>
+              <p className="text-gray-600">Please wait while we redirect you to the login page.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   console.log("✅ AUTHENTICATION SUCCESS: User is authenticated", user);

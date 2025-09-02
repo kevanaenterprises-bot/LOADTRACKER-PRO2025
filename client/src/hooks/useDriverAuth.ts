@@ -33,6 +33,12 @@ export function useDriverAuth() {
         throw new Error("Requires login");
       }
       
+      // Make sure we have the essential user data
+      if (!data.id && !data.userId) {
+        console.log("❌ Missing user ID in response");
+        throw new Error("Invalid user data");
+      }
+      
       console.log("✅ Driver authenticated:", data);
       return data;
     },

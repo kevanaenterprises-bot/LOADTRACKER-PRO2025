@@ -638,12 +638,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid username or password" });
       }
 
-      // Create session for driver
+      // Create session for driver with complete user data
       (req.session as any).driverAuth = {
         userId: driver.id,
         username: driver.username,
-        role: driver.role
+        role: driver.role,
+        firstName: driver.firstName,
+        lastName: driver.lastName
       };
+
+      // Force save session to ensure persistence
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+        } else {
+          console.log("✅ Driver session saved successfully");
+        }
+      });
 
       res.json({ 
         message: "Login successful",
@@ -702,12 +713,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid username or password" });
       }
 
-      // Create session for driver
+      // Create session for driver with complete user data
       (req.session as any).driverAuth = {
         userId: driver.id,
         username: driver.username,
-        role: driver.role
+        role: driver.role,
+        firstName: driver.firstName,
+        lastName: driver.lastName
       };
+
+      // Force save session to ensure persistence
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+        } else {
+          console.log("✅ Driver session saved successfully");
+        }
+      });
 
       res.json({ 
         message: "Login successful",
@@ -737,7 +759,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Check session auth FIRST - if there's a valid driver session, use it
     if ((req.session as any).driverAuth) {
       console.log("✅ DRIVER SESSION FOUND:", (req.session as any).driverAuth);
-      return res.json((req.session as any).driverAuth);
+      const driverData = (req.session as any).driverAuth;
+      
+      // Return full driver information including firstName and lastName
+      return res.json({
+        id: driverData.userId,
+        username: driverData.username,
+        role: driverData.role,
+        firstName: driverData.firstName || driverData.username, // Fallback to username
+        lastName: driverData.lastName || "",
+      });
     }
     
     // Only check bypass token if there's no valid session
@@ -746,9 +777,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (bypassToken === BYPASS_SECRET) {
       // For production compatibility, don't return hardcoded driver data but allow the portal to redirect to login
       console.log("⚠️ BYPASS TOKEN: No session found, redirecting to driver login for proper authentication");
-      return res.status(200).json({ 
-        requiresLogin: true, 
-        message: "Please log in to access your driver portal" 
+      return res.status(401).json({ 
+        message: "Not authenticated - please log in" 
       });
     }
 
