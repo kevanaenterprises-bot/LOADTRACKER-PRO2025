@@ -379,11 +379,40 @@ export default function InvoiceInbox() {
                     <Button
                       size="sm"
                       onClick={() => {
-                        // Here you could add email functionality using the preview
-                        toast({
-                          title: "Email Feature",
-                          description: "Email functionality coming soon - this preview shows what would be sent",
-                        });
+                        const email = prompt("Enter email address to send complete package:");
+                        if (email && previewInvoice) {
+                          // Use the existing email API endpoint
+                          fetch(`/api/invoices/${previewInvoice.id}/email-complete-package`, {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025'
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify({ 
+                              emailAddress: email,
+                              loadId: previewInvoice.loadId 
+                            })
+                          })
+                          .then(response => response.json())
+                          .then(data => {
+                            if (data.message && data.message.includes('successfully')) {
+                              toast({
+                                title: "✅ Email Sent!",
+                                description: `Complete package sent to ${email}`,
+                              });
+                            } else {
+                              throw new Error(data.message || 'Failed to send email');
+                            }
+                          })
+                          .catch(error => {
+                            toast({
+                              title: "❌ Email Failed",
+                              description: error.message || "Failed to send email",
+                              variant: "destructive"
+                            });
+                          });
+                        }
                       }}
                     >
                       <FileText className="h-4 w-4 mr-1" />
