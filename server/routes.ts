@@ -2305,7 +2305,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const primaryLoadNumber = load.number109 || 'Unknown';
       const subject = `Complete Package - Load ${primaryLoadNumber} - Invoice ${invoice.invoiceNumber}`;
       
-      let emailHTML = generateCompletePackageEmailHTML(invoice, load, availableDocuments);
+      // Simple email - no cover page, just attachment notification
+      let emailHTML = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #2d5aa0;">GO 4 Farms & Cattle</h2>
+          <p>Please find attached the invoice and POD for Load ${primaryLoadNumber}.</p>
+          <p>Invoice Number: ${invoice.invoiceNumber}</p>
+          <p>Amount: $${invoice.totalAmount}</p>
+          <p>Thank you for your business!</p>
+        </div>
+      `;
       
       // Send actual email using Outlook SMTP
       console.log("🔍 Attempting to send email to:", emailAddress);
@@ -2328,8 +2337,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("🔍 Generating combined invoice+POD PDF...");
       const attachments = [];
       
-      // Generate combined invoice with POD embedded
-      let combinedHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+      // Generate INVOICE ONLY (no rate con) with POD embedded  
+      let combinedHTML = generateInvoiceOnlyHTML(invoice, load);
       let podImages: Array<{content: Buffer, type: string}> = [];
       
       // Handle POD documents - Attach ONLY the actual uploaded files
@@ -3920,6 +3929,172 @@ function getFileExtension(contentType?: string): string {
   };
   
   return mimeToExt[contentType.toLowerCase()] || 'pdf';
+}
+
+// Generate invoice-only HTML (no rate confirmation)
+function generateInvoiceOnlyHTML(invoice: any, load: any): string {
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Invoice ${invoice.invoiceNumber}</title>
+      <style>
+        @media print {
+          body { margin: 0; }
+          .no-print { display: none; }
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          line-height: 1.4;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-bottom: 2px solid #333;
+          padding-bottom: 20px;
+          margin-bottom: 30px;
+          gap: 20px;
+        }
+        .company-info-section {
+          text-align: center;
+        }
+        .company-name {
+          font-size: 28px;
+          font-weight: bold;
+          color: #2d5aa0;
+          margin-bottom: 5px;
+        }
+        .company-info {
+          font-size: 14px;
+          color: #666;
+        }
+        .invoice-details {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+        }
+        .invoice-number {
+          font-size: 24px;
+          font-weight: bold;
+          color: #333;
+        }
+        .details-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 30px;
+        }
+        .details-table th,
+        .details-table td {
+          border: 1px solid #ddd;
+          padding: 12px;
+          text-align: left;
+        }
+        .details-table th {
+          background-color: #f5f5f5;
+          font-weight: bold;
+        }
+        .total-section {
+          margin-top: 30px;
+          text-align: right;
+        }
+        .total-amount {
+          font-size: 20px;
+          font-weight: bold;
+          color: #2d5aa0;
+        }
+        .footer {
+          margin-top: 50px;
+          padding-top: 20px;
+          border-top: 1px solid #ddd;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="company-info-section">
+          <div class="company-name">GO 4 Farms & Cattle</div>
+          <div class="company-info">
+            1510 Crystal Valley Way<br>
+            Melissa, TX 75454<br>
+            Phone: 214-878-1230<br>
+            Email: accounting@go4fc.com
+          </div>
+        </div>
+      </div>
+
+      <div class="invoice-details">
+        <div>
+          <div class="invoice-number">INVOICE ${invoice.invoiceNumber}</div>
+          <div>Date: ${currentDate}</div>
+          <div>Load: ${load.number109 || 'N/A'}</div>
+        </div>
+      </div>
+
+      <table class="details-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Transportation Service - Load ${load.number109 || 'N/A'}</td>
+            <td>${load.location?.city || 'N/A'}</td>
+            <td>${load.location?.city || 'N/A'}</td>
+            <td>$${invoice.totalAmount}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="total-section">
+        <div class="total-amount">Total Amount Due: $${invoice.totalAmount}</div>
+        <div style="margin-top: 10px; font-size: 14px;">Payment Terms: Net 30 Days</div>
+      </div>
+
+      <div class="footer">
+        <div>Thank you for your business!</div>
+        <div>For questions about this shipment, please contact us at billing@go4farms.com or (214) 878-1230</div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+// Generate HTML section for POD images to embed in invoice
+function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}>, loadNumber: string): string {
+  const podImagesHTML = podImages.map((pod, index) => {
+    // Convert image buffer to base64 data URL
+    const base64Data = pod.content.toString('base64');
+    const dataUrl = `data:${pod.type};base64,${base64Data}`;
+    
+    return `
+      <div style="page-break-before: always; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+          <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
+          <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
+        </div>
+        <div style="text-align: center;">
+          <img src="${dataUrl}" style="max-width: 100%; height: auto; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return podImagesHTML;
 }
 
 // POD template generation removed - only actual uploaded POD files are used for email attachments
