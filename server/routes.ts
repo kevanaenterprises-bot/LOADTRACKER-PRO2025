@@ -1625,22 +1625,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     console.log("🔥 API LOADS HANDLER CALLED!");
     try {
-      // KEVIN FIX: Handle different authentication methods
-      let userId = (req.user as any)?.claims?.sub;
-      let user = userId ? await storage.getUser(userId) : null;
+      // KEVIN BYPASS FIX: Check bypass token first to force driver mode
+      let userId: string | undefined;
+      let user: any = null;
       
-      // If no Replit user, check for driver authentication
-      if (!user && (req.session as any)?.driverAuth) {
-        userId = (req.session as any).driverAuth.id;
-        user = await storage.getUser(userId);
-        console.log(`🔥 USING DRIVER AUTH: ${userId}, user:`, user);
-      }
-      
-      // BYPASS: For Kevin's specific ID during testing
-      if (!user && isBypassActive(req)) {
+      if (isBypassActive(req)) {
         userId = "605889a6-d87b-46c4-880a-7e058ad87802"; // Kevin's ID
         user = await storage.getUser(userId);
-        console.log(`🔥 USING BYPASS FOR KEVIN: ${userId}, user:`, user);
+        console.log(`🔥 BYPASS ACTIVE: Using Kevin's driver ID ${userId}, user:`, user);
+      } else {
+        // Normal authentication flow
+        userId = (req.user as any)?.claims?.sub;
+        user = userId ? await storage.getUser(userId) : null;
+        
+        // If no Replit user, check for driver authentication
+        if (!user && (req.session as any)?.driverAuth) {
+          userId = (req.session as any).driverAuth.id;
+          user = await storage.getUser(userId);
+          console.log(`🔥 USING DRIVER AUTH: ${userId}, user:`, user);
+        }
       }
       
       let loads;
