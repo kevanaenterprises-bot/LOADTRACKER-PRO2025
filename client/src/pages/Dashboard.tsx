@@ -34,8 +34,9 @@ const driverSchema = z.object({
 
 const locationSchema = z.object({
   name: z.string().min(1, "Location name is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(2, "State is required").max(2, "Use 2-letter state code"),
+  address: z.string().optional(), // Optional for future geo-fencing
+  city: z.string().optional(), // Optional for future geo-fencing  
+  state: z.string().optional(), // Optional for future geo-fencing
   flatRate: z.string().min(1, "Rate is required"),
 });
 
@@ -115,6 +116,7 @@ export default function Dashboard() {
     resolver: zodResolver(locationSchema),
     defaultValues: {
       name: "",
+      address: "",
       city: "",
       state: "",
       flatRate: "",
@@ -568,10 +570,23 @@ export default function Dashboard() {
                           />
                           <FormField
                             control={locationForm.control}
+                            name="address"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Address (Optional - for future geo-fencing)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="123 Industrial Blvd" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={locationForm.control}
                             name="city"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>City</FormLabel>
+                                <FormLabel>City (Optional - for future geo-fencing)</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Miami" {...field} />
                                 </FormControl>
@@ -584,7 +599,7 @@ export default function Dashboard() {
                               name="state"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>State</FormLabel>
+                                  <FormLabel>State (Optional - for future geo-fencing)</FormLabel>
                                   <FormControl>
                                     <Input placeholder="FL" {...field} />
                                   </FormControl>

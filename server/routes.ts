@@ -1673,6 +1673,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SMS webhook endpoint for driver confirmations
+  app.post("/api/sms/webhook", async (req, res) => {
+    try {
+      const { From: phoneNumber, Body: messageBody } = req.body;
+      
+      if (!phoneNumber || !messageBody) {
+        return res.status(400).send("Missing phone number or message body");
+      }
+      
+      const response = messageBody.trim().toLowerCase();
+      console.log(`📱 SMS received from ${phoneNumber}: "${messageBody}"`);
+      
+      if (response === 'yes' || response === 'y') {
+        // Find driver by phone number
+        const driver = await storage.getUserByPhoneNumber(phoneNumber);
+        if (!driver) {
+          console.log(`❌ No driver found for phone number ${phoneNumber}`);
+          return res.status(200).send("Phone number not found in system");
+        }
+        
+        // Find their most recent assigned but unconfirmed load
+        const loads = await storage.getLoadsByDriver(driver.id);
+        const unconfirmedLoad = loads.find(load => 
+          load.driverId === driver.id && 
+          !load.driverConfirmed &&
+          load.status === 'created'
+        );
+        
+        if (unconfirmedLoad) {
+          // Mark load as confirmed
+          await storage.updateLoad(unconfirmedLoad.id, {
+            driverConfirmed: true,
+            driverConfirmedAt: new Date(),
+          });
+          
+          console.log(`✅ Driver ${driver.firstName} ${driver.lastName} confirmed load ${unconfirmedLoad.number109}`);
+          
+          // Send confirmation SMS
+          await sendSMSToDriver(
+            phoneNumber,
+            `✅ CONFIRMED! Load ${unconfirmedLoad.number109} confirmed. Safe travels!`
+          );
+        } else {
+          console.log(`❌ No unconfirmed loads found for driver ${driver.id}`);
+          await sendSMSToDriver(
+            phoneNumber,
+            "No pending loads found to confirm."
+          );
+        }
+      } else if (response === 'no' || response === 'n') {
+        // Handle decline - unassign driver from load
+        const driver = await storage.getUserByPhoneNumber(phoneNumber);
+        if (driver) {
+          const loads = await storage.getLoadsByDriver(driver.id);
+          const unconfirmedLoad = loads.find(load => 
+            load.driverId === driver.id && 
+            !load.driverConfirmed &&
+            load.status === 'created'
+          );
+          
+          if (unconfirmedLoad) {
+            // Unassign driver
+            await storage.updateLoad(unconfirmedLoad.id, { driverId: null });
+            console.log(`❌ Driver ${driver.firstName} ${driver.lastName} declined load ${unconfirmedLoad.number109}`);
+            
+            await sendSMSToDriver(
+              phoneNumber,
+              `Load ${unconfirmedLoad.number109} declined. The load has been unassigned.`
+            );
+          }
+        }
+      }
+      
+      res.status(200).send("OK");
+    } catch (error) {
+      console.error("SMS webhook error:", error);
+      res.status(500).send("Error processing SMS");
+    }
+  });
+
   // Get load by number - FOR STANDALONE BOL UPLOAD
   app.get("/api/loads/by-number/:number", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
@@ -1855,7 +1935,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (driver?.phoneNumber) {
             await sendSMSToDriver(
               driver.phoneNumber,
-              `New load assigned: ${validatedData.number109}. Pickup: 1800 East Plano Parkway. Delivery: ${location?.name || 'See details'}. Est. miles: ${validatedData.estimatedMiles || 'TBD'}`
+              `NEW LOAD ASSIGNED - ${new Date().toLocaleDateString()}
+Load: ${validatedData.number109}
+Destination: ${location?.name || 'See load details'}
+${location?.city ? `City: ${location.city}` : ''}
+
+Reply YES to confirm acceptance or NO to decline.`
             );
           }
         } catch (smsError) {
@@ -2006,7 +2091,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const location = load.location;
           await sendSMSToDriver(
             driver.phoneNumber,
-            `New load assigned: ${load.number109}. Pickup: 1800 East Plano Parkway. Delivery: ${location?.name || 'See details'}. Est. miles: ${load.estimatedMiles || 'TBD'}`
+            `NEW LOAD ASSIGNED - ${new Date().toLocaleDateString()}
+Load: ${load.number109}
+Destination: ${location?.name || (load.companyName || 'See load details')}
+${location?.city ? `City: ${location.city}` : ''}
+
+Reply YES to confirm acceptance or NO to decline.`
           );
         }
       } catch (smsError) {
@@ -2137,7 +2227,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const location = load.location;
           await sendSMSToDriver(
             driver.phoneNumber,
-            `New load assigned: ${load.number109}. Pickup: 1800 East Plano Parkway. Delivery: ${location?.name || 'See details'}. Est. miles: ${load.estimatedMiles || 'TBD'}`
+            `NEW LOAD ASSIGNED - ${new Date().toLocaleDateString()}
+Load: ${load.number109}
+Destination: ${location?.name || (load.companyName || 'See load details')}
+${location?.city ? `City: ${location.city}` : ''}
+
+Reply YES to confirm acceptance or NO to decline.`
           );
         }
       } catch (smsError) {

@@ -44,9 +44,9 @@ export const users = pgTable("users", {
 export const locations = pgTable("locations", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
-  address: text("address"), // Optional
-  city: varchar("city").notNull(),
-  state: varchar("state").notNull(),
+  address: text("address"), // Optional - for future geo-fencing
+  city: varchar("city"), // Optional - for future geo-fencing
+  state: varchar("state"), // Optional - for future geo-fencing
   contactName: varchar("contact_name"),
   contactPhone: varchar("contact_phone"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -79,6 +79,9 @@ export const loads = pgTable("loads", {
   // Basic timestamps for manual status tracking
   deliveredAt: timestamp("delivered_at"),
   completedAt: timestamp("completed_at"),
+  // Driver confirmation tracking
+  driverConfirmed: boolean("driver_confirmed").default(false),
+  driverConfirmedAt: timestamp("driver_confirmed_at"),
 });
 
 // BOL tracking table for duplicate prevention
