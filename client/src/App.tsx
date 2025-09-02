@@ -128,13 +128,9 @@ function Router() {
       {/* Simple driver test - always accessible */}
       <Route path="/simple-test" component={SimpleDriverTest} />
       
-      {/* Driver portal - for authenticated drivers OR office users accessing it */}
-      {(driverAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role === "office") || adminAuth.isAuthenticated) && (
-        <>
-          <Route path="/driver-portal" component={DriverPortal} />
-          <Route path="/driver" component={DriverPortal} />
-        </>
-      )}
+      {/* Driver portal - always available for production access */}
+      <Route path="/driver-portal" component={DriverPortal} />
+      <Route path="/driver" component={DriverPortal} />
       
       {/* Admin/Office routes - Check admin auth OR Replit auth (but not drivers) */}
       {adminAuth.isAuthenticated || (officeAuth.isAuthenticated && officeAuth.user?.role !== "driver") ? (
