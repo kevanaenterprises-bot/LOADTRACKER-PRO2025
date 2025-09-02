@@ -149,30 +149,9 @@ export default function DriverPortal() {
   console.log("- isAuthenticated:", isAuthenticated);
   console.log("- error:", error);
   
-  // Handle authentication errors with immediate redirect
-  if (!isLoading && error) {
-    console.log("🚨 Authentication error detected, redirecting to login");
-    // Use a flag to prevent multiple redirects
-    if (!sessionStorage.getItem('driver-redirecting')) {
-      sessionStorage.setItem('driver-redirecting', 'true');
-      window.location.href = "/driver-login";
-    }
-    return (
-      <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
-        <div className="p-4">
-          <div className="bg-white rounded-lg shadow-material p-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-red-600">Redirecting to Login</h3>
-              <p className="text-gray-600">Please wait while we redirect you to the login page.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
-  // Show loading while authentication is being checked
+  // SIMPLIFIED: Show loading only during initial authentication check
   if (isLoading) {
+    console.log("🔄 Still loading authentication...");
     return (
       <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
         <div className="p-4">
@@ -188,14 +167,23 @@ export default function DriverPortal() {
     );
   }
   
-  // If we get here and user is still not available, redirect to login
-  if (!user || !isAuthenticated) {
-    console.log("🚨 No authenticated user found, redirecting to login");
-    // Use a flag to prevent multiple redirects
+  // SIMPLIFIED: If not loading and we have an authenticated user, show portal
+  if (isAuthenticated && user) {
+    console.log("✅ AUTHENTICATION SUCCESS: User is authenticated", user);
+    // Continue to portal rendering below
+  } else {
+    // SIMPLIFIED: Any other case (error, no user, etc.) redirect to login
+    console.log("🚨 Not authenticated, redirecting to login");
+    console.log("🚨 Auth state:", { isAuthenticated, user: !!user, error: !!error });
+    
+    // Only redirect if not already redirecting
     if (!sessionStorage.getItem('driver-redirecting')) {
       sessionStorage.setItem('driver-redirecting', 'true');
-      window.location.href = "/driver-login";
+      setTimeout(() => {
+        window.location.href = "/driver-login";
+      }, 100);
     }
+    
     return (
       <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
         <div className="p-4">
@@ -209,8 +197,6 @@ export default function DriverPortal() {
       </div>
     );
   }
-  
-  console.log("✅ AUTHENTICATION SUCCESS: User is authenticated", user);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);

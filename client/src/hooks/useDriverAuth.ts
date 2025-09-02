@@ -9,7 +9,7 @@ export function useDriverAuth() {
     queryFn: async () => {
       console.log("🔍 Driver auth: Checking authentication...");
 
-      // For driver auth, check session FIRST before trying bypass token
+      // Check session with cookies
       const response = await fetch("/api/auth/driver-user", {
         credentials: "include",
         headers: {
@@ -27,12 +27,6 @@ export function useDriverAuth() {
       const data = await response.json();
       console.log("🔍 Driver auth data:", data);
       
-      // Check if we need to redirect to login
-      if (data.requiresLogin) {
-        console.log("🔀 Driver auth requires login");
-        throw new Error("Requires login");
-      }
-      
       // Make sure we have the essential user data
       if (!data.id && !data.userId) {
         console.log("❌ Missing user ID in response");
@@ -42,12 +36,11 @@ export function useDriverAuth() {
       console.log("✅ Driver authenticated:", data);
       return data;
     },
-    retry: 1, // Retry once in case of race condition
+    retry: false, // Don't retry to avoid confusion
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 2, // 2 minutes
     gcTime: 0, // Don't cache authentication failures
-    retryDelay: 1000, // Wait 1 second before retry
   });
 
   const logout = async () => {

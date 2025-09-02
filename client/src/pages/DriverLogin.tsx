@@ -26,10 +26,13 @@ const driverLoginSchema = z.object({
 type DriverLoginForm = z.infer<typeof driverLoginSchema>;
 
 export default function DriverLogin() {
-  // Clear redirect flag when login page loads
+  // Clear redirect flag when login page loads and clear any auth cache
   useEffect(() => {
     sessionStorage.removeItem('driver-redirecting');
-  }, []);
+    // Clear authentication cache when login page loads to ensure fresh login
+    queryClient.removeQueries({ queryKey: ["/api/auth/driver-user"] });
+    console.log("🔄 Driver login page loaded, cleared redirect flag and auth cache");
+  }, [queryClient]);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
