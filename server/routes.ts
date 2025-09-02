@@ -1633,6 +1633,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!user && (req.session as any)?.driverAuth) {
         userId = (req.session as any).driverAuth.id;
         user = await storage.getUser(userId);
+        console.log(`🔥 USING DRIVER AUTH: ${userId}, user:`, user);
+      }
+      
+      // BYPASS: For Kevin's specific ID during testing
+      if (!user && isBypassActive(req)) {
+        userId = "605889a6-d87b-46c4-880a-7e058ad87802"; // Kevin's ID
+        user = await storage.getUser(userId);
+        console.log(`🔥 USING BYPASS FOR KEVIN: ${userId}, user:`, user);
       }
       
       let loads;
