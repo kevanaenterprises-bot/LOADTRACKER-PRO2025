@@ -1581,35 +1581,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(401).json({ message: "Authentication required" });
     }
   }, async (req, res) => {
-    // KEVIN TEST: Return hardcoded data to verify route works
-    const driverId = req.params.driverId;
-    
-    if (driverId === "605889a6-d87b-46c4-880a-7e058ad87802") {
-      // Return Kevin's 2 loads from database as hardcoded data
-      res.json([
-        {
-          id: "49ea5719-a316-4e97-bf00-f1fe3348d56f",
-          number109: "109-test1",
-          driverId: "605889a6-d87b-46c4-880a-7e058ad87802",
-          status: "in_progress",
-          bolNumber: null,
-          driver: { firstName: "Kevin", lastName: "Owen" },
-          location: null,
-          invoice: null
-        },
-        {
-          id: "682348a4-43a3-4f7c-be47-3daf49996006", 
-          number109: "109-PROD001",
-          driverId: "605889a6-d87b-46c4-880a-7e058ad87802",
-          status: "in_progress",
-          bolNumber: null,
-          driver: { firstName: "Kevin", lastName: "Owen" },
-          location: null,
-          invoice: null
-        }
-      ]);
-    } else {
-      res.json([]);
+    try {
+      const driverId = req.params.driverId;
+      console.log(`🔍 Getting loads for driver: ${driverId}`);
+      
+      const storage = new Storage();
+      const loads = await storage.getLoadsByDriver(driverId);
+      
+      console.log(`📦 Found ${loads.length} actual loads for driver ${driverId}`);
+      res.json(loads);
+    } catch (error) {
+      console.error("Error fetching driver loads:", error);
+      res.status(500).json({ error: "Failed to fetch driver loads" });
     }
   });
 
