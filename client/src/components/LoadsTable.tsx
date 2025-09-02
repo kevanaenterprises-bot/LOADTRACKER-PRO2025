@@ -175,13 +175,13 @@ export default function LoadsTable() {
       
       // Force complete cache reset and refetch
       queryClient.resetQueries({ queryKey: ["/api/loads"] });
-      queryClient.resetQueries({ queryKey: [`/api/drivers/${data.driverId}/loads`] });
+      queryClient.resetQueries({ queryKey: [`/api/loads`] });
       queryClient.resetQueries({ queryKey: ["/api/drivers/available"] });
       queryClient.resetQueries({ queryKey: ["/api/dashboard/stats"] });
       
       // Also invalidate for good measure
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
-      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${data.driverId}/loads`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/loads`] });
       queryClient.invalidateQueries({ queryKey: ["/api/drivers/available"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       

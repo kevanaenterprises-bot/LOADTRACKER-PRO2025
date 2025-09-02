@@ -222,8 +222,10 @@ export default function DriverPortal() {
         return aPriority - bPriority;
       }
       
-      // If same priority, sort by creation time (oldest first)
-      return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+      // If same priority, sort by creation time (oldest first)  
+      const aTime = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const bTime = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return aTime - bTime;
     });
     
   const currentLoad = sortedActiveLoads[0] || null;
