@@ -141,7 +141,14 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
 };
 
 export default function DriverPortal() {
-  const { user, logout, isLoading } = useDriverAuth();
+  const { user, logout, isLoading, isAuthenticated } = useDriverAuth();
+  
+  // If not authenticated and not loading, redirect to login
+  if (!isAuthenticated && !isLoading) {
+    console.log("🔀 Portal: Not authenticated, redirecting to login");
+    window.location.href = '/driver-login';
+    return null;
+  }
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);

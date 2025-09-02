@@ -37,22 +37,8 @@ import QuickLogin from "@/pages/QuickLogin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const officeAuth = useAuth();
-  const driverAuth = useDriverAuth();
-  const adminAuth = useAdminAuth();
-
-  const isLoading = officeAuth.isLoading || driverAuth.isLoading || adminAuth.isLoading;
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // Remove the authentication loading checks to prevent infinite loops
+  // Each protected route will handle its own authentication
 
   return (
     <Switch>
