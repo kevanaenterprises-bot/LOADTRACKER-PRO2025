@@ -70,6 +70,15 @@ app.get('/api/ready', (_req, res) => {
   });
 });
 
+// Status endpoint for deployment verification (separate from frontend)
+app.get('/api/status', (_req, res) => {
+  res.status(200).json({ 
+    status: 'LoadTracker Pro is running', 
+    timestamp: new Date().toISOString(),
+    version: '2.1'
+  });
+});
+
 (async () => {
   console.log('🚀 Starting LoadTracker Pro server...');
   
@@ -118,6 +127,7 @@ app.get('/api/ready', (_req, res) => {
       console.log(`   - GET / (LoadTracker Pro frontend)`);
       console.log(`   - GET /api/health (health check)`);
       console.log(`   - GET /api/ready (readiness check)`);
+      console.log(`   - GET /api/status (server status)`);
       log(`serving on port ${port}`);
     });
 
