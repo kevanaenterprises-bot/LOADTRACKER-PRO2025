@@ -74,6 +74,7 @@ export function useDriverAuth() {
     user,
     isLoading,
     isAuthenticated: !!user && !error,
+    error,
     logout,
   };
   

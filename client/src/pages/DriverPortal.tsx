@@ -141,7 +141,7 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
 };
 
 export default function DriverPortal() {
-  const { user, logout, isLoading, isAuthenticated } = useDriverAuth();
+  const { user, logout, isLoading, isAuthenticated, error } = useDriverAuth();
   
   // TEMPORARY: Disable all automatic redirects to debug the issue
   console.log("🔍 PORTAL STATE DEBUG:");
@@ -152,15 +152,15 @@ export default function DriverPortal() {
   console.log("- user === undefined:", user === undefined);
   console.log("- user === null:", user === null);
   
-  // Show what we would do but don't actually redirect yet
-  if (!isAuthenticated && !isLoading && user === undefined) {
-    console.log("🚨 WOULD REDIRECT: Authentication failed");
-  } else if (isAuthenticated) {
-    console.log("✅ AUTHENTICATION SUCCESS: User is authenticated");
+  // Handle authentication errors properly
+  if (!isLoading && error) {
+    console.log("🚨 Authentication error detected, redirecting to login");
+    window.location.href = "/driver-login";
+    return null;
   }
   
-  // Show loading while authentication is being checked
-  if (isLoading || !user) {
+  // Show loading while authentication is being checked (only during initial load)
+  if (isLoading) {
     return (
       <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
         <div className="p-4">
@@ -175,6 +175,15 @@ export default function DriverPortal() {
       </div>
     );
   }
+  
+  // If we get here and user is still not available, redirect to login
+  if (!user || !isAuthenticated) {
+    console.log("🚨 No authenticated user found, redirecting to login");
+    window.location.href = "/driver-login";
+    return null;
+  }
+  
+  console.log("✅ AUTHENTICATION SUCCESS: User is authenticated", user);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);
