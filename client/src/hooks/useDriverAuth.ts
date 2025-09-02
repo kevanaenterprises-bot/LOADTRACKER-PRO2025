@@ -35,10 +35,21 @@ export function useDriverAuth() {
         credentials: "include",
         headers,
       });
+      
       if (!response.ok) {
         throw new Error("Not authenticated");
       }
-      return response.json();
+      
+      const data = await response.json();
+      
+      // Check if we need to redirect to login
+      if (data.requiresLogin) {
+        console.log("🔀 Driver auth requires login - redirecting");
+        window.location.href = '/driver-login';
+        throw new Error("Redirecting to login");
+      }
+      
+      return data;
     },
     retry: false,
     refetchInterval: false,
