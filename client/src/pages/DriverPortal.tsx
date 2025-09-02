@@ -43,7 +43,7 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
     onSuccess: (data) => {
       // Refresh all driver-related queries
       queryClient.invalidateQueries({ queryKey: ['/api/driver/loads'] });
-      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${load.driverId}/loads`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/loads`] });
       
       // Show clear success message
       toast({ 
@@ -151,14 +151,9 @@ export default function DriverPortal() {
 
   // Get driver's loads with bypass token support
   const { data: loads = [], refetch } = useQuery({
-    queryKey: [`/api/drivers/${user?.id}/loads`],
+    queryKey: [`/api/loads`],
     queryFn: async () => {
-      if (!user?.id) {
-        console.log("🚫 No user ID available for driver loads");
-        return [];
-      }
-      
-      console.log(`🔄 Fetching loads for driver: ${user.id}`);
+      console.log(`🔄 Fetching loads for authenticated driver`);
       
       let bypassToken = localStorage.getItem('bypass-token');
       const headers: any = {};
@@ -166,7 +161,7 @@ export default function DriverPortal() {
         headers['X-Bypass-Token'] = bypassToken;
       }
 
-      const response = await fetch(`/api/drivers/${user.id}/loads`, {
+      const response = await fetch(`/api/loads`, {
         credentials: "include",
         headers,
       });
@@ -376,7 +371,7 @@ export default function DriverPortal() {
                     description: "POD photo uploaded successfully!",
                   });
                   // Use correct query key that matches the main query  
-                  queryClient.invalidateQueries({ queryKey: [`/api/drivers/${user?.id}/loads`] });
+                  queryClient.invalidateQueries({ queryKey: [`/api/loads`] });
                   setSelectedLoadForBOL(null);
                 }}
               />

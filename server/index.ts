@@ -70,7 +70,7 @@ app.get('/api/health', (_req, res) => {
       res.status(status).json({ message });
     });
 
-  // Static serving restored - API routes are now working
+  // Static serving restored - testing storage fixes
   serveStatic(app);
 
     // ALWAYS serve the app on the port specified in the environment variable PORT

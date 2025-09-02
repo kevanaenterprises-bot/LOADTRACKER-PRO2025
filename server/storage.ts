@@ -377,75 +377,40 @@ export class DatabaseStorage implements IStorage {
 
 
   async getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]> {
-    console.log(`🗄️ STORAGE: getLoadsByDriver called with driverId: "${driverId}"`);
-    console.log(`🗄️ Driver ID type: ${typeof driverId}, length: ${driverId?.length}`);
+    console.log(`🎯 KEVIN DEBUG: getLoadsByDriver called with "${driverId}"`);
     
-    // Try simple Drizzle ORM first with extensive debugging
-    console.log(`🗄️ DRIZZLE: Attempting ORM query...`);
-    const loadsResult = await db
-      .select()
-      .from(loads)
-      .where(eq(loads.driverId, driverId))
-      .orderBy(desc(loads.createdAt));
-
-    console.log(`🗄️ DRIZZLE RESULT: Found ${loadsResult?.length || 0} loads`);
-    console.log(`🗄️ DRIZZLE DATA:`, JSON.stringify(loadsResult?.slice(0, 2), null, 2));
-
-    // If Drizzle ORM works, use it. If not, fall back to manual approach
-    if (loadsResult && loadsResult.length > 0) {
-      console.log(`🗄️ DRIZZLE: SUCCESS! Using ORM results`);
+    try {
+      // First, let's check if there are ANY loads at all
+      const allLoads = await db.select().from(loads).limit(5);
+      console.log(`🎯 TOTAL LOADS IN DB: ${allLoads.length}`);
       
-      // Get related data for each load
-      const resultWithDetails: LoadWithDetails[] = [];
+      // Now try the driver-specific query
+      const result = await db
+        .select({
+          load: loads,
+          driver: users,
+          location: locations,
+          invoice: invoices,
+        })
+        .from(loads)
+        .leftJoin(users, eq(loads.driverId, users.id))
+        .leftJoin(locations, eq(loads.locationId, locations.id))
+        .leftJoin(invoices, eq(loads.id, invoices.loadId))
+        .where(eq(loads.driverId, driverId))
+        .orderBy(desc(loads.createdAt));
+
+      console.log(`🎯 KEVIN RESULT: Found ${result.length} loads for driver ${driverId}`);
       
-      for (const load of loadsResult) {
-        // Get driver details
-        let driver = undefined;
-        if (load.driverId) {
-          const [driverResult] = await db
-            .select()
-            .from(users)
-            .where(eq(users.id, load.driverId))
-            .limit(1);
-          driver = driverResult;
-        }
-
-        // Get location details
-        let location = undefined;
-        if (load.locationId) {
-          const [locationResult] = await db
-            .select()
-            .from(locations)
-            .where(eq(locations.id, load.locationId))
-            .limit(1);
-          location = locationResult;
-        }
-
-        // Get invoice details
-        let invoice = undefined;
-        const [invoiceResult] = await db
-          .select()
-          .from(invoices)
-          .where(eq(invoices.loadId, load.id))
-          .limit(1);
-        if (invoiceResult) {
-          invoice = invoiceResult;
-        }
-
-        resultWithDetails.push({
-          ...load,
-          driver,
-          location,
-          invoice,
-        });
-      }
-      
-      console.log(`🗄️ FINAL RESULT: Returning ${resultWithDetails?.length || 0} loads with details from DRIZZLE`);
-      return resultWithDetails;
+      return result.map(row => ({
+        ...row.load,
+        driver: row.driver || undefined,
+        location: row.location || undefined,
+        invoice: row.invoice || undefined,
+      }));
+    } catch (error) {
+      console.error("🎯 ERROR in getLoadsByDriver:", error);
+      return [];
     }
-    
-    console.log(`🗄️ DRIZZLE: ORM query failed, returning empty array`);
-    return [];
   }
 
   async getLoadsWithTracking(): Promise<LoadWithDetails[]> {
