@@ -444,54 +444,8 @@ export class DatabaseStorage implements IStorage {
       return resultWithDetails;
     }
     
-    console.log(`🗄️ DRIZZLE: Failed, falling back to manual query...`);
-    
-    // Fallback: Just return basic load objects we know exist
-    const manualLoads = [
-      {
-        id: "682348a4-43a3-4f7c-be47-3daf49996006",
-        number109: "109-PROD001",
-        driverId: driverId,
-        locationId: "",
-        estimatedMiles: 0,
-        specialInstructions: "",
-        status: "created",
-        bolNumber: "",
-        tripNumber: "",
-        bolDocumentPath: "",
-        podDocumentPath: "",
-        extraStops: 0,
-        lumperCharge: "0.00",
-        poNumber: "",
-        appointmentTime: "",
-        pickupAddress: "",
-        deliveryAddress: "",
-        companyName: "",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        shipperLatitude: null,
-        shipperLongitude: null,
-        receiverLatitude: null,
-        receiverLongitude: null,
-        enRoutePickupAt: null,
-        atShipperAt: null,
-        leftShipperAt: null,
-        enRouteReceiverAt: null,
-        atReceiverAt: null,
-        deliveredAt: null,
-        completedAt: null,
-      }
-    ];
-    
-    const fallbackResults = manualLoads.map(load => ({
-      ...load,
-      driver: undefined,
-      location: undefined,
-      invoice: undefined,
-    }));
-    
-    console.log(`🗄️ FINAL RESULT: Returning ${fallbackResults.length} loads with MANUAL FALLBACK`);
-    return fallbackResults;
+    console.log(`🗄️ DRIZZLE: ORM query failed, returning empty array`);
+    return [];
   }
 
   async getLoadsWithTracking(): Promise<LoadWithDetails[]> {
