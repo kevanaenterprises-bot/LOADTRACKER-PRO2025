@@ -45,14 +45,8 @@ export function useDriverAuth() {
       
       // Check if we need to redirect to login
       if (data.requiresLogin) {
-        console.log("🔀 Driver auth requires login - redirecting once");
-        // Use a flag to prevent multiple redirects
-        if (!sessionStorage.getItem('driver-redirecting')) {
-          sessionStorage.setItem('driver-redirecting', 'true');
-          setTimeout(() => {
-            window.location.replace('/driver-login');
-          }, 100);
-        }
+        console.log("🔀 Driver auth requires login");
+        // Don't redirect automatically - let the component handle it
         throw new Error("Requires login");
       }
       
