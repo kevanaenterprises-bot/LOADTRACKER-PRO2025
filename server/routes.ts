@@ -781,6 +781,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // DATABASE TEST: Check if DB connection works
+  app.get("/api/test/db-connection", async (req, res) => {
+    console.log("🧪 Testing database connection...");
+    try {
+      const allLoads = await storage.getLoads();
+      console.log(`🧪 DB TEST: Found ${allLoads?.length || 0} total loads`);
+      
+      res.json({ 
+        success: true,
+        totalLoads: allLoads?.length || 0,
+        message: "Database connection working"
+      });
+    } catch (error) {
+      console.error("🧪 DB TEST ERROR:", error);
+      res.status(500).json({ error: "Database connection failed", details: error.message });
+    }
+  });
+
   // Test endpoint to verify bypass token
   app.get("/api/test/bypass", (req, res) => {
     const bypassToken = req.headers['x-bypass-token'];
