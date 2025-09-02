@@ -1633,10 +1633,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (user?.role === "driver" && userId) {
         console.log(`🔥 DRIVER MODE: Getting loads for driver ${userId}`);
         loads = await storage.getLoadsByDriver(userId);
+        console.log(`🔒 SECURITY: Driver ${userId} should only see ${loads?.length || 0} assigned loads`);
       } else {
         console.log("🔥 ADMIN MODE: Getting all loads");
         loads = await storage.getLoads();
+        console.log(`📋 ADMIN: Returning ${loads?.length || 0} total loads`);
       }
+      
+      // SECURITY CHECK: Log exactly what's being returned
+      console.log(`🔒 FINAL SECURITY CHECK: User role="${user?.role}", userId="${userId}", returning ${loads?.length || 0} loads`);
       
       console.log(`🔥 RETURNING: ${loads?.length || 0} loads`);
       res.json(loads);
