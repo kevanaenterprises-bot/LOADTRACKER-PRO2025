@@ -2081,6 +2081,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update load financial details
+  app.patch("/api/loads/:id/financials", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      
+      console.log(`Updating load ${id} financials:`, updateData);
+      
+      const storage = new Storage();
+      const updatedLoad = await storage.updateLoad(id, updateData);
+      
+      res.json(updatedLoad);
+    } catch (error) {
+      console.error('Error updating load financials:', error);
+      res.status(500).json({ error: 'Failed to update load financials' });
+    }
+  });
+
   app.patch("/api/loads/:id/assign-driver", (req, res, next) => {
     // Check multiple auth methods: admin session, Replit auth, driver auth, OR token bypass
     const hasAdminAuth = !!(req.session as any)?.adminAuth;

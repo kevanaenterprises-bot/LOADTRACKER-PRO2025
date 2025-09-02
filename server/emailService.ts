@@ -57,20 +57,13 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
       bcc: bcc.length > 0 ? bcc.join(', ') : undefined,
       subject,
       html,
-      // Critical: Explicitly exclude text version to force HTML-only mode
-      // This prevents email clients from choosing plain text over HTML
-      alternatives: [
-        {
-          contentType: 'text/html; charset=utf-8',
-          content: html
-        }
-      ],
+      // Force HTML-only: Remove text property completely
+      text: '',
       attachments: attachments.length > 0 ? attachments.map(att => ({
         filename: att.filename,
         content: att.content,
         contentType: att.contentType,
-        encoding: 'base64',
-        disposition: 'attachment'
+        encoding: 'base64'
       })) : undefined,
     };
 
@@ -85,8 +78,7 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
         console.log(`    ${index + 1}. ${att.filename} (${att.content.length} bytes, ${att.contentType})`);
       });
     }
-    console.log(`  - Headers:`, mailOptions.headers);
-    console.log(`  - Force HTML mode: text=${mailOptions.text}, encoding=${mailOptions.encoding}`);
+    console.log(`  - Force HTML mode: text=${mailOptions.text}`);
 
     const result = await transporter.sendMail(mailOptions);
     

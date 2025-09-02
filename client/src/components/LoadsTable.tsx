@@ -73,6 +73,42 @@ export default function LoadsTable() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [assigningDriver, setAssigningDriver] = useState(false);
 
+  // Function to update load financial details
+  const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
+    try {
+      const response = await fetch(`/api/loads/${loadId}/financials`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [field]: value })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update load financials');
+      }
+      
+      // Update the selected load state immediately for UI feedback
+      if (selectedLoad && selectedLoad.id === loadId) {
+        setSelectedLoad({ ...selectedLoad, [field]: value });
+      }
+      
+      // Refresh the loads data
+      queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
+      
+      toast({
+        title: "Updated",
+        description: `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Failed to update ${field}`,
+        variant: "destructive",
+      });
+    }
+  };
+
   const { data: loads, isLoading } = useQuery({
     queryKey: ["/api/loads"],
     retry: false,
@@ -481,11 +517,7 @@ export default function LoadsTable() {
               {/* Documents Status */}
               <div>
                 <h4 className="font-semibold mb-2">Documents</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <div className={`w-3 h-3 rounded-full ${selectedLoad.bolDocumentPath ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span>BOL Document {selectedLoad.bolDocumentPath ? '✅' : '❌'}</span>
-                  </div>
+                <div className="text-sm">
                   <div className="flex items-center space-x-2">
                     <div className={`w-3 h-3 rounded-full ${selectedLoad.podDocumentPath ? 'bg-green-500' : 'bg-gray-300'}`}></div>
                     <span>POD Document {selectedLoad.podDocumentPath ? '✅' : '❌'}</span>
@@ -494,16 +526,41 @@ export default function LoadsTable() {
               </div>
 
               {/* Financial Information */}
-              {selectedLoad.location && (
-                <div>
-                  <h4 className="font-semibold mb-2">Financial Details</h4>
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div><strong>Flat Rate:</strong> ${selectedLoad.location.flatRate || '0.00'}</div>
-                    <div><strong>Lumper Charge:</strong> ${selectedLoad.lumperCharge || '0.00'}</div>
-                    <div><strong>Extra Stops:</strong> {selectedLoad.extraStops || 0} × $50</div>
+              <div>
+                <h4 className="font-semibold mb-2">Financial Details</h4>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <label className="text-xs text-gray-600 block">Flat Rate</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      defaultValue={selectedLoad.flatRate || '0.00'}
+                      className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'flatRate', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 block">Lumper Charge</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      defaultValue={selectedLoad.lumperCharge || '0.00'}
+                      className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'lumperCharge', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 block">Extra Stops</label>
+                    <input 
+                      type="number" 
+                      defaultValue={selectedLoad.extraStops || 0}
+                      className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
+                    />
+                    <div className="text-xs text-gray-500 mt-1">{selectedLoad.extraStops || 0} × $50 = ${((selectedLoad.extraStops || 0) * 50).toFixed(2)}</div>
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Action Buttons */}
               <div className="pt-4 border-t space-y-4">
