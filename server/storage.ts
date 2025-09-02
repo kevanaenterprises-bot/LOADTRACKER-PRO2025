@@ -82,6 +82,7 @@ export interface IStorage {
   getDrivers(): Promise<User[]>;
   getAvailableDrivers(): Promise<User[]>;
   createDriver(driver: any): Promise<User>;
+  deleteDriver(driverId: string): Promise<void>;
 
   // Status history
   addStatusHistory(loadId: string, status: string, notes?: string): Promise<void>;
@@ -624,6 +625,30 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return newDriver;
+  }
+
+  async deleteDriver(driverId: string): Promise<void> {
+    console.log("🗑️ Deleting driver:", driverId);
+    
+    try {
+      // First check if driver has any assigned loads
+      const assignedLoads = await db.select().from(loads).where(eq(loads.driverId, driverId));
+      
+      if (assignedLoads.length > 0) {
+        // Unassign the driver from all loads before deletion
+        await db.update(loads)
+          .set({ driverId: null })
+          .where(eq(loads.driverId, driverId));
+        console.log(`🗑️ Unassigned driver from ${assignedLoads.length} loads before deletion`);
+      }
+      
+      // Delete the driver
+      await db.delete(users).where(eq(users.id, driverId));
+      console.log("🗑️ ✅ Driver deleted successfully");
+    } catch (error: any) {
+      console.error("🗑️ ❌ Error deleting driver:", error);
+      throw error;
+    }
   }
 
   async addStatusHistory(loadId: string, status: string, notes?: string): Promise<void> {

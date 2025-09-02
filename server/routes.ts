@@ -1558,6 +1558,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete driver endpoint
+  app.delete("/api/drivers/:driverId", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const driverId = req.params.driverId;
+      console.log("🗑️ Deleting driver:", driverId);
+      
+      await storage.deleteDriver(driverId);
+      
+      res.json({ message: "Driver deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting driver:", error);
+      res.status(500).json({ message: error.message || "Failed to delete driver" });
+    }
+  });
+
   // Get loads for a specific driver (for driver portal)
   app.get("/api/drivers/:driverId/loads", (req, res, next) => {
     const adminAuth = !!(req.session as any)?.adminAuth;

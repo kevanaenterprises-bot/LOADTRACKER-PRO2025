@@ -14,6 +14,7 @@ import LoadsTable from "@/components/LoadsTable";
 import InvoiceInbox from "@/components/InvoiceInbox";
 import { OCRUploader } from "@/components/OCRUploader";
 import LoadTrackingMap from "@/components/LoadTrackingMap";
+import { DriverList } from "@/components/DriverList";
 import { Header } from "@/components/Header";
 import { CacheDebugger } from "@/components/CacheDebugger";
 import { Button } from "@/components/ui/button";
@@ -432,7 +433,7 @@ export default function Dashboard() {
 
           {/* Driver Management Tab */}
           <TabsContent value="drivers" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -526,6 +527,19 @@ export default function Dashboard() {
                       🔧 Debug Driver Creation
                     </Button>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Driver List Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-users text-primary"></i>
+                    Current Drivers
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <DriverList />
                 </CardContent>
               </Card>
 
