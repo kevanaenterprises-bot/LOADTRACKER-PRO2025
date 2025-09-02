@@ -47,10 +47,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   
   // BYPASS: Kevin's loads endpoint (bypasses Vite middleware) 
-  app.get('/working-dashboard-kevin', async (req, res) => {
+  app.get('/api/working-dashboard-kevin', async (req, res) => {
     try {
       console.log("🔥 BYPASS: Direct loads query for Kevin");
-      const result = await storage.getLoadsByDriver('605889a6-d87b-46c4-880a-7e058ad');
+      const result = await storage.getLoadsByDriver('605889a6-d87b-46c4-880a-7e058ad87802');
       console.log("🔥 BYPASS: Storage result:", JSON.stringify(result, null, 2));
       res.json(result);
     } catch (error) {
@@ -1519,13 +1519,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get loads for a specific driver (for driver portal)
   app.get("/api/drivers/:driverId/loads", (req, res, next) => {
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    const adminAuth = !!(req.session as any)?.adminAuth;
+    const replitAuth = !!req.user;
+    const driverAuth = !!(req.session as any)?.driverAuth;
+    const bypassAuth = isBypassActive(req);
+    const hasAuth = adminAuth || replitAuth || driverAuth || bypassAuth;
+    
+    console.log("🔒 DRIVER LOADS AUTH:", {
+      adminAuth,
+      replitAuth,
+      driverAuth,
+      bypassAuth,
+      hasAuth,
+      driverId: req.params.driverId
+    });
+    
     if (hasAuth) {
       next();
     } else {
       res.status(401).json({ message: "Authentication required" });
     }
   }, async (req, res) => {
+    console.log("🎯 DRIVER LOADS HANDLER CALLED!");
     try {
       const driverId = req.params.driverId;
       console.log(`🚚 API ENDPOINT: Fetching loads for driver: ${driverId}`);
