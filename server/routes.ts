@@ -2476,20 +2476,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Embed POD images into the invoice HTML if available
       if (podImages.length > 0) {
         console.log(`🔗 Embedding ${podImages.length} POD image(s) into invoice...`);
-        const podSectionHTML = generatePODSectionHTML(podImages, primaryLoadNumber);
-        combinedHTML = combinedHTML.replace('</body>', `${podSectionHTML}</body>`);
-        console.log(`✅ POD images embedded into combined invoice`);
+        try {
+          const podSectionHTML = generatePODSectionHTML(podImages, primaryLoadNumber);
+          combinedHTML = combinedHTML.replace('</body>', `${podSectionHTML}</body>`);
+          console.log(`✅ POD images embedded into combined invoice`);
+        } catch (embedError) {
+          console.error(`❌ Failed to embed POD images:`, embedError);
+          console.log(`⚠️  Falling back to invoice-only PDF due to POD embedding error`);
+          // Keep original invoice HTML without POD if embedding fails
+        }
       }
       
       // Generate single combined PDF
       console.log(`📄 Generating combined PDF with invoice + ${podImages.length} POD image(s)...`);
-      const combinedPDF = await generatePDF(combinedHTML);
+      console.log(`📄 Combined HTML length: ${combinedHTML.length} characters`);
+      
+      let combinedPDF;
+      try {
+        combinedPDF = await generatePDF(combinedHTML);
+        console.log(`✅ PDF generation successful`);
+      } catch (pdfError) {
+        console.error(`❌ PDF generation failed:`, pdfError);
+        console.log(`⚠️  Attempting fallback with simpler HTML...`);
+        
+        // Fallback: Generate simple invoice-only PDF without POD embedding
+        const fallbackHTML = generateInvoiceOnlyHTML(invoice, load);
+        combinedPDF = await generatePDF(fallbackHTML);
+        console.log(`✅ Fallback PDF generation successful`);
+      }
+      
+      // PDF integrity checks
+      console.log(`📄 Generated PDF size: ${combinedPDF.length} bytes`);
+      console.log(`📄 PDF header check: ${combinedPDF.slice(0, 8).toString()}`);
+      console.log(`📄 PDF footer check: ${combinedPDF.slice(-10).toString()}`);
+      
+      // Verify PDF starts with correct header
+      const pdfHeader = combinedPDF.slice(0, 4).toString();
+      if (pdfHeader !== '%PDF') {
+        console.error(`❌ INVALID PDF HEADER: "${pdfHeader}" - PDF may be corrupted!`);
+      } else {
+        console.log(`✅ PDF header valid: ${pdfHeader}`);
+      }
+      
       attachments.push({
         filename: `Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf`,
         content: combinedPDF,
         contentType: 'application/pdf'
       });
-      console.log(`✅ Generated combined PDF: Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf`);
+      console.log(`✅ Generated combined PDF: Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf (${combinedPDF.length} bytes)`);
 
       // Handle BOL documents - Attach ONLY the actual uploaded files (same logic as POD)
       if (load.bolDocumentPath) {
@@ -2566,7 +2600,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log(`🔍 Generated ${attachments.length} PDF attachments for load ${primaryLoadNumber}:`);
-      attachments.forEach(att => console.log(`  - ${att.filename}`));
+      attachments.forEach(att => {
+        console.log(`  - ${att.filename} (${att.content.length} bytes, type: ${att.contentType})`);
+        // Additional PDF validation for production debugging
+        if (att.contentType === 'application/pdf') {
+          const header = att.content.slice(0, 8).toString();
+          const isValidPDF = header.startsWith('%PDF');
+          console.log(`    PDF header: "${header}" - Valid: ${isValidPDF}`);
+        }
+      });
       
       const emailResult = await sendEmail({
         to: emailAddress,
