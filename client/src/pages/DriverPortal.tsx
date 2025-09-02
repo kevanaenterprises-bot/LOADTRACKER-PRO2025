@@ -170,8 +170,11 @@ export default function DriverPortal() {
   const { toast } = useToast();
   const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);
 
-  console.log("🔍 POD Upload Debug:");
+  console.log("🔍 Driver Portal Debug:");
   console.log("Current user:", user);
+  console.log("isLoading:", isLoading);
+  console.log("isAuthenticated:", isAuthenticated);
+  console.log("error:", error);
 
   // Get driver's loads with bypass token support
   const { data: loads = [], refetch } = useQuery({

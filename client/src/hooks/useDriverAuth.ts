@@ -7,49 +7,33 @@ export function useDriverAuth() {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ["/api/auth/driver-user"],
     queryFn: async () => {
-      // Get bypass token if available (like the dashboard does)
-      let bypassToken = localStorage.getItem('bypass-token');
-      if (!bypassToken) {
-        try {
-          const authResponse = await fetch("/api/auth/browser-bypass", {
-            method: "POST",
-            credentials: "include",
-          });
-          if (authResponse.ok) {
-            const authData = await authResponse.json();
-            bypassToken = authData.token;
-            if (bypassToken) {
-              localStorage.setItem('bypass-token', bypassToken);
-            }
-          }
-        } catch (error) {
-          // Silent fail - will use normal authentication
-        }
-      }
+      console.log("🔍 Driver auth: Checking authentication...");
 
-      const headers: any = { "Content-Type": "application/json" };
-      if (bypassToken) {
-        headers['X-Bypass-Token'] = bypassToken;
-      }
-
+      // For driver auth, check session FIRST before trying bypass token
       const response = await fetch("/api/auth/driver-user", {
         credentials: "include",
-        headers,
+        headers: {
+          "Content-Type": "application/json"
+        }
       });
       
+      console.log("🔍 Driver auth response:", response.status, response.statusText);
+      
       if (!response.ok) {
+        console.log("❌ Driver auth failed:", response.status);
         throw new Error("Not authenticated");
       }
       
       const data = await response.json();
+      console.log("🔍 Driver auth data:", data);
       
       // Check if we need to redirect to login
       if (data.requiresLogin) {
         console.log("🔀 Driver auth requires login");
-        // Don't redirect automatically - let the component handle it
         throw new Error("Requires login");
       }
       
+      console.log("✅ Driver authenticated:", data);
       return data;
     },
     retry: false,
