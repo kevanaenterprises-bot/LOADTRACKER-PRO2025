@@ -2338,6 +2338,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Handle POD documents - Attach ONLY the actual uploaded files
+      console.log(`🔍 EMAIL DEBUG: Checking POD for load ${primaryLoadNumber}`);
+      console.log(`🔍 load.podDocumentPath = "${load.podDocumentPath}"`);
+      console.log(`🔍 load.podDocumentPath type = ${typeof load.podDocumentPath}`);
+      console.log(`🔍 load.podDocumentPath truthy = ${!!load.podDocumentPath}`);
+      
       if (load.podDocumentPath) {
         console.log(`📄 Processing uploaded POD documents for load ${primaryLoadNumber}`);
         console.log(`📄 POD path: ${load.podDocumentPath}`);
