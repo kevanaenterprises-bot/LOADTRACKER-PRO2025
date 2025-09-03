@@ -271,11 +271,11 @@ export default function DriverPortal() {
     }
   }, [user?.id, refetch]);
 
-  const currentLoad = loads.find(load => 
+  const currentLoad = loads.find((load: Load) => 
     load.status !== 'completed' && load.status !== 'delivered'
   );
   
-  const recentLoads = loads.filter(load => 
+  const recentLoads = loads.filter((load: Load) => 
     load.status === 'completed' || load.status === 'delivered'
   ).slice(0, 5);
 
@@ -336,7 +336,7 @@ export default function DriverPortal() {
           <div>
             <h3 className="text-lg font-semibold mb-3 text-secondary">Recent Loads</h3>
             <div className="space-y-3">
-              {recentLoads.map(load => (
+              {recentLoads.map((load: Load) => (
                 <div key={load.id} className="bg-white rounded-lg shadow-material p-4">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-medium">Load #{load.number109}</span>
