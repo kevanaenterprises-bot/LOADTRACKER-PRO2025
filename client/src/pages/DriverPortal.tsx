@@ -207,21 +207,22 @@ export default function DriverPortal() {
   console.log("isAuthenticated:", isAuthenticated);
   console.log("error:", error);
 
-  // Get driver's loads with bypass token support
+  // Get driver's loads using the correct driver-specific endpoint
   const { data: loads = [], refetch } = useQuery({
-    queryKey: [`/api/loads`],
+    queryKey: [`/api/drivers/${user?.id}/loads`],
     queryFn: async () => {
-      console.log(`🔄 Fetching loads for authenticated driver`);
-      
-      let bypassToken = localStorage.getItem('bypass-token');
-      const headers: any = {};
-      if (bypassToken) {
-        headers['X-Bypass-Token'] = bypassToken;
+      if (!user?.id) {
+        console.log("❌ No user ID available for loads fetch");
+        return [];
       }
-
-      const response = await fetch(`/api/loads`, {
+      
+      console.log(`🔄 Fetching loads for driver: ${user.id}`);
+      
+      const response = await fetch(`/api/drivers/${user.id}/loads`, {
         credentials: "include",
-        headers,
+        headers: {
+          "Content-Type": "application/json"
+        },
       });
       
       console.log(`📡 API Response: ${response.status} ${response.statusText}`);
@@ -229,16 +230,16 @@ export default function DriverPortal() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ API Error:", errorText);
-        throw new Error(`Failed to fetch loads: ${response.status} ${errorText}`);
+        throw new Error(`Failed to fetch driver loads`);
       }
       
       const data = await response.json();
-      console.log("✅ Received loads data:", data);
+      console.log("✅ Received driver loads data:", data);
       return data;
     },
     enabled: !!user?.id,
-    staleTime: 0, // Always allow fresh data for driver loads
-    refetchInterval: 5000, // Refetch every 5 seconds (increased from 2)
+    staleTime: 30000, // Cache for 30 seconds
+    refetchInterval: 10000, // Refetch every 10 seconds
     refetchOnWindowFocus: true,
   });
 
