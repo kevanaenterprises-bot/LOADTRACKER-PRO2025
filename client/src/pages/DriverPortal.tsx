@@ -303,6 +303,10 @@ export default function DriverPortal() {
     logout();
   };
 
+  console.log("🎯 PORTAL RENDER: About to render portal with loads:", loads);
+  console.log("🎯 PORTAL RENDER: Current load:", currentLoad);
+  console.log("🎯 PORTAL RENDER: Recent loads:", recentLoads);
+
   return (
     <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
       {/* Driver Header */}
