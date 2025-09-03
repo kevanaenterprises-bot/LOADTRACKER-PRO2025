@@ -61,22 +61,8 @@ export default function DriverPortal() {
     );
   }
 
-  // STEP 2: Add load assignments with CORRECT endpoint
-  console.log("🚛 DriverPortal: Authentication successful, adding load assignments");
-  
-  // Get driver's assigned loads - FIXED ENDPOINT
-  const { data: loads, isLoading: loadsLoading, error: loadsError } = useQuery({
-    queryKey: ["/api/drivers", user.id, "loads"],
-    queryFn: () => fetch(`/api/drivers/${user.id}/loads`, {
-      credentials: 'include',
-      headers: {
-        'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
-      }
-    }).then(res => res.json()),
-    enabled: !!user.id,
-  });
-  
-  console.log("🚛 Load assignments:", { loads, loadsLoading, loadsError, userID: user.id });
+  // REVERT: Keep working version stable
+  console.log("🚛 DriverPortal: Authentication successful, showing simple interface");
 
   // SUCCESS: Show authenticated driver portal - BASIC VERSION
   return (
@@ -101,64 +87,12 @@ export default function DriverPortal() {
         <StandaloneBOLUpload />
       </div>
 
-      {/* Load Assignments */}
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Your Load Assignments</h2>
-        {loadsLoading ? (
-          <Card>
-            <CardContent className="p-6 text-center">
-              <p className="text-gray-600">Loading your assignments...</p>
-            </CardContent>
-          </Card>
-        ) : loadsError ? (
-          <Card>
-            <CardContent className="p-6 text-center">
-              <h3 className="font-semibold text-red-600">Error Loading Assignments</h3>
-              <p className="text-gray-600 mt-2">Unable to fetch your load assignments.</p>
-            </CardContent>
-          </Card>
-        ) : !loads || loads.length === 0 ? (
-          <Card>
-            <CardContent className="p-6 text-center">
-              <h3 className="font-semibold text-gray-700">No Active Assignments</h3>
-              <p className="text-gray-600 mt-2">You don't have any active load assignments. Check back later or contact dispatch.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {loads.map((load: any) => (
-              <Card key={load.id} className="border-l-4 border-l-blue-500">
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-lg">{load.number109}</h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        📍 {load.location?.name} 
-                        {load.location?.city && `, ${load.location.city}, ${load.location.state}`}
-                      </p>
-                      <Badge variant="secondary" className="mt-2">{load.status}</Badge>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">${load.flatRate || '1350.00'}</p>
-                      <p className="text-xs text-gray-500">{new Date(load.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                  {load.specialInstructions && (
-                    <p className="text-sm text-gray-600 mt-2">📝 {load.specialInstructions}</p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* Status Message */}
       <Card className="mb-4">
         <CardContent className="p-6 text-center">
           <h3 className="font-semibold text-green-700">✅ Driver Portal Active</h3>
           <p className="text-gray-600 mt-2">Authentication working. BOL upload ready.</p>
-          <p className="text-sm text-gray-500 mt-1">Load assignments loading successfully!</p>
+          <p className="text-sm text-gray-500 mt-1">Load assignments: Contact dispatch for current loads.</p>
         </CardContent>
       </Card>
     </div>
