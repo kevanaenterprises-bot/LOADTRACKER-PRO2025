@@ -1615,7 +1615,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const replitAuth = !!req.user;
     const driverAuth = !!(req.session as any)?.driverAuth;
     const bypassAuth = isBypassActive(req);
-    const hasAuth = adminAuth || replitAuth || driverAuth || bypassAuth;
+    
+    // CRITICAL FIX: Also check if the session has driver auth by checking the user role
+    const sessionHasDriverAuth = (req.session as any)?.driverAuth?.role === 'driver' || 
+                                 (req.session as any)?.user?.role === 'driver';
+    
+    const hasAuth = adminAuth || replitAuth || driverAuth || bypassAuth || sessionHasDriverAuth;
     
     console.log("🔒 DRIVER LOADS AUTH:", {
       adminAuth,
@@ -1636,7 +1641,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const driverId = req.params.driverId;
       console.log(`🔍 Getting loads for driver: ${driverId}`);
       
-      const storage = new Storage();
       const loads = await storage.getLoadsByDriver(driverId);
       
       console.log(`📦 Found ${loads.length} actual loads for driver ${driverId}`);
@@ -2229,7 +2233,6 @@ Reply YES to confirm acceptance or NO to decline.`
       
       console.log(`Updating load ${id} financials:`, updateData);
       
-      const storage = new Storage();
       const updatedLoad = await storage.updateLoad(id, updateData);
       
       res.json(updatedLoad);
