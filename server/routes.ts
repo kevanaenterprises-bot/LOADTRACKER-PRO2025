@@ -1953,6 +1953,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update load with signature
+  app.patch("/api/loads/:id/signature", (req, res, next) => {
+    const adminAuth = !!(req.session as any)?.adminAuth;
+    const replitAuth = !!req.user;
+    const driverAuth = !!(req.session as any)?.driverAuth;
+    const bypassAuth = isBypassActive(req);
+    
+    const hasAuth = adminAuth || replitAuth || driverAuth || bypassAuth;
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      const { signatureURL, signedAt } = req.body;
+      
+      console.log(`✍️ Saving signature for load: ${loadId}`);
+      
+      const updatedLoad = await storage.updateLoad(loadId, { 
+        signatureURL,
+        signedAt: signedAt ? new Date(signedAt) : new Date()
+      });
+      
+      res.json({ message: "Signature saved successfully", load: updatedLoad });
+    } catch (error) {
+      console.error("Error saving signature:", error);
+      res.status(500).json({ message: "Failed to save signature" });
+    }
+  });
+
   // GPS Tracking API endpoints
 
   // Confirm load and enable GPS tracking
