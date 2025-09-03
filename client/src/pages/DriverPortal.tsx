@@ -141,10 +141,14 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
 };
 
 export default function DriverPortal() {
-  console.log("🚀 DriverPortal component is rendering...");
+  console.log("🚨 EMERGENCY DEBUG: DriverPortal function called!");
+  console.log("🚨 typeof window:", typeof window);
+  console.log("🚨 window.location:", window?.location?.href);
   
   const { user, logout, isLoading, isAuthenticated, error } = useDriverAuth();
-  
+  console.log("🚨 useDriverAuth hook called successfully");
+  console.log("🚨 Auth result:", { user: !!user, isLoading, isAuthenticated, error: !!error });
+
   console.log("🔍 DETAILED PORTAL STATE DEBUG:");
   console.log("- user:", JSON.stringify(user, null, 2));
   console.log("- isLoading:", isLoading);
@@ -152,56 +156,56 @@ export default function DriverPortal() {
   console.log("- error:", JSON.stringify(error, null, 2));
   console.log("- Current path:", window.location.pathname);
   console.log("- Session storage driver-redirecting:", sessionStorage.getItem('driver-redirecting'));
-  
+
   // SIMPLIFIED: Show loading only during initial authentication check
   if (isLoading) {
     console.log("🔄 SHOWING LOADING STATE - Still loading authentication...");
     return (
-      <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
-        <div className="p-4">
-          <div className="bg-white rounded-lg shadow-material p-6 mb-6">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-              <h3 className="text-lg font-semibold text-secondary mb-2">Loading Your Portal...</h3>
-              <p className="text-gray-600">Verifying your authentication.</p>
-            </div>
+    <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
+      <div className="p-4">
+        <div className="bg-white rounded-lg shadow-material p-6 mb-6">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-secondary mb-2">Loading Your Portal...</h3>
+            <p className="text-gray-600">Verifying your authentication.</p>
           </div>
         </div>
       </div>
-    );
-  }
-  
+    </div>
+  );
+}
+
   // CRITICAL FIX: Only redirect if explicitly not authenticated
   if (!isLoading && !isAuthenticated) {
     console.log("🚨 SHOWING REDIRECT STATE - Not authenticated, redirecting to login");
     console.log("🚨 Auth state:", { isAuthenticated, user: !!user, error: !!error });
-    
-    // Only redirect if not already redirecting
-    if (!sessionStorage.getItem('driver-redirecting')) {
-      sessionStorage.setItem('driver-redirecting', 'true');
-      setTimeout(() => {
-        window.location.href = "/driver-login";
-      }, 100);
-    }
-    
-    return (
-      <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
-        <div className="p-4">
-          <div className="bg-white rounded-lg shadow-material p-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold text-red-600">Redirecting to Login</h3>
-              <p className="text-gray-600">Please wait while we redirect you to the login page.</p>
-            </div>
+  
+  // Only redirect if not already redirecting
+  if (!sessionStorage.getItem('driver-redirecting')) {
+    sessionStorage.setItem('driver-redirecting', 'true');
+    setTimeout(() => {
+      window.location.href = "/driver-login";
+    }, 100);
+  }
+  
+  return (
+    <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
+      <div className="p-4">
+        <div className="bg-white rounded-lg shadow-material p-6">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-red-600">Redirecting to Login</h3>
+            <p className="text-gray-600">Please wait while we redirect you to the login page.</p>
           </div>
         </div>
       </div>
-    );
-  }
-  
-  // SIMPLIFIED: If we get here, show the portal (authenticated or loading state handled above)
-  console.log("✅ REACHED PORTAL RENDER SECTION!");
-  console.log("✅ Final auth check before render:", { isLoading, isAuthenticated, hasUser: !!user });
-  console.log("✅ User data:", user);
+    </div>
+  );
+}
+
+// SIMPLIFIED: If we get here, show the portal (authenticated or loading state handled above)
+console.log("✅ REACHED PORTAL RENDER SECTION!");
+console.log("✅ Final auth check before render:", { isLoading, isAuthenticated, hasUser: !!user });
+console.log("✅ User data:", user);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);
