@@ -6,6 +6,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import StandaloneBOLUpload from "@/components/StandaloneBOLUpload";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import DriverLoadCard from "@/components/DriverLoadCard";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
@@ -87,12 +88,17 @@ export default function DriverPortal() {
         <StandaloneBOLUpload />
       </div>
 
+      {/* Notification Settings */}
+      <div className="mb-4">
+        <NotificationSettings driverId={user.id} />
+      </div>
+
       {/* Status Message */}
       <Card className="mb-4">
         <CardContent className="p-6 text-center">
           <h3 className="font-semibold text-green-700">✅ Driver Portal Active</h3>
           <p className="text-gray-600 mt-2">Authentication working. BOL upload ready.</p>
-          <p className="text-sm text-gray-500 mt-1">Load assignments: Contact dispatch for current loads.</p>
+          <p className="text-sm text-gray-500 mt-1">Notification settings and preferences available above.</p>
         </CardContent>
       </Card>
     </div>

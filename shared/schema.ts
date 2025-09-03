@@ -137,6 +137,46 @@ export const loadStatusHistory = pgTable("load_status_history", {
   notes: text("notes"),
 });
 
+// Driver notification preferences
+export const notificationPreferences = pgTable("notification_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  driverId: varchar("driver_id").references(() => users.id).notNull(),
+  
+  // Alert types preferences
+  loadAssignments: boolean("load_assignments").default(true), // New load assigned
+  statusReminders: boolean("status_reminders").default(true), // Reminder to update status
+  documentReminders: boolean("document_reminders").default(true), // Upload BOL/POD reminders
+  deliveryAlerts: boolean("delivery_alerts").default(true), // Delivery deadline approaching
+  emergencyAlerts: boolean("emergency_alerts").default(true), // Urgent dispatcher messages
+  
+  // Delivery method preferences
+  smsEnabled: boolean("sms_enabled").default(true),
+  emailEnabled: boolean("email_enabled").default(false),
+  inAppEnabled: boolean("in_app_enabled").default(true),
+  
+  // Timing preferences
+  quietHoursStart: varchar("quiet_hours_start").default("22:00"), // 10 PM
+  quietHoursEnd: varchar("quiet_hours_end").default("06:00"), // 6 AM
+  enableQuietHours: boolean("enable_quiet_hours").default(true),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Notification log for tracking sent messages
+export const notificationLog = pgTable("notification_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  driverId: varchar("driver_id").references(() => users.id).notNull(),
+  type: varchar("type").notNull(), // "load_assignment", "status_reminder", etc.
+  method: varchar("method").notNull(), // "sms", "email", "in_app"
+  message: text("message").notNull(),
+  status: varchar("status").notNull().default("sent"), // "sent", "delivered", "failed"
+  loadId: varchar("load_id").references(() => loads.id), // Optional: related load
+  sentAt: timestamp("sent_at").defaultNow(),
+  deliveredAt: timestamp("delivered_at"),
+  errorMessage: text("error_message"),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -178,6 +218,17 @@ export const insertInvoiceSchema = createInsertSchema(invoices).omit({
   generatedAt: true,
 });
 
+export const insertNotificationPreferencesSchema = createInsertSchema(notificationPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertNotificationLogSchema = createInsertSchema(notificationLog).omit({
+  id: true,
+  sentAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -192,6 +243,10 @@ export type Rate = typeof rates.$inferSelect;
 export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
 export type Invoice = typeof invoices.$inferSelect;
 export type LoadStatusHistoryEntry = typeof loadStatusHistory.$inferSelect;
+export type InsertNotificationPreferences = z.infer<typeof insertNotificationPreferencesSchema>;
+export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationLog = z.infer<typeof insertNotificationLogSchema>;
+export type NotificationLog = typeof notificationLog.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {

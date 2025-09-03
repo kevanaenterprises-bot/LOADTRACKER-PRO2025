@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { setupAuth, isAuthenticated, getSession } from "./replitAuth";
 import { ObjectStorageService } from "./objectStorage";
 import { sendSMSToDriver } from "./smsService";
+import { sendTestNotification, notificationService } from "./notificationService";
 import { processRateConfirmationImage } from "./ocrService";
 import { GPSService } from "./gpsService";
 import multer from 'multer';
@@ -1609,6 +1610,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Driver Notification Preferences
+  app.get("/api/drivers/:driverId/notifications", (req, res, next) => {
+    const adminAuth = !!(req.session as any)?.adminAuth;
+    const replitAuth = !!req.user;
+    const driverAuth = !!(req.session as any)?.driverAuth;
+    const bypassAuth = isBypassActive(req);
+    
+    const hasAuth = adminAuth || replitAuth || driverAuth || bypassAuth;
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const driverId = req.params.driverId;
+      console.log(`🔔 Getting notification preferences for driver: ${driverId}`);
+      
+      let preferences = await storage.getNotificationPreferences(driverId);
+      
+      // Create default preferences if none exist
+      if (!preferences) {
+        preferences = await storage.createDefaultNotificationPreferences(driverId);
+        console.log(`🔔 Created default preferences for driver: ${driverId}`);
+      }
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error fetching notification preferences:", error);
+      res.status(500).json({ error: "Failed to fetch notification preferences" });
+    }
+  });
+
+  app.patch("/api/drivers/:driverId/notifications", (req, res, next) => {
+    const adminAuth = !!(req.session as any)?.adminAuth;
+    const replitAuth = !!req.user;
+    const driverAuth = !!(req.session as any)?.driverAuth;
+    const bypassAuth = isBypassActive(req);
+    
+    const hasAuth = adminAuth || replitAuth || driverAuth || bypassAuth;
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const driverId = req.params.driverId;
+      const updates = req.body;
+      
+      console.log(`🔔 Updating notification preferences for driver: ${driverId}`, updates);
+      
+      // Handle test notification request
+      if (updates.testNotification) {
+        await sendTestNotification(driverId);
+        delete updates.testNotification;
+        // If this was just a test, return early
+        if (Object.keys(updates).length === 0) {
+          const currentPrefs = await storage.getNotificationPreferences(driverId);
+          return res.json(currentPrefs);
+        }
+      }
+      
+      const preferences = await storage.updateNotificationPreferences(driverId, updates);
+      
+      res.json(preferences);
+    } catch (error) {
+      console.error("Error updating notification preferences:", error);
+      res.status(500).json({ error: "Failed to update notification preferences" });
+    }
+  });
+
   // Get loads for a specific driver (for driver portal)
   app.get("/api/drivers/:driverId/loads", (req, res, next) => {
     const adminAuth = !!(req.session as any)?.adminAuth;
@@ -2285,24 +2360,22 @@ Reply YES to confirm acceptance or NO to decline.`
       // Update the load with driver assignment
       const updatedLoad = await storage.updateLoad(loadId, { driverId });
 
-      // Send SMS to driver if they have a phone number
+      // Send notification to the assigned driver using new notification service
       try {
-        const driver = await storage.getUser(driverId);
-        if (driver?.phoneNumber) {
-          const location = load.location;
-          await sendSMSToDriver(
-            driver.phoneNumber,
-            `NEW LOAD ASSIGNED - ${new Date().toLocaleDateString()}
-Load: ${load.number109}
-Destination: ${location?.name || (load.companyName || 'See load details')}
-${location?.city ? `City: ${location.city}` : ''}
-
-Reply YES to confirm acceptance or NO to decline.`
-          );
-        }
-      } catch (smsError) {
-        console.error("Failed to send SMS:", smsError);
-        // Don't fail the assignment if SMS fails
+        const location = load.location;
+        const destinationName = location?.name || load.companyName || 'Unknown Destination';
+        const fullDestination = location?.city ? `${destinationName}, ${location.city}, ${location.state}` : destinationName;
+        
+        await notificationService.sendLoadAssignmentNotification(
+          driverId,
+          load.number109,
+          fullDestination,
+          loadId
+        );
+        console.log(`🔔 Load assignment notification sent to driver ${driverId}`);
+      } catch (notificationError) {
+        console.error("Failed to send load assignment notification:", notificationError);
+        // Don't fail the assignment if notification fails
       }
 
       res.json(updatedLoad);

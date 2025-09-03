@@ -7,6 +7,8 @@ import {
   invoiceCounter,
   invoices,
   loadStatusHistory,
+  notificationPreferences,
+  notificationLog,
   type User,
   type UpsertUser,
   type Location,
@@ -21,6 +23,10 @@ import {
   type Invoice,
   type InsertInvoice,
   type LoadStatusHistoryEntry,
+  type NotificationPreferences,
+  type InsertNotificationPreferences,
+  type NotificationLog,
+  type InsertNotificationLog,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, not } from "drizzle-orm";
@@ -69,6 +75,13 @@ export interface IStorage {
   updateInvoice(invoiceNumber: string, updates: Partial<Invoice>): Promise<Invoice>;
   markInvoicePrinted(invoiceId: string): Promise<Invoice>;
   getNextInvoiceNumber(): Promise<string>;
+
+  // Notification methods
+  getNotificationPreferences(driverId: string): Promise<NotificationPreferences | null>;
+  createDefaultNotificationPreferences(driverId: string): Promise<NotificationPreferences>;
+  updateNotificationPreferences(driverId: string, updates: Partial<InsertNotificationPreferences>): Promise<NotificationPreferences>;
+  logNotification(notification: InsertNotificationLog): Promise<NotificationLog>;
+  getNotificationHistory(driverId: string, limit?: number): Promise<NotificationLog[]>;
 
   // Statistics
   getDashboardStats(): Promise<{
@@ -698,6 +711,58 @@ export class DatabaseStorage implements IStorage {
     }
     
     return `GO${nextNumber}`;
+  }
+
+  // Notification preferences methods
+  async getNotificationPreferences(driverId: string): Promise<NotificationPreferences | null> {
+    const [prefs] = await db
+      .select()
+      .from(notificationPreferences)
+      .where(eq(notificationPreferences.driverId, driverId))
+      .limit(1);
+    return prefs || null;
+  }
+
+  async createDefaultNotificationPreferences(driverId: string): Promise<NotificationPreferences> {
+    const [prefs] = await db
+      .insert(notificationPreferences)
+      .values({ driverId })
+      .returning();
+    return prefs;
+  }
+
+  async updateNotificationPreferences(
+    driverId: string, 
+    updates: Partial<InsertNotificationPreferences>
+  ): Promise<NotificationPreferences> {
+    const [updated] = await db
+      .update(notificationPreferences)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(notificationPreferences.driverId, driverId))
+      .returning();
+
+    if (!updated) {
+      // Create if doesn't exist
+      return this.createDefaultNotificationPreferences(driverId);
+    }
+    return updated;
+  }
+
+  async logNotification(notification: InsertNotificationLog): Promise<NotificationLog> {
+    const [logged] = await db
+      .insert(notificationLog)
+      .values(notification)
+      .returning();
+    return logged;
+  }
+
+  async getNotificationHistory(driverId: string, limit = 50): Promise<NotificationLog[]> {
+    return db
+      .select()
+      .from(notificationLog)
+      .where(eq(notificationLog.driverId, driverId))
+      .orderBy(desc(notificationLog.sentAt))
+      .limit(limit);
   }
 }
 
