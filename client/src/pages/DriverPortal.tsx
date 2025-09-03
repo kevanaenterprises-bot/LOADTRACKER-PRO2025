@@ -61,8 +61,16 @@ export default function DriverPortal() {
     );
   }
 
-  // STEP 1: Simple working version first
-  console.log("🚛 DriverPortal: Authentication successful, showing simple interface");
+  // STEP 2: Add load assignments carefully
+  console.log("🚛 DriverPortal: Authentication successful, adding load assignments");
+  
+  // Get driver's assigned loads
+  const { data: loads, isLoading: loadsLoading, error: loadsError } = useQuery({
+    queryKey: ["/api/driver/loads", user.id],
+    enabled: !!user.id,
+  });
+  
+  console.log("🚛 Load data:", { loads, loadsLoading, loadsError, userID: user.id });
 
   // SUCCESS: Show authenticated driver portal - BASIC VERSION
   return (
@@ -87,12 +95,58 @@ export default function DriverPortal() {
         <StandaloneBOLUpload />
       </div>
 
+      {/* Load Assignments */}
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold mb-2">Your Load Assignments</h2>
+        {loadsLoading ? (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-gray-600">Loading your assignments...</p>
+            </CardContent>
+          </Card>
+        ) : loadsError ? (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <h3 className="font-semibold text-red-600">Error Loading Assignments</h3>
+              <p className="text-gray-600 mt-2">Unable to fetch your load assignments. Please try refreshing.</p>
+            </CardContent>
+          </Card>
+        ) : !loads || loads.length === 0 ? (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <h3 className="font-semibold text-gray-700">No Active Assignments</h3>
+              <p className="text-gray-600 mt-2">You don't have any active load assignments. Check back later or contact dispatch.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-3">
+            {loads.map((load: any) => (
+              <Card key={load.id}>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold">{load.number109 || 'Load #' + load.id}</h3>
+                      <p className="text-sm text-gray-600">{load.pickupLocation} → {load.deliveryLocation}</p>
+                      <Badge variant="secondary" className="mt-1">{load.status}</Badge>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium">${load.rate}</p>
+                      <p className="text-xs text-gray-500">{new Date(load.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Status Message */}
       <Card className="mb-4">
         <CardContent className="p-6 text-center">
           <h3 className="font-semibold text-green-700">✅ Driver Portal Active</h3>
           <p className="text-gray-600 mt-2">Authentication working. BOL upload ready.</p>
-          <p className="text-sm text-gray-500 mt-1">Load assignments coming next...</p>
+          <p className="text-sm text-gray-500 mt-1">Load assignments loaded successfully!</p>
         </CardContent>
       </Card>
     </div>
