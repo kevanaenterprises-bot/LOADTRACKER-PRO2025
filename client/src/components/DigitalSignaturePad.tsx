@@ -149,15 +149,9 @@ export function DigitalSignaturePad({
 
         // Save signature reference to load if loadId provided
         if (loadId) {
-          await apiRequest(`/api/loads/${loadId}/signature`, {
-            method: "PATCH",
-            headers: {
-              'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
-            },
-            body: JSON.stringify({ 
-              signatureURL: uploadURL,
-              signedAt: new Date().toISOString() 
-            }),
+          await apiRequest(`/api/loads/${loadId}/signature`, "PATCH", { 
+            signatureURL: uploadURL,
+            signedAt: new Date().toISOString() 
           });
         }
 
@@ -206,12 +200,17 @@ export function DigitalSignaturePad({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-white">
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-white relative">
           <canvas
             ref={canvasRef}
             width={400}
             height={200}
             className="w-full h-auto border border-gray-200 rounded cursor-crosshair touch-none"
+            style={{ 
+              touchAction: 'none',
+              position: 'relative',
+              display: 'block'
+            }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}

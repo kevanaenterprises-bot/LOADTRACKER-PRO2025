@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import StandaloneBOLUpload from "@/components/StandaloneBOLUpload";
 import { NotificationSettings } from "@/components/NotificationSettings";
-import { DigitalSignaturePad } from "@/components/DigitalSignaturePad";
+import DriverLoadsDisplay from "@/components/DriverLoadsDisplay";
 import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import DriverLoadCard from "@/components/DriverLoadCard";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
@@ -83,7 +83,13 @@ export default function DriverPortal() {
         </div>
       </div>
 
-      {/* BOL Upload Section - Core Functionality */}
+      {/* Driver Loads Section - MOST IMPORTANT */}
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold mb-2">Your Assigned Loads</h2>
+        <DriverLoadsDisplay driverId={user.id} />
+      </div>
+
+      {/* BOL Upload Section */}
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">BOL Upload</h2>
         <StandaloneBOLUpload />
@@ -92,12 +98,6 @@ export default function DriverPortal() {
       {/* Notification Settings */}
       <div className="mb-4">
         <NotificationSettings driverId={user.id} />
-      </div>
-
-      {/* Digital Signature */}
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Digital Signature</h2>
-        <DigitalSignaturePad />
       </div>
 
       {/* Status Message */}

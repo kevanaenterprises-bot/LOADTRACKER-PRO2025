@@ -1,0 +1,228 @@
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { DigitalSignaturePad } from "@/components/DigitalSignaturePad";
+import { apiRequest } from "@/lib/queryClient";
+
+interface DriverLoadsDisplayProps {
+  driverId: string;
+}
+
+export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedLoad, setSelectedLoad] = useState<any>(null);
+  const [showSignatureDialog, setShowSignatureDialog] = useState(false);
+  const [showLoadDetails, setShowLoadDetails] = useState(false);
+
+  // Fetch driver's assigned loads
+  const { data: loads = [], isLoading } = useQuery<any[]>({
+    queryKey: ["/api/drivers", driverId, "loads"],
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Status update mutation
+  const statusUpdateMutation = useMutation({
+    mutationFn: async ({ loadId, status }: { loadId: string; status: string }) => {
+      return await apiRequest(`/api/loads/${loadId}/status`, "PATCH", { status });
+    },
+    onSuccess: () => {
+      toast({ title: "Success", description: "Status updated successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/drivers", driverId, "loads"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error", 
+        description: error.message || "Failed to update status",
+        variant: "destructive"
+      });
+    },
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "created": return "bg-blue-100 text-blue-800";
+      case "assigned": return "bg-yellow-100 text-yellow-800";
+      case "in_progress": return "bg-orange-100 text-orange-800";
+      case "at_shipper": return "bg-purple-100 text-purple-800";
+      case "left_shipper": return "bg-indigo-100 text-indigo-800";
+      case "at_receiver": return "bg-pink-100 text-pink-800";
+      case "delivered": return "bg-green-100 text-green-800";
+      case "completed": return "bg-gray-100 text-gray-800";
+      default: return "bg-gray-100 text-gray-600";
+    }
+  };
+
+  const updateStatus = (loadId: string, newStatus: string) => {
+    statusUpdateMutation.mutate({ loadId, status: newStatus });
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p className="text-gray-600">Loading your loads...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (loads.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <h3 className="font-semibold text-gray-700">No Loads Assigned</h3>
+          <p className="text-gray-600 mt-2">You don't have any loads assigned yet.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      {loads.map((load: any) => (
+        <Card key={load.id} className="mb-4 border-l-4 border-l-blue-500">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-xl font-bold text-blue-700">
+                  {load.number109}
+                </CardTitle>
+                <p className="text-sm text-gray-600">
+                  {load.location?.name} - {load.location?.city}, {load.location?.state}
+                </p>
+              </div>
+              <Badge className={getStatusColor(load.status)}>
+                {load.status.replace('_', ' ').toUpperCase()}
+              </Badge>
+            </div>
+          </CardHeader>
+          
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <p className="text-sm font-medium text-gray-700">Distance</p>
+                <p className="text-lg">{load.estimatedMiles} miles</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700">Rate</p>
+                <p className="text-lg">${load.flatRate}</p>
+              </div>
+            </div>
+            
+            {load.specialInstructions && (
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                <p className="text-sm font-medium text-yellow-800">Special Instructions:</p>
+                <p className="text-sm text-yellow-700">{load.specialInstructions}</p>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                onClick={() => {
+                  setSelectedLoad(load);
+                  setShowLoadDetails(true);
+                }}
+                variant="outline"
+                size="sm"
+                data-testid={`button-view-details-${load.id}`}
+              >
+                View Details
+              </Button>
+              
+              {load.status !== "delivered" && load.status !== "completed" && (
+                <>
+                  <Button 
+                    onClick={() => updateStatus(load.id, "in_progress")}
+                    variant="default"
+                    size="sm"
+                    disabled={statusUpdateMutation.isPending}
+                    data-testid={`button-start-load-${load.id}`}
+                  >
+                    {load.status === "created" ? "Start Load" : "Update Status"}
+                  </Button>
+                  
+                  <Button 
+                    onClick={() => {
+                      setSelectedLoad(load);
+                      setShowSignatureDialog(true);
+                    }}
+                    variant="outline"
+                    size="sm"
+                    data-testid={`button-sign-documents-${load.id}`}
+                  >
+                    Sign Documents
+                  </Button>
+                </>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+
+      {/* Load Details Dialog */}
+      <Dialog open={showLoadDetails} onOpenChange={setShowLoadDetails}>
+        <DialogContent className="max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle>Load Details - {selectedLoad?.number109}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <p className="font-medium">Destination:</p>
+              <p>{selectedLoad?.location?.name}</p>
+              <p>{selectedLoad?.location?.city}, {selectedLoad?.location?.state}</p>
+            </div>
+            <div>
+              <p className="font-medium">Distance: {selectedLoad?.estimatedMiles} miles</p>
+              <p className="font-medium">Rate: ${selectedLoad?.flatRate}</p>
+              {selectedLoad?.lumperCharge > 0 && (
+                <p className="font-medium">Lumper Fee: ${selectedLoad?.lumperCharge}</p>
+              )}
+            </div>
+            <div>
+              <p className="font-medium">Status:</p>
+              <Badge className={getStatusColor(selectedLoad?.status)}>
+                {selectedLoad?.status?.replace('_', ' ').toUpperCase()}
+              </Badge>
+            </div>
+            {selectedLoad?.specialInstructions && (
+              <div>
+                <p className="font-medium">Special Instructions:</p>
+                <p className="text-sm bg-yellow-50 p-2 rounded">{selectedLoad?.specialInstructions}</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Signature Dialog - Fixed Position */}
+      <Dialog open={showSignatureDialog} onOpenChange={setShowSignatureDialog}>
+        <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Sign Documents - {selectedLoad?.number109}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <DigitalSignaturePad 
+              loadId={selectedLoad?.id}
+              loadNumber={selectedLoad?.number109}
+              onSignatureComplete={() => {
+                setShowSignatureDialog(false);
+                toast({ 
+                  title: "Success", 
+                  description: "Document signed successfully" 
+                });
+                queryClient.invalidateQueries({ queryKey: ["/api/drivers", driverId, "loads"] });
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
