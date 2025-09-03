@@ -167,12 +167,8 @@ export default function DriverPortal() {
     );
   }
   
-  // SIMPLIFIED: If not loading and we have an authenticated user, show portal
-  if (isAuthenticated && user) {
-    console.log("✅ AUTHENTICATION SUCCESS: User is authenticated", user);
-    // Continue to portal rendering below
-  } else {
-    // SIMPLIFIED: Any other case (error, no user, etc.) redirect to login
+  // CRITICAL FIX: Only redirect if explicitly not authenticated
+  if (!isLoading && !isAuthenticated) {
     console.log("🚨 Not authenticated, redirecting to login");
     console.log("🚨 Auth state:", { isAuthenticated, user: !!user, error: !!error });
     
@@ -197,6 +193,9 @@ export default function DriverPortal() {
       </div>
     );
   }
+  
+  // SIMPLIFIED: If we get here, show the portal (authenticated or loading state handled above)
+  console.log("✅ SHOWING DRIVER PORTAL - User:", user);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);
