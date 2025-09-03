@@ -141,17 +141,21 @@ const DriverLoadCard = ({ load }: { load: Load }) => {
 };
 
 export default function DriverPortal() {
+  console.log("🚀 DriverPortal component is rendering...");
+  
   const { user, logout, isLoading, isAuthenticated, error } = useDriverAuth();
   
-  console.log("🔍 PORTAL STATE DEBUG:");
-  console.log("- user:", user);
+  console.log("🔍 DETAILED PORTAL STATE DEBUG:");
+  console.log("- user:", JSON.stringify(user, null, 2));
   console.log("- isLoading:", isLoading);
   console.log("- isAuthenticated:", isAuthenticated);
-  console.log("- error:", error);
+  console.log("- error:", JSON.stringify(error, null, 2));
+  console.log("- Current path:", window.location.pathname);
+  console.log("- Session storage driver-redirecting:", sessionStorage.getItem('driver-redirecting'));
   
   // SIMPLIFIED: Show loading only during initial authentication check
   if (isLoading) {
-    console.log("🔄 Still loading authentication...");
+    console.log("🔄 SHOWING LOADING STATE - Still loading authentication...");
     return (
       <div className="max-w-lg mx-auto min-h-screen bg-gray-50">
         <div className="p-4">
@@ -169,7 +173,7 @@ export default function DriverPortal() {
   
   // CRITICAL FIX: Only redirect if explicitly not authenticated
   if (!isLoading && !isAuthenticated) {
-    console.log("🚨 Not authenticated, redirecting to login");
+    console.log("🚨 SHOWING REDIRECT STATE - Not authenticated, redirecting to login");
     console.log("🚨 Auth state:", { isAuthenticated, user: !!user, error: !!error });
     
     // Only redirect if not already redirecting
@@ -195,7 +199,9 @@ export default function DriverPortal() {
   }
   
   // SIMPLIFIED: If we get here, show the portal (authenticated or loading state handled above)
-  console.log("✅ SHOWING DRIVER PORTAL - User:", user);
+  console.log("✅ REACHED PORTAL RENDER SECTION!");
+  console.log("✅ Final auth check before render:", { isLoading, isAuthenticated, hasUser: !!user });
+  console.log("✅ User data:", user);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [selectedLoadForBOL, setSelectedLoadForBOL] = useState<Load | null>(null);
