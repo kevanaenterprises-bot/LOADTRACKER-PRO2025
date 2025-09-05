@@ -32,7 +32,7 @@ import {
   InsertLoadStop,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql, not } from "drizzle-orm";
+import { eq, desc, and, sql, not, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -253,7 +253,7 @@ export class DatabaseStorage implements IStorage {
     // Get stops for each load
     const loadIds = result.map(row => row.load.id);
     const allStops = loadIds.length > 0 
-      ? await db.select().from(loadStops).where(sql`${loadStops.loadId} = ANY(${loadIds})`)
+      ? await db.select().from(loadStops).where(inArray(loadStops.loadId, loadIds))
       : [];
 
     return result.map(row => ({
