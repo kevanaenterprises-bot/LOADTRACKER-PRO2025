@@ -1527,6 +1527,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/locations/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const location = await storage.updateLocation(req.params.id, req.body);
+      if (!location) {
+        return res.status(404).json({ message: "Location not found" });
+      }
+      res.json(location);
+    } catch (error) {
+      console.error("Error updating location:", error);
+      res.status(400).json({ message: "Failed to update location" });
+    }
+  });
+
+  app.delete("/api/locations/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      await storage.deleteLocation(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting location:", error);
+      res.status(400).json({ message: "Failed to delete location" });
+    }
+  });
+
   // Drivers - WITH TOKEN BYPASS
   app.get("/api/drivers", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
@@ -3643,6 +3680,29 @@ Reply YES to confirm acceptance or NO to decline.`
     } catch (error) {
       console.error("Error creating rate:", error);
       res.status(400).json({ message: "Invalid rate data" });
+    }
+  });
+
+  app.put("/api/rates/:id", isAdminAuthenticated, async (req, res) => {
+    try {
+      const rate = await storage.updateRate(req.params.id, req.body);
+      if (!rate) {
+        return res.status(404).json({ message: "Rate not found" });
+      }
+      res.json(rate);
+    } catch (error) {
+      console.error("Error updating rate:", error);
+      res.status(400).json({ message: "Failed to update rate" });
+    }
+  });
+
+  app.delete("/api/rates/:id", isAdminAuthenticated, async (req, res) => {
+    try {
+      await storage.deleteRate(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting rate:", error);
+      res.status(400).json({ message: "Failed to delete rate" });
     }
   });
 

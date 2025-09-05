@@ -50,6 +50,8 @@ export interface IStorage {
   getLocation(id: string): Promise<Location | undefined>;
   getLocationByName(name: string): Promise<Location | undefined>;
   createLocation(location: InsertLocation): Promise<Location>;
+  updateLocation(id: string, location: Partial<InsertLocation>): Promise<Location | undefined>;
+  deleteLocation(id: string): Promise<void>;
 
   // Load operations
   createLoad(load: InsertLoad, stops?: InsertLoadStop[]): Promise<Load>;
@@ -78,6 +80,8 @@ export interface IStorage {
   getRates(): Promise<Rate[]>;
   getRateByLocation(city: string, state: string): Promise<Rate | undefined>;
   createRate(rate: InsertRate): Promise<Rate>;
+  updateRate(id: string, rate: Partial<InsertRate>): Promise<Rate | undefined>;
+  deleteRate(id: string): Promise<void>;
 
   // Customer operations
   getCustomers(): Promise<Customer[]>;
@@ -228,6 +232,19 @@ export class DatabaseStorage implements IStorage {
   async createLocation(location: InsertLocation): Promise<Location> {
     const [newLocation] = await db.insert(locations).values(location).returning();
     return newLocation;
+  }
+
+  async updateLocation(id: string, location: Partial<InsertLocation>): Promise<Location | undefined> {
+    const [updatedLocation] = await db
+      .update(locations)
+      .set(location)
+      .where(eq(locations.id, id))
+      .returning();
+    return updatedLocation;
+  }
+
+  async deleteLocation(id: string): Promise<void> {
+    await db.delete(locations).where(eq(locations.id, id));
   }
 
   async createLoad(load: InsertLoad, stops?: InsertLoadStop[]): Promise<Load> {
@@ -593,6 +610,19 @@ export class DatabaseStorage implements IStorage {
   async createRate(rate: InsertRate): Promise<Rate> {
     const [newRate] = await db.insert(rates).values(rate).returning();
     return newRate;
+  }
+
+  async updateRate(id: string, rate: Partial<InsertRate>): Promise<Rate | undefined> {
+    const [updatedRate] = await db
+      .update(rates)
+      .set(rate)
+      .where(eq(rates.id, id))
+      .returning();
+    return updatedRate;
+  }
+
+  async deleteRate(id: string): Promise<void> {
+    await db.delete(rates).where(eq(rates.id, id));
   }
 
   // Customer operations

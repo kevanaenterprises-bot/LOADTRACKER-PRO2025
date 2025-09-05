@@ -17,6 +17,8 @@ import LoadTrackingMap from "@/components/LoadTrackingMap";
 import { DriverList } from "@/components/DriverList";
 import { Header } from "@/components/Header";
 import CustomerForm from "@/components/CustomerForm";
+import LocationManagement from "@/components/LocationManagement";
+import RateManagement from "@/components/RateManagement";
 import { CacheDebugger } from "@/components/CacheDebugger";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -52,7 +54,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers">("loads");
+  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers" | "locations" | "rates">("loads");
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
@@ -389,6 +391,14 @@ export default function Dashboard() {
               <i className="fas fa-building text-lg md:text-base text-indigo-600"></i>
               <span className="text-center leading-tight">Customers</span>
             </TabsTrigger>
+            <TabsTrigger value="locations" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-purple-700 hover:text-purple-900 font-semibold">
+              <i className="fas fa-map-marker-alt text-lg md:text-base text-purple-600"></i>
+              <span className="text-center leading-tight">Locations</span>
+            </TabsTrigger>
+            <TabsTrigger value="rates" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-green-700 hover:text-green-900 font-semibold">
+              <i className="fas fa-dollar-sign text-lg md:text-base text-green-600"></i>
+              <span className="text-center leading-tight">Rates</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Load Management Tab */}
@@ -657,6 +667,16 @@ export default function Dashboard() {
           {/* Customers Tab */}
           <TabsContent value="customers" className="mt-6">
             <CustomerForm />
+          </TabsContent>
+
+          {/* Locations Tab */}
+          <TabsContent value="locations" className="mt-6">
+            <LocationManagement />
+          </TabsContent>
+
+          {/* Rates Tab */}
+          <TabsContent value="rates" className="mt-6">
+            <RateManagement />
           </TabsContent>
 
         </Tabs>
