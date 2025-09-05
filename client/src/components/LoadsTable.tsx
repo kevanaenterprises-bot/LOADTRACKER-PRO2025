@@ -30,11 +30,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus, Package, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
+import { LoadSection } from "@/components/LoadsTableSections";
 
 const getStatusColor = (status: string) => {
   switch (status) {
+    case "pending":
     case "created":
       return "bg-gray-100 text-gray-800";
+    case "assigned":
+      return "bg-blue-100 text-blue-800";
+    case "in_transit":
     case "en_route_pickup":
     case "en_route_receiver":
       return "bg-warning bg-opacity-20 text-warning";
@@ -43,10 +48,11 @@ const getStatusColor = (status: string) => {
       return "bg-blue-100 text-blue-800";
     case "delivered":
       return "bg-success bg-opacity-20 text-success";
+    case "awaiting_invoicing":
     case "empty":
       return "bg-purple-100 text-purple-800";
+    case "awaiting_payment":
     case "waiting_for_invoice":
-      return "bg-yellow-100 text-yellow-800";
     case "invoiced":
       return "bg-orange-100 text-orange-800";
     case "paid":
@@ -60,8 +66,14 @@ const getStatusColor = (status: string) => {
 
 const getStatusText = (status: string) => {
   switch (status) {
+    case "pending":
+      return "Pending Assignment";
     case "created":
       return "Created";
+    case "assigned":
+      return "Driver Assigned";
+    case "in_transit":
+      return "In Transit";
     case "en_route_pickup":
       return "En Route to Pickup";
     case "at_shipper":
@@ -74,10 +86,12 @@ const getStatusText = (status: string) => {
       return "At Receiver";
     case "delivered":
       return "Delivered";
+    case "awaiting_invoicing":
     case "empty":
-      return "Empty - Ready for Invoice";
+      return "Awaiting Invoicing";
+    case "awaiting_payment":
     case "waiting_for_invoice":
-      return "Waiting for Invoice";
+      return "Awaiting Payment";
     case "invoiced":
       return "Invoiced";
     case "paid":
@@ -468,14 +482,18 @@ export default function LoadsTable() {
     );
   }
 
-  // Categorize loads by status for invoice workflow
-  const inProgressLoads = Array.isArray(loads) ? loads.filter((load: any) => 
-    !["empty", "waiting_for_invoice", "invoiced", "paid", "completed"].includes(load.status)
+  // Categorize loads by new workflow stages
+  const pendingLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "pending" || load.status === "created") : [];
+  const assignedLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "assigned" && load.driverId) : [];
+  const inTransitLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+    ["in_transit", "en_route_pickup", "at_shipper", "left_shipper", "en_route_receiver", "at_receiver", "delivered", "in_progress"].includes(load.status)
   ) : [];
-  
-  const emptyLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "empty") : [];
-  const waitingForInvoiceLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "waiting_for_invoice") : [];
-  const invoicedLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "invoiced") : [];
+  const awaitingInvoicingLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+    load.status === "awaiting_invoicing" || load.status === "empty"
+  ) : [];
+  const awaitingPaymentLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+    load.status === "awaiting_payment" || load.status === "invoiced" || load.status === "waiting_for_invoice"
+  ) : [];
   const paidLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "paid") : [];
 
   return (
@@ -519,319 +537,101 @@ export default function LoadsTable() {
       </CardHeader>
       <CardContent>
         {/* Trucker Tip for first-time users */}
-        {inProgressLoads.length === 0 && emptyLoads.length === 0 && (
+        {pendingLoads.length === 0 && assignedLoads.length === 0 && inTransitLoads.length === 0 && (
           <TruckerTip 
             message="Hey there! Looks like you're just getting started. Create your first load using the 'Create Load' tab above. I'll help guide you through each step!"
             mood="helpful"
           />
         )}
         
-        {/* In Progress Loads Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <h3 className="text-lg font-semibold text-blue-700">In Progress ({inProgressLoads.length})</h3>
-            <HelpButton 
-              content="These are active loads that drivers are currently working on. Once the POD is uploaded, they'll move to the 'Empty' section for invoicing."
-            />
+        {/* Pending/Waiting Assignment Section */}
+        <LoadSection
+          loads={pendingLoads}
+          title="Pending - Waiting Assignment"
+          color="text-gray-700"
+          helpText="Newly created loads waiting for a driver to be assigned."
+          showDriverAssign={true}
+          availableDrivers={availableDrivers}
+          onLoadClick={handleLoadClick}
+          onDeleteLoad={handleDeleteLoad}
+        />
+        
+        {/* Driver Assigned Section */}
+        <LoadSection
+          loads={assignedLoads}
+          title="Driver Assigned"
+          color="text-blue-700"
+          helpText="Loads with assigned drivers waiting to start transit."
+          onLoadClick={handleLoadClick}
+          onDeleteLoad={handleDeleteLoad}
+        />
+        
+        {/* In Transit Section */}
+        <LoadSection
+          loads={inTransitLoads}
+          title="In Transit"
+          color="text-yellow-700"
+          helpText="Loads currently being transported. Drivers are on the road!"
+          onLoadClick={handleLoadClick}
+          onDeleteLoad={handleDeleteLoad}
+        />
+        
+        {/* Awaiting Invoicing Section */}
+        <LoadSection
+          loads={awaitingInvoicingLoads}
+          title="Awaiting Invoicing"
+          color="text-purple-700"
+          helpText="POD has been uploaded. These loads are ready to be invoiced."
+          showInvoiceButton={true}
+          onLoadClick={handleLoadClick}
+          onGenerateInvoice={() => {
+            if (awaitingInvoicingLoads.length > 0) {
+              setSelectedLoad(awaitingInvoicingLoads[0]);
+              handleGenerateInvoice();
+            }
+          }}
+          onDeleteLoad={handleDeleteLoad}
+        />
+        
+        {/* Awaiting Payment Section */}
+        <LoadSection
+          loads={awaitingPaymentLoads}
+          title="Awaiting Payment"
+          color="text-orange-700"
+          helpText="Invoiced loads waiting for payment from customers."
+          showPaymentButton={true}
+          onLoadClick={handleLoadClick}
+          onDeleteLoad={handleDeleteLoad}
+        />
+        
+        {/* Paid Loads Section - Brief Summary */}
+        {paidLoads.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <h3 className="text-lg font-semibold text-green-700">Recently Paid ({paidLoads.length})</h3>
+              <HelpButton 
+                content="Loads that have been paid. View all paid invoices in the 'Paid Invoices' tab."
+              />
+            </div>
+            <div className="text-center py-4 bg-green-50 rounded">
+              <p className="text-green-700">
+                {paidLoads.length} loads have been paid. 
+                <Button 
+                  variant="link" 
+                  className="text-green-700 underline"
+                  onClick={() => {
+                    toast({ 
+                      title: "Coming Soon", 
+                      description: "Paid Invoices tab will be available soon!" 
+                    });
+                  }}
+                >
+                  View Paid Invoices →
+                </Button>
+              </p>
+            </div>
           </div>
-          {inProgressLoads.length === 0 ? (
-            <div className="text-center py-4 bg-gray-50 rounded">
-              <p className="text-gray-600">No loads in progress</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>109 Number</TableHead>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Destination</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="min-w-[200px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {inProgressLoads.map((load: any) => (
-                  <TableRow 
-                    key={load.id} 
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handleLoadClick(load)}
-                  >
-                    <TableCell>
-                      <div>
-                        <div className="text-sm font-medium text-secondary">
-                          {load.number109}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(load.createdAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {load.driver ? (
-                        <div className="flex items-center">
-                          <img 
-                            className="h-8 w-8 rounded-full mr-3" 
-                            src={load.driver.profileImageUrl || `https://ui-avatars.io/api/?name=${load.driver.firstName}+${load.driver.lastName}&background=1976D2&color=fff`}
-                            alt="Driver" 
-                          />
-                          <div>
-                            <div className="text-sm font-medium text-secondary">
-                              {load.driver.firstName} {load.driver.lastName}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              ID: {load.driver.id.slice(0, 8)}
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-gray-500">No driver assigned</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {load.location ? (
-                        <div>
-                          <div className="text-sm text-secondary">{load.location.name}</div>
-                          <div className="text-xs text-gray-500">
-                            {load.estimatedMiles || 0} miles
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-gray-500">No location</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(load.status)}>
-                        {getStatusText(load.status)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-1 min-w-[200px]">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLoadClick(load);
-                          }}
-                          title="View load details"
-                        >
-                          <i className="fas fa-eye text-primary"></i>
-                        </Button>
-                        {hasInvoice(load.id) ? (
-                          <PrintButton 
-                            invoiceId={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === load.id)?.id : undefined}
-                            loadId={load.id}
-                            load={load}
-                            invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === load.id) : undefined}
-                            variant="ghost"
-                            size="sm"
-                          />
-                        ) : (
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleLoadClick(load);
-                            }}
-                            title="Generate invoice"
-                            className="text-green-600 hover:text-green-700"
-                          >
-                            <i className="fas fa-file-invoice-dollar"></i>
-                          </Button>
-                        )}
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteLoad(load);
-                          }}
-                          title="Delete load"
-                          className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
-                        >
-                          <i className="fas fa-trash mr-1"></i>
-                          Delete
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          )}
-        </div>
-
-        {/* Empty Loads Section - Ready for Invoicing */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-purple-700">Empty - Ready for Invoicing ({emptyLoads.length})</h3>
-          {emptyLoads.length > 0 && (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>109 Number</TableHead>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Destination</TableHead>
-                    <TableHead>POD Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {emptyLoads.map((load: any) => (
-                    <TableRow key={load.id} className="hover:bg-purple-50">
-                      <TableCell>{load.number109}</TableCell>
-                      <TableCell>
-                        {load.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'Unassigned'}
-                      </TableCell>
-                      <TableCell>{load.location?.name || 'N/A'}</TableCell>
-                      <TableCell>
-                        <Badge className="bg-green-100 text-green-800">POD Uploaded</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            setSelectedLoad(load);
-                            handleGenerateInvoice();
-                          }}
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <i className="fas fa-file-invoice mr-1"></i>
-                          Generate Invoice
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
-
-        {/* Waiting for Invoice Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-yellow-700">Waiting for Invoice ({waitingForInvoiceLoads.length})</h3>
-          {waitingForInvoiceLoads.length > 0 && (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>109 Number</TableHead>
-                    <TableHead>Driver</TableHead>
-                    <TableHead>Destination</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {waitingForInvoiceLoads.map((load: any) => (
-                    <TableRow key={load.id} className="hover:bg-yellow-50">
-                      <TableCell>{load.number109}</TableCell>
-                      <TableCell>
-                        {load.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'Unassigned'}
-                      </TableCell>
-                      <TableCell>{load.location?.name || 'N/A'}</TableCell>
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedLoad(load);
-                            handleGenerateInvoice();
-                          }}
-                        >
-                          <i className="fas fa-clock mr-1"></i>
-                          Process Invoice
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
-
-        {/* Invoiced Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-orange-700">Invoiced ({invoicedLoads.length})</h3>
-          {invoicedLoads.length > 0 && (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>109 Number</TableHead>
-                    <TableHead>Invoice #</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoicedLoads.map((load: any) => (
-                    <TableRow key={load.id} className="hover:bg-orange-50">
-                      <TableCell>{load.number109}</TableCell>
-                      <TableCell>{load.invoice?.invoiceNumber || 'N/A'}</TableCell>
-                      <TableCell>{load.invoice?.customer?.name || 'N/A'}</TableCell>
-                      <TableCell>${load.invoice?.totalAmount || '0.00'}</TableCell>
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            // Mark as paid
-                            apiRequest(`/api/loads/${load.id}/status`, "PATCH", { status: "paid" })
-                              .then(() => {
-                                toast({ title: "Load marked as paid" });
-                                queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
-                              });
-                          }}
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          <i className="fas fa-check-circle mr-1"></i>
-                          Mark as Paid
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
-
-        {/* Paid Section */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-green-700">Paid ({paidLoads.length})</h3>
-          {paidLoads.length > 0 && (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>109 Number</TableHead>
-                    <TableHead>Invoice #</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Paid Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paidLoads.map((load: any) => (
-                    <TableRow key={load.id} className="hover:bg-green-50">
-                      <TableCell>{load.number109}</TableCell>
-                      <TableCell>{load.invoice?.invoiceNumber || 'N/A'}</TableCell>
-                      <TableCell>{load.invoice?.customer?.name || 'N/A'}</TableCell>
-                      <TableCell>${load.invoice?.totalAmount || '0.00'}</TableCell>
-                      <TableCell>{load.paidAt ? new Date(load.paidAt).toLocaleDateString() : 'N/A'}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </div>
+        )}
       </CardContent>
 
       {/* Load Details Dialog */}

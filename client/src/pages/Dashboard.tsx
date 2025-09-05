@@ -20,6 +20,7 @@ import CustomerForm from "@/components/CustomerForm";
 import LocationManagement from "@/components/LocationManagement";
 import RateManagement from "@/components/RateManagement";
 import { CacheDebugger } from "@/components/CacheDebugger";
+import { PaidInvoices } from "@/components/PaidInvoices";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,7 +55,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers" | "locations" | "rates">("loads");
+  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices">("loads");
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
@@ -370,7 +371,7 @@ export default function Dashboard() {
 
         {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-8">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 h-auto gap-1">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 h-auto gap-1">
             <TabsTrigger value="loads" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-blue-700 hover:text-blue-900 font-semibold">
               <i className="fas fa-truck text-lg md:text-base text-blue-600"></i>
               <span className="text-center leading-tight">Load Management</span>
@@ -398,6 +399,10 @@ export default function Dashboard() {
             <TabsTrigger value="rates" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-green-700 hover:text-green-900 font-semibold">
               <i className="fas fa-dollar-sign text-lg md:text-base text-green-600"></i>
               <span className="text-center leading-tight">Rates</span>
+            </TabsTrigger>
+            <TabsTrigger value="paid-invoices" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-emerald-700 hover:text-emerald-900 font-semibold">
+              <i className="fas fa-check-circle text-lg md:text-base text-emerald-600"></i>
+              <span className="text-center leading-tight">Paid Invoices</span>
             </TabsTrigger>
           </TabsList>
 
@@ -677,6 +682,11 @@ export default function Dashboard() {
           {/* Rates Tab */}
           <TabsContent value="rates" className="mt-6">
             <RateManagement />
+          </TabsContent>
+
+          {/* Paid Invoices Tab */}
+          <TabsContent value="paid-invoices" className="mt-6">
+            <PaidInvoices />
           </TabsContent>
 
         </Tabs>
