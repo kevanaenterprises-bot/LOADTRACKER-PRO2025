@@ -70,18 +70,37 @@ export async function sendSMSToDriver(toNumber: string, message: string): Promis
   });
 
   try {
+    console.log(`📱 ATTEMPTING TO SEND SMS TO TWILIO:`, {
+      from: fromNumber,
+      to: normalizedNumber,
+      messagePreview: message.substring(0, 50) + "..."
+    });
+    
     const result = await twilioClient.messages.create({
       body: message,
       from: fromNumber,
       to: normalizedNumber,
     });
-    console.log(`✅ SMS sent successfully: ${result.sid}`, {
+    
+    console.log(`✅ SMS QUEUED WITH TWILIO: ${result.sid}`, {
       to: normalizedNumber,
       status: result.status,
       direction: result.direction,
       price: result.price,
-      uri: result.uri
+      uri: result.uri,
+      dateCreated: result.dateCreated,
+      dateSent: result.dateSent,
+      errorCode: result.errorCode,
+      errorMessage: result.errorMessage
     });
+    
+    // Important: Twilio messages are queued, not instantly delivered
+    console.log(`⚠️ NOTE: SMS status is "${result.status}" - Messages may take time to deliver or may fail silently if:
+    - Phone number is not verified in Twilio (for trial accounts)
+    - Recipient has not opted in to receive messages
+    - Phone number format is incorrect
+    - Twilio account has insufficient balance`);
+    
   } catch (error) {
     console.error("❌ Failed to send SMS - Detailed Error:", {
       error: error.message,
