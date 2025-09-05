@@ -67,7 +67,7 @@ export const loads = pgTable("loads", {
   podDocumentPath: varchar("pod_document_path"),
   signatureURL: varchar("signature_url"),
   signedAt: timestamp("signed_at"),
-  extraStops: integer("extra_stops").default(0), // Number of extra stops
+  extraStops: decimal("extra_stops", { precision: 10, scale: 2 }).default("0.00"), // Extra stops charge amount
   lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"), // Lumper charge amount
   flatRate: decimal("flat_rate", { precision: 10, scale: 2 }).default("0.00"), // Flat rate for this specific load
   // OCR-extracted fields from Rate Con

@@ -78,7 +78,7 @@ export default function LoadForm() {
       status: "created",
       flatRate: "0.00",
       lumperCharge: "0.00", 
-      extraStops: 0,
+      extraStops: "0.00",
       driverConfirmed: false,
     },
   });
@@ -180,9 +180,6 @@ export default function LoadForm() {
 
     setStops([...stops, newStop]);
     setShowStopDialog(false);
-    
-    // Update extraStops count in form
-    form.setValue("extraStops", stops.length + 1);
   };
 
   const removeStop = (index: number) => {
@@ -193,7 +190,6 @@ export default function LoadForm() {
       stopSequence: i + 1,
     }));
     setStops(resequencedStops);
-    form.setValue("extraStops", resequencedStops.length);
   };
 
   const moveStopUp = (index: number) => {
