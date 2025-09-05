@@ -598,14 +598,14 @@ export default function LoadsTable() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-600 block">Extra Stops</label>
+                    <label className="text-xs text-gray-600 block">Extra Stops ($)</label>
                     <input 
                       type="number" 
-                      defaultValue={selectedLoad.extraStops || 0}
+                      step="0.01"
+                      defaultValue={selectedLoad.extraStops || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
                     />
-                    <div className="text-xs text-gray-500 mt-1">{selectedLoad.extraStops || 0} stops × $50 = ${((selectedLoad.extraStops || 0) * 50).toFixed(2)}</div>
                   </div>
                 </div>
               </div>
