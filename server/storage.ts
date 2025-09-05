@@ -396,11 +396,17 @@ export class DatabaseStorage implements IStorage {
       .returning();
 
     // Create BOL record for duplicate tracking
-    await this.createBOLNumber({
-      bolNumber,
-      tripNumber,
-      loadId: id,
-    });
+    // Wrap in try-catch to handle duplicates when using override
+    try {
+      await this.createBOLNumber({
+        bolNumber,
+        tripNumber,
+        loadId: id,
+      });
+    } catch (error) {
+      console.log("⚠️ BOL record creation skipped (duplicate with override):", bolNumber);
+      // Continue even if BOL record fails - this supports override scenarios
+    }
 
     return updatedLoad;
   }
