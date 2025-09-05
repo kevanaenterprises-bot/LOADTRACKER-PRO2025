@@ -57,6 +57,7 @@ export interface IStorage {
   updateLoadPOD(id: string, podDocumentPath: string): Promise<Load>;
   getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]>;
   getLoadsWithTracking(): Promise<LoadWithDetails[]>;
+  deleteLoad(id: string): Promise<void>;
 
   // BOL operations
   checkBOLExists(bolNumber: string): Promise<boolean>;
@@ -458,6 +459,16 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
+  async deleteLoad(id: string): Promise<void> {
+    // Delete related records first to maintain referential integrity
+    await db.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
+    await db.delete(bolNumbers).where(eq(bolNumbers.loadId, id));
+    await db.delete(invoices).where(eq(invoices.loadId, id));
+    
+    // Finally delete the load itself
+    await db.delete(loads).where(eq(loads.id, id));
+  }
+
   async checkBOLExists(bolNumber: string): Promise<boolean> {
     const [existing] = await db
       .select({ count: sql<number>`count(*)` })
@@ -583,25 +594,34 @@ export class DatabaseStorage implements IStorage {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Active loads (not completed)
+    // Active loads (assigned to drivers, not completed)
     const [activeLoadsResult] = await db
       .select({ count: sql<number>`count(*)` })
       .from(loads)
-      .where(sql`status != 'completed'`);
+      .where(and(
+        sql`${loads.driverId} IS NOT NULL`,
+        sql`${loads.status} NOT IN ('completed', 'delivered')`
+      ));
 
-    // In transit loads
+    // In transit loads (actively moving between pickup and delivery)
     const [inTransitResult] = await db
       .select({ count: sql<number>`count(*)` })
       .from(loads)
-      .where(sql`status IN ('en_route_pickup', 'left_shipper', 'en_route_receiver')`);
+      .where(and(
+        sql`${loads.driverId} IS NOT NULL`,
+        sql`${loads.status} IN ('in_progress', 'en_route_pickup', 'left_shipper', 'en_route_receiver')`
+      ));
 
     // Delivered today
     const [deliveredTodayResult] = await db
       .select({ count: sql<number>`count(*)` })
       .from(loads)
-      .where(sql`delivered_at >= ${today}`);
+      .where(and(
+        eq(loads.status, 'delivered'),
+        sql`${loads.deliveredAt} >= ${today}`
+      ));
 
-    // Revenue today
+    // Revenue today from completed invoices
     const [revenueTodayResult] = await db
       .select({ total: sql<string>`COALESCE(SUM(total_amount), 0)` })
       .from(invoices)

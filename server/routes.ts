@@ -2381,6 +2381,52 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Delete load endpoint - admins can delete loads  
+  app.delete("/api/loads/:id", (req, res, next) => {
+    // Flexible authentication for load deletion
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
+    const hasAdminAuth = (req.session as any)?.adminAuth;
+    const hasAuth = hasReplitAuth || hasAdminAuth || hasTokenBypass;
+    
+    console.log("Load deletion auth check:", {
+      hasReplitAuth,
+      hasAdminAuth,
+      hasTokenBypass,
+      finalAuth: hasAuth
+    });
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Unauthorized - admin access required for load deletion" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      
+      // Get load details before deletion
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // Delete the load
+      await storage.deleteLoad(loadId);
+      
+      console.log(`🗑️ Load ${load.number109} deleted by admin`);
+      
+      res.json({
+        message: "Load deleted successfully",
+        deletedLoad: load.number109
+      });
+    } catch (error) {
+      console.error("Error deleting load:", error);
+      res.status(500).json({ message: "Failed to delete load" });
+    }
+  });
+
   // Update load financial details
   app.patch("/api/loads/:id/financials", isAuthenticated, async (req, res) => {
     try {
