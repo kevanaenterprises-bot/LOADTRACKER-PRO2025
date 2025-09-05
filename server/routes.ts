@@ -15,6 +15,7 @@ import {
   insertBolNumberSchema,
   insertRateSchema,
   insertUserSchema,
+  insertCustomerSchema,
   type Load,
   type User,
   type Location,
@@ -1652,11 +1653,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, async (req, res) => {
     try {
-      const customer = await storage.createCustomer(req.body);
+      const validatedData = insertCustomerSchema.parse(req.body);
+      const customer = await storage.createCustomer(validatedData);
       res.json(customer);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating customer:", error);
-      res.status(500).json({ message: "Failed to create customer" });
+      if (error?.name === 'ZodError') {
+        res.status(400).json({ message: "Invalid customer data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: error?.message || "Failed to create customer" });
+      }
     }
   });
 
@@ -3562,9 +3568,10 @@ Reply YES to confirm acceptance or NO to decline.`
       // Update load with POD document path(s)
       const load = await storage.updateLoadPOD(req.params.id, finalPodPath);
       
-      // Update status to delivered if not already
-      if (load.status !== "delivered" && load.status !== "completed") {
-        await storage.updateLoadStatus(req.params.id, "delivered");
+      // Update status to empty when POD is uploaded (ready for invoicing)
+      if (load.status !== "empty" && load.status !== "waiting_for_invoice" && load.status !== "invoiced" && load.status !== "paid") {
+        await storage.updateLoadStatus(req.params.id, "empty");
+        console.log(`✅ Load ${req.params.id} moved to EMPTY status - ready for invoicing`);
       }
 
       // Automatically generate invoice when POD is uploaded

@@ -42,6 +42,14 @@ const getStatusColor = (status: string) => {
       return "bg-blue-100 text-blue-800";
     case "delivered":
       return "bg-success bg-opacity-20 text-success";
+    case "empty":
+      return "bg-purple-100 text-purple-800";
+    case "waiting_for_invoice":
+      return "bg-yellow-100 text-yellow-800";
+    case "invoiced":
+      return "bg-orange-100 text-orange-800";
+    case "paid":
+      return "bg-green-200 text-green-900";
     case "completed":
       return "bg-green-100 text-green-800";
     default:
@@ -65,6 +73,14 @@ const getStatusText = (status: string) => {
       return "At Receiver";
     case "delivered":
       return "Delivered";
+    case "empty":
+      return "Empty - Ready for Invoice";
+    case "waiting_for_invoice":
+      return "Waiting for Invoice";
+    case "invoiced":
+      return "Invoiced";
+    case "paid":
+      return "Paid";
     case "completed":
       return "Completed";
     default:
@@ -451,14 +467,21 @@ export default function LoadsTable() {
     );
   }
 
-  // Filter out completed loads for the main table
-  const activeLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status !== "completed") : [];
+  // Categorize loads by status for invoice workflow
+  const inProgressLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+    !["empty", "waiting_for_invoice", "invoiced", "paid", "completed"].includes(load.status)
+  ) : [];
+  
+  const emptyLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "empty") : [];
+  const waitingForInvoiceLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "waiting_for_invoice") : [];
+  const invoicedLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "invoiced") : [];
+  const paidLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "paid") : [];
 
   return (
     <Card className="material-card">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Active Loads</CardTitle>
+          <CardTitle>Load Management</CardTitle>
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
@@ -488,26 +511,27 @@ export default function LoadsTable() {
         </div>
       </CardHeader>
       <CardContent>
-        {activeLoads.length === 0 ? (
-          <div className="text-center py-8">
-            <i className="fas fa-truck text-4xl text-gray-400 mb-4"></i>
-            <p className="text-gray-600">No active loads found</p>
-            <p className="text-xs text-gray-400 mt-2">Debug: {Array.isArray(loads) ? loads.length : 'Loading...'} total loads</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>109 Number</TableHead>
-                  <TableHead>Driver</TableHead>
-                  <TableHead>Destination</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="min-w-[200px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {activeLoads.map((load: any) => (
+        {/* In Progress Loads Section */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-blue-700">In Progress ({inProgressLoads.length})</h3>
+          {inProgressLoads.length === 0 ? (
+            <div className="text-center py-4 bg-gray-50 rounded">
+              <p className="text-gray-600">No loads in progress</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>109 Number</TableHead>
+                    <TableHead>Driver</TableHead>
+                    <TableHead>Destination</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="min-w-[200px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {inProgressLoads.map((load: any) => (
                   <TableRow 
                     key={load.id} 
                     className="hover:bg-gray-50 cursor-pointer"
@@ -617,7 +641,177 @@ export default function LoadsTable() {
               </TableBody>
             </Table>
           </div>
-        )}
+          )}
+        </div>
+
+        {/* Empty Loads Section - Ready for Invoicing */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-purple-700">Empty - Ready for Invoicing ({emptyLoads.length})</h3>
+          {emptyLoads.length > 0 && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>109 Number</TableHead>
+                    <TableHead>Driver</TableHead>
+                    <TableHead>Destination</TableHead>
+                    <TableHead>POD Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {emptyLoads.map((load: any) => (
+                    <TableRow key={load.id} className="hover:bg-purple-50">
+                      <TableCell>{load.number109}</TableCell>
+                      <TableCell>
+                        {load.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'Unassigned'}
+                      </TableCell>
+                      <TableCell>{load.location?.name || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Badge className="bg-green-100 text-green-800">POD Uploaded</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedLoad(load);
+                            handleGenerateInvoice();
+                          }}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <i className="fas fa-file-invoice mr-1"></i>
+                          Generate Invoice
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
+
+        {/* Waiting for Invoice Section */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-yellow-700">Waiting for Invoice ({waitingForInvoiceLoads.length})</h3>
+          {waitingForInvoiceLoads.length > 0 && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>109 Number</TableHead>
+                    <TableHead>Driver</TableHead>
+                    <TableHead>Destination</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {waitingForInvoiceLoads.map((load: any) => (
+                    <TableRow key={load.id} className="hover:bg-yellow-50">
+                      <TableCell>{load.number109}</TableCell>
+                      <TableCell>
+                        {load.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'Unassigned'}
+                      </TableCell>
+                      <TableCell>{load.location?.name || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedLoad(load);
+                            handleGenerateInvoice();
+                          }}
+                        >
+                          <i className="fas fa-clock mr-1"></i>
+                          Process Invoice
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
+
+        {/* Invoiced Section */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-orange-700">Invoiced ({invoicedLoads.length})</h3>
+          {invoicedLoads.length > 0 && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>109 Number</TableHead>
+                    <TableHead>Invoice #</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoicedLoads.map((load: any) => (
+                    <TableRow key={load.id} className="hover:bg-orange-50">
+                      <TableCell>{load.number109}</TableCell>
+                      <TableCell>{load.invoice?.invoiceNumber || 'N/A'}</TableCell>
+                      <TableCell>{load.invoice?.customer?.name || 'N/A'}</TableCell>
+                      <TableCell>${load.invoice?.totalAmount || '0.00'}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            // Mark as paid
+                            apiRequest(`/api/loads/${load.id}/status`, "PATCH", { status: "paid" })
+                              .then(() => {
+                                toast({ title: "Load marked as paid" });
+                                queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+                              });
+                          }}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          <i className="fas fa-check-circle mr-1"></i>
+                          Mark as Paid
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
+
+        {/* Paid Section */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold mb-4 text-green-700">Paid ({paidLoads.length})</h3>
+          {paidLoads.length > 0 && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>109 Number</TableHead>
+                    <TableHead>Invoice #</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Paid Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paidLoads.map((load: any) => (
+                    <TableRow key={load.id} className="hover:bg-green-50">
+                      <TableCell>{load.number109}</TableCell>
+                      <TableCell>{load.invoice?.invoiceNumber || 'N/A'}</TableCell>
+                      <TableCell>{load.invoice?.customer?.name || 'N/A'}</TableCell>
+                      <TableCell>${load.invoice?.totalAmount || '0.00'}</TableCell>
+                      <TableCell>{load.paidAt ? new Date(load.paidAt).toLocaleDateString() : 'N/A'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </div>
       </CardContent>
 
       {/* Load Details Dialog */}
