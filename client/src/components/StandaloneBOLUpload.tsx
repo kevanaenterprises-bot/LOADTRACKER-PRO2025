@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { BatchPODUpload } from "@/components/BatchPODUpload";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
 
 const bolUploadSchema = z.object({
@@ -25,6 +27,10 @@ export default function StandaloneBOLUpload() {
   const [uploading, setUploading] = useState(false);
   const [readyForUpload, setReadyForUpload] = useState(false);
   const [loadId, setLoadId] = useState<string | null>(null);
+  const [showOverrideDialog, setShowOverrideDialog] = useState(false);
+  const [overridePassword, setOverridePassword] = useState("");
+  const [pendingFormData, setPendingFormData] = useState<BOLUploadData | null>(null);
+  const [duplicateError, setDuplicateError] = useState("");
 
   // Ensure bypass token is available for mobile
   React.useEffect(() => {
@@ -75,7 +81,7 @@ export default function StandaloneBOLUpload() {
       );
       
       if (bolCheckResponse?.exists) {
-        throw new Error(`BOL number ${data.bolNumber} has already been used by another load`);
+        throw new Error(`DUPLICATE:BOL number ${data.bolNumber} has already been used by another load`);
       }
 
       // Update the load with BOL information
@@ -95,6 +101,13 @@ export default function StandaloneBOLUpload() {
       });
     },
     onError: (error: Error) => {
+      if (error.message.startsWith("DUPLICATE:")) {
+        // Show override dialog for duplicate BOL numbers
+        setDuplicateError(error.message.replace("DUPLICATE:", ""));
+        setShowOverrideDialog(true);
+        return;
+      }
+      
       toast({
         title: "Error",
         description: error.message,
@@ -104,7 +117,51 @@ export default function StandaloneBOLUpload() {
   });
 
   const onSubmit = (data: BOLUploadData) => {
+    setPendingFormData(data);
     findLoadMutation.mutate(data);
+  };
+
+  const handleOverrideSubmit = async () => {
+    if (overridePassword !== "1159" || !pendingFormData) {
+      toast({
+        title: "Invalid Password",
+        description: "Incorrect override password entered.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Find the load by primary load number (bypass duplicate check)
+      const loadResponse = await apiRequest(`/api/loads/by-number/${pendingFormData.loadNumber}`, "GET");
+      
+      if (!loadResponse) {
+        throw new Error(`Load ${pendingFormData.loadNumber} not found`);
+      }
+
+      // Update the load with BOL information (skip duplicate check)
+      const updateResponse = await apiRequest(`/api/loads/${loadResponse.id}/bol`, "PATCH", {
+        bolNumber: pendingFormData.bolNumber,
+        tripNumber: pendingFormData.tripNumber,
+      });
+
+      setLoadId(loadResponse.id);
+      setReadyForUpload(true);
+      setShowOverrideDialog(false);
+      setOverridePassword("");
+      setPendingFormData(null);
+      
+      toast({
+        title: "Override Successful",
+        description: "Duplicate BOL number accepted with override. Now upload your BOL photo.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Override Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUploadComplete = () => {
@@ -269,6 +326,57 @@ export default function StandaloneBOLUpload() {
           )}
         </div>
       </CardContent>
+
+      {/* Override Dialog for Duplicate BOL Numbers */}
+      <Dialog open={showOverrideDialog} onOpenChange={setShowOverrideDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>BOL Number Override Required</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800 font-medium">⚠️ Duplicate BOL Number Detected</p>
+              <p className="text-sm text-yellow-700 mt-1">{duplicateError}</p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="override-password">Enter Override Password</Label>
+              <Input
+                id="override-password"
+                type="password"
+                placeholder="Enter override password"
+                value={overridePassword}
+                onChange={(e) => setOverridePassword(e.target.value)}
+                className="w-full"
+              />
+              <p className="text-xs text-gray-500">
+                Contact management for the override password if you need to use the same BOL number twice.
+              </p>
+            </div>
+            
+            <div className="flex space-x-2 pt-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setShowOverrideDialog(false);
+                  setOverridePassword("");
+                  setPendingFormData(null);
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleOverrideSubmit}
+                disabled={!overridePassword}
+                className="flex-1 bg-yellow-600 hover:bg-yellow-700"
+              >
+                Override & Continue
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
