@@ -273,9 +273,18 @@ export default function LoadForm() {
                                 if (value === "custom") {
                                   updateStop(stop.id, 'locationId', undefined);
                                 } else {
+                                  const selectedLocation = locations.find((loc: any) => loc.id === value);
                                   updateStop(stop.id, 'locationId', value);
-                                  updateStop(stop.id, 'customAddress', undefined);
-                                  updateStop(stop.id, 'customName', undefined);
+                                  // Auto-populate address info from selected location
+                                  if (selectedLocation) {
+                                    updateStop(stop.id, 'customName', selectedLocation.name);
+                                    const fullAddress = [
+                                      selectedLocation.address,
+                                      selectedLocation.city,
+                                      selectedLocation.state
+                                    ].filter(Boolean).join(', ');
+                                    updateStop(stop.id, 'customAddress', fullAddress || selectedLocation.name);
+                                  }
                                 }
                               }}
                             >
@@ -294,29 +303,31 @@ export default function LoadForm() {
                           </div>
                         </div>
                         
-                        {/* Custom Address Fields - only show if custom is selected */}
-                        {!stop.locationId && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div>
-                              <FormLabel className="text-sm">Company/Location Name</FormLabel>
-                              <Input
-                                className="mt-1"
-                                placeholder="Company or location name"
-                                value={stop.customName || ""}
-                                onChange={(e) => updateStop(stop.id, 'customName', e.target.value)}
-                              />
-                            </div>
-                            <div>
-                              <FormLabel className="text-sm">Address</FormLabel>
-                              <Input
-                                className="mt-1"
-                                placeholder="Full address"
-                                value={stop.customAddress || ""}
-                                onChange={(e) => updateStop(stop.id, 'customAddress', e.target.value)}
-                              />
-                            </div>
+                        {/* Address Fields */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                          <div>
+                            <FormLabel className="text-sm">Company/Location Name</FormLabel>
+                            <Input
+                              className="mt-1"
+                              placeholder="Company or location name"
+                              value={stop.customName || ""}
+                              onChange={(e) => updateStop(stop.id, 'customName', e.target.value)}
+                              disabled={!!stop.locationId}
+                              title={stop.locationId ? "Auto-filled from selected location" : ""}
+                            />
                           </div>
-                        )}
+                          <div>
+                            <FormLabel className="text-sm">Address</FormLabel>
+                            <Input
+                              className="mt-1"
+                              placeholder="Full address"
+                              value={stop.customAddress || ""}
+                              onChange={(e) => updateStop(stop.id, 'customAddress', e.target.value)}
+                              disabled={!!stop.locationId}
+                              title={stop.locationId ? "Auto-filled from selected location" : ""}
+                            />
+                          </div>
+                        </div>
                         
                         {/* Notes */}
                         <div className="mt-4">

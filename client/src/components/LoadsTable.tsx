@@ -997,7 +997,25 @@ export default function LoadsTable() {
                         </div>
                         <div>
                           <label className="text-xs text-gray-600 block mb-1">Location</label>
-                          <Select value={newStop.locationId} onValueChange={(value) => setNewStop({...newStop, locationId: value, useCustomAddress: false})}>
+                          <Select value={newStop.locationId} onValueChange={(value) => {
+                            if (value === 'custom') {
+                              setNewStop({...newStop, locationId: value, useCustomAddress: true, customName: '', customAddress: ''});
+                            } else {
+                              const selectedLocation = locations?.find((loc: any) => loc.id === value);
+                              const fullAddress = selectedLocation ? [
+                                selectedLocation.address,
+                                selectedLocation.city,
+                                selectedLocation.state
+                              ].filter(Boolean).join(', ') : '';
+                              setNewStop({
+                                ...newStop, 
+                                locationId: value, 
+                                useCustomAddress: false,
+                                customName: selectedLocation?.name || '',
+                                customAddress: fullAddress || selectedLocation?.name || ''
+                              });
+                            }
+                          }}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select location..." />
                             </SelectTrigger>
@@ -1013,24 +1031,27 @@ export default function LoadsTable() {
                         </div>
                       </div>
                       
-                      {(newStop.locationId === 'custom' || newStop.useCustomAddress) && (
-                        <div className="space-y-2">
-                          <input
-                            type="text"
-                            placeholder="Location Name"
-                            value={newStop.customName}
-                            onChange={(e) => setNewStop({...newStop, customName: e.target.value})}
-                            className="w-full px-3 py-2 border rounded text-sm"
-                          />
-                          <input
-                            type="text"
-                            placeholder="Address"
-                            value={newStop.customAddress}
-                            onChange={(e) => setNewStop({...newStop, customAddress: e.target.value})}
-                            className="w-full px-3 py-2 border rounded text-sm"
-                          />
-                        </div>
-                      )}
+                      {/* Address Fields - Always show, disabled when location is selected */}
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          placeholder="Location Name"
+                          value={newStop.customName}
+                          onChange={(e) => setNewStop({...newStop, customName: e.target.value})}
+                          disabled={newStop.locationId !== 'custom'}
+                          title={newStop.locationId !== 'custom' ? "Auto-filled from selected location" : ""}
+                          className={`w-full px-3 py-2 border rounded text-sm ${newStop.locationId !== 'custom' ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                        />
+                        <input
+                          type="text"
+                          placeholder="Address"
+                          value={newStop.customAddress}
+                          onChange={(e) => setNewStop({...newStop, customAddress: e.target.value})}
+                          disabled={newStop.locationId !== 'custom'}
+                          title={newStop.locationId !== 'custom' ? "Auto-filled from selected location" : ""}
+                          className={`w-full px-3 py-2 border rounded text-sm ${newStop.locationId !== 'custom' ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                        />
+                      </div>
                       
                       <div>
                         <label className="text-xs text-gray-600 block mb-1">Notes (optional)</label>
