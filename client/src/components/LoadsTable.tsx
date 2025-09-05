@@ -583,22 +583,12 @@ export default function LoadsTable() {
                 </div>
               </div>
 
-              {/* Financial Information */}
+              {/* Invoice Fields - Lumper Fees and Extra Stops */}
               <div>
-                <h4 className="font-semibold mb-2">Financial Details</h4>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <h4 className="font-semibold mb-2">Additional Charges for Invoice</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <label className="text-xs text-gray-600 block">Flat Rate</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      defaultValue={selectedLoad.flatRate || '0.00'}
-                      className="w-full px-2 py-1 text-sm border rounded mt-1"
-                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'flatRate', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600 block">Lumper Charge</label>
+                    <label className="text-xs text-gray-600 block">Lumper Fees ($)</label>
                     <input 
                       type="number" 
                       step="0.01"
@@ -615,7 +605,7 @@ export default function LoadsTable() {
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
                     />
-                    <div className="text-xs text-gray-500 mt-1">{selectedLoad.extraStops || 0} × $50 = ${((selectedLoad.extraStops || 0) * 50).toFixed(2)}</div>
+                    <div className="text-xs text-gray-500 mt-1">{selectedLoad.extraStops || 0} stops × $50 = ${((selectedLoad.extraStops || 0) * 50).toFixed(2)}</div>
                   </div>
                 </div>
               </div>
