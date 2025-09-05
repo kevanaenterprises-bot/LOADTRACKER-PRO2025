@@ -1001,9 +1001,9 @@ export default function LoadsTable() {
                             <div className="space-y-2">
                               <Select value={newStop.locationId} onValueChange={(value) => {
                                 if (value === 'custom') {
-                                  setNewStop({...newStop, locationId: undefined, customName: '', customAddress: ''});
+                                  setNewStop({...newStop, locationId: 'custom', customName: '', customAddress: ''});
                                 } else {
-                                  const selectedLocation = locations?.find((loc: any) => loc.id === value);
+                                  const selectedLocation = Array.isArray(locations) ? locations.find((loc: any) => loc.id === value) : null;
                                   const fullAddress = selectedLocation ? [
                                     selectedLocation.address,
                                     selectedLocation.city,
@@ -1022,11 +1022,11 @@ export default function LoadsTable() {
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="custom">Enter Custom Address</SelectItem>
-                                  {locations?.map((location: any) => (
+                                  {Array.isArray(locations) ? locations.map((location: any) => (
                                     <SelectItem key={location.id} value={location.id}>
                                       {location.name} - {location.city}, {location.state}
                                     </SelectItem>
-                                  ))}
+                                  )) : null}
                                 </SelectContent>
                               </Select>
                               {/* Show selected location info */}
@@ -1039,7 +1039,7 @@ export default function LoadsTable() {
                             <div className="space-y-2">
                               <Select value="custom" onValueChange={(value) => {
                                 if (value !== 'custom') {
-                                  const selectedLocation = locations?.find((loc: any) => loc.id === value);
+                                  const selectedLocation = Array.isArray(locations) ? locations.find((loc: any) => loc.id === value) : null;
                                   const fullAddress = selectedLocation ? [
                                     selectedLocation.address,
                                     selectedLocation.city,
@@ -1058,11 +1058,11 @@ export default function LoadsTable() {
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="custom">Enter Custom Address</SelectItem>
-                                  {locations?.map((location: any) => (
+                                  {Array.isArray(locations) ? locations.map((location: any) => (
                                     <SelectItem key={location.id} value={location.id}>
                                       {location.name} - {location.city}, {location.state}
                                     </SelectItem>
-                                  ))}
+                                  )) : null}
                                 </SelectContent>
                               </Select>
                               <input

@@ -277,16 +277,19 @@ export default function LoadForm() {
                                       updateStop(stop.id, 'customName', '');
                                       updateStop(stop.id, 'customAddress', '');
                                     } else {
-                                      const selectedLocation = locations.find((loc: any) => loc.id === value);
+                                      const selectedLocation = Array.isArray(locations) ? locations.find((loc: any) => loc.id === value) : null;
                                       updateStop(stop.id, 'locationId', value);
                                       if (selectedLocation) {
-                                        updateStop(stop.id, 'customName', selectedLocation.name);
+                                        console.log('🔄 Auto-populating location:', selectedLocation);
+                                        updateStop(stop.id, 'customName', selectedLocation.name || '');
                                         const fullAddress = [
                                           selectedLocation.address,
                                           selectedLocation.city,
                                           selectedLocation.state
                                         ].filter(Boolean).join(', ');
-                                        updateStop(stop.id, 'customAddress', fullAddress || selectedLocation.name);
+                                        updateStop(stop.id, 'customAddress', fullAddress || selectedLocation.name || '');
+                                      } else {
+                                        console.log('❌ Location not found:', value, 'Available locations:', locations);
                                       }
                                     }
                                   }}
@@ -296,11 +299,11 @@ export default function LoadForm() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="custom">Enter Custom Address</SelectItem>
-                                    {locations.map((location: any) => (
+                                    {Array.isArray(locations) ? locations.map((location: any) => (
                                       <SelectItem key={location.id} value={location.id}>
                                         {location.name} - {location.city}, {location.state}
                                       </SelectItem>
-                                    ))}
+                                    )) : null}
                                   </SelectContent>
                                 </Select>
                               </div>
@@ -310,16 +313,19 @@ export default function LoadForm() {
                                   value="custom"
                                   onValueChange={(value) => {
                                     if (value !== "custom") {
-                                      const selectedLocation = locations.find((loc: any) => loc.id === value);
+                                      const selectedLocation = Array.isArray(locations) ? locations.find((loc: any) => loc.id === value) : null;
                                       updateStop(stop.id, 'locationId', value);
                                       if (selectedLocation) {
-                                        updateStop(stop.id, 'customName', selectedLocation.name);
+                                        console.log('🔄 Auto-populating location (custom mode):', selectedLocation);
+                                        updateStop(stop.id, 'customName', selectedLocation.name || '');
                                         const fullAddress = [
                                           selectedLocation.address,
                                           selectedLocation.city,
                                           selectedLocation.state
                                         ].filter(Boolean).join(', ');
-                                        updateStop(stop.id, 'customAddress', fullAddress || selectedLocation.name);
+                                        updateStop(stop.id, 'customAddress', fullAddress || selectedLocation.name || '');
+                                      } else {
+                                        console.log('❌ Location not found (custom mode):', value, 'Available locations:', locations);
                                       }
                                     }
                                   }}
@@ -329,11 +335,11 @@ export default function LoadForm() {
                                   </SelectTrigger>
                                   <SelectContent>
                                     <SelectItem value="custom">Enter Custom Address</SelectItem>
-                                    {locations.map((location: any) => (
+                                    {Array.isArray(locations) ? locations.map((location: any) => (
                                       <SelectItem key={location.id} value={location.id}>
                                         {location.name} - {location.city}, {location.state}
                                       </SelectItem>
-                                    ))}
+                                    )) : null}
                                   </SelectContent>
                                 </Select>
                                 <Input
