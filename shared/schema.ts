@@ -86,6 +86,21 @@ export const loads = pgTable("loads", {
   driverConfirmedAt: timestamp("driver_confirmed_at"),
 });
 
+// Load stops table for multiple pickups and deliveries
+export const loadStops = pgTable("load_stops", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  loadId: varchar("load_id").references(() => loads.id).notNull(),
+  stopType: varchar("stop_type").notNull(), // "pickup" or "dropoff"
+  stopSequence: integer("stop_sequence").notNull(), // Order of the stop (1, 2, 3, etc.)
+  locationId: varchar("location_id").references(() => locations.id), // Reference to existing location
+  companyName: varchar("company_name"), // Company name for this stop
+  address: text("address"),
+  contactName: varchar("contact_name"),
+  contactPhone: varchar("contact_phone"),
+  notes: text("notes"), // Special instructions for this stop
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // BOL tracking table for duplicate prevention
 export const bolNumbers = pgTable("bol_numbers", {
   id: serial("id").primaryKey(),
@@ -204,6 +219,11 @@ export const insertLoadSchema = createInsertSchema(loads).omit({
   completedAt: true,
 });
 
+export const insertLoadStopSchema = createInsertSchema(loadStops).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertBolNumberSchema = createInsertSchema(bolNumbers).omit({
   id: true,
   createdAt: true,
@@ -238,6 +258,8 @@ export type InsertLocation = z.infer<typeof insertLocationSchema>;
 export type Location = typeof locations.$inferSelect;
 export type InsertLoad = z.infer<typeof insertLoadSchema>;
 export type Load = typeof loads.$inferSelect;
+export type InsertLoadStop = z.infer<typeof insertLoadStopSchema>;
+export type LoadStop = typeof loadStops.$inferSelect;
 export type InsertBolNumber = z.infer<typeof insertBolNumberSchema>;
 export type BolNumber = typeof bolNumbers.$inferSelect;
 export type InsertRate = z.infer<typeof insertRateSchema>;

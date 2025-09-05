@@ -48,6 +48,16 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Enhanced POD Attachment Fix** - Fixed missing POD attachments in complete package emails
 - ✅ **Broker-Agnostic System** - No longer limited to 109/374 format, supports any customer/broker numbering
 
+**January 9, 2025 - Multiple Stops Feature Implementation**
+- ✅ **Database Schema Updated** - Added load_stops table to track multiple pickups and drop-offs per load
+- ✅ **Add Stop Button** - New "Add Stop" button in Create Load form for adding extra pickup/delivery locations
+- ✅ **Stop Type Selection** - Interactive dialog allows users to choose between pickup or drop-off for each stop
+- ✅ **Company Dropdown** - Select from existing locations/companies for each stop using dropdown menu
+- ✅ **Visual Stop Display** - Added stops show with icons (package for pickup, map pin for drop-off) and sequence numbers
+- ✅ **Stop Management** - Users can add special instructions per stop and remove stops with X button
+- ✅ **Backend Support** - API fully supports creating loads with multiple stops and storing them in database
+- ✅ **Automatic Sequencing** - Stops are automatically numbered in the order they're added
+
 **August 22, 2025 - Enhanced Standalone BOL Upload System**
 - ✅ **Permanent Prefixes** - 109 and 374 fields now pre-filled with "109-" and "374-" that cannot be removed
 - ✅ **Smart Input Handling** - Automatically maintains prefixes if user tries to delete them

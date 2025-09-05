@@ -2084,7 +2084,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Location validated:", location.name);
       }
       
-      const validatedData = insertLoadSchema.parse(req.body);
+      // Extract stops from the request body
+      const { stops, ...loadData } = req.body;
+      
+      const validatedData = insertLoadSchema.parse(loadData);
       console.log("Load creation - validation successful, creating load:", validatedData);
       
       // Check if 109 number already exists
@@ -2095,7 +2098,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "109 number already exists" });
       }
 
-      const load = await storage.createLoad(validatedData);
+      // Validate stops if provided
+      let validatedStops = undefined;
+      if (stops && Array.isArray(stops) && stops.length > 0) {
+        // Validate each stop location exists
+        for (const stop of stops) {
+          if (stop.locationId) {
+            const location = await storage.getLocation(stop.locationId);
+            if (!location) {
+              return res.status(400).json({ message: `Stop location not found: ${stop.locationId}` });
+            }
+          }
+        }
+        validatedStops = stops;
+        console.log("Load creation - stops validated:", validatedStops.length);
+      }
+
+      const load = await storage.createLoad(validatedData, validatedStops);
       console.log("Load creation successful:", load.id);
 
       // Send SMS to driver if assigned
@@ -2157,6 +2176,24 @@ Reply YES to confirm acceptance or NO to decline.`
     } catch (error) {
       console.error("Error fetching load:", error);
       res.status(500).json({ message: "Failed to fetch load" });
+    }
+  });
+  
+  // Get load stops for a specific load
+  app.get("/api/loads/:id/stops", (req, res, next) => {
+    const hasAuth = req.isAuthenticated() || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const stops = await storage.getLoadStops(req.params.id);
+      res.json(stops);
+    } catch (error) {
+      console.error("Error fetching load stops:", error);
+      res.status(500).json({ message: "Failed to fetch load stops" });
     }
   });
 

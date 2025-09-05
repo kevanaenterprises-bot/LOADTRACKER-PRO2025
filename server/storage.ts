@@ -2,6 +2,7 @@ import {
   users,
   locations,
   loads,
+  loadStops,
   bolNumbers,
   rates,
   invoiceCounter,
@@ -16,6 +17,8 @@ import {
   type Load,
   type InsertLoad,
   type LoadWithDetails,
+  type LoadStop,
+  type InsertLoadStop,
   type BolNumber,
   type InsertBolNumber,
   type Rate,
@@ -46,7 +49,7 @@ export interface IStorage {
   createLocation(location: InsertLocation): Promise<Location>;
 
   // Load operations
-  createLoad(load: InsertLoad): Promise<Load>;
+  createLoad(load: InsertLoad, stops?: InsertLoadStop[]): Promise<Load>;
   getLoads(): Promise<LoadWithDetails[]>;
   getLoad(id: string): Promise<LoadWithDetails | undefined>;
   getLoadByNumber(number: string): Promise<LoadWithDetails | undefined>;
@@ -58,6 +61,10 @@ export interface IStorage {
   getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]>;
   getLoadsWithTracking(): Promise<LoadWithDetails[]>;
   deleteLoad(id: string): Promise<void>;
+  
+  // Load stops operations
+  getLoadStops(loadId: string): Promise<LoadStop[]>;
+  createLoadStop(stop: InsertLoadStop): Promise<LoadStop>;
 
   // BOL operations
   checkBOLExists(bolNumber: string): Promise<boolean>;
@@ -213,13 +220,35 @@ export class DatabaseStorage implements IStorage {
     return newLocation;
   }
 
-  async createLoad(load: InsertLoad): Promise<Load> {
+  async createLoad(load: InsertLoad, stops?: InsertLoadStop[]): Promise<Load> {
     const [newLoad] = await db.insert(loads).values(load).returning();
     
     // Add initial status history
     await this.addStatusHistory(newLoad.id, "created", "Load created by office staff");
     
+    // Create load stops if provided
+    if (stops && stops.length > 0) {
+      const stopsWithLoadId = stops.map(stop => ({
+        ...stop,
+        loadId: newLoad.id,
+      }));
+      await db.insert(loadStops).values(stopsWithLoadId);
+    }
+    
     return newLoad;
+  }
+  
+  async getLoadStops(loadId: string): Promise<LoadStop[]> {
+    return await db
+      .select()
+      .from(loadStops)
+      .where(eq(loadStops.loadId, loadId))
+      .orderBy(loadStops.stopSequence);
+  }
+  
+  async createLoadStop(stop: InsertLoadStop): Promise<LoadStop> {
+    const [newStop] = await db.insert(loadStops).values(stop).returning();
+    return newStop;
   }
 
   async getLoads(): Promise<LoadWithDetails[]> {
