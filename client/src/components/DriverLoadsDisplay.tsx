@@ -126,14 +126,10 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
           </CardHeader>
           
           <CardContent className="pt-0">
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="mb-4">
               <div>
                 <p className="text-sm font-medium text-gray-700">Distance</p>
                 <p className="text-lg">{load.estimatedMiles} miles</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-700">Rate</p>
-                <p className="text-lg">${load.flatRate}</p>
               </div>
             </div>
             
@@ -215,7 +211,6 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
             </div>
             <div>
               <p className="font-medium">Distance: {selectedLoad?.estimatedMiles} miles</p>
-              <p className="font-medium">Rate: ${selectedLoad?.flatRate}</p>
               {selectedLoad?.lumperCharge > 0 && (
                 <p className="font-medium">Lumper Fee: ${selectedLoad?.lumperCharge}</p>
               )}
