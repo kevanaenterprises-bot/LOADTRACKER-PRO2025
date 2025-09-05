@@ -378,7 +378,7 @@ export default function Dashboard() {
             </TabsTrigger>
             <TabsTrigger value="ocr" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-purple-700 hover:text-purple-900 font-semibold">
               <i className="fas fa-camera text-lg md:text-base text-purple-600"></i>
-              <span className="text-center leading-tight">Wright Con Scanner</span>
+              <span className="text-center leading-tight">Rate Con Scanner</span>
             </TabsTrigger>
             <TabsTrigger value="drivers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-orange-700 hover:text-orange-900 font-semibold">
               <i className="fas fa-users text-lg md:text-base text-orange-600"></i>
@@ -413,11 +413,11 @@ export default function Dashboard() {
             <LoadTrackingMap />
           </TabsContent>
 
-          {/* OCR Wright Con Scanner Tab */}
+          {/* OCR Rate Con Scanner Tab */}
           <TabsContent value="ocr" className="mt-6">
             <div className="max-w-4xl mx-auto">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">Wright Con Scanner</h2>
+                <h2 className="text-2xl font-bold mb-2">Rate Con Scanner</h2>
                 <p className="text-gray-600">
                   Upload rate confirmation images to automatically extract load details and generate new loads.
                   The system will read load numbers, PO numbers, appointment times, company names, and addresses.

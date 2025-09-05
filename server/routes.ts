@@ -3598,7 +3598,7 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  // OCR Routes for Wright Con processing
+  // OCR Routes for Rate Con processing
   app.post('/api/ocr/extract', upload.single('image'), async (req, res) => {
     try {
       if (!req.file) {
@@ -3662,7 +3662,7 @@ Reply YES to confirm acceptance or NO to decline.`
       
       res.json({
         ...newLoad,
-        message: `Load ${newLoad.number109} created from Wright Con data`,
+        message: `Load ${newLoad.number109} created from Rate Con data`,
         extractedData
       });
       

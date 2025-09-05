@@ -33,7 +33,7 @@ export async function extractLoadDataFromImage(base64Image: string): Promise<Ext
       // "claude-sonnet-4-20250514"
       model: DEFAULT_MODEL_STR,
       max_tokens: 2048,
-      system: `You are an expert OCR system for logistics documents. Extract data from Wright Con (rate confirmation) images.
+      system: `You are an expert OCR system for logistics documents. Extract data from Rate Con (rate confirmation) images and PDFs.
 
 Return ONLY a JSON object with these fields:
 - loadNumber: The load/trip number
@@ -51,7 +51,7 @@ If a field is not found, use null. Be precise and only extract what you clearly 
         content: [
           {
             type: "text",
-            text: "Extract load data from this Wright Con (rate confirmation) document. Focus on load numbers, PO numbers, appointment times, company names, and pickup/delivery addresses."
+            text: "Extract load data from this Rate Con (rate confirmation) document. Focus on load numbers, PO numbers, appointment times, company names, and pickup/delivery addresses."
           },
           {
             type: "image",

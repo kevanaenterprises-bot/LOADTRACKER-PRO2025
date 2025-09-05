@@ -130,13 +130,13 @@ export function OCRUploader() {
   });
 
   const handleFileSelect = (file: File) => {
-    if (file && file.type.startsWith('image/')) {
+    if (file && (file.type.startsWith('image/') || file.type === 'application/pdf')) {
       setSelectedFile(file);
       setExtractedData(null);
     } else {
       toast({
         title: "Invalid File",
-        description: "Please select an image file (JPG, PNG, etc.)",
+        description: "Please select an image file (JPG, PNG, etc.) or PDF.",
         variant: "destructive",
       });
     }
@@ -165,7 +165,7 @@ export function OCRUploader() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5" />
-          Wright Con OCR Scanner
+          Rate Con OCR Scanner
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -186,13 +186,13 @@ export function OCRUploader() {
         >
           <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
           <div className="space-y-2">
-            <p className="text-lg font-medium">Upload Wright Con Image</p>
+            <p className="text-lg font-medium">Upload Rate Con Document</p>
             <p className="text-sm text-gray-500">
-              Drag and drop or click to select a rate confirmation image
+              Drag and drop or click to select a rate confirmation image or PDF
             </p>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,.pdf"
               onChange={handleFileInput}
               className="hidden"
               id="ocr-file-input"
