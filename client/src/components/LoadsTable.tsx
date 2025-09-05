@@ -362,7 +362,7 @@ export default function LoadsTable() {
                   <TableHead>Driver</TableHead>
                   <TableHead>Destination</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="min-w-[200px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -421,7 +421,7 @@ export default function LoadsTable() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-1 min-w-[200px]">
                         <Button 
                           variant="ghost" 
                           size="sm"
@@ -457,16 +457,17 @@ export default function LoadsTable() {
                           </Button>
                         )}
                         <Button 
-                          variant="ghost" 
+                          variant="outline" 
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteLoad(load);
                           }}
                           title="Delete load"
-                          className="text-red-600 hover:text-red-700"
+                          className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
                         >
-                          <i className="fas fa-trash"></i>
+                          <i className="fas fa-trash mr-1"></i>
+                          Delete
                         </Button>
                       </div>
                     </TableCell>
