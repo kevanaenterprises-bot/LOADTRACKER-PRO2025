@@ -75,6 +75,13 @@ export default function LoadForm() {
     refetchOnWindowFocus: false,
   });
 
+  // Debug logging to check what data we're actually getting
+  console.log('🔍 LoadForm Data Check:');
+  console.log('📍 Locations data type:', typeof locations, 'isArray:', Array.isArray(locations));
+  console.log('📍 Locations data:', locations);
+  console.log('📍 First location example:', locations[0]);
+  console.log('📍 Locations count:', Array.isArray(locations) ? locations.length : 'Not array');
+
   // Removed drivers query - no longer needed for load creation
 
   const createLoadMutation = useMutation({
