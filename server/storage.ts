@@ -493,6 +493,7 @@ export class DatabaseStorage implements IStorage {
     await db.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
     await db.delete(bolNumbers).where(eq(bolNumbers.loadId, id));
     await db.delete(invoices).where(eq(invoices.loadId, id));
+    await db.delete(loadStops).where(eq(loadStops.loadId, id)); // Delete load stops
     
     // Finally delete the load itself
     await db.delete(loads).where(eq(loads.id, id));

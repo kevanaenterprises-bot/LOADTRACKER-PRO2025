@@ -36,7 +36,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, MapPin, Package } from "lucide-react";
+import { Plus, X, MapPin, Package, ArrowUp, ArrowDown } from "lucide-react";
 
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
@@ -179,6 +179,36 @@ export default function LoadForm() {
     form.setValue("extraStops", resequencedStops.length);
   };
 
+  const moveStopUp = (index: number) => {
+    if (index === 0) return; // Can't move first item up
+    
+    const newStops = [...stops];
+    // Swap with previous item
+    [newStops[index - 1], newStops[index]] = [newStops[index], newStops[index - 1]];
+    
+    // Update sequence numbers
+    const resequencedStops = newStops.map((stop, i) => ({
+      ...stop,
+      stopSequence: i + 1,
+    }));
+    setStops(resequencedStops);
+  };
+
+  const moveStopDown = (index: number) => {
+    if (index === stops.length - 1) return; // Can't move last item down
+    
+    const newStops = [...stops];
+    // Swap with next item
+    [newStops[index], newStops[index + 1]] = [newStops[index + 1], newStops[index]];
+    
+    // Update sequence numbers
+    const resequencedStops = newStops.map((stop, i) => ({
+      ...stop,
+      stopSequence: i + 1,
+    }));
+    setStops(resequencedStops);
+  };
+
   const onSubmit = (data: FormData) => {
     const submitData = {
       ...data,
@@ -285,14 +315,34 @@ export default function LoadForm() {
                             )}
                           </div>
                         </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeStop(index)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => moveStopUp(index)}
+                            disabled={index === 0}
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => moveStopDown(index)}
+                            disabled={index === stops.length - 1}
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeStop(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
