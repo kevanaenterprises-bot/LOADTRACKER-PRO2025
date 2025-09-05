@@ -158,14 +158,13 @@ export default function CustomerManagement() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email Address *</Label>
+                  <Label htmlFor="email">Email Address (optional)</Label>
                   <Input
                     id="email"
                     type="email"
                     value={customerData.email}
                     onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
                     placeholder="company@example.com"
-                    required
                   />
                 </div>
                 <div>
@@ -239,7 +238,7 @@ export default function CustomerManagement() {
               </Button>
               <Button
                 onClick={handleCreate}
-                disabled={createCustomerMutation.isPending || !customerData.name || !customerData.email}
+                disabled={createCustomerMutation.isPending || !customerData.name}
               >
                 {createCustomerMutation.isPending ? "Creating..." : "Create Customer"}
               </Button>
@@ -267,14 +266,13 @@ export default function CustomerManagement() {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-email">Email Address *</Label>
+                <Label htmlFor="edit-email">Email Address (optional)</Label>
                 <Input
                   id="edit-email"
                   type="email"
                   value={customerData.email}
                   onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
                   placeholder="company@example.com"
-                  required
                 />
               </div>
               <div>
@@ -349,7 +347,7 @@ export default function CustomerManagement() {
             </Button>
             <Button
               onClick={handleUpdate}
-              disabled={updateCustomerMutation.isPending || !customerData.name || !customerData.email}
+              disabled={updateCustomerMutation.isPending || !customerData.name}
             >
               {updateCustomerMutation.isPending ? "Updating..." : "Update Customer"}
             </Button>
