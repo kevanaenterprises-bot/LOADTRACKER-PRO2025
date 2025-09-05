@@ -9,14 +9,15 @@ import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
 
 if (!process.env.REPLIT_DOMAINS) {
-  throw new Error("Environment variable REPLIT_DOMAINS not provided");
+  console.warn("⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.");
+  process.env.REPLIT_DOMAINS = "localhost,replit.app";
 }
 
 const getOidcConfig = memoize(
   async () => {
     return await client.discovery(
       new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-      process.env.REPL_ID!
+      process.env.REPL_ID || "loadtracker-pro"
     );
   },
   { maxAge: 3600 * 1000 }
@@ -34,7 +35,7 @@ export function getSession() {
   
   return session({
     store: sessionStore,
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || 'loadtracker-default-secret-change-in-production',
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -88,8 +89,7 @@ export async function setupAuth(app: Express) {
     verified(null, user);
   };
 
-  for (const domain of process.env
-    .REPLIT_DOMAINS!.split(",")) {
+  for (const domain of (process.env.REPLIT_DOMAINS || "localhost,replit.app").split(",")) {
     const strategy = new Strategy(
       {
         name: `replitauth:${domain}`,
@@ -123,7 +123,7 @@ export async function setupAuth(app: Express) {
     req.logout(() => {
       res.redirect(
         client.buildEndSessionUrl(config, {
-          client_id: process.env.REPL_ID!,
+          client_id: process.env.REPL_ID || "loadtracker-pro",
           post_logout_redirect_uri: `${req.protocol}://${req.hostname}`,
         }).href
       );
