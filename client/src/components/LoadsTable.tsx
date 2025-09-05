@@ -74,6 +74,79 @@ export default function LoadsTable() {
   const [assigningDriver, setAssigningDriver] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loadToDelete, setLoadToDelete] = useState<any>(null);
+  const [managingStops, setManagingStops] = useState(false);
+  const [newStop, setNewStop] = useState({
+    type: 'pickup',
+    locationId: '',
+    customName: '',
+    customAddress: '',
+    notes: '',
+    useCustomAddress: false
+  });
+
+  // Function to add a stop to existing load
+  const handleAddStop = async () => {
+    if (!selectedLoad || (!newStop.locationId && !newStop.customAddress)) {
+      toast({ title: "Please select a location or enter custom address", variant: "destructive" });
+      return;
+    }
+
+    try {
+      const stopData = {
+        loadId: selectedLoad.id,
+        type: newStop.type,
+        sequence: (selectedLoad.stops?.length || 0) + 1,
+        ...(newStop.locationId && newStop.locationId !== 'custom' ? 
+          { locationId: newStop.locationId } : 
+          { customName: newStop.customName, customAddress: newStop.customAddress }
+        ),
+        notes: newStop.notes || null
+      };
+
+      const response = await fetch(`/api/loads/${selectedLoad.id}/stops`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(stopData)
+      });
+
+      if (response.ok) {
+        // Refresh the loads data and close the form
+        await queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
+        setNewStop({ type: 'pickup', locationId: '', customName: '', customAddress: '', notes: '', useCustomAddress: false });
+        setManagingStops(false);
+        toast({ title: "Stop added successfully" });
+      } else {
+        const error = await response.json();
+        toast({ title: "Error adding stop", description: error.message, variant: "destructive" });
+      }
+    } catch (error) {
+      console.error('Error adding stop:', error);
+      toast({ title: "Error adding stop", variant: "destructive" });
+    }
+  };
+
+  // Function to delete a stop from existing load
+  const handleDeleteStop = async (stopId: string) => {
+    if (!selectedLoad) return;
+
+    try {
+      const response = await fetch(`/api/loads/${selectedLoad.id}/stops/${stopId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        // Refresh the loads data
+        await queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
+        toast({ title: "Stop removed successfully" });
+      } else {
+        const error = await response.json();
+        toast({ title: "Error removing stop", description: error.message, variant: "destructive" });
+      }
+    } catch (error) {
+      console.error('Error removing stop:', error);
+      toast({ title: "Error removing stop", variant: "destructive" });
+    }
+  };
 
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
@@ -571,6 +644,145 @@ export default function LoadsTable() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Load Stops */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold">Load Stops</h4>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setManagingStops(true)}
+                  >
+                    <i className="fas fa-plus mr-1"></i>
+                    Manage Stops
+                  </Button>
+                </div>
+                
+                {selectedLoad.stops && selectedLoad.stops.length > 0 ? (
+                  <div className="space-y-2">
+                    {selectedLoad.stops.map((stop: any, index: number) => (
+                      <div key={stop.id} className="flex items-center justify-between p-3 border rounded bg-gray-50">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">
+                            {index + 1}
+                          </div>
+                          <div className="text-sm">
+                            <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                              stop.type === 'pickup' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {stop.type === 'pickup' ? 'PICKUP' : 'DELIVERY'}
+                            </span>
+                            <div className="mt-1">
+                              <strong>{stop.customName || (stop.location ? stop.location.name : 'Unknown')}</strong>
+                              {stop.customAddress && <div className="text-gray-600">{stop.customAddress}</div>}
+                              {stop.notes && <div className="text-gray-500 italic">{stop.notes}</div>}
+                            </div>
+                          </div>
+                        </div>
+                        {managingStops && (
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleDeleteStop(stop.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <i className="fas fa-trash"></i>
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500 py-4 text-center border border-dashed rounded">
+                    No stops defined for this load
+                  </div>
+                )}
+                
+                {managingStops && (
+                  <div className="mt-4 p-4 border rounded bg-blue-50">
+                    <h5 className="font-medium mb-3">Add New Stop</h5>
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs text-gray-600 block mb-1">Type</label>
+                          <Select value={newStop.type} onValueChange={(value) => setNewStop({...newStop, type: value})}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select type..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pickup">Pickup</SelectItem>
+                              <SelectItem value="delivery">Delivery</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-600 block mb-1">Location</label>
+                          <Select value={newStop.locationId} onValueChange={(value) => setNewStop({...newStop, locationId: value, useCustomAddress: false})}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select location..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {locations?.map((location: any) => (
+                                <SelectItem key={location.id} value={location.id}>
+                                  {location.name}
+                                </SelectItem>
+                              ))}
+                              <SelectItem value="custom">Custom Address</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      {(newStop.locationId === 'custom' || newStop.useCustomAddress) && (
+                        <div className="space-y-2">
+                          <input
+                            type="text"
+                            placeholder="Location Name"
+                            value={newStop.customName}
+                            onChange={(e) => setNewStop({...newStop, customName: e.target.value})}
+                            className="w-full px-3 py-2 border rounded text-sm"
+                          />
+                          <input
+                            type="text"
+                            placeholder="Address"
+                            value={newStop.customAddress}
+                            onChange={(e) => setNewStop({...newStop, customAddress: e.target.value})}
+                            className="w-full px-3 py-2 border rounded text-sm"
+                          />
+                        </div>
+                      )}
+                      
+                      <div>
+                        <label className="text-xs text-gray-600 block mb-1">Notes (optional)</label>
+                        <input
+                          type="text"
+                          placeholder="Special instructions..."
+                          value={newStop.notes}
+                          onChange={(e) => setNewStop({...newStop, notes: e.target.value})}
+                          className="w-full px-3 py-2 border rounded text-sm"
+                        />
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <Button onClick={handleAddStop} size="sm">
+                          Add Stop
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setManagingStops(false);
+                            setNewStop({ type: 'pickup', locationId: '', customName: '', customAddress: '', notes: '', useCustomAddress: false });
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Documents Status */}

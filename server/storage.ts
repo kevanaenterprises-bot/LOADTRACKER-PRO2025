@@ -52,6 +52,7 @@ export interface IStorage {
   createLoad(load: InsertLoad): Promise<Load>;
   createLoadStop(stop: InsertLoadStop): Promise<LoadStop>;
   getLoadStops(loadId: string): Promise<LoadStop[]>;
+  deleteLoadStop(stopId: string): Promise<void>;
   getLoads(): Promise<LoadWithDetails[]>;
   getLoad(id: string): Promise<LoadWithDetails | undefined>;
   getLoadByNumber(number: string): Promise<LoadWithDetails | undefined>;
@@ -234,6 +235,10 @@ export class DatabaseStorage implements IStorage {
 
   async getLoadStops(loadId: string): Promise<LoadStop[]> {
     return await db.select().from(loadStops).where(eq(loadStops.loadId, loadId)).orderBy(loadStops.sequence);
+  }
+
+  async deleteLoadStop(stopId: string): Promise<void> {
+    await db.delete(loadStops).where(eq(loadStops.id, stopId));
   }
 
   async getLoads(): Promise<LoadWithDetails[]> {

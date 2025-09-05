@@ -2178,6 +2178,66 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Add stop to existing load
+  app.post("/api/loads/:id/stops", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const stopData = req.body;
+
+      // Validate load exists
+      const load = await storage.getLoad(id);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      // Validate stop data
+      if (!stopData.type || !['pickup', 'delivery'].includes(stopData.type)) {
+        return res.status(400).json({ message: "Stop type must be 'pickup' or 'delivery'" });
+      }
+
+      if (!stopData.locationId && !stopData.customAddress) {
+        return res.status(400).json({ message: "Stop must have either a location or custom address" });
+      }
+
+      // Create the stop
+      const newStop = await storage.createLoadStop({
+        loadId: id,
+        type: stopData.type,
+        sequence: stopData.sequence || 1,
+        locationId: stopData.locationId || null,
+        customAddress: stopData.customAddress || null,
+        customName: stopData.customName || null,
+        notes: stopData.notes || null,
+      });
+
+      res.status(201).json(newStop);
+    } catch (error: any) {
+      console.error("Add stop error:", error);
+      res.status(500).json({ message: error?.message || "Error adding stop" });
+    }
+  });
+
+  // Delete stop from existing load
+  app.delete("/api/loads/:id/stops/:stopId", isAuthenticated, async (req, res) => {
+    try {
+      const { id, stopId } = req.params;
+
+      // Validate load exists
+      const load = await storage.getLoad(id);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      // Delete the stop
+      await storage.deleteLoadStop(stopId);
+
+      res.status(200).json({ message: "Stop removed successfully" });
+    } catch (error: any) {
+      console.error("Delete stop error:", error);
+      res.status(500).json({ message: error?.message || "Error removing stop" });
+    }
+  });
+
   app.get("/api/loads/:id", (req, res, next) => {
     // Support both authenticated users and bypass token
     const hasAuth = req.isAuthenticated() || isBypassActive(req);
