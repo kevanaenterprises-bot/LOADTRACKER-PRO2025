@@ -3143,7 +3143,8 @@ Reply YES to confirm acceptance or NO to decline.`
       // Calculate invoice amount based on flat rate system
       const flatRate = parseFloat(rate.flatRate.toString());
       const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
-      const extraStopsCharge = (load.extraStops || 0) * 50;
+      const extraStops = parseFloat(load.extraStops?.toString() || "0");
+      const extraStopsCharge = extraStops * 50;
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
       // Generate sequential invoice number starting with GO6000
@@ -3154,7 +3155,7 @@ Reply YES to confirm acceptance or NO to decline.`
         flatRate: rate.flatRate,
         lumperCharge: load.lumperCharge || "0.00",
         extraStopsCharge: extraStopsCharge.toString(),
-        extraStopsCount: load.extraStops || 0,
+        extraStopsCount: parseFloat(load.extraStops?.toString() || "0"),
         totalAmount: totalAmount.toString(),
         status: "pending",
       });
@@ -3337,7 +3338,8 @@ Reply YES to confirm acceptance or NO to decline.`
               // Calculate invoice amount based on flat rate system
               const flatRate = parseFloat(rate.flatRate.toString());
               const lumperCharge = parseFloat(loadWithDetails.lumperCharge?.toString() || "0");
-              const extraStopsCharge = (loadWithDetails.extraStops || 0) * 50;
+              const extraStops = parseFloat(loadWithDetails.extraStops?.toString() || "0");
+              const extraStopsCharge = extraStops * 50;
               const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
               // Auto-generate invoice with sequential GO6000 series
@@ -3348,7 +3350,7 @@ Reply YES to confirm acceptance or NO to decline.`
                 flatRate: rate.flatRate,
                 lumperCharge: loadWithDetails.lumperCharge || "0.00",
                 extraStopsCharge: extraStopsCharge.toString(),
-                extraStopsCount: loadWithDetails.extraStops || 0,
+                extraStopsCount: parseFloat(loadWithDetails.extraStops?.toString() || "0"),
                 totalAmount: totalAmount.toString(),
                 status: "pending",
               });
@@ -3467,7 +3469,8 @@ Reply YES to confirm acceptance or NO to decline.`
             // Calculate invoice amount based on flat rate system
             const flatRate = parseFloat(rate.flatRate.toString());
             const lumperCharge = parseFloat(loadWithDetails.lumperCharge?.toString() || "0");
-            const extraStopsCharge = (loadWithDetails.extraStops || 0) * 50;
+            const extraStops = parseFloat(loadWithDetails.extraStops?.toString() || "0");
+            const extraStopsCharge = extraStops * 50;
             const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
             // Auto-generate invoice with sequential GO6000 series
@@ -3478,7 +3481,7 @@ Reply YES to confirm acceptance or NO to decline.`
               flatRate: rate.flatRate,
               lumperCharge: loadWithDetails.lumperCharge || "0.00",
               extraStopsCharge: extraStopsCharge.toString(),
-              extraStopsCount: loadWithDetails.extraStops || 0,
+              extraStopsCount: parseFloat(loadWithDetails.extraStops?.toString() || "0"),
               totalAmount: totalAmount.toString(),
               status: "pending",
             });
@@ -3519,7 +3522,8 @@ Reply YES to confirm acceptance or NO to decline.`
       // Calculate invoice amount based on new flat rate system
       const flatRate = parseFloat(rate.flatRate.toString());
       const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
-      const extraStopsCharge = (load.extraStops || 0) * 50; // $50 per extra stop
+      const extraStops = parseFloat(load.extraStops?.toString() || "0");
+      const extraStopsCharge = extraStops * 50; // $50 per extra stop
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
       // Auto-generate invoice with sequential GO6000 series
@@ -3530,7 +3534,7 @@ Reply YES to confirm acceptance or NO to decline.`
         flatRate: rate.flatRate,
         lumperCharge: load.lumperCharge || "0.00",
         extraStopsCharge: extraStopsCharge.toString(),
-        extraStopsCount: load.extraStops || 0,
+        extraStopsCount: parseFloat(load.extraStops?.toString() || "0"),
         totalAmount: totalAmount.toString(),
         status: "pending",
       });
@@ -3622,7 +3626,7 @@ Reply YES to confirm acceptance or NO to decline.`
             driverId: driver.id,
             locationId: miamiFLLocation?.id,
             lumperCharge: "150.00",
-            extraStops: 2,
+            extraStops: "2.00",
             status: "in_transit" as const
           },
           {
@@ -3634,7 +3638,7 @@ Reply YES to confirm acceptance or NO to decline.`
             driverId: driver.id,
             locationId: houstonTXLocation?.id,
             lumperCharge: "0.00",
-            extraStops: 1,
+            extraStops: "1.00",
             status: "delivered" as const
           },
           {
@@ -3646,7 +3650,7 @@ Reply YES to confirm acceptance or NO to decline.`
             driverId: driver.id,
             locationId: phoenixAZLocation?.id,
             lumperCharge: "75.00",
-            extraStops: 0,
+            extraStops: "0.00",
             status: "at_receiver" as const
           }
         ];
@@ -3759,7 +3763,7 @@ Reply YES to confirm acceptance or NO to decline.`
         deliveryAddress: extractedData.deliveryAddress || null,
         companyName: extractedData.companyName || null,
         // Default values for required fields
-        extraStops: 0,
+        extraStops: "0.00",
         lumperCharge: "0.00",
         estimatedMiles: null,
         driverId: null,
