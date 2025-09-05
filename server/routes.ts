@@ -2092,8 +2092,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if 109 number already exists
       const existingLoads = await storage.getLoads();
-      const exists = existingLoads.some(load => load.number109 === validatedData.number109);
-      if (exists) {
+      const existingLoad = existingLoads.find(load => load.number109 === validatedData.number109);
+      if (existingLoad) {
         // Check if override password is provided and correct
         if (overridePassword !== "1159") {
           console.log("Load creation failed - 109 number already exists:", validatedData.number109);
@@ -2102,8 +2102,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             requiresOverride: true 
           });
         }
-        // If override password is correct, continue with creation
-        console.log("Load creation - duplicate override with correct password for:", validatedData.number109);
+        // If override password is correct, delete the existing load first
+        console.log("Load creation - override password correct, deleting existing load:", existingLoad.id);
+        await storage.deleteLoad(existingLoad.id);
+        console.log("Existing load deleted, proceeding with new load creation");
       }
 
       // Validate stops if provided
