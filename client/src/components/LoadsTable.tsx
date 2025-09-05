@@ -678,6 +678,42 @@ export default function LoadsTable() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Load Deletion</DialogTitle>
+            <div className="text-red-600 font-medium">⚠️ This action cannot be undone</div>
+          </DialogHeader>
+          {loadToDelete && (
+            <div className="py-4">
+              <p className="text-gray-700">
+                Are you sure you want to delete load <strong>{loadToDelete.number109}</strong>?
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                This will permanently remove the load and all associated data from the system.
+              </p>
+            </div>
+          )}
+          <div className="flex justify-end space-x-3">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteLoadMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDeleteLoad}
+              disabled={deleteLoadMutation.isPending}
+            >
+              {deleteLoadMutation.isPending ? "Deleting..." : "Delete Load"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

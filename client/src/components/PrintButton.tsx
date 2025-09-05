@@ -225,51 +225,15 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   };
 
   return (
-    <>
-      <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
+    <div className="flex space-x-2">
+      {/* Email Button */}
+      <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
         <DialogTrigger asChild>
-          <Button variant={variant} size={size} disabled={isPrinting}>
-            <Printer className="h-4 w-4 mr-2" />
-            {isPrinting ? "Printing..." : "Print"}
+          <Button variant={variant} size={size} disabled={isEmailing}>
+            <Mail className="h-4 w-4 mr-2" />
+            {isEmailing ? "Emailing..." : "Email"}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Email Complete Document Package</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {invoice && load && (
-              <Card className="cursor-pointer hover:bg-gray-50 border-2 border-green-200 bg-green-50" onClick={() => setEmailDialogOpen(true)}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center">
-                    <Mail className="h-4 w-4 mr-2 text-green-700" />
-                    Send Complete Package
-                    <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-700 rounded font-semibold">
-                      ALL DOCS
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-sm text-gray-700 font-medium">
-                    Email all available documents together
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    Invoice + Rate Confirmation + POD (if available) - Complete delivery package
-                  </p>
-                  <div className="mt-3 p-3 bg-gray-50 rounded">
-                    <p className="text-xs text-gray-700">
-                      <strong>Load:</strong> {load.number_109 || load.number109} • <strong>Invoice:</strong> {invoice.invoiceNumber} • <strong>Amount:</strong> ${invoice.totalAmount}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Email Dialog */}
-      <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Email Complete Document Package</DialogTitle>
@@ -338,7 +302,57 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
           </div>
         </DialogContent>
       </Dialog>
-    </>
+
+      {/* Print Button */}
+      <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" size={size} disabled={isPrinting}>
+            <Printer className="h-4 w-4 mr-2" />
+            {isPrinting ? "Printing..." : "Print"}
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Print Documents</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {invoice && load && (
+              <div className="space-y-3">
+                <Card className="cursor-pointer hover:bg-gray-50 border-2 border-blue-200 bg-blue-50" onClick={handlePrintInvoice}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center">
+                      <FileText className="h-4 w-4 mr-2 text-blue-700" />
+                      Print Invoice & Rate Confirmation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-xs text-gray-600">
+                      Invoice: {invoice.invoiceNumber} • Load: {load.number_109 || load.number109} • ${invoice.totalAmount}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {load.podDocumentPath && (
+                  <Card className="cursor-pointer hover:bg-gray-50 border-2 border-orange-200 bg-orange-50" onClick={handlePrintPOD}>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm flex items-center">
+                        <Package className="h-4 w-4 mr-2 text-orange-700" />
+                        Print POD Document
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-xs text-gray-600">
+                        Proof of Delivery attachment
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
 
