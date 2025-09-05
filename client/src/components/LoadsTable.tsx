@@ -997,60 +997,91 @@ export default function LoadsTable() {
                         </div>
                         <div>
                           <label className="text-xs text-gray-600 block mb-1">Location</label>
-                          <Select value={newStop.locationId} onValueChange={(value) => {
-                            if (value === 'custom') {
-                              setNewStop({...newStop, locationId: value, useCustomAddress: true, customName: '', customAddress: ''});
-                            } else {
-                              const selectedLocation = locations?.find((loc: any) => loc.id === value);
-                              const fullAddress = selectedLocation ? [
-                                selectedLocation.address,
-                                selectedLocation.city,
-                                selectedLocation.state
-                              ].filter(Boolean).join(', ') : '';
-                              setNewStop({
-                                ...newStop, 
-                                locationId: value, 
-                                useCustomAddress: false,
-                                customName: selectedLocation?.name || '',
-                                customAddress: fullAddress || selectedLocation?.name || ''
-                              });
-                            }
-                          }}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select location..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {locations?.map((location: any) => (
-                                <SelectItem key={location.id} value={location.id}>
-                                  {location.name}
-                                </SelectItem>
-                              ))}
-                              <SelectItem value="custom">Custom Address</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          {newStop.locationId && newStop.locationId !== 'custom' ? (
+                            <div className="space-y-2">
+                              <Select value={newStop.locationId} onValueChange={(value) => {
+                                if (value === 'custom') {
+                                  setNewStop({...newStop, locationId: undefined, customName: '', customAddress: ''});
+                                } else {
+                                  const selectedLocation = locations?.find((loc: any) => loc.id === value);
+                                  const fullAddress = selectedLocation ? [
+                                    selectedLocation.address,
+                                    selectedLocation.city,
+                                    selectedLocation.state
+                                  ].filter(Boolean).join(', ') : '';
+                                  setNewStop({
+                                    ...newStop, 
+                                    locationId: value,
+                                    customName: selectedLocation?.name || '',
+                                    customAddress: fullAddress || selectedLocation?.name || ''
+                                  });
+                                }
+                              }}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select location..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="custom">Enter Custom Address</SelectItem>
+                                  {locations?.map((location: any) => (
+                                    <SelectItem key={location.id} value={location.id}>
+                                      {location.name} - {location.city}, {location.state}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              {/* Show selected location info */}
+                              <div className="p-2 bg-green-50 border border-green-200 rounded text-xs">
+                                <strong>{newStop.customName}</strong>
+                                {newStop.customAddress && <div className="text-gray-600">{newStop.customAddress}</div>}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              <Select value="custom" onValueChange={(value) => {
+                                if (value !== 'custom') {
+                                  const selectedLocation = locations?.find((loc: any) => loc.id === value);
+                                  const fullAddress = selectedLocation ? [
+                                    selectedLocation.address,
+                                    selectedLocation.city,
+                                    selectedLocation.state
+                                  ].filter(Boolean).join(', ') : '';
+                                  setNewStop({
+                                    ...newStop, 
+                                    locationId: value,
+                                    customName: selectedLocation?.name || '',
+                                    customAddress: fullAddress || selectedLocation?.name || ''
+                                  });
+                                }
+                              }}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select existing location or enter custom..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="custom">Enter Custom Address</SelectItem>
+                                  {locations?.map((location: any) => (
+                                    <SelectItem key={location.id} value={location.id}>
+                                      {location.name} - {location.city}, {location.state}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <input
+                                type="text"
+                                placeholder="Company/Location Name"
+                                value={newStop.customName}
+                                onChange={(e) => setNewStop({...newStop, customName: e.target.value})}
+                                className="w-full px-3 py-2 border rounded text-sm"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Full Address"
+                                value={newStop.customAddress}
+                                onChange={(e) => setNewStop({...newStop, customAddress: e.target.value})}
+                                className="w-full px-3 py-2 border rounded text-sm"
+                              />
+                            </div>
+                          )}
                         </div>
-                      </div>
-                      
-                      {/* Address Fields - Always show, disabled when location is selected */}
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          placeholder="Location Name"
-                          value={newStop.customName}
-                          onChange={(e) => setNewStop({...newStop, customName: e.target.value})}
-                          disabled={newStop.locationId !== 'custom'}
-                          title={newStop.locationId !== 'custom' ? "Auto-filled from selected location" : ""}
-                          className={`w-full px-3 py-2 border rounded text-sm ${newStop.locationId !== 'custom' ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                        />
-                        <input
-                          type="text"
-                          placeholder="Address"
-                          value={newStop.customAddress}
-                          onChange={(e) => setNewStop({...newStop, customAddress: e.target.value})}
-                          disabled={newStop.locationId !== 'custom'}
-                          title={newStop.locationId !== 'custom' ? "Auto-filled from selected location" : ""}
-                          className={`w-full px-3 py-2 border rounded text-sm ${newStop.locationId !== 'custom' ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                        />
                       </div>
                       
                       <div>

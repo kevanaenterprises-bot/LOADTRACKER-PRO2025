@@ -264,70 +264,100 @@ export default function LoadForm() {
                             </Select>
                           </div>
                           
-                          {/* Location Selection */}
+                          {/* Single Location Field */}
                           <div>
                             <FormLabel className="text-sm">Location</FormLabel>
-                            <Select 
-                              value={stop.locationId || "custom"} 
-                              onValueChange={(value) => {
-                                if (value === "custom") {
-                                  updateStop(stop.id, 'locationId', undefined);
-                                } else {
-                                  const selectedLocation = locations.find((loc: any) => loc.id === value);
-                                  updateStop(stop.id, 'locationId', value);
-                                  // Auto-populate address info from selected location
-                                  if (selectedLocation) {
-                                    updateStop(stop.id, 'customName', selectedLocation.name);
-                                    const fullAddress = [
-                                      selectedLocation.address,
-                                      selectedLocation.city,
-                                      selectedLocation.state
-                                    ].filter(Boolean).join(', ');
-                                    updateStop(stop.id, 'customAddress', fullAddress || selectedLocation.name);
-                                  }
-                                }
-                              }}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="Select location or custom" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="custom">Custom Address</SelectItem>
-                                {locations.map((location: any) => (
-                                  <SelectItem key={location.id} value={location.id}>
-                                    {location.name} - {location.city}, {location.state}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            {stop.locationId && stop.locationId !== "custom" ? (
+                              <div className="flex items-center gap-2 mt-1">
+                                <Select 
+                                  value={stop.locationId} 
+                                  onValueChange={(value) => {
+                                    if (value === "custom") {
+                                      updateStop(stop.id, 'locationId', undefined);
+                                      updateStop(stop.id, 'customName', '');
+                                      updateStop(stop.id, 'customAddress', '');
+                                    } else {
+                                      const selectedLocation = locations.find((loc: any) => loc.id === value);
+                                      updateStop(stop.id, 'locationId', value);
+                                      if (selectedLocation) {
+                                        updateStop(stop.id, 'customName', selectedLocation.name);
+                                        const fullAddress = [
+                                          selectedLocation.address,
+                                          selectedLocation.city,
+                                          selectedLocation.state
+                                        ].filter(Boolean).join(', ');
+                                        updateStop(stop.id, 'customAddress', fullAddress || selectedLocation.name);
+                                      }
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select location" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="custom">Enter Custom Address</SelectItem>
+                                    {locations.map((location: any) => (
+                                      <SelectItem key={location.id} value={location.id}>
+                                        {location.name} - {location.city}, {location.state}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            ) : (
+                              <div className="space-y-2 mt-1">
+                                <Select 
+                                  value="custom"
+                                  onValueChange={(value) => {
+                                    if (value !== "custom") {
+                                      const selectedLocation = locations.find((loc: any) => loc.id === value);
+                                      updateStop(stop.id, 'locationId', value);
+                                      if (selectedLocation) {
+                                        updateStop(stop.id, 'customName', selectedLocation.name);
+                                        const fullAddress = [
+                                          selectedLocation.address,
+                                          selectedLocation.city,
+                                          selectedLocation.state
+                                        ].filter(Boolean).join(', ');
+                                        updateStop(stop.id, 'customAddress', fullAddress || selectedLocation.name);
+                                      }
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select existing location or enter custom" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="custom">Enter Custom Address</SelectItem>
+                                    {locations.map((location: any) => (
+                                      <SelectItem key={location.id} value={location.id}>
+                                        {location.name} - {location.city}, {location.state}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <Input
+                                  placeholder="Company/Location Name"
+                                  value={stop.customName || ""}
+                                  onChange={(e) => updateStop(stop.id, 'customName', e.target.value)}
+                                />
+                                <Input
+                                  placeholder="Full Address"
+                                  value={stop.customAddress || ""}
+                                  onChange={(e) => updateStop(stop.id, 'customAddress', e.target.value)}
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
                         
-                        {/* Address Fields */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                          <div>
-                            <FormLabel className="text-sm">Company/Location Name</FormLabel>
-                            <Input
-                              className="mt-1"
-                              placeholder="Company or location name"
-                              value={stop.customName || ""}
-                              onChange={(e) => updateStop(stop.id, 'customName', e.target.value)}
-                              disabled={!!stop.locationId}
-                              title={stop.locationId ? "Auto-filled from selected location" : ""}
-                            />
+                        {/* Show selected location info when existing location is chosen */}
+                        {stop.locationId && stop.locationId !== "custom" && (
+                          <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm">
+                            <strong>{stop.customName}</strong>
+                            {stop.customAddress && <div className="text-gray-600">{stop.customAddress}</div>}
                           </div>
-                          <div>
-                            <FormLabel className="text-sm">Address</FormLabel>
-                            <Input
-                              className="mt-1"
-                              placeholder="Full address"
-                              value={stop.customAddress || ""}
-                              onChange={(e) => updateStop(stop.id, 'customAddress', e.target.value)}
-                              disabled={!!stop.locationId}
-                              title={stop.locationId ? "Auto-filled from selected location" : ""}
-                            />
-                          </div>
-                        </div>
+                        )}
                         
                         {/* Notes */}
                         <div className="mt-4">
