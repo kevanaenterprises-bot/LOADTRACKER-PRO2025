@@ -5,11 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search, Mail } from "lucide-react";
+import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search } from "lucide-react";
 import { format } from "date-fns";
 
 interface Invoice {
@@ -34,11 +32,6 @@ interface Invoice {
       city: string;
       state: string;
     };
-    customer?: {
-      id: string;
-      name: string;
-      email?: string;
-    };
     podDocumentPath?: string;
   };
 }
@@ -50,9 +43,6 @@ export default function InvoiceInbox() {
   const [previewHTML, setPreviewHTML] = useState("");
   const [previewInvoice, setPreviewInvoice] = useState<Invoice | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
-  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-  const [selectedInvoiceForEmail, setSelectedInvoiceForEmail] = useState<Invoice | null>(null);
-  const [additionalEmail, setAdditionalEmail] = useState("");
 
   const { data: invoicesData, isLoading } = useQuery({
     queryKey: ["/api/invoices"],
@@ -389,8 +379,40 @@ export default function InvoiceInbox() {
                     <Button
                       size="sm"
                       onClick={() => {
-                        setEmailDialogOpen(true);
-                        setSelectedInvoiceForEmail(previewInvoice);
+                        const email = prompt("Enter email address to send complete package:");
+                        if (email && previewInvoice) {
+                          // Use the existing email API endpoint
+                          fetch(`/api/invoices/${previewInvoice.id}/email-complete-package`, {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025'
+                            },
+                            credentials: 'include',
+                            body: JSON.stringify({ 
+                              emailAddress: email,
+                              loadId: previewInvoice.loadId 
+                            })
+                          })
+                          .then(response => response.json())
+                          .then(data => {
+                            if (data.message && data.message.includes('successfully')) {
+                              toast({
+                                title: "✅ Email Sent!",
+                                description: `Complete package sent to ${email}`,
+                              });
+                            } else {
+                              throw new Error(data.message || 'Failed to send email');
+                            }
+                          })
+                          .catch(error => {
+                            toast({
+                              title: "❌ Email Failed",
+                              description: error.message || "Failed to send email",
+                              variant: "destructive"
+                            });
+                          });
+                        }
                       }}
                     >
                       <FileText className="h-4 w-4 mr-1" />
@@ -414,120 +436,6 @@ export default function InvoiceInbox() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Email Dialog */}
-      <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Send Complete Document Package</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Email Recipients</Label>
-              <div className="space-y-2 p-3 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">
-                  <strong>Auto-included:</strong>
-                  <ul className="list-disc list-inside mt-1">
-                    <li>kevin@go4fc.com</li>
-                    <li>gofarmsbills@gmail.com</li>
-                  </ul>
-                </div>
-                
-                {selectedInvoiceForEmail?.load?.customer?.email ? (
-                  <div className="text-sm text-green-700">
-                    <strong>Customer Email:</strong> {selectedInvoiceForEmail.load.customer.email}
-                  </div>
-                ) : (
-                  <div className="text-sm text-amber-600">
-                    <strong>Note:</strong> Customer has no email address - won't be included
-                  </div>
-                )}
-                
-                <div className="mt-2">
-                  <Label htmlFor="additional-email">Additional Email (optional)</Label>
-                  <Input
-                    id="additional-email"
-                    type="email"
-                    placeholder="additional@company.com"
-                    value={additionalEmail}
-                    onChange={(e) => setAdditionalEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex space-x-2 pt-2">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setEmailDialogOpen(false);
-                  setAdditionalEmail("");
-                  setSelectedInvoiceForEmail(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={() => {
-                  if (selectedInvoiceForEmail) {
-                    // Build email list with auto-included addresses plus customer and additional
-                    const emails = ['kevin@go4fc.com', 'gofarmsbills@gmail.com'];
-                    if (selectedInvoiceForEmail.load?.customer?.email) {
-                      emails.push(selectedInvoiceForEmail.load.customer.email);
-                    }
-                    if (additionalEmail) {
-                      emails.push(additionalEmail);
-                    }
-                    
-                    const emailList = emails.join(', ');
-                    
-                    // Use the existing email API endpoint
-                    fetch(`/api/invoices/${selectedInvoiceForEmail.id}/email-complete-package`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025'
-                      },
-                      credentials: 'include',
-                      body: JSON.stringify({ 
-                        emailAddress: emailList,
-                        loadId: selectedInvoiceForEmail.loadId 
-                      })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                      if (data.message && data.message.includes('successfully')) {
-                        toast({
-                          title: "✅ Email Sent!",
-                          description: `Complete package sent to ${emails.length} recipients`,
-                        });
-                      } else {
-                        throw new Error(data.message || 'Failed to send email');
-                      }
-                    })
-                    .catch(error => {
-                      toast({
-                        title: "❌ Email Failed",
-                        description: error.message || "Failed to send email",
-                        variant: "destructive"
-                      });
-                    });
-                    
-                    setEmailDialogOpen(false);
-                    setAdditionalEmail("");
-                    setSelectedInvoiceForEmail(null);
-                  }
-                }}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Send to All Recipients
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
-

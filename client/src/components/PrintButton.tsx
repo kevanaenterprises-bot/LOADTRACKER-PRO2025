@@ -172,11 +172,11 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
     setPrintDialogOpen(false);
   };
 
-  const handleEmailCompletePackage = async (recipients: string = emailAddress) => {
-    if (!recipients) {
+  const handleEmailCompletePackage = async () => {
+    if (!emailAddress) {
       toast({
         title: "Email Required",
-        description: "Please provide at least one email address.",
+        description: "Please enter an email address.",
         variant: "destructive",
       });
       return;
@@ -193,7 +193,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       
       // Send complete document package - invoice + POD/BOL + rate confirmation (if available)
       await apiRequest(`/api/invoices/${invoiceIdentifier}/email-complete-package`, "POST", {
-        emailAddress: recipients,
+        emailAddress,
         loadId: loadId,
       });
 
@@ -207,8 +207,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       }
 
       toast({
-        title: "Complete Package Sent", 
-        description: `All available documents sent to recipients: ${documentsIncluded.join(", ")}`,
+        title: "Complete Package Sent",
+        description: `All available documents sent to ${emailAddress}: ${documentsIncluded.join(", ")}`,
       });
       
       setEmailDialogOpen(false);
@@ -240,38 +240,15 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Email Recipients</Label>
-              <div className="space-y-2 p-3 bg-gray-50 rounded">
-                <div className="text-sm text-gray-600">
-                  <strong>Auto-included:</strong>
-                  <ul className="list-disc list-inside mt-1">
-                    <li>kevin@go4fc.com</li>
-                    <li>gofarmsbills@gmail.com</li>
-                  </ul>
-                </div>
-                
-                {load?.customer?.email ? (
-                  <div className="text-sm text-green-700">
-                    <strong>Customer Email:</strong> {load.customer.email}
-                  </div>
-                ) : (
-                  <div className="text-sm text-amber-600">
-                    <strong>Note:</strong> Customer has no email address - won't be included
-                  </div>
-                )}
-                
-                <div className="mt-2">
-                  <Label htmlFor="additional-email">Additional Email (optional)</Label>
-                  <Input
-                    id="additional-email"
-                    type="email"
-                    placeholder="additional@company.com"
-                    value={emailAddress}
-                    onChange={(e) => setEmailAddress(e.target.value)}
-                    disabled={isEmailing}
-                  />
-                </div>
-              </div>
+              <Label htmlFor="email">Recipient Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="customer@company.com"
+                value={emailAddress}
+                onChange={(e) => setEmailAddress(e.target.value)}
+                disabled={isEmailing}
+              />
             </div>
             
             {invoice && load && (
@@ -305,20 +282,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                 Cancel
               </Button>
               <Button 
-                onClick={() => {
-                  // Build email list with auto-included addresses plus customer and additional
-                  const emails = ['kevin@go4fc.com', 'gofarmsbills@gmail.com'];
-                  if (load?.customer?.email) {
-                    emails.push(load.customer.email);
-                  }
-                  if (emailAddress) {
-                    emails.push(emailAddress);
-                  }
-                  
-                  // Use the combined email list
-                  handleEmailCompletePackage(emails.join(', '));
-                }}
-                disabled={isEmailing}
+                onClick={handleEmailCompletePackage}
+                disabled={isEmailing || !emailAddress}
                 className="bg-green-600 hover:bg-green-700"
               >
                 {isEmailing ? (

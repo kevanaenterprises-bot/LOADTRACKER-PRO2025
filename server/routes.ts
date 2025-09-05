@@ -12,7 +12,6 @@ import multer from 'multer';
 import {
   insertLoadSchema,
   insertLocationSchema,
-  insertCustomerSchema,
   insertBolNumberSchema,
   insertRateSchema,
   insertUserSchema,
@@ -1528,102 +1527,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Customers API
-  app.get("/api/customers", (req, res, next) => {
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
-    if (hasAuth) {
-      next();
-    } else {
-      res.status(401).json({ message: "Authentication required" });
-    }
-  }, async (req, res) => {
-    try {
-      const customers = await storage.getCustomers();
-      res.json(customers);
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-      res.status(500).json({ message: "Failed to fetch customers" });
-    }
-  });
-
-  app.post("/api/customers", (req, res, next) => {
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
-    if (hasAuth) {
-      next();
-    } else {
-      res.status(401).json({ message: "Authentication required" });
-    }
-  }, async (req, res) => {
-    try {
-      const validatedData = insertCustomerSchema.parse(req.body);
-      const customer = await storage.createCustomer(validatedData);
-      res.status(201).json(customer);
-    } catch (error: any) {
-      console.error("Error creating customer:", error);
-      if (error?.name === 'ZodError') {
-        res.status(400).json({ message: "Invalid customer data", errors: error.errors });
-      } else {
-        res.status(400).json({ message: error?.message || "Invalid customer data" });
-      }
-    }
-  });
-
-  // Update location information
-  app.patch("/api/locations/:id", (req, res, next) => {
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
-    if (hasAuth) {
-      next();
-    } else {
-      res.status(401).json({ message: "Authentication required" });
-    }
-  }, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updates = req.body;
-
-      // Validate location exists
-      const location = await storage.getLocation(id);
-      if (!location) {
-        return res.status(404).json({ message: "Location not found" });
-      }
-
-      // Update location
-      const updatedLocation = await storage.updateLocation(id, updates);
-      res.status(200).json(updatedLocation);
-    } catch (error: any) {
-      console.error("Error updating location:", error);
-      res.status(500).json({ message: error?.message || "Error updating location" });
-    }
-  });
-
-  // Update customer information
-  app.patch("/api/customers/:id", (req, res, next) => {
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
-    if (hasAuth) {
-      next();
-    } else {
-      res.status(401).json({ message: "Authentication required" });
-    }
-  }, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updates = req.body;
-
-      // Validate customer exists
-      const customer = await storage.getCustomer(id);
-      if (!customer) {
-        return res.status(404).json({ message: "Customer not found" });
-      }
-
-      // Update customer
-      const updatedCustomer = await storage.updateCustomer(id, updates);
-      res.status(200).json(updatedCustomer);
-    } catch (error: any) {
-      console.error("Error updating customer:", error);
-      res.status(500).json({ message: error?.message || "Error updating customer" });
-    }
-  });
-
   // Drivers - WITH TOKEN BYPASS
   app.get("/api/drivers", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
@@ -2171,38 +2074,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Load creation - validating request body:", JSON.stringify(req.body));
       
-      // Extract stops from request body before validation
-      const { stops, ...loadData } = req.body;
-      
-      // Validate location exists if provided (for backward compatibility)
-      if (loadData.locationId) {
-        const location = await storage.getLocation(loadData.locationId);
+      // Validate location exists if provided
+      if (req.body.locationId) {
+        const location = await storage.getLocation(req.body.locationId);
         if (!location) {
-          console.log("Load creation failed - location not found:", loadData.locationId);
+          console.log("Load creation failed - location not found:", req.body.locationId);
           return res.status(400).json({ message: "Selected location does not exist. Please add the location first." });
         }
         console.log("Location validated:", location.name);
       }
       
-      // Validate stops if provided
-      if (stops && stops.length > 0) {
-        for (const stop of stops) {
-          if (stop.locationId) {
-            const location = await storage.getLocation(stop.locationId);
-            if (!location) {
-              console.log("Load creation failed - stop location not found:", stop.locationId);
-              return res.status(400).json({ message: `Stop location does not exist: ${stop.locationId}` });
-            }
-          }
-          // Validate stop has either locationId or custom address
-          if (!stop.locationId && !stop.customAddress) {
-            return res.status(400).json({ message: "Each stop must have either a location or custom address" });
-          }
-        }
-        console.log("Stops validated:", stops.length, "stops");
-      }
-      
-      const validatedData = insertLoadSchema.parse(loadData);
+      const validatedData = insertLoadSchema.parse(req.body);
       console.log("Load creation - validation successful, creating load:", validatedData);
       
       // Check if 109 number already exists
@@ -2215,24 +2097,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const load = await storage.createLoad(validatedData);
       console.log("Load creation successful:", load.id);
-
-      // Create stops if provided
-      if (stops && stops.length > 0) {
-        console.log("Creating stops for load:", load.id);
-        for (const stop of stops) {
-          const stopData = {
-            loadId: load.id,
-            type: stop.type,
-            sequence: stop.sequence,
-            locationId: stop.locationId || null,
-            customAddress: stop.customAddress || null,
-            customName: stop.customName || null,
-            notes: stop.notes || null,
-          };
-          await storage.createLoadStop(stopData);
-        }
-        console.log("Created", stops.length, "stops for load");
-      }
 
       // Send SMS to driver if assigned
       if (validatedData.driverId) {
@@ -2272,152 +2136,6 @@ Reply YES to confirm acceptance or NO to decline.`
       } else {
         res.status(400).json({ message: error?.message || "Invalid load data" });
       }
-    }
-  });
-
-  // Add stop to existing load
-  app.post("/api/loads/:id/stops", (req, res, next) => {
-    // Enhanced authentication check for stop creation
-    const hasAdminAuth = req.session?.adminAuth?.role === 'admin';
-    const hasDriverAuth = req.session?.driverAuth?.role === 'driver';
-    const hasReplitAuth = req.headers['x-replit-user-id'];
-    const hasTokenBypass = req.headers['x-bypass-token'] === 'LOADTRACKER_BYPASS_2025';
-    
-    console.log("Stop creation auth check:", { hasAdminAuth, hasDriverAuth, hasReplitAuth, hasTokenBypass });
-    
-    if (hasAdminAuth || hasDriverAuth || hasReplitAuth || hasTokenBypass) {
-      return next();
-    }
-    
-    return res.status(401).json({ message: "Not authenticated" });
-  }, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const stopData = req.body;
-
-      // Validate load exists
-      const load = await storage.getLoad(id);
-      if (!load) {
-        return res.status(404).json({ message: "Load not found" });
-      }
-
-      // Validate stop data
-      if (!stopData.type || !['pickup', 'delivery'].includes(stopData.type)) {
-        return res.status(400).json({ message: "Stop type must be 'pickup' or 'delivery'" });
-      }
-
-      if (!stopData.locationId && !stopData.customAddress) {
-        return res.status(400).json({ message: "Stop must have either a location or custom address" });
-      }
-
-      // Create the stop
-      const newStop = await storage.createLoadStop({
-        loadId: id,
-        type: stopData.type,
-        sequence: stopData.sequence || 1,
-        locationId: stopData.locationId || null,
-        customAddress: stopData.customAddress || null,
-        customName: stopData.customName || null,
-        notes: stopData.notes || null,
-      });
-
-      res.status(201).json(newStop);
-    } catch (error: any) {
-      console.error("Add stop error:", error);
-      res.status(500).json({ message: error?.message || "Error adding stop" });
-    }
-  });
-
-  // Delete stop from existing load
-  app.delete("/api/loads/:id/stops/:stopId", (req, res, next) => {
-    // Enhanced authentication check for stop deletion
-    const hasAdminAuth = req.session?.adminAuth?.role === 'admin';
-    const hasDriverAuth = req.session?.driverAuth?.role === 'driver';
-    const hasReplitAuth = req.headers['x-replit-user-id'];
-    const hasTokenBypass = req.headers['x-bypass-token'] === 'LOADTRACKER_BYPASS_2025';
-    
-    console.log("Stop deletion auth check:", { hasAdminAuth, hasDriverAuth, hasReplitAuth, hasTokenBypass });
-    
-    if (hasAdminAuth || hasDriverAuth || hasReplitAuth || hasTokenBypass) {
-      return next();
-    }
-    
-    return res.status(401).json({ message: "Not authenticated" });
-  }, async (req, res) => {
-    try {
-      const { id, stopId } = req.params;
-
-      // Validate load exists
-      const load = await storage.getLoad(id);
-      if (!load) {
-        return res.status(404).json({ message: "Load not found" });
-      }
-
-      // Delete the stop
-      await storage.deleteLoadStop(stopId);
-
-      res.status(200).json({ message: "Stop removed successfully" });
-    } catch (error: any) {
-      console.error("Delete stop error:", error);
-      res.status(500).json({ message: error?.message || "Error removing stop" });
-    }
-  });
-
-  // Update customer information for existing load
-  app.patch("/api/loads/:id/customer", isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const customerData = req.body;
-
-      // Validate load exists
-      const load = await storage.getLoad(id);
-      if (!load) {
-        return res.status(404).json({ message: "Load not found" });
-      }
-
-      // Update the load with customer information
-      const updatedLoad = await storage.updateLoad(id, {
-        companyName: customerData.companyName,
-        poNumber: customerData.poNumber,
-        appointmentTime: customerData.appointmentTime,
-        pickupAddress: customerData.pickupAddress,
-        deliveryAddress: customerData.deliveryAddress,
-      });
-
-      res.status(200).json(updatedLoad);
-    } catch (error: any) {
-      console.error("Update customer error:", error);
-      res.status(500).json({ message: error?.message || "Error updating customer information" });
-    }
-  });
-
-  // Assign customer to existing load
-  app.patch("/api/loads/:id/customer-assign", isAuthenticated, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { customerId } = req.body;
-
-      // Validate load exists
-      const load = await storage.getLoad(id);
-      if (!load) {
-        return res.status(404).json({ message: "Load not found" });
-      }
-
-      // Validate customer exists if provided
-      if (customerId) {
-        const customer = await storage.getCustomer(customerId);
-        if (!customer) {
-          return res.status(404).json({ message: "Customer not found" });
-        }
-      }
-
-      // Update the load with customer assignment
-      const updatedLoad = await storage.updateLoad(id, { customerId });
-
-      res.status(200).json(updatedLoad);
-    } catch (error: any) {
-      console.error("Assign customer error:", error);
-      res.status(500).json({ message: error?.message || "Error assigning customer" });
     }
   });
 

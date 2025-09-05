@@ -10,7 +10,6 @@ import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import AdminTestDashboard from "@/pages/AdminTestDashboard";
 import DriverPortal from "@/pages/DriverPortal";
-import CustomerManagement from "@/components/CustomerManagement";
 import DriverLogin from "@/pages/DriverLogin";
 import DebugUpload from "@/pages/DebugUpload";
 import ProductionDebug from "@/pages/ProductionDebug";
@@ -118,9 +117,6 @@ function Router() {
       {/* Driver portal - always available for production access */}
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
-      
-      {/* Customer management - admin access */}
-      <Route path="/customers" component={CustomerManagement} />
       
       {/* Landing page by default */}
       <Route path="/" component={Landing} />

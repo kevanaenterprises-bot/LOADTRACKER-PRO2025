@@ -27,15 +27,9 @@ import {
   type InsertNotificationPreferences,
   type NotificationLog,
   type InsertNotificationLog,
-  loadStops,
-  LoadStop,
-  InsertLoadStop,
-  customers,
-  Customer,
-  InsertCustomer,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql, not, inArray } from "drizzle-orm";
+import { eq, desc, and, sql, not } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -50,20 +44,9 @@ export interface IStorage {
   getLocation(id: string): Promise<Location | undefined>;
   getLocationByName(name: string): Promise<Location | undefined>;
   createLocation(location: InsertLocation): Promise<Location>;
-  updateLocation(id: string, updates: Partial<Location>): Promise<Location>;
-  
-  // Customer operations
-  getCustomers(): Promise<Customer[]>;
-  getCustomer(id: string): Promise<Customer | undefined>;
-  getCustomerByName(name: string): Promise<Customer | undefined>;
-  createCustomer(customer: InsertCustomer): Promise<Customer>;
-  updateCustomer(id: string, updates: Partial<Customer>): Promise<Customer>;
 
   // Load operations
   createLoad(load: InsertLoad): Promise<Load>;
-  createLoadStop(stop: InsertLoadStop): Promise<LoadStop>;
-  getLoadStops(loadId: string): Promise<LoadStop[]>;
-  deleteLoadStop(stopId: string): Promise<void>;
   getLoads(): Promise<LoadWithDetails[]>;
   getLoad(id: string): Promise<LoadWithDetails | undefined>;
   getLoadByNumber(number: string): Promise<LoadWithDetails | undefined>;
@@ -230,43 +213,6 @@ export class DatabaseStorage implements IStorage {
     return newLocation;
   }
 
-  async updateLocation(id: string, updates: Partial<Location>): Promise<Location> {
-    const [updatedLocation] = await db
-      .update(locations)
-      .set(updates)
-      .where(eq(locations.id, id))
-      .returning();
-    return updatedLocation;
-  }
-
-  async getCustomers(): Promise<Customer[]> {
-    return await db.select().from(customers).orderBy(customers.name);
-  }
-
-  async getCustomer(id: string): Promise<Customer | undefined> {
-    const [customer] = await db.select().from(customers).where(eq(customers.id, id));
-    return customer;
-  }
-
-  async getCustomerByName(name: string): Promise<Customer | undefined> {
-    const [customer] = await db.select().from(customers).where(eq(customers.name, name));
-    return customer;
-  }
-
-  async createCustomer(customer: InsertCustomer): Promise<Customer> {
-    const [newCustomer] = await db.insert(customers).values(customer).returning();
-    return newCustomer;
-  }
-
-  async updateCustomer(id: string, updates: Partial<Customer>): Promise<Customer> {
-    const [updatedCustomer] = await db
-      .update(customers)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(customers.id, id))
-      .returning();
-    return updatedCustomer;
-  }
-
   async createLoad(load: InsertLoad): Promise<Load> {
     const [newLoad] = await db.insert(loads).values(load).returning();
     
@@ -276,48 +222,25 @@ export class DatabaseStorage implements IStorage {
     return newLoad;
   }
 
-  async createLoadStop(stop: InsertLoadStop): Promise<LoadStop> {
-    const [newStop] = await db.insert(loadStops).values(stop).returning();
-    return newStop;
-  }
-
-  async getLoadStops(loadId: string): Promise<LoadStop[]> {
-    return await db.select().from(loadStops).where(eq(loadStops.loadId, loadId)).orderBy(loadStops.sequence);
-  }
-
-  async deleteLoadStop(stopId: string): Promise<void> {
-    await db.delete(loadStops).where(eq(loadStops.id, stopId));
-  }
-
   async getLoads(): Promise<LoadWithDetails[]> {
     const result = await db
       .select({
         load: loads,
         driver: users,
         location: locations,
-        customer: customers,
         invoice: invoices,
       })
       .from(loads)
       .leftJoin(users, eq(loads.driverId, users.id))
       .leftJoin(locations, eq(loads.locationId, locations.id))
-      .leftJoin(customers, eq(loads.customerId, customers.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .orderBy(desc(loads.createdAt));
-
-    // Get stops for each load
-    const loadIds = result.map(row => row.load.id);
-    const allStops = loadIds.length > 0 
-      ? await db.select().from(loadStops).where(inArray(loadStops.loadId, loadIds))
-      : [];
 
     return result.map(row => ({
       ...row.load,
       driver: row.driver || undefined,
       location: row.location || undefined,
-      customer: row.customer || undefined,
       invoice: row.invoice || undefined,
-      stops: allStops.filter(stop => stop.loadId === row.load.id).sort((a, b) => a.sequence - b.sequence),
     }));
   }
 
@@ -327,28 +250,21 @@ export class DatabaseStorage implements IStorage {
         load: loads,
         driver: users,
         location: locations,
-        customer: customers,
         invoice: invoices,
       })
       .from(loads)
       .leftJoin(users, eq(loads.driverId, users.id))
       .leftJoin(locations, eq(loads.locationId, locations.id))
-      .leftJoin(customers, eq(loads.customerId, customers.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .where(eq(loads.id, id));
 
     if (!result) return undefined;
 
-    // Get stops for this load
-    const stops = await this.getLoadStops(result.load.id);
-
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
-      customer: result.customer || undefined,
       invoice: result.invoice || undefined,
-      stops: stops,
     };
   }
 
@@ -358,13 +274,11 @@ export class DatabaseStorage implements IStorage {
         load: loads,
         driver: users,
         location: locations,
-        customer: customers,
         invoice: invoices,
       })
       .from(loads)
       .leftJoin(users, eq(loads.driverId, users.id))
       .leftJoin(locations, eq(loads.locationId, locations.id))
-      .leftJoin(customers, eq(loads.customerId, customers.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .where(eq(loads.number109, number));
 
@@ -374,7 +288,6 @@ export class DatabaseStorage implements IStorage {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
-      customer: result.customer || undefined,
       invoice: result.invoice || undefined,
     };
   }
