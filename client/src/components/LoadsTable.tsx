@@ -72,6 +72,8 @@ export default function LoadsTable() {
   const [selectedLoad, setSelectedLoad] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [assigningDriver, setAssigningDriver] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [loadToDelete, setLoadToDelete] = useState<any>(null);
 
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
@@ -249,6 +251,50 @@ export default function LoadsTable() {
     }
   };
 
+  // Delete load mutation
+  const deleteLoadMutation = useMutation({
+    mutationFn: async (loadId: string) => {
+      const response = await fetch(`/api/loads/${loadId}`, {
+        method: 'DELETE',
+        headers: {
+          'x-bypass-token': localStorage.getItem('bypass-token') || '',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete load');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Load Deleted",
+        description: `Load ${data.deletedLoad} has been successfully deleted.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
+      setDeleteDialogOpen(false);
+      setLoadToDelete(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Delete Failed",
+        description: error.message || "Failed to delete load. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteLoad = (load: any) => {
+    setLoadToDelete(load);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteLoad = () => {
+    if (loadToDelete) {
+      deleteLoadMutation.mutate(loadToDelete.id);
+    }
+  };
+
   if (isLoading) {
     return (
       <Card className="material-card">
@@ -410,6 +456,18 @@ export default function LoadsTable() {
                             <i className="fas fa-file-invoice-dollar"></i>
                           </Button>
                         )}
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteLoad(load);
+                          }}
+                          title="Delete load"
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <i className="fas fa-trash"></i>
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
