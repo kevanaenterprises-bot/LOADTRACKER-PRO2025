@@ -75,7 +75,10 @@ app.get('/api/ready', (_req, res) => {
   console.log('🚀 Starting LoadTracker Pro server...');
   
   try {
-    // Explicit PORT environment variable handling with validation
+    // Comprehensive environment variable validation for deployment
+    console.log('🔧 Validating environment configuration...');
+    
+    // Port validation
     const portEnv = process.env.PORT;
     const port = parseInt(portEnv || '5000', 10);
     
@@ -83,8 +86,59 @@ app.get('/api/ready', (_req, res) => {
       throw new Error(`Invalid PORT value: ${portEnv}. PORT must be a valid number between 1 and 65535.`);
     }
     
-    console.log(`🔧 Configuration: PORT=${port}, HOST=0.0.0.0`);
+    // Database validation
+    if (!process.env.DATABASE_URL) {
+      throw new Error('Missing DATABASE_URL environment variable. Database connection is required for the application to function.');
+    }
+    console.log('✅ Database URL configured');
+    
+    // Object storage validation (warn if missing, don't fail)
+    const hasPrivateObjectDir = !!process.env.PRIVATE_OBJECT_DIR;
+    const hasPublicSearchPaths = !!process.env.PUBLIC_OBJECT_SEARCH_PATHS;
+    
+    if (!hasPrivateObjectDir || !hasPublicSearchPaths) {
+      console.warn('⚠️  Object storage not fully configured:');
+      if (!hasPrivateObjectDir) {
+        console.warn('   - PRIVATE_OBJECT_DIR is not set. File uploads will be disabled.');
+      }
+      if (!hasPublicSearchPaths) {
+        console.warn('   - PUBLIC_OBJECT_SEARCH_PATHS is not set. Public file serving will be disabled.');
+      }
+      console.warn('   Object storage features will be unavailable but the server will continue to start.');
+    } else {
+      console.log('✅ Object storage environment variables configured');
+    }
+    
+    // Optional service validation (Twilio, etc.)
+    const hasTwilio = !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN);
+    if (!hasTwilio) {
+      console.warn('⚠️  SMS service (Twilio) not configured. Driver notifications will be disabled.');
+    } else {
+      console.log('✅ SMS service (Twilio) configured');
+    }
+    
+    // Authentication validation
+    const hasSessionSecret = !!process.env.SESSION_SECRET;
+    if (!hasSessionSecret) {
+      console.warn('⚠️  SESSION_SECRET not set. Using default secret (not recommended for production).');
+    } else {
+      console.log('✅ Session authentication configured');
+    }
+    
+    console.log(`🔧 Configuration validated: PORT=${port}, HOST=0.0.0.0`);
     console.log(`🔧 Environment: NODE_ENV=${process.env.NODE_ENV || 'development'}`);
+    
+    // Test database connection
+    console.log('🔧 Testing database connection...');
+    try {
+      // Import storage to test database connection
+      const { storage } = await import('./storage');
+      await storage.getLoads(); // Simple query to test connection
+      console.log('✅ Database connection successful');
+    } catch (dbError) {
+      console.error('❌ Database connection failed:', dbError);
+      throw new Error(`Database connection failed: ${dbError instanceof Error ? dbError.message : 'Unknown database error'}`);
+    }
     
     // Register routes with enhanced error handling
     console.log('📝 Registering application routes...');

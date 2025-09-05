@@ -11,24 +11,48 @@ import {
 
 const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
-// The object storage client is used to interact with the object storage service.
-export const objectStorageClient = new Storage({
-  credentials: {
-    audience: "replit",
-    subject_token_type: "access_token",
-    token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-    type: "external_account",
-    credential_source: {
-      url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-      format: {
-        type: "json",
-        subject_token_field_name: "access_token",
-      },
-    },
-    universe_domain: "googleapis.com",
-  },
-  projectId: "",
-});
+// Lazy initialization of object storage client to prevent startup crashes
+let objectStorageClient: Storage | null = null;
+let objectStorageError: Error | null = null;
+
+function getObjectStorageClient(): Storage {
+  if (objectStorageError) {
+    throw objectStorageError;
+  }
+  
+  if (!objectStorageClient) {
+    try {
+      console.log('🔧 Initializing Google Cloud Storage client...');
+      objectStorageClient = new Storage({
+        credentials: {
+          audience: "replit",
+          subject_token_type: "access_token",
+          token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
+          type: "external_account",
+          credential_source: {
+            url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
+            format: {
+              type: "json",
+              subject_token_field_name: "access_token",
+            },
+          },
+          universe_domain: "googleapis.com",
+        },
+        projectId: "",
+      });
+      console.log('✅ Google Cloud Storage client initialized successfully');
+    } catch (error) {
+      console.error('❌ Failed to initialize Google Cloud Storage client:', error);
+      objectStorageError = error instanceof Error ? error : new Error('Unknown object storage initialization error');
+      throw objectStorageError;
+    }
+  }
+  
+  return objectStorageClient;
+}
+
+// Export the function to get the object storage client
+export { getObjectStorageClient };
 
 export class ObjectNotFoundError extends Error {
   constructor() {
@@ -76,22 +100,27 @@ export class ObjectStorageService {
 
   // Search for a public object from the search paths.
   async searchPublicObject(filePath: string): Promise<File | null> {
-    for (const searchPath of this.getPublicObjectSearchPaths()) {
-      const fullPath = `${searchPath}/${filePath}`;
+    try {
+      for (const searchPath of this.getPublicObjectSearchPaths()) {
+        const fullPath = `${searchPath}/${filePath}`;
 
-      // Full path format: /<bucket_name>/<object_name>
-      const { bucketName, objectName } = parseObjectPath(fullPath);
-      const bucket = objectStorageClient.bucket(bucketName);
-      const file = bucket.file(objectName);
+        // Full path format: /<bucket_name>/<object_name>
+        const { bucketName, objectName } = parseObjectPath(fullPath);
+        const bucket = getObjectStorageClient().bucket(bucketName);
+        const file = bucket.file(objectName);
 
-      // Check if file exists
-      const [exists] = await file.exists();
-      if (exists) {
-        return file;
+        // Check if file exists
+        const [exists] = await file.exists();
+        if (exists) {
+          return file;
+        }
       }
-    }
 
-    return null;
+      return null;
+    } catch (error) {
+      console.error('⚠️ Object storage not configured or available for public object search:', error);
+      return null; // Gracefully return null when object storage is not available
+    }
   }
 
   // Downloads an object to the response.
@@ -132,53 +161,66 @@ export class ObjectStorageService {
 
   // Gets the upload URL for an object entity.
   async getObjectEntityUploadURL(): Promise<string> {
-    const privateObjectDir = this.getPrivateObjectDir();
-    if (!privateObjectDir) {
-      throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
-      );
+    try {
+      const privateObjectDir = this.getPrivateObjectDir();
+      if (!privateObjectDir) {
+        throw new Error(
+          "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
+            "tool and set PRIVATE_OBJECT_DIR env var."
+        );
+      }
+
+      const objectId = randomUUID();
+      const fullPath = `${privateObjectDir}/uploads/${objectId}`;
+
+      const { bucketName, objectName } = parseObjectPath(fullPath);
+
+      // Sign URL for PUT method with TTL
+      return signObjectURL({
+        bucketName,
+        objectName,
+        method: "PUT",
+        ttlSec: 900,
+      });
+    } catch (error) {
+      console.error('⚠️ Object storage not configured or available for upload URL generation:', error);
+      throw new Error('Object storage service is not available. Please configure object storage or contact support.');
     }
-
-    const objectId = randomUUID();
-    const fullPath = `${privateObjectDir}/uploads/${objectId}`;
-
-    const { bucketName, objectName } = parseObjectPath(fullPath);
-
-    // Sign URL for PUT method with TTL
-    return signObjectURL({
-      bucketName,
-      objectName,
-      method: "PUT",
-      ttlSec: 900,
-    });
   }
 
   // Gets the object entity file from the object path.
   async getObjectEntityFile(objectPath: string): Promise<File> {
-    if (!objectPath.startsWith("/objects/")) {
-      throw new ObjectNotFoundError();
-    }
+    try {
+      if (!objectPath.startsWith("/objects/")) {
+        throw new ObjectNotFoundError();
+      }
 
-    const parts = objectPath.slice(1).split("/");
-    if (parts.length < 2) {
-      throw new ObjectNotFoundError();
-    }
+      const parts = objectPath.slice(1).split("/");
+      if (parts.length < 2) {
+        throw new ObjectNotFoundError();
+      }
 
-    const entityId = parts.slice(1).join("/");
-    let entityDir = this.getPrivateObjectDir();
-    if (!entityDir.endsWith("/")) {
-      entityDir = `${entityDir}/`;
+      const entityId = parts.slice(1).join("/");
+      let entityDir = this.getPrivateObjectDir();
+      if (!entityDir.endsWith("/")) {
+        entityDir = `${entityDir}/`;
+      }
+      const objectEntityPath = `${entityDir}${entityId}`;
+      const { bucketName, objectName } = parseObjectPath(objectEntityPath);
+      const bucket = getObjectStorageClient().bucket(bucketName);
+      const objectFile = bucket.file(objectName);
+      const [exists] = await objectFile.exists();
+      if (!exists) {
+        throw new ObjectNotFoundError();
+      }
+      return objectFile;
+    } catch (error) {
+      if (error instanceof ObjectNotFoundError) {
+        throw error; // Re-throw ObjectNotFoundError as-is
+      }
+      console.error('⚠️ Object storage not configured or available for file access:', error);
+      throw new Error('Object storage service is not available. Please configure object storage or contact support.');
     }
-    const objectEntityPath = `${entityDir}${entityId}`;
-    const { bucketName, objectName } = parseObjectPath(objectEntityPath);
-    const bucket = objectStorageClient.bucket(bucketName);
-    const objectFile = bucket.file(objectName);
-    const [exists] = await objectFile.exists();
-    if (!exists) {
-      throw new ObjectNotFoundError();
-    }
-    return objectFile;
   }
 
   normalizeObjectEntityPath(
@@ -211,14 +253,20 @@ export class ObjectStorageService {
     rawPath: string,
     aclPolicy: ObjectAclPolicy
   ): Promise<string> {
-    const normalizedPath = this.normalizeObjectEntityPath(rawPath);
-    if (!normalizedPath.startsWith("/")) {
-      return normalizedPath;
-    }
+    try {
+      const normalizedPath = this.normalizeObjectEntityPath(rawPath);
+      if (!normalizedPath.startsWith("/")) {
+        return normalizedPath;
+      }
 
-    const objectFile = await this.getObjectEntityFile(normalizedPath);
-    await setObjectAclPolicy(objectFile, aclPolicy);
-    return normalizedPath;
+      const objectFile = await this.getObjectEntityFile(normalizedPath);
+      await setObjectAclPolicy(objectFile, aclPolicy);
+      return normalizedPath;
+    } catch (error) {
+      console.error('⚠️ Failed to set ACL policy on object entity:', error);
+      // Return the normalized path even if ACL setting fails to avoid breaking the caller
+      return this.normalizeObjectEntityPath(rawPath);
+    }
   }
 
   // Checks if the user can access the object entity.
