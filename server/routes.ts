@@ -3407,8 +3407,12 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(400).json({ message: "POD document URL is required" });
       }
 
-      const userId = (req.user as any)?.claims?.sub;
-      const objectStorageService = new ObjectStorageService();
+      // Get user ID with fallback
+      const userId = (req.user as any)?.claims?.sub || 
+                    (req.session as any)?.driverAuth?.id || 
+                    'system-upload';
+                    
+      console.log(`📄 POD upload initiated by user: ${userId}`);
       
       // Handle multiple POD documents (comma-separated URLs)
       const podUrls = podDocumentURL.split(',').map((url: string) => url.trim());
@@ -3416,17 +3420,25 @@ Reply YES to confirm acceptance or NO to decline.`
       
       console.log(`📄 Processing ${podUrls.length} POD document(s) for load ${req.params.id}`);
       
-      // Set ACL policy for each uploaded document
+      // Process each document with error handling
       for (const url of podUrls) {
         if (url) {
-          const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
-            url,
-            {
-              owner: userId,
-              visibility: "private", // POD documents should be private
-            }
-          );
-          processedPaths.push(objectPath);
+          try {
+            const objectStorageService = new ObjectStorageService();
+            const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+              url,
+              {
+                owner: userId,
+                visibility: "private", // POD documents should be private
+              }
+            );
+            processedPaths.push(objectPath);
+            console.log(`✅ POD document processed: ${objectPath}`);
+          } catch (aclError) {
+            console.error(`⚠️ ACL policy error for ${url}, using direct path:`, aclError);
+            // If ACL fails, still save the path
+            processedPaths.push(url);
+          }
         }
       }
 

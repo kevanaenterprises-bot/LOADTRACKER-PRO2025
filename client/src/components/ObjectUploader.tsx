@@ -7,6 +7,7 @@ import "@uppy/dashboard/dist/style.min.css";
 import AwsS3 from "@uppy/aws-s3";
 import type { UploadResult } from "@uppy/core";
 import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 
 interface ObjectUploaderProps {
   maxNumberOfFiles?: number;
@@ -153,7 +154,11 @@ export function ObjectUploader({
 
   return (
     <div>
-      <Button onClick={() => setShowModal(true)} className={buttonClassName}>
+      <Button 
+        onClick={() => setShowModal(true)} 
+        className={`${buttonClassName} flex items-center gap-2`}
+      >
+        <Upload className="h-4 w-4" />
         {children}
       </Button>
 
@@ -162,6 +167,16 @@ export function ObjectUploader({
         open={showModal}
         onRequestClose={() => setShowModal(false)}
         proudlyDisplayPoweredByUppy={false}
+        note="Drag and drop your files here or browse"
+        locale={{
+          strings: {
+            dropPasteFiles: '📁 Drop files here or %{browse}',
+            dropPasteFolders: '📁 Drop files here or %{browse}',
+            dropPasteBoth: '📁 Drop files here or %{browse}',
+            dropHint: 'Drop your files here',
+            browse: 'browse',
+          }
+        }}
       />
     </div>
   );
