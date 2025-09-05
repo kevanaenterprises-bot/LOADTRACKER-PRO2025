@@ -50,6 +50,7 @@ export interface IStorage {
   getLocation(id: string): Promise<Location | undefined>;
   getLocationByName(name: string): Promise<Location | undefined>;
   createLocation(location: InsertLocation): Promise<Location>;
+  updateLocation(id: string, updates: Partial<Location>): Promise<Location>;
   
   // Customer operations
   getCustomers(): Promise<Customer[]>;
@@ -227,6 +228,15 @@ export class DatabaseStorage implements IStorage {
   async createLocation(location: InsertLocation): Promise<Location> {
     const [newLocation] = await db.insert(locations).values(location).returning();
     return newLocation;
+  }
+
+  async updateLocation(id: string, updates: Partial<Location>): Promise<Location> {
+    const [updatedLocation] = await db
+      .update(locations)
+      .set(updates)
+      .where(eq(locations.id, id))
+      .returning();
+    return updatedLocation;
   }
 
   async getCustomers(): Promise<Customer[]> {
