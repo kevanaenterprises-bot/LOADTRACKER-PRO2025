@@ -31,6 +31,7 @@ export default function StandaloneBOLUpload() {
   const [overridePassword, setOverridePassword] = useState("");
   const [pendingFormData, setPendingFormData] = useState<BOLUploadData | null>(null);
   const [duplicateError, setDuplicateError] = useState("");
+  const [showOverrideButton, setShowOverrideButton] = useState(false);
 
   // Ensure bypass token is available for mobile
   React.useEffect(() => {
@@ -75,13 +76,23 @@ export default function StandaloneBOLUpload() {
       }
 
       // Check if BOL number already exists for OTHER loads (exclude current load)
-      const bolCheckResponse = await apiRequest(
-        `/api/bol/check/${data.bolNumber}?excludeLoadId=${loadResponse.id}`, 
-        "GET"
-      );
-      
-      if (bolCheckResponse?.exists) {
-        throw new Error(`DUPLICATE:BOL number ${data.bolNumber} has already been used by another load`);
+      try {
+        const bolCheckResponse = await apiRequest(
+          `/api/bol/check/${data.bolNumber}?excludeLoadId=${loadResponse.id}`, 
+          "GET"
+        );
+        
+        if (bolCheckResponse?.exists) {
+          throw new Error(`DUPLICATE:BOL number ${data.bolNumber} has already been used by another load`);
+        }
+      } catch (checkError: any) {
+        console.log('BOL check error:', checkError);
+        // If the duplicate check fails or returns duplicate, throw the duplicate error
+        if (checkError.message?.includes('DUPLICATE') || checkError.message?.includes('already been used')) {
+          throw checkError;
+        }
+        // For other errors (like auth issues), log but continue
+        console.warn('BOL duplicate check failed, continuing:', checkError);
       }
 
       // Update the load with BOL information
@@ -101,11 +112,23 @@ export default function StandaloneBOLUpload() {
       });
     },
     onError: (error: Error) => {
-      if (error.message.startsWith("DUPLICATE:")) {
+      console.log('BOL submission error:', error.message);
+      
+      // Check for various duplicate error formats
+      if (error.message.includes("DUPLICATE") || 
+          error.message.includes("already been used") || 
+          error.message.includes("already exists")) {
         // Show override dialog for duplicate BOL numbers
-        setDuplicateError(error.message.replace("DUPLICATE:", ""));
+        const cleanError = error.message.replace("DUPLICATE:", "");
+        setDuplicateError(cleanError);
         setShowOverrideDialog(true);
+        setShowOverrideButton(true); // Also show manual override button
         return;
+      }
+      
+      // For other validation errors, show override button as fallback
+      if (error.message.includes("validation") || error.message.includes("Validation")) {
+        setShowOverrideButton(true);
       }
       
       toast({
@@ -280,6 +303,24 @@ export default function StandaloneBOLUpload() {
                   </Button>
                 </form>
               </Form>
+              
+              {/* Manual Override Button - Shows when validation fails */}
+              {showOverrideButton && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <p className="text-sm text-yellow-800 mb-2">Having trouble with validation?</p>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      setPendingFormData(form.getValues());
+                      setDuplicateError("Manual override requested for duplicate/validation issues");
+                      setShowOverrideDialog(true);
+                    }}
+                    className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+                  >
+                    Use Override (Password Required)
+                  </Button>
+                </div>
+              )}
             </>
           ) : (
             <>
