@@ -33,25 +33,32 @@ export async function extractLoadDataFromImage(base64Image: string): Promise<Ext
       // "claude-sonnet-4-20250514"
       model: DEFAULT_MODEL_STR,
       max_tokens: 2048,
-      system: `You are an expert OCR system for logistics documents. Extract data from Rate Con (rate confirmation) images and PDFs.
+      system: `You are an expert OCR system for logistics documents. Extract data from Rate Con (rate confirmation) images and PDFs, even from blurry or low-quality images.
+
+IMPORTANT: Do your best to extract data even from poor quality images. Look for:
+- Numbers that could be load/trip numbers (often starting with 109-, 374-, or similar patterns)
+- PO numbers (look for "PO", "Purchase Order", "PO#")
+- Dates and times (appointment, pickup, delivery)
+- Company names (usually at the top or sender info)
+- Addresses (look for city, state, zip patterns)
 
 Return ONLY a JSON object with these fields:
-- loadNumber: The load/trip number
+- loadNumber: The load/trip number (check for patterns like 109-XXXXX, any number labeled as load/trip)
 - poNumber: PO or purchase order number
 - appointmentTime: Date/time of appointment (format as ISO string if possible)
 - companyName: The company that sent the rate confirmation
 - pickupAddress: Complete pickup address including city, state
 - deliveryAddress: Complete delivery address including city, state
-- confidence: Number 0-1 indicating extraction confidence
+- confidence: Number 0-1 indicating extraction confidence (be generous - 0.7+ if you can read most text)
 - rawText: Any additional relevant text found
 
-If a field is not found, use null. Be precise and only extract what you clearly see.`,
+If a field is not found, use null. Try to extract partial information if the full field is unclear.`,
       messages: [{
         role: "user",
         content: [
           {
             type: "text",
-            text: "Extract load data from this Rate Con (rate confirmation) document. Focus on load numbers, PO numbers, appointment times, company names, and pickup/delivery addresses."
+            text: "Extract load data from this Rate Con (rate confirmation) document. The image may be blurry or low quality - do your best to extract any visible text. Focus on load numbers (often starting with 109-, 374-, or similar), PO numbers, appointment times, company names, and pickup/delivery addresses. Even partial data is helpful."
           },
           {
             type: "image",
@@ -88,11 +95,28 @@ If a field is not found, use null. Be precise and only extract what you clearly 
       console.error("Failed to parse OCR JSON response:", parseError);
     }
 
-    // Fallback: return raw text with low confidence
-    return {
-      confidence: 0.3,
+    // Fallback: Try to extract basic patterns from raw text
+    const fallbackData: ExtractedLoadData = {
+      confidence: 0.5,
       rawText: extractedText
     };
+    
+    // Try to find load number patterns
+    const loadNumberPattern = /(\b\d{3}-\d+\b|\bload\s*#?\s*\d+\b|\btrip\s*#?\s*\d+\b)/i;
+    const loadMatch = extractedText.match(loadNumberPattern);
+    if (loadMatch) {
+      fallbackData.loadNumber = loadMatch[1];
+      fallbackData.confidence = 0.6;
+    }
+    
+    // Try to find PO number patterns  
+    const poPattern = /\b(po|purchase\s*order)\s*#?\s*(\d+)\b/i;
+    const poMatch = extractedText.match(poPattern);
+    if (poMatch) {
+      fallbackData.poNumber = poMatch[2];
+    }
+    
+    return fallbackData;
 
   } catch (error) {
     console.error("OCR extraction error:", error);

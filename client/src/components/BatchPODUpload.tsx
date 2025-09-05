@@ -26,9 +26,10 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(event.target.files || []);
+  const processFiles = (fileList: FileList | File[]) => {
+    const selectedFiles = Array.from(fileList);
     
     if (selectedFiles.length === 0) return;
     
@@ -59,6 +60,40 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
       title: "Files Added",
       description: `${validFiles.length} file(s) ready for upload`,
     });
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      processFiles(event.target.files);
+    }
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    const droppedFiles = e.dataTransfer.files;
+    if (droppedFiles.length > 0) {
+      processFiles(droppedFiles);
+    }
   };
 
   const removeFile = (fileId: string) => {
@@ -202,12 +237,22 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* File Selection */}
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-          <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+        {/* File Selection with Drag and Drop */}
+        <div 
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-all ${
+            isDragging 
+              ? 'border-blue-500 bg-blue-50 scale-105' 
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+        >
+          <Upload className={`h-8 w-8 mx-auto mb-2 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`} />
           <label htmlFor="pod-files" className="cursor-pointer">
             <span className="text-sm font-medium text-blue-600 hover:text-blue-500">
-              Click to select POD files
+              {isDragging ? 'Drop files here' : 'Click to select POD files'}
             </span>
             <span className="text-sm text-gray-500 block">or drag and drop</span>
             <span className="text-xs text-gray-400 block mt-1">
