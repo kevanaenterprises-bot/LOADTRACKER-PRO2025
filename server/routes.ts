@@ -3216,17 +3216,21 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   }, async (req, res) => {
     try {
-      const { bolNumber, tripNumber } = req.body;
+      const { bolNumber, tripNumber, override } = req.body;
       
       // Validate trip number format (4 digits)
       if (!/^\d{4}$/.test(tripNumber)) {
         return res.status(400).json({ message: "Trip number must be 4 digits" });
       }
 
-      // Check if BOL already exists
-      const exists = await storage.checkBOLExists(bolNumber);
-      if (exists) {
-        return res.status(400).json({ message: "BOL number already exists" });
+      // Check if BOL already exists - but skip check if override flag is set
+      if (!override) {
+        const exists = await storage.checkBOLExists(bolNumber);
+        if (exists) {
+          return res.status(400).json({ message: "BOL number already exists" });
+        }
+      } else {
+        console.log("🔐 Override flag detected - skipping duplicate BOL check for", bolNumber);
       }
 
       const load = await storage.updateLoadBOL(req.params.id, bolNumber, tripNumber);

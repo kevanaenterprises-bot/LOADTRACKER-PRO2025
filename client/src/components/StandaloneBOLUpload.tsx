@@ -162,10 +162,11 @@ export default function StandaloneBOLUpload() {
         throw new Error(`Load ${pendingFormData.loadNumber} not found`);
       }
 
-      // Update the load with BOL information (skip duplicate check)
+      // Update the load with BOL information (skip duplicate check with override flag)
       const updateResponse = await apiRequest(`/api/loads/${loadResponse.id}/bol`, "PATCH", {
         bolNumber: pendingFormData.bolNumber,
         tripNumber: pendingFormData.tripNumber,
+        override: true  // This flag tells backend to skip duplicate check
       });
 
       setLoadId(loadResponse.id);
