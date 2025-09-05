@@ -45,6 +45,27 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
     },
   });
 
+  // Load return mutation
+  const returnLoadMutation = useMutation({
+    mutationFn: async (loadId: string) => {
+      return await apiRequest(`/api/loads/${loadId}/return-load`, "PATCH", {});
+    },
+    onSuccess: (data: any) => {
+      toast({ 
+        title: "Load Returned", 
+        description: "Load has been returned to the admin dashboard" 
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/drivers", driverId, "loads"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error", 
+        description: error.message || "Failed to return load",
+        variant: "destructive"
+      });
+    },
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "created": return "bg-blue-100 text-blue-800";
@@ -161,6 +182,20 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
                   </Button>
                 </>
               )}
+              
+              <Button 
+                onClick={() => {
+                  if (confirm(`Are you sure you want to return load ${load.number109} to the office?`)) {
+                    returnLoadMutation.mutate(load.id);
+                  }
+                }}
+                variant="destructive"
+                size="sm"
+                disabled={returnLoadMutation.isPending}
+                data-testid={`button-return-load-${load.id}`}
+              >
+                {returnLoadMutation.isPending ? "Returning..." : "Return Load"}
+              </Button>
             </div>
           </CardContent>
         </Card>

@@ -2333,6 +2333,54 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Load return endpoint - drivers can return loads to admin
+  app.patch("/api/loads/:id/return-load", (req, res, next) => {
+    // Flexible authentication for load returns
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
+    const hasDriverAuth = (req.session as any)?.driverAuth;
+    const hasAdminAuth = (req.session as any)?.adminAuth;
+    const hasAuth = hasReplitAuth || hasDriverAuth || hasAdminAuth || hasTokenBypass;
+    
+    console.log("Load return auth check:", {
+      hasReplitAuth,
+      hasDriverAuth,
+      hasAdminAuth,
+      hasTokenBypass,
+      finalAuth: hasAuth
+    });
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Unauthorized - load return requires authentication" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      
+      // Get current load details
+      const currentLoad = await storage.getLoad(loadId);
+      if (!currentLoad) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // Unassign driver from load by setting driverId to null
+      const updatedLoad = await storage.updateLoad(loadId, { driverId: null });
+      
+      console.log(`📦 Load ${currentLoad.number109} returned to admin dashboard by driver`);
+      
+      res.json({
+        message: "Load returned successfully",
+        load: updatedLoad
+      });
+    } catch (error) {
+      console.error("Error returning load:", error);
+      res.status(500).json({ message: "Failed to return load" });
+    }
+  });
+
   // Update load financial details
   app.patch("/api/loads/:id/financials", isAuthenticated, async (req, res) => {
     try {

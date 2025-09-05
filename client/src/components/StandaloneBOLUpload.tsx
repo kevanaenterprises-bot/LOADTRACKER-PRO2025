@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SimpleFileUpload } from "@/components/SimpleFileUpload";
+import { BatchPODUpload } from "@/components/BatchPODUpload";
 import { apiRequest } from "@/lib/queryClient";
 
 const bolUploadSchema = z.object({
@@ -239,12 +239,13 @@ export default function StandaloneBOLUpload() {
               </div>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <h4 className="font-medium text-blue-900 mb-2">📸 Upload POD Photo</h4>
+                <h4 className="font-medium text-blue-900 mb-2">📸 Upload POD Photos (Multiple Pages)</h4>
                 <p className="text-sm text-blue-700 mb-3">
-                  Take a clear photo of your signed delivery receipt (POD)
+                  Take photos of all pages of your signed delivery receipt (POD). You can upload multiple images at once.
                 </p>
-                <SimpleFileUpload
+                <BatchPODUpload
                   loadId={loadId!}
+                  loadNumber={form.watch("loadNumber")}
                   onUploadComplete={handleUploadComplete}
                 />
               </div>
