@@ -2074,17 +2074,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Load creation - validating request body:", JSON.stringify(req.body));
       
-      // Validate location exists if provided
-      if (req.body.locationId) {
-        const location = await storage.getLocation(req.body.locationId);
+      // Extract stops from request body before validation
+      const { stops, ...loadData } = req.body;
+      
+      // Validate location exists if provided (for backward compatibility)
+      if (loadData.locationId) {
+        const location = await storage.getLocation(loadData.locationId);
         if (!location) {
-          console.log("Load creation failed - location not found:", req.body.locationId);
+          console.log("Load creation failed - location not found:", loadData.locationId);
           return res.status(400).json({ message: "Selected location does not exist. Please add the location first." });
         }
         console.log("Location validated:", location.name);
       }
       
-      const validatedData = insertLoadSchema.parse(req.body);
+      // Validate stops if provided
+      if (stops && stops.length > 0) {
+        for (const stop of stops) {
+          if (stop.locationId) {
+            const location = await storage.getLocation(stop.locationId);
+            if (!location) {
+              console.log("Load creation failed - stop location not found:", stop.locationId);
+              return res.status(400).json({ message: `Stop location does not exist: ${stop.locationId}` });
+            }
+          }
+          // Validate stop has either locationId or custom address
+          if (!stop.locationId && !stop.customAddress) {
+            return res.status(400).json({ message: "Each stop must have either a location or custom address" });
+          }
+        }
+        console.log("Stops validated:", stops.length, "stops");
+      }
+      
+      const validatedData = insertLoadSchema.parse(loadData);
       console.log("Load creation - validation successful, creating load:", validatedData);
       
       // Check if 109 number already exists
@@ -2097,6 +2118,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const load = await storage.createLoad(validatedData);
       console.log("Load creation successful:", load.id);
+
+      // Create stops if provided
+      if (stops && stops.length > 0) {
+        console.log("Creating stops for load:", load.id);
+        for (const stop of stops) {
+          const stopData = {
+            loadId: load.id,
+            type: stop.type,
+            sequence: stop.sequence,
+            locationId: stop.locationId || null,
+            customAddress: stop.customAddress || null,
+            customName: stop.customName || null,
+            notes: stop.notes || null,
+          };
+          await storage.createLoadStop(stopData);
+        }
+        console.log("Created", stops.length, "stops for load");
+      }
 
       // Send SMS to driver if assigned
       if (validatedData.driverId) {

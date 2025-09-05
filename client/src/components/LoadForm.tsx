@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
-import { insertLoadSchema } from "@shared/schema";
+import { insertLoadSchema, InsertLoadStop } from "@shared/schema";
 import { z } from "zod";
 import {
   Form,
@@ -26,25 +26,37 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Trash2, MapPin } from "lucide-react";
 
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
-  locationId: z.string().min(1, "Location is required"),
-  // Remove driverId requirement - will be assigned after creation
+  // Remove locationId requirement - will use stops instead
   estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
-}).omit({ driverId: true });
+}).omit({ driverId: true, locationId: true });
 
 type FormData = z.infer<typeof formSchema>;
+
+// Stop interface for managing stops
+interface LoadStop {
+  id: string;
+  type: "pickup" | "delivery";
+  locationId?: string;
+  customAddress?: string;
+  customName?: string;
+  notes?: string;
+  sequence: number;
+}
 
 export default function LoadForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [stops, setStops] = useState<LoadStop[]>([]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       number109: "109",
-      locationId: "",
       estimatedMiles: 0,
       specialInstructions: "",
       status: "created",
@@ -68,11 +80,25 @@ export default function LoadForm() {
   const createLoadMutation = useMutation({
     mutationFn: async (data: FormData) => {
       console.log("Load creation data being sent:", data);
-      console.log("Available locations:", locations);
-      if (!data.locationId) {
-        throw new Error("Please select a location");
+      console.log("Stops being sent:", stops);
+      if (stops.length === 0) {
+        throw new Error("Please add at least one stop");
       }
-      return await apiRequest("/api/loads", "POST", data);
+      
+      // Convert stops to the format expected by the API
+      const stopsData = stops.map(stop => ({
+        type: stop.type,
+        sequence: stop.sequence,
+        locationId: stop.locationId || null,
+        customAddress: stop.customAddress || null,
+        customName: stop.customName || null,
+        notes: stop.notes || null,
+      }));
+      
+      return await apiRequest("/api/loads", "POST", {
+        ...data,
+        stops: stopsData
+      });
     },
     onSuccess: () => {
       toast({
@@ -81,11 +107,11 @@ export default function LoadForm() {
       });
       form.reset({
         number109: "109",
-        locationId: "",
         estimatedMiles: 0,
         specialInstructions: "",
         status: "created",
       });
+      setStops([]);
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
     },
@@ -113,6 +139,33 @@ export default function LoadForm() {
     createLoadMutation.mutate(data);
   };
 
+  const addStop = () => {
+    const newStop: LoadStop = {
+      id: Date.now().toString(),
+      type: "pickup",
+      sequence: stops.length + 1,
+    };
+    setStops([...stops, newStop]);
+  };
+
+  const removeStop = (stopId: string) => {
+    const newStops = stops.filter(stop => stop.id !== stopId);
+    // Resequence remaining stops
+    const resequencedStops = newStops.map((stop, index) => ({
+      ...stop,
+      sequence: index + 1
+    }));
+    setStops(resequencedStops);
+  };
+
+  const updateStop = (stopId: string, field: keyof LoadStop, value: any) => {
+    setStops(stops.map(stop => 
+      stop.id === stopId 
+        ? { ...stop, [field]: value }
+        : stop
+    ));
+  };
+
   return (
     <Card className="material-card">
       <CardHeader>
@@ -138,36 +191,156 @@ export default function LoadForm() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="locationId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Receiver Location</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Location" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {locations.length > 0 ? (
-                        locations.map((location: any) => (
-                          <SelectItem key={location.id} value={location.id}>
-                            {location.name} - {location.city}, {location.state}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="no-locations" disabled>
-                          No locations available - Add locations first
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
+            {/* Stops Management Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <FormLabel className="text-base font-medium">Load Stops</FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addStop}
+                  className="flex items-center gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Stop
+                </Button>
+              </div>
+              
+              {stops.length === 0 ? (
+                <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center">
+                  <MapPin className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 font-medium">No stops added yet</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Add pickup and delivery stops for this load
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={addStop}
+                    className="mt-4"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add First Stop
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {stops.map((stop, index) => (
+                    <Card key={stop.id} className="border-l-4 border-l-blue-500">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Badge variant={stop.type === 'pickup' ? 'default' : 'secondary'}>
+                              Stop {stop.sequence} - {stop.type.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeStop(stop.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Stop Type */}
+                          <div>
+                            <FormLabel className="text-sm">Type</FormLabel>
+                            <Select 
+                              value={stop.type} 
+                              onValueChange={(value) => updateStop(stop.id, 'type', value as 'pickup' | 'delivery')}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="pickup">Pickup</SelectItem>
+                                <SelectItem value="delivery">Delivery</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          {/* Location Selection */}
+                          <div>
+                            <FormLabel className="text-sm">Location</FormLabel>
+                            <Select 
+                              value={stop.locationId || "custom"} 
+                              onValueChange={(value) => {
+                                if (value === "custom") {
+                                  updateStop(stop.id, 'locationId', undefined);
+                                } else {
+                                  updateStop(stop.id, 'locationId', value);
+                                  updateStop(stop.id, 'customAddress', undefined);
+                                  updateStop(stop.id, 'customName', undefined);
+                                }
+                              }}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select location or custom" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="custom">Custom Address</SelectItem>
+                                {locations.map((location: any) => (
+                                  <SelectItem key={location.id} value={location.id}>
+                                    {location.name} - {location.city}, {location.state}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        
+                        {/* Custom Address Fields - only show if custom is selected */}
+                        {!stop.locationId && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                              <FormLabel className="text-sm">Company/Location Name</FormLabel>
+                              <Input
+                                className="mt-1"
+                                placeholder="Company or location name"
+                                value={stop.customName || ""}
+                                onChange={(e) => updateStop(stop.id, 'customName', e.target.value)}
+                              />
+                            </div>
+                            <div>
+                              <FormLabel className="text-sm">Address</FormLabel>
+                              <Input
+                                className="mt-1"
+                                placeholder="Full address"
+                                value={stop.customAddress || ""}
+                                onChange={(e) => updateStop(stop.id, 'customAddress', e.target.value)}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Notes */}
+                        <div className="mt-4">
+                          <FormLabel className="text-sm">Notes (Optional)</FormLabel>
+                          <Textarea
+                            className="mt-1"
+                            placeholder="Special instructions for this stop..."
+                            rows={2}
+                            value={stop.notes || ""}
+                            onChange={(e) => updateStop(stop.id, 'notes', e.target.value)}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               )}
-            />
+              
+              {stops.length > 0 && (
+                <div className="text-sm text-gray-600">
+                  Total stops: {stops.length} ({stops.filter(s => s.type === 'pickup').length} pickup, {stops.filter(s => s.type === 'delivery').length} delivery)
+                </div>
+              )}
+            </div>
 
             {/* Driver assignment removed - will be done after load creation */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

@@ -86,6 +86,21 @@ export const loads = pgTable("loads", {
   driverConfirmedAt: timestamp("driver_confirmed_at"),
 });
 
+// Load stops table for multiple pickup/delivery stops
+export const loadStops = pgTable("load_stops", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  loadId: varchar("load_id").references(() => loads.id).notNull(),
+  type: varchar("type").notNull(), // "pickup" or "delivery"
+  sequence: integer("sequence").notNull(), // Order of stops (1, 2, 3...)
+  locationId: varchar("location_id").references(() => locations.id), // Optional: use existing location
+  customAddress: text("custom_address"), // Optional: custom address instead of location
+  customName: varchar("custom_name"), // Optional: custom stop name
+  notes: text("notes"), // Optional: special instructions for this stop
+  scheduledTime: timestamp("scheduled_time"), // Optional: scheduled pickup/delivery time
+  completedAt: timestamp("completed_at"), // When this stop was completed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // BOL tracking table for duplicate prevention
 export const bolNumbers = pgTable("bol_numbers", {
   id: serial("id").primaryKey(),
@@ -231,6 +246,12 @@ export const insertNotificationLogSchema = createInsertSchema(notificationLog).o
   sentAt: true,
 });
 
+export const insertLoadStopSchema = createInsertSchema(loadStops).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -249,10 +270,13 @@ export type InsertNotificationPreferences = z.infer<typeof insertNotificationPre
 export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationLog = z.infer<typeof insertNotificationLogSchema>;
 export type NotificationLog = typeof notificationLog.$inferSelect;
+export type InsertLoadStop = z.infer<typeof insertLoadStopSchema>;
+export type LoadStop = typeof loadStops.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {
   driver?: User;
   location?: Location;
   invoice?: Invoice;
+  stops?: LoadStop[];
 };

@@ -27,6 +27,9 @@ import {
   type InsertNotificationPreferences,
   type NotificationLog,
   type InsertNotificationLog,
+  loadStops,
+  LoadStop,
+  InsertLoadStop,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, not } from "drizzle-orm";
@@ -47,6 +50,8 @@ export interface IStorage {
 
   // Load operations
   createLoad(load: InsertLoad): Promise<Load>;
+  createLoadStop(stop: InsertLoadStop): Promise<LoadStop>;
+  getLoadStops(loadId: string): Promise<LoadStop[]>;
   getLoads(): Promise<LoadWithDetails[]>;
   getLoad(id: string): Promise<LoadWithDetails | undefined>;
   getLoadByNumber(number: string): Promise<LoadWithDetails | undefined>;
@@ -222,6 +227,15 @@ export class DatabaseStorage implements IStorage {
     return newLoad;
   }
 
+  async createLoadStop(stop: InsertLoadStop): Promise<LoadStop> {
+    const [newStop] = await db.insert(loadStops).values(stop).returning();
+    return newStop;
+  }
+
+  async getLoadStops(loadId: string): Promise<LoadStop[]> {
+    return await db.select().from(loadStops).where(eq(loadStops.loadId, loadId)).orderBy(loadStops.sequence);
+  }
+
   async getLoads(): Promise<LoadWithDetails[]> {
     const result = await db
       .select({
@@ -236,11 +250,18 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .orderBy(desc(loads.createdAt));
 
+    // Get stops for each load
+    const loadIds = result.map(row => row.load.id);
+    const allStops = loadIds.length > 0 
+      ? await db.select().from(loadStops).where(sql`${loadStops.loadId} = ANY(${loadIds})`)
+      : [];
+
     return result.map(row => ({
       ...row.load,
       driver: row.driver || undefined,
       location: row.location || undefined,
       invoice: row.invoice || undefined,
+      stops: allStops.filter(stop => stop.loadId === row.load.id).sort((a, b) => a.sequence - b.sequence),
     }));
   }
 
@@ -260,11 +281,15 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
+    // Get stops for this load
+    const stops = await this.getLoadStops(result.load.id);
+
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
       invoice: result.invoice || undefined,
+      stops: stops,
     };
   }
 
