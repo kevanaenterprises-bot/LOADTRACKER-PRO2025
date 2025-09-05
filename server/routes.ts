@@ -2238,6 +2238,34 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Update customer information for existing load
+  app.patch("/api/loads/:id/customer", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const customerData = req.body;
+
+      // Validate load exists
+      const load = await storage.getLoad(id);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      // Update the load with customer information
+      const updatedLoad = await storage.updateLoad(id, {
+        companyName: customerData.companyName,
+        poNumber: customerData.poNumber,
+        appointmentTime: customerData.appointmentTime,
+        pickupAddress: customerData.pickupAddress,
+        deliveryAddress: customerData.deliveryAddress,
+      });
+
+      res.status(200).json(updatedLoad);
+    } catch (error: any) {
+      console.error("Update customer error:", error);
+      res.status(500).json({ message: error?.message || "Error updating customer information" });
+    }
+  });
+
   app.get("/api/loads/:id", (req, res, next) => {
     // Support both authenticated users and bypass token
     const hasAuth = req.isAuthenticated() || isBypassActive(req);

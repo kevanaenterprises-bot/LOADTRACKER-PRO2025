@@ -75,6 +75,7 @@ export default function LoadsTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loadToDelete, setLoadToDelete] = useState<any>(null);
   const [managingStops, setManagingStops] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState(false);
   const [newStop, setNewStop] = useState({
     type: 'pickup',
     locationId: '',
@@ -82,6 +83,13 @@ export default function LoadsTable() {
     customAddress: '',
     notes: '',
     useCustomAddress: false
+  });
+  const [customerData, setCustomerData] = useState({
+    companyName: '',
+    poNumber: '',
+    appointmentTime: '',
+    pickupAddress: '',
+    deliveryAddress: ''
   });
 
   // Function to add a stop to existing load
@@ -148,6 +156,48 @@ export default function LoadsTable() {
     }
   };
 
+  // Function to save customer data changes
+  const handleSaveCustomer = async () => {
+    if (!selectedLoad) return;
+
+    try {
+      const response = await fetch(`/api/loads/${selectedLoad.id}/customer`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(customerData)
+      });
+
+      if (response.ok) {
+        // Update the selected load with new customer data
+        setSelectedLoad({ ...selectedLoad, ...customerData });
+        // Refresh the loads data
+        await queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
+        setEditingCustomer(false);
+        toast({ title: "Customer information updated successfully" });
+      } else {
+        const error = await response.json();
+        toast({ title: "Error updating customer info", description: error.message, variant: "destructive" });
+      }
+    } catch (error) {
+      console.error('Error updating customer info:', error);
+      toast({ title: "Error updating customer info", variant: "destructive" });
+    }
+  };
+
+  // Function to start editing customer data
+  const handleEditCustomer = () => {
+    if (selectedLoad) {
+      setCustomerData({
+        companyName: selectedLoad.companyName || '',
+        poNumber: selectedLoad.poNumber || '',
+        appointmentTime: selectedLoad.appointmentTime || '',
+        pickupAddress: selectedLoad.pickupAddress || '',
+        deliveryAddress: selectedLoad.deliveryAddress || ''
+      });
+      setEditingCustomer(true);
+    }
+  };
+
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
     try {
@@ -199,6 +249,12 @@ export default function LoadsTable() {
 
   const { data: availableDrivers = [] } = useQuery({
     queryKey: ["/api/drivers/available"],
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: locations = [] } = useQuery({
+    queryKey: ["/api/locations"],
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -644,6 +700,109 @@ export default function LoadsTable() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Customer Information */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold">Customer Information</h4>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleEditCustomer}
+                  >
+                    <i className="fas fa-edit mr-1"></i>
+                    Edit Customer
+                  </Button>
+                </div>
+                
+                {!editingCustomer ? (
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <div><strong>Company:</strong> {selectedLoad.companyName || 'Not specified'}</div>
+                      <div><strong>PO Number:</strong> {selectedLoad.poNumber || 'Not specified'}</div>
+                    </div>
+                    <div>
+                      <div><strong>Appointment:</strong> {selectedLoad.appointmentTime || 'Not specified'}</div>
+                    </div>
+                    <div className="col-span-2">
+                      <div><strong>Pickup Address:</strong> {selectedLoad.pickupAddress || 'Not specified'}</div>
+                      <div><strong>Delivery Address:</strong> {selectedLoad.deliveryAddress || 'Not specified'}</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 border rounded bg-blue-50">
+                    <h5 className="font-medium mb-3">Edit Customer Information</h5>
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs text-gray-600 block mb-1">Company Name</label>
+                          <input
+                            type="text"
+                            value={customerData.companyName}
+                            onChange={(e) => setCustomerData({...customerData, companyName: e.target.value})}
+                            className="w-full px-3 py-2 border rounded text-sm"
+                            placeholder="Enter company name"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-600 block mb-1">PO Number</label>
+                          <input
+                            type="text"
+                            value={customerData.poNumber}
+                            onChange={(e) => setCustomerData({...customerData, poNumber: e.target.value})}
+                            className="w-full px-3 py-2 border rounded text-sm"
+                            placeholder="Enter PO number"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="text-xs text-gray-600 block mb-1">Appointment Time</label>
+                        <input
+                          type="text"
+                          value={customerData.appointmentTime}
+                          onChange={(e) => setCustomerData({...customerData, appointmentTime: e.target.value})}
+                          className="w-full px-3 py-2 border rounded text-sm"
+                          placeholder="e.g., 10:00 AM - 12:00 PM"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-xs text-gray-600 block mb-1">Pickup Address</label>
+                        <textarea
+                          value={customerData.pickupAddress}
+                          onChange={(e) => setCustomerData({...customerData, pickupAddress: e.target.value})}
+                          className="w-full px-3 py-2 border rounded text-sm h-20"
+                          placeholder="Enter full pickup address"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-xs text-gray-600 block mb-1">Delivery Address</label>
+                        <textarea
+                          value={customerData.deliveryAddress}
+                          onChange={(e) => setCustomerData({...customerData, deliveryAddress: e.target.value})}
+                          className="w-full px-3 py-2 border rounded text-sm h-20"
+                          placeholder="Enter full delivery address"
+                        />
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <Button onClick={handleSaveCustomer} size="sm">
+                          Save Changes
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setEditingCustomer(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Load Stops */}
