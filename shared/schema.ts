@@ -123,6 +123,18 @@ export const rates = pgTable("rates", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Customers table for brokers and direct haul clients
+export const customers = pgTable("customers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  contactPerson: varchar("contact_person"),
+  email: varchar("email"),
+  phone: varchar("phone"),
+  address: text("address"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Invoice counter for sequential numbering
 export const invoiceCounter = pgTable("invoice_counter", {
   id: serial("id").primaryKey(),
@@ -134,6 +146,7 @@ export const invoiceCounter = pgTable("invoice_counter", {
 export const invoices = pgTable("invoices", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   loadId: varchar("load_id").references(() => loads.id),
+  customerId: varchar("customer_id").references(() => customers.id),
   invoiceNumber: varchar("invoice_number").notNull().unique(),
   flatRate: decimal("flat_rate", { precision: 10, scale: 2 }),
   lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"),
@@ -235,6 +248,12 @@ export const insertRateSchema = createInsertSchema(rates).omit({
   updatedAt: true,
 });
 
+export const insertCustomerSchema = createInsertSchema(customers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertInvoiceSchema = createInsertSchema(invoices).omit({
   id: true,
   generatedAt: true,
@@ -264,6 +283,8 @@ export type InsertBolNumber = z.infer<typeof insertBolNumberSchema>;
 export type BolNumber = typeof bolNumbers.$inferSelect;
 export type InsertRate = z.infer<typeof insertRateSchema>;
 export type Rate = typeof rates.$inferSelect;
+export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
+export type Customer = typeof customers.$inferSelect;
 export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
 export type Invoice = typeof invoices.$inferSelect;
 export type LoadStatusHistoryEntry = typeof loadStatusHistory.$inferSelect;

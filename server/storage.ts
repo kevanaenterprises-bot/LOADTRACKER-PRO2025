@@ -5,6 +5,7 @@ import {
   loadStops,
   bolNumbers,
   rates,
+  customers,
   invoiceCounter,
   invoices,
   loadStatusHistory,
@@ -23,6 +24,8 @@ import {
   type InsertBolNumber,
   type Rate,
   type InsertRate,
+  type Customer,
+  type InsertCustomer,
   type Invoice,
   type InsertInvoice,
   type LoadStatusHistoryEntry,
@@ -75,6 +78,13 @@ export interface IStorage {
   getRates(): Promise<Rate[]>;
   getRateByLocation(city: string, state: string): Promise<Rate | undefined>;
   createRate(rate: InsertRate): Promise<Rate>;
+
+  // Customer operations
+  getCustomers(): Promise<Customer[]>;
+  getCustomer(id: string): Promise<Customer | undefined>;
+  createCustomer(customer: InsertCustomer): Promise<Customer>;
+  updateCustomer(id: string, updates: Partial<Customer>): Promise<Customer>;
+  deleteCustomer(id: string): Promise<void>;
 
   // Invoice operations
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
@@ -583,6 +593,40 @@ export class DatabaseStorage implements IStorage {
   async createRate(rate: InsertRate): Promise<Rate> {
     const [newRate] = await db.insert(rates).values(rate).returning();
     return newRate;
+  }
+
+  // Customer operations
+  async getCustomers(): Promise<Customer[]> {
+    return await db
+      .select()
+      .from(customers)
+      .orderBy(customers.name);
+  }
+
+  async getCustomer(id: string): Promise<Customer | undefined> {
+    const [customer] = await db
+      .select()
+      .from(customers)
+      .where(eq(customers.id, id));
+    return customer;
+  }
+
+  async createCustomer(customer: InsertCustomer): Promise<Customer> {
+    const [newCustomer] = await db.insert(customers).values(customer).returning();
+    return newCustomer;
+  }
+
+  async updateCustomer(id: string, updates: Partial<Customer>): Promise<Customer> {
+    const [updatedCustomer] = await db
+      .update(customers)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(customers.id, id))
+      .returning();
+    return updatedCustomer;
+  }
+
+  async deleteCustomer(id: string): Promise<void> {
+    await db.delete(customers).where(eq(customers.id, id));
   }
 
   async createInvoice(invoice: InsertInvoice): Promise<Invoice> {

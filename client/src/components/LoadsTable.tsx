@@ -88,6 +88,8 @@ export default function LoadsTable() {
   const [pendingStops, setPendingStops] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
   const [existingStops, setExistingStops] = useState<any[]>([]);
+  const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState("");
 
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
@@ -153,17 +155,23 @@ export default function LoadsTable() {
     refetchOnWindowFocus: false,
   });
   
+  const { data: customers = [] } = useQuery<any[]>({
+    queryKey: ["/api/customers"],
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  
   useEffect(() => {
     setLocations(locationsData);
   }, [locationsData]);
 
   // Manual invoice generation mutation
   const generateInvoiceMutation = useMutation({
-    mutationFn: async (loadId: string) => {
+    mutationFn: async ({ loadId, customerId }: { loadId: string; customerId?: string }) => {
       const response = await fetch("/api/loads/" + loadId + "/generate-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ customerId }),
         credentials: "include",
       });
       
@@ -220,7 +228,22 @@ export default function LoadsTable() {
 
   const handleGenerateInvoice = () => {
     if (selectedLoad) {
-      generateInvoiceMutation.mutate(selectedLoad.id);
+      if (customers.length > 0) {
+        setInvoiceDialogOpen(true);
+      } else {
+        generateInvoiceMutation.mutate({ loadId: selectedLoad.id });
+      }
+    }
+  };
+  
+  const handleGenerateInvoiceWithCustomer = () => {
+    if (selectedLoad) {
+      generateInvoiceMutation.mutate({ 
+        loadId: selectedLoad.id, 
+        customerId: selectedCustomer || undefined 
+      });
+      setInvoiceDialogOpen(false);
+      setSelectedCustomer("");
     }
   };
 
@@ -819,6 +842,62 @@ export default function LoadsTable() {
               disabled={deleteLoadMutation.isPending}
             >
               {deleteLoadMutation.isPending ? "Deleting..." : "Delete Load"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice Customer Selection Dialog */}
+      <Dialog open={invoiceDialogOpen} onOpenChange={setInvoiceDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Generate Invoice</DialogTitle>
+            <DialogDescription>
+              Select a customer for this invoice (optional). Customers with email addresses will receive invoices automatically.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="customer">Customer</Label>
+              <Select value={selectedCustomer} onValueChange={setSelectedCustomer}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a customer (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Customer Selected</SelectItem>
+                  {customers.map((customer: any) => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.name}
+                      {customer.email && ` (${customer.email})`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end space-x-3">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setInvoiceDialogOpen(false);
+                setSelectedCustomer("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleGenerateInvoiceWithCustomer}
+              disabled={generateInvoiceMutation.isPending}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {generateInvoiceMutation.isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Generating...
+                </>
+              ) : (
+                <>Generate Invoice</>
+              )}
             </Button>
           </div>
         </DialogContent>

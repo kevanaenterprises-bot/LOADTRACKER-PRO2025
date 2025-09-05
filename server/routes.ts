@@ -1588,6 +1588,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer management endpoints
+  app.get("/api/customers", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const customers = await storage.getCustomers();
+      res.json(customers);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      res.status(500).json({ message: "Failed to fetch customers" });
+    }
+  });
+
+  app.post("/api/customers", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const customer = await storage.createCustomer(req.body);
+      res.json(customer);
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      res.status(500).json({ message: "Failed to create customer" });
+    }
+  });
+
+  app.put("/api/customers/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const customer = await storage.updateCustomer(req.params.id, req.body);
+      res.json(customer);
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      res.status(500).json({ message: "Failed to update customer" });
+    }
+  });
+
+  app.delete("/api/customers/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      await storage.deleteCustomer(req.params.id);
+      res.json({ message: "Customer deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      res.status(500).json({ message: "Failed to delete customer" });
+    }
+  });
+
   // Delete driver endpoint
   app.delete("/api/drivers/:driverId", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
@@ -3110,6 +3179,7 @@ Reply YES to confirm acceptance or NO to decline.`
   app.post("/api/loads/:id/generate-invoice", async (req, res) => {
     try {
       const loadId = req.params.id;
+      const { customerId } = req.body;
       const load = await storage.getLoad(loadId);
       
       if (!load) {
@@ -3151,6 +3221,7 @@ Reply YES to confirm acceptance or NO to decline.`
       const invoiceNumber = await storage.getNextInvoiceNumber();
       const invoice = await storage.createInvoice({
         loadId: load.id,
+        customerId: customerId || undefined,
         invoiceNumber,
         flatRate: rate.flatRate,
         lumperCharge: load.lumperCharge || "0.00",
