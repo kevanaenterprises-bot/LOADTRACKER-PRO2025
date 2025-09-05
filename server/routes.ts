@@ -12,6 +12,7 @@ import multer from 'multer';
 import {
   insertLoadSchema,
   insertLocationSchema,
+  insertCustomerSchema,
   insertBolNumberSchema,
   insertRateSchema,
   insertUserSchema,
@@ -1527,6 +1528,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customers API
+  app.get("/api/customers", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const customers = await storage.getCustomers();
+      res.json(customers);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      res.status(500).json({ message: "Failed to fetch customers" });
+    }
+  });
+
+  app.post("/api/customers", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const validatedData = insertCustomerSchema.parse(req.body);
+      const customer = await storage.createCustomer(validatedData);
+      res.status(201).json(customer);
+    } catch (error: any) {
+      console.error("Error creating customer:", error);
+      if (error?.name === 'ZodError') {
+        res.status(400).json({ message: "Invalid customer data", errors: error.errors });
+      } else {
+        res.status(400).json({ message: error?.message || "Invalid customer data" });
+      }
+    }
+  });
+
   // Drivers - WITH TOKEN BYPASS
   app.get("/api/drivers", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
@@ -2263,6 +2304,36 @@ Reply YES to confirm acceptance or NO to decline.`
     } catch (error: any) {
       console.error("Update customer error:", error);
       res.status(500).json({ message: error?.message || "Error updating customer information" });
+    }
+  });
+
+  // Assign customer to existing load
+  app.patch("/api/loads/:id/customer-assign", isAuthenticated, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { customerId } = req.body;
+
+      // Validate load exists
+      const load = await storage.getLoad(id);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      // Validate customer exists if provided
+      if (customerId) {
+        const customer = await storage.getCustomer(customerId);
+        if (!customer) {
+          return res.status(404).json({ message: "Customer not found" });
+        }
+      }
+
+      // Update the load with customer assignment
+      const updatedLoad = await storage.updateLoad(id, { customerId });
+
+      res.status(200).json(updatedLoad);
+    } catch (error: any) {
+      console.error("Assign customer error:", error);
+      res.status(500).json({ message: error?.message || "Error assigning customer" });
     }
   });
 

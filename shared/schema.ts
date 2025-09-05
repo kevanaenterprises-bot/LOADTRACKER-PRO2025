@@ -52,12 +52,28 @@ export const locations = pgTable("locations", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Customers table for billing and contact management
+export const customers = pgTable("customers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  email: varchar("email"), // Optional email for invoice delivery
+  contactName: varchar("contact_name"),
+  contactPhone: varchar("contact_phone"),
+  address: text("address"),
+  city: varchar("city"),
+  state: varchar("state"),
+  zipCode: varchar("zip_code"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Loads table
 export const loads = pgTable("loads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   number109: varchar("number_109").notNull().unique(),
   driverId: varchar("driver_id").references(() => users.id),
   locationId: varchar("location_id").references(() => locations.id),
+  customerId: varchar("customer_id").references(() => customers.id),
   estimatedMiles: integer("estimated_miles"),
   specialInstructions: text("special_instructions"),
   status: varchar("status").notNull().default("created"), // created, in_progress, delivered, completed
@@ -211,6 +227,12 @@ export const insertLocationSchema = createInsertSchema(locations).omit({
   createdAt: true,
 });
 
+export const insertCustomerSchema = createInsertSchema(customers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertLoadSchema = createInsertSchema(loads).omit({
   id: true,
   createdAt: true,
@@ -257,6 +279,8 @@ export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type InsertLocation = z.infer<typeof insertLocationSchema>;
 export type Location = typeof locations.$inferSelect;
+export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
+export type Customer = typeof customers.$inferSelect;
 export type InsertLoad = z.infer<typeof insertLoadSchema>;
 export type Load = typeof loads.$inferSelect;
 export type InsertBolNumber = z.infer<typeof insertBolNumberSchema>;
@@ -277,6 +301,7 @@ export type LoadStop = typeof loadStops.$inferSelect;
 export type LoadWithDetails = Load & {
   driver?: User;
   location?: Location;
+  customer?: Customer;
   invoice?: Invoice;
   stops?: LoadStop[];
 };

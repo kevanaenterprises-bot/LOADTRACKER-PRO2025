@@ -30,6 +30,9 @@ import {
   loadStops,
   LoadStop,
   InsertLoadStop,
+  customers,
+  Customer,
+  InsertCustomer,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, not, inArray } from "drizzle-orm";
@@ -47,6 +50,12 @@ export interface IStorage {
   getLocation(id: string): Promise<Location | undefined>;
   getLocationByName(name: string): Promise<Location | undefined>;
   createLocation(location: InsertLocation): Promise<Location>;
+  
+  // Customer operations
+  getCustomers(): Promise<Customer[]>;
+  getCustomer(id: string): Promise<Customer | undefined>;
+  getCustomerByName(name: string): Promise<Customer | undefined>;
+  createCustomer(customer: InsertCustomer): Promise<Customer>;
 
   // Load operations
   createLoad(load: InsertLoad): Promise<Load>;
@@ -219,6 +228,25 @@ export class DatabaseStorage implements IStorage {
     return newLocation;
   }
 
+  async getCustomers(): Promise<Customer[]> {
+    return await db.select().from(customers).orderBy(customers.name);
+  }
+
+  async getCustomer(id: string): Promise<Customer | undefined> {
+    const [customer] = await db.select().from(customers).where(eq(customers.id, id));
+    return customer;
+  }
+
+  async getCustomerByName(name: string): Promise<Customer | undefined> {
+    const [customer] = await db.select().from(customers).where(eq(customers.name, name));
+    return customer;
+  }
+
+  async createCustomer(customer: InsertCustomer): Promise<Customer> {
+    const [newCustomer] = await db.insert(customers).values(customer).returning();
+    return newCustomer;
+  }
+
   async createLoad(load: InsertLoad): Promise<Load> {
     const [newLoad] = await db.insert(loads).values(load).returning();
     
@@ -247,11 +275,13 @@ export class DatabaseStorage implements IStorage {
         load: loads,
         driver: users,
         location: locations,
+        customer: customers,
         invoice: invoices,
       })
       .from(loads)
       .leftJoin(users, eq(loads.driverId, users.id))
       .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(customers, eq(loads.customerId, customers.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .orderBy(desc(loads.createdAt));
 
@@ -265,6 +295,7 @@ export class DatabaseStorage implements IStorage {
       ...row.load,
       driver: row.driver || undefined,
       location: row.location || undefined,
+      customer: row.customer || undefined,
       invoice: row.invoice || undefined,
       stops: allStops.filter(stop => stop.loadId === row.load.id).sort((a, b) => a.sequence - b.sequence),
     }));
@@ -276,11 +307,13 @@ export class DatabaseStorage implements IStorage {
         load: loads,
         driver: users,
         location: locations,
+        customer: customers,
         invoice: invoices,
       })
       .from(loads)
       .leftJoin(users, eq(loads.driverId, users.id))
       .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(customers, eq(loads.customerId, customers.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .where(eq(loads.id, id));
 
@@ -293,6 +326,7 @@ export class DatabaseStorage implements IStorage {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
+      customer: result.customer || undefined,
       invoice: result.invoice || undefined,
       stops: stops,
     };
@@ -304,11 +338,13 @@ export class DatabaseStorage implements IStorage {
         load: loads,
         driver: users,
         location: locations,
+        customer: customers,
         invoice: invoices,
       })
       .from(loads)
       .leftJoin(users, eq(loads.driverId, users.id))
       .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(customers, eq(loads.customerId, customers.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .where(eq(loads.number109, number));
 
@@ -318,6 +354,7 @@ export class DatabaseStorage implements IStorage {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
+      customer: result.customer || undefined,
       invoice: result.invoice || undefined,
     };
   }

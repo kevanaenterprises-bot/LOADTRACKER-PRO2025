@@ -72,6 +72,7 @@ export default function LoadsTable() {
   const [selectedLoad, setSelectedLoad] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [assigningDriver, setAssigningDriver] = useState(false);
+  const [assigningCustomer, setAssigningCustomer] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loadToDelete, setLoadToDelete] = useState<any>(null);
   const [managingStops, setManagingStops] = useState(false);
@@ -259,6 +260,12 @@ export default function LoadsTable() {
     refetchOnWindowFocus: false,
   });
 
+  const { data: customers = [] } = useQuery({
+    queryKey: ["/api/customers"],
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
   // Manual invoice generation mutation
   const generateInvoiceMutation = useMutation({
     mutationFn: async (loadId: string) => {
@@ -378,6 +385,58 @@ export default function LoadsTable() {
     if (selectedLoad && driverId) {
       assignDriverMutation.mutate({ loadId: selectedLoad.id, driverId });
     }
+  };
+
+  // Customer assignment mutation  
+  const assignCustomerMutation = useMutation({
+    mutationFn: async (customerId: string) => {
+      if (!selectedLoad) throw new Error("No load selected");
+      
+      const response = await fetch(`/api/loads/${selectedLoad.id}/customer-assign`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ customerId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to assign customer');
+      }
+
+      return response.json();
+    },
+    onSuccess: (updatedLoad) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
+      
+      // Update selected load state
+      if (selectedLoad) {
+        const assignedCustomer = Array.isArray(customers) ? customers.find((customer: any) => customer.id === updatedLoad.customerId) : undefined;
+        setSelectedLoad({ 
+          ...selectedLoad, 
+          customerId: updatedLoad.customerId,
+          customer: assignedCustomer 
+        });
+      }
+      
+      setAssigningCustomer(false);
+      
+      toast({
+        title: "Success",
+        description: "Customer assigned successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to assign customer",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAssignCustomer = (customerId: string) => {
+    assignCustomerMutation.mutate(customerId);
   };
 
   // Delete load mutation
@@ -686,6 +745,66 @@ export default function LoadsTable() {
                           {assignDriverMutation.isPending && (
                             <div className="mt-2 text-sm text-blue-600">
                               Assigning driver...
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div>
+                      <strong>Customer:</strong>
+                      {selectedLoad.customer ? (
+                        <div className="mt-1 flex items-center justify-between">
+                          <span className="text-blue-600">{selectedLoad.customer.name}</span>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setAssigningCustomer(true)}
+                            className="ml-2"
+                          >
+                            Change Customer
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="mt-1">
+                          <span className="text-gray-500">Not assigned</span>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setAssigningCustomer(true)}
+                            className="ml-2"
+                          >
+                            Assign Customer
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {assigningCustomer && (
+                        <div className="mt-2 p-3 border rounded bg-gray-50">
+                          <div className="flex items-center space-x-2">
+                            <Select onValueChange={handleAssignCustomer}>
+                              <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="Select a customer..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {customers && Array.isArray(customers) && customers.map((customer: any) => (
+                                  <SelectItem key={customer.id} value={customer.id}>
+                                    {customer.name} {customer.email && `(${customer.email})`}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setAssigningCustomer(false)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                          {assignCustomerMutation.isPending && (
+                            <div className="mt-2 text-sm text-blue-600">
+                              Assigning customer...
                             </div>
                           )}
                         </div>
