@@ -96,7 +96,9 @@ export default function LoadsTable() {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'x-bypass-token': localStorage.getItem('bypass-token') || '',
         },
+        credentials: 'include',
         body: JSON.stringify({ [field]: value })
       });
       
