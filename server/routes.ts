@@ -2084,8 +2084,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Location validated:", location.name);
       }
       
-      // Extract stops from the request body
-      const { stops, ...loadData } = req.body;
+      // Extract stops and override password from the request body
+      const { stops, overridePassword, ...loadData } = req.body;
       
       const validatedData = insertLoadSchema.parse(loadData);
       console.log("Load creation - validation successful, creating load:", validatedData);
@@ -2094,8 +2094,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const existingLoads = await storage.getLoads();
       const exists = existingLoads.some(load => load.number109 === validatedData.number109);
       if (exists) {
-        console.log("Load creation failed - 109 number already exists:", validatedData.number109);
-        return res.status(400).json({ message: "109 number already exists" });
+        // Check if override password is provided and correct
+        if (overridePassword === "1159") {
+          console.log("Load creation - duplicate override with correct password for:", validatedData.number109);
+        } else {
+          console.log("Load creation failed - 109 number already exists:", validatedData.number109);
+          return res.status(400).json({ 
+            message: "109 number already exists",
+            requiresOverride: true 
+          });
+        }
       }
 
       // Validate stops if provided
@@ -2194,6 +2202,61 @@ Reply YES to confirm acceptance or NO to decline.`
     } catch (error) {
       console.error("Error fetching load stops:", error);
       res.status(500).json({ message: "Failed to fetch load stops" });
+    }
+  });
+
+  // Add stops to an existing load
+  app.post("/api/loads/:id/stops", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      const { stops } = req.body;
+      
+      // Verify load exists
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // Get existing stops to determine the next sequence number
+      const existingStops = await storage.getLoadStops(loadId);
+      const maxSequence = existingStops.reduce((max, stop) => Math.max(max, stop.stopSequence), 0);
+      
+      // Validate and create new stops
+      if (stops && Array.isArray(stops) && stops.length > 0) {
+        for (let i = 0; i < stops.length; i++) {
+          const stop = stops[i];
+          
+          // Validate stop location if provided
+          if (stop.locationId) {
+            const location = await storage.getLocation(stop.locationId);
+            if (!location) {
+              return res.status(400).json({ message: `Stop location not found: ${stop.locationId}` });
+            }
+          }
+          
+          // Create the stop with proper sequencing
+          await storage.createLoadStop({
+            ...stop,
+            loadId,
+            stopSequence: maxSequence + i + 1,
+          });
+        }
+        
+        console.log(`Added ${stops.length} stops to load ${loadId}`);
+        res.json({ success: true, message: `${stops.length} stops added successfully` });
+      } else {
+        res.status(400).json({ message: "No stops provided" });
+      }
+    } catch (error) {
+      console.error("Error adding stops to load:", error);
+      res.status(500).json({ message: "Failed to add stops" });
     }
   });
 

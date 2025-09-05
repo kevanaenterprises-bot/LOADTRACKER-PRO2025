@@ -20,9 +20,15 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
+  DialogDescription,
   DialogTrigger 
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, Package, MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -74,6 +80,14 @@ export default function LoadsTable() {
   const [assigningDriver, setAssigningDriver] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loadToDelete, setLoadToDelete] = useState<any>(null);
+  const [addingStops, setAddingStops] = useState(false);
+  const [showStopDialog, setShowStopDialog] = useState(false);
+  const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
+  const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [stopNotes, setStopNotes] = useState("");
+  const [pendingStops, setPendingStops] = useState<any[]>([]);
+  const [locations, setLocations] = useState<any[]>([]);
+  const [existingStops, setExistingStops] = useState<any[]>([]);
 
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
@@ -129,6 +143,17 @@ export default function LoadsTable() {
     retry: false,
     refetchOnWindowFocus: false,
   });
+  
+  // Fetch locations for stop selection
+  const { data: locationsData = [] } = useQuery<any[]>({
+    queryKey: ["/api/locations"],
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+  
+  useEffect(() => {
+    setLocations(locationsData);
+  }, [locationsData]);
 
   // Manual invoice generation mutation
   const generateInvoiceMutation = useMutation({
@@ -174,10 +199,21 @@ export default function LoadsTable() {
     },
   });
 
-  const handleLoadClick = (load: any) => {
+  const handleLoadClick = async (load: any) => {
     console.log("Load clicked:", load);
     setSelectedLoad(load);
     setDialogOpen(true);
+    
+    // Fetch existing stops for this load
+    try {
+      const response = await fetch(`/api/loads/${load.id}/stops`);
+      if (response.ok) {
+        const stops = await response.json();
+        setExistingStops(stops);
+      }
+    } catch (error) {
+      console.error("Failed to fetch load stops:", error);
+    }
   };
 
   const handleGenerateInvoice = () => {
@@ -287,6 +323,86 @@ export default function LoadsTable() {
   const handleDeleteLoad = (load: any) => {
     setLoadToDelete(load);
     setDeleteDialogOpen(true);
+  };
+  
+  // Add stops mutation
+  const addStopsMutation = useMutation({
+    mutationFn: async ({ loadId, stops }: { loadId: string; stops: any[] }) => {
+      const response = await fetch(`/api/loads/${loadId}/stops`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stops }),
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to add stops");
+      }
+      
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Stops Added",
+        description: "Additional stops have been added to the load successfully.",
+      });
+      setPendingStops([]);
+      setAddingStops(false);
+      
+      // Refetch existing stops
+      if (selectedLoad) {
+        fetch(`/api/loads/${selectedLoad.id}/stops`)
+          .then(res => res.json())
+          .then(stops => setExistingStops(stops))
+          .catch(err => console.error("Failed to refetch stops:", err));
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add stops",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const handleAddStopClick = () => {
+    setShowStopDialog(true);
+    setCurrentStopType("pickup");
+    setSelectedLocationId("");
+    setStopNotes("");
+  };
+  
+  const confirmAddStop = () => {
+    if (!selectedLocationId) {
+      toast({
+        title: "Error",
+        description: "Please select a company/location for this stop",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const selectedLocation = locations.find((loc: any) => loc.id === selectedLocationId);
+    
+    const newStop = {
+      stopType: currentStopType,
+      locationId: selectedLocationId,
+      companyName: selectedLocation?.name || "",
+      address: selectedLocation?.address || "",
+      contactName: selectedLocation?.contactName || "",
+      contactPhone: selectedLocation?.contactPhone || "",
+      notes: stopNotes,
+    };
+    
+    setPendingStops([...pendingStops, newStop]);
+    setShowStopDialog(false);
+  };
+  
+  const submitStops = () => {
+    if (selectedLoad && pendingStops.length > 0) {
+      addStopsMutation.mutate({ loadId: selectedLoad.id, stops: pendingStops });
+    }
   };
 
   const confirmDeleteLoad = () => {

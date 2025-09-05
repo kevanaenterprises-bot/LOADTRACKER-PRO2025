@@ -65,6 +65,8 @@ export default function LoadForm() {
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
   const [selectedLocationId, setSelectedLocationId] = useState("");
   const [stopNotes, setStopNotes] = useState("");
+  const [showOverride, setShowOverride] = useState(false);
+  const [overridePassword, setOverridePassword] = useState("");
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -88,7 +90,7 @@ export default function LoadForm() {
   });
 
   const createLoadMutation = useMutation({
-    mutationFn: async (data: FormData & { stops?: LoadStop[] }) => {
+    mutationFn: async (data: FormData & { stops?: LoadStop[]; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
       if (!data.locationId) {
         throw new Error("Please select a location");
@@ -108,10 +110,12 @@ export default function LoadForm() {
         status: "created",
       });
       setStops([]);
+      setShowOverride(false);
+      setOverridePassword("");
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -123,6 +127,19 @@ export default function LoadForm() {
         }, 500);
         return;
       }
+      
+      // Check if this is a duplicate error that needs override
+      const errorResponse = error?.response || error;
+      if (errorResponse?.requiresOverride || error.message?.includes("109 number already exists")) {
+        setShowOverride(true);
+        toast({
+          title: "Duplicate 109 Number",
+          description: "This 109 number already exists. Enter override password to recreate it.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
         title: "Error",
         description: error.message || "Failed to create load",
@@ -213,6 +230,7 @@ export default function LoadForm() {
     const submitData = {
       ...data,
       stops,
+      ...(showOverride && overridePassword ? { overridePassword } : {}),
     };
     createLoadMutation.mutate(submitData);
   };
@@ -242,6 +260,23 @@ export default function LoadForm() {
                   </FormItem>
                 )}
               />
+
+              {/* Override Password Field - shown when duplicate detected */}
+              {showOverride && (
+                <div className="space-y-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <Label className="text-yellow-800">Override Password Required</Label>
+                  <Input
+                    type="password"
+                    value={overridePassword}
+                    onChange={(e) => setOverridePassword(e.target.value)}
+                    placeholder="Enter override password"
+                    className="bg-white"
+                  />
+                  <p className="text-sm text-yellow-700">
+                    This 109 number already exists. Enter the override password to recreate it.
+                  </p>
+                </div>
+              )}
 
               <FormField
                 control={form.control}
