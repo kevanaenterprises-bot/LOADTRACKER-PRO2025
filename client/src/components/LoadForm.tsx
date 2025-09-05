@@ -73,6 +73,8 @@ export default function LoadForm() {
     queryKey: ["/api/locations"],
     retry: false,
     refetchOnWindowFocus: false,
+    staleTime: 0, // Force fresh data every time
+    cacheTime: 0, // Don't cache old data
   });
 
   // Debug logging to check what data we're actually getting
