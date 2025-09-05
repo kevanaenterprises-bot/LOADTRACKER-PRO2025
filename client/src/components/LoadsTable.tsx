@@ -29,6 +29,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Package, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
+import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -481,7 +482,13 @@ export default function LoadsTable() {
     <Card className="material-card">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Load Management</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Load Management</CardTitle>
+            <HelpButton 
+              title="Load Management Overview"
+              content="Track your loads through their complete journey: In Progress → Empty (POD uploaded) → Invoiced → Paid. Each section helps you see what needs attention!"
+            />
+          </div>
           <div className="flex space-x-2">
             <Button 
               variant="outline" 
@@ -511,9 +518,22 @@ export default function LoadsTable() {
         </div>
       </CardHeader>
       <CardContent>
+        {/* Trucker Tip for first-time users */}
+        {inProgressLoads.length === 0 && emptyLoads.length === 0 && (
+          <TruckerTip 
+            message="Hey there! Looks like you're just getting started. Create your first load using the 'Create Load' tab above. I'll help guide you through each step!"
+            mood="helpful"
+          />
+        )}
+        
         {/* In Progress Loads Section */}
         <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 text-blue-700">In Progress ({inProgressLoads.length})</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-semibold text-blue-700">In Progress ({inProgressLoads.length})</h3>
+            <HelpButton 
+              content="These are active loads that drivers are currently working on. Once the POD is uploaded, they'll move to the 'Empty' section for invoicing."
+            />
+          </div>
           {inProgressLoads.length === 0 ? (
             <div className="text-center py-4 bg-gray-50 rounded">
               <p className="text-gray-600">No loads in progress</p>

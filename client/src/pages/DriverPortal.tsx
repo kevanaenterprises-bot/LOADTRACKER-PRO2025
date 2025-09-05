@@ -12,6 +12,7 @@ import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import DriverLoadCard from "@/components/DriverLoadCard";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { apiRequest } from "@/lib/queryClient";
+import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 
 export default function DriverPortal() {
   console.log("🚨 DEBUG: DriverPortal loading...");
@@ -69,6 +70,13 @@ export default function DriverPortal() {
   // SUCCESS: Show authenticated driver portal - BASIC VERSION
   return (
     <div className="max-w-lg mx-auto min-h-screen bg-gray-50 p-4">
+      {/* Trucker Tip Welcome Message */}
+      <TruckerTip 
+        message="Welcome to your Driver Portal! This is where you'll upload BOL photos and POD documents. Just follow the simple steps below!"
+        name="Driver Dave"
+        mood="happy"
+      />
+      
       {/* Header */}
       <div className="bg-white rounded-lg shadow p-6 mb-4">
         <div className="flex justify-between items-start">

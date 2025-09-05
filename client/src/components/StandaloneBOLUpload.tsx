@@ -12,6 +12,7 @@ import { BatchPODUpload } from "@/components/BatchPODUpload";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
+import { HelpButton } from "@/components/HelpTooltip";
 
 const bolUploadSchema = z.object({
   loadNumber: z.string().min(1, "Load number is required"),
@@ -209,9 +210,15 @@ export default function StandaloneBOLUpload() {
   return (
     <Card className="material-card border-l-4 border-l-blue-500">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center">
-          <i className="fas fa-camera mr-2 text-blue-500"></i>
-          Upload POD Photo
+        <CardTitle className="text-lg flex items-center justify-between">
+          <div className="flex items-center">
+            <i className="fas fa-camera mr-2 text-blue-500"></i>
+            Upload POD Photo
+          </div>
+          <HelpButton 
+            title="POD Upload Instructions"
+            content="Enter the load number and BOL number from your paperwork, then upload a photo of your Proof of Delivery. This confirms the load was delivered successfully."
+          />
         </CardTitle>
       </CardHeader>
       <CardContent>

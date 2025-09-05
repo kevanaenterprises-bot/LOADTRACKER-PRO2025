@@ -37,6 +37,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, MapPin, Package, ArrowUp, ArrowDown } from "lucide-react";
+import { HelpButton } from "@/components/HelpTooltip";
 
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
@@ -236,7 +237,13 @@ export default function LoadForm() {
       <Card className="material-card">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Create New Load</span>
+            <div className="flex items-center gap-2">
+              <span>Create New Load</span>
+              <HelpButton 
+                title="Creating Loads"
+                content="Start by entering the load number, select the primary destination, add estimated miles, and optionally add multiple pickup/dropoff stops."
+              />
+            </div>
             <i className="fas fa-plus-circle text-primary text-xl"></i>
           </CardTitle>
         </CardHeader>
@@ -248,7 +255,12 @@ export default function LoadForm() {
                 name="number109"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>109 Number</FormLabel>
+                    <div className="flex items-center gap-2">
+                      <FormLabel>109 Number</FormLabel>
+                      <HelpButton 
+                        content="Enter your unique load number. It can be any format like 109-12345, ABC-5678, or any broker's numbering system."
+                      />
+                    </div>
                     <FormControl>
                       <Input {...field} placeholder="109-2024-001" />
                     </FormControl>
@@ -279,7 +291,12 @@ export default function LoadForm() {
                 name="locationId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Primary Delivery Location</FormLabel>
+                    <div className="flex items-center gap-2">
+                      <FormLabel>Primary Delivery Location</FormLabel>
+                      <HelpButton 
+                        content="Select the main delivery destination. You can add more stops using the 'Add Stop' button below."
+                      />
+                    </div>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
