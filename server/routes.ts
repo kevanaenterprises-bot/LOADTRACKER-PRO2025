@@ -2095,15 +2095,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const exists = existingLoads.some(load => load.number109 === validatedData.number109);
       if (exists) {
         // Check if override password is provided and correct
-        if (overridePassword === "1159") {
-          console.log("Load creation - duplicate override with correct password for:", validatedData.number109);
-        } else {
+        if (overridePassword !== "1159") {
           console.log("Load creation failed - 109 number already exists:", validatedData.number109);
           return res.status(400).json({ 
             message: "109 number already exists",
             requiresOverride: true 
           });
         }
+        // If override password is correct, continue with creation
+        console.log("Load creation - duplicate override with correct password for:", validatedData.number109);
       }
 
       // Validate stops if provided
