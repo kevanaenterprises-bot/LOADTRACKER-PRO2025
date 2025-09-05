@@ -277,21 +277,36 @@ export default function LoadForm() {
                                       updateStop(stop.id, 'customName', '');
                                       updateStop(stop.id, 'customAddress', '');
                                     } else {
+                                      console.log('🔍 Looking for location ID:', value, 'in locations:', locations);
                                       const selectedLocation = Array.isArray(locations) ? locations.find((loc: any) => loc.id === value) : null;
+                                      console.log('🎯 Found location:', selectedLocation);
+                                      
                                       updateStop(stop.id, 'locationId', value);
+                                      
                                       if (selectedLocation) {
                                         console.log('🔄 Auto-populating location:', selectedLocation);
-                                        // Always populate the company name
-                                        updateStop(stop.id, 'customName', selectedLocation.name || '');
+                                        
+                                        // Force update the company name
+                                        const companyName = selectedLocation.name || '';
+                                        updateStop(stop.id, 'customName', companyName);
+                                        console.log('📝 Set company name to:', companyName);
+                                        
                                         // Build comprehensive address
                                         const addressParts = [
                                           selectedLocation.address,
                                           selectedLocation.city,
                                           selectedLocation.state
-                                        ].filter(Boolean);
-                                        const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : selectedLocation.name || '';
+                                        ].filter(part => part && part.trim() !== '');
+                                        
+                                        const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : (selectedLocation.name || '');
                                         updateStop(stop.id, 'customAddress', fullAddress);
-                                        console.log('✅ Populated:', { name: selectedLocation.name, address: fullAddress });
+                                        console.log('📍 Set address to:', fullAddress);
+                                        
+                                        console.log('✅ DONE - Populated:', { 
+                                          name: companyName, 
+                                          address: fullAddress,
+                                          originalLocation: selectedLocation 
+                                        });
                                       } else {
                                         console.log('❌ Location not found:', value, 'Available locations:', locations);
                                       }
@@ -317,21 +332,36 @@ export default function LoadForm() {
                                   value="custom"
                                   onValueChange={(value) => {
                                     if (value !== "custom") {
+                                      console.log('🔍 (Custom mode) Looking for location ID:', value, 'in locations:', locations);
                                       const selectedLocation = Array.isArray(locations) ? locations.find((loc: any) => loc.id === value) : null;
+                                      console.log('🎯 (Custom mode) Found location:', selectedLocation);
+                                      
                                       updateStop(stop.id, 'locationId', value);
+                                      
                                       if (selectedLocation) {
                                         console.log('🔄 Auto-populating location (custom mode):', selectedLocation);
-                                        // Always populate the company name
-                                        updateStop(stop.id, 'customName', selectedLocation.name || '');
+                                        
+                                        // Force update the company name
+                                        const companyName = selectedLocation.name || '';
+                                        updateStop(stop.id, 'customName', companyName);
+                                        console.log('📝 (Custom mode) Set company name to:', companyName);
+                                        
                                         // Build comprehensive address
                                         const addressParts = [
                                           selectedLocation.address,
                                           selectedLocation.city,
                                           selectedLocation.state
-                                        ].filter(Boolean);
-                                        const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : selectedLocation.name || '';
+                                        ].filter(part => part && part.trim() !== '');
+                                        
+                                        const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : (selectedLocation.name || '');
                                         updateStop(stop.id, 'customAddress', fullAddress);
-                                        console.log('✅ Populated (custom mode):', { name: selectedLocation.name, address: fullAddress });
+                                        console.log('📍 (Custom mode) Set address to:', fullAddress);
+                                        
+                                        console.log('✅ DONE (Custom mode) - Populated:', { 
+                                          name: companyName, 
+                                          address: fullAddress,
+                                          originalLocation: selectedLocation 
+                                        });
                                       } else {
                                         console.log('❌ Location not found (custom mode):', value, 'Available locations:', locations);
                                       }
