@@ -17,6 +17,7 @@ import LoadTrackingMap from "@/components/LoadTrackingMap";
 import { DriverList } from "@/components/DriverList";
 import { Header } from "@/components/Header";
 import { CacheDebugger } from "@/components/CacheDebugger";
+import CustomerManagement from "@/components/CustomerManagement";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,7 +52,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking">("loads");
+  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers">("loads");
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
@@ -367,7 +368,7 @@ export default function Dashboard() {
 
         {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-8">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-4 h-auto gap-1">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-5 h-auto gap-1">
             <TabsTrigger value="loads" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-blue-700 hover:text-blue-900 font-semibold">
               <i className="fas fa-truck text-lg md:text-base text-blue-600"></i>
               <span className="text-center leading-tight">Load Management</span>
@@ -383,6 +384,10 @@ export default function Dashboard() {
             <TabsTrigger value="drivers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-orange-700 hover:text-orange-900 font-semibold">
               <i className="fas fa-users text-lg md:text-base text-orange-600"></i>
               <span className="text-center leading-tight">Driver Management</span>
+            </TabsTrigger>
+            <TabsTrigger value="customers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-pink-700 hover:text-pink-900 font-semibold">
+              <i className="fas fa-building text-lg md:text-base text-pink-600"></i>
+              <span className="text-center leading-tight">Customer Management</span>
             </TabsTrigger>
           </TabsList>
 
@@ -647,6 +652,11 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Customer Management Tab */}
+          <TabsContent value="customers" className="mt-6">
+            <CustomerManagement />
           </TabsContent>
 
         </Tabs>

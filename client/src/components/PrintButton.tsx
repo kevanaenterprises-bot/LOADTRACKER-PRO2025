@@ -250,9 +250,13 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                   </ul>
                 </div>
                 
-                {load?.customer?.email && (
+                {load?.customer?.email ? (
                   <div className="text-sm text-green-700">
                     <strong>Customer Email:</strong> {load.customer.email}
+                  </div>
+                ) : (
+                  <div className="text-sm text-amber-600">
+                    <strong>Note:</strong> Customer has no email address - won't be included
                   </div>
                 )}
                 

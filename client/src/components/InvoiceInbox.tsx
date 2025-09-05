@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search } from "lucide-react";
+import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search, Mail } from "lucide-react";
 import { format } from "date-fns";
 
 interface Invoice {
@@ -431,9 +433,13 @@ export default function InvoiceInbox() {
                   </ul>
                 </div>
                 
-                {selectedInvoiceForEmail?.load?.customer?.email && (
+                {selectedInvoiceForEmail?.load?.customer?.email ? (
                   <div className="text-sm text-green-700">
                     <strong>Customer Email:</strong> {selectedInvoiceForEmail.load.customer.email}
+                  </div>
+                ) : (
+                  <div className="text-sm text-amber-600">
+                    <strong>Note:</strong> Customer has no email address - won't be included
                   </div>
                 )}
                 

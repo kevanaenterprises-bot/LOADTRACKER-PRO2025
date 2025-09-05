@@ -1568,6 +1568,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update customer information
+  app.patch("/api/customers/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+
+      // Validate customer exists
+      const customer = await storage.getCustomer(id);
+      if (!customer) {
+        return res.status(404).json({ message: "Customer not found" });
+      }
+
+      // Update customer
+      const updatedCustomer = await storage.updateCustomer(id, updates);
+      res.status(200).json(updatedCustomer);
+    } catch (error: any) {
+      console.error("Error updating customer:", error);
+      res.status(500).json({ message: error?.message || "Error updating customer" });
+    }
+  });
+
   // Drivers - WITH TOKEN BYPASS
   app.get("/api/drivers", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
