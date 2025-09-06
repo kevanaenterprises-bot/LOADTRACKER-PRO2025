@@ -33,7 +33,7 @@ const fromNumber = rawFromNumber ? normalizePhoneNumber(rawFromNumber) : "";
 let telnyxClient: any = null;
 
 if (apiKey) {
-  telnyxClient = telnyx(apiKey);
+  telnyxClient = new telnyx(apiKey);
 }
 
 export async function sendSMSToDriver(toNumber: string, message: string): Promise<void> {
