@@ -1862,7 +1862,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check for driver authentication
       else if ((req.session as any)?.driverAuth) {
         userId = (req.session as any).driverAuth.id;
-        user = await storage.getUser(userId);
+        user = userId ? await storage.getUser(userId) : null;
         console.log(`🔥 DRIVER SESSION: Using driver ID ${userId}`, { 
           firstName: user?.firstName, 
           lastName: user?.lastName,
@@ -3253,10 +3253,10 @@ Reply YES to confirm acceptance or NO to decline.`
       }
 
       // Get rate for the location
-      const rate = await storage.getRateByLocation(
+      const rate = (load.location?.city && load.location?.state) ? await storage.getRateByLocation(
         load.location.city, 
         load.location.state
-      );
+      ) : null;
       
       if (!rate) {
         return res.status(400).json({ 
@@ -3456,10 +3456,10 @@ Reply YES to confirm acceptance or NO to decline.`
             console.log("🧾 No existing invoice found - generating new invoice");
             
             // Get rate for the location
-            const rate = await storage.getRateByLocation(
+            const rate = (loadWithDetails.location?.city && loadWithDetails.location?.state) ? await storage.getRateByLocation(
               loadWithDetails.location.city, 
               loadWithDetails.location.state
-            );
+            ) : null;
             
             if (rate) {
               console.log("🧾 Rate found - calculating invoice amount");
@@ -3588,7 +3588,7 @@ Reply YES to confirm acceptance or NO to decline.`
       // Automatically generate invoice when POD is uploaded
       try {
         const loadWithDetails = await storage.getLoad(req.params.id);
-        if (loadWithDetails && loadWithDetails.location) {
+        if (loadWithDetails && loadWithDetails.location?.city && loadWithDetails.location?.state) {
           // Get rate for the location
           const rate = await storage.getRateByLocation(
             loadWithDetails.location.city, 
@@ -3639,7 +3639,7 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(404).json({ message: "Load not found" });
       }
 
-      if (!load.location) {
+      if (!load.location || !load.location.city || !load.location.state) {
         return res.status(400).json({ message: "Load location not found" });
       }
 

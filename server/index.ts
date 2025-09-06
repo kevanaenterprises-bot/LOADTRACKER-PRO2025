@@ -2,6 +2,25 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Process-level error handlers to catch any unhandled errors that might cause silent failures
+process.on('uncaughtException', (error) => {
+  console.error('💥 UNCAUGHT EXCEPTION - Server will exit:', error);
+  console.error('Stack trace:', error.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 UNHANDLED PROMISE REJECTION - Server will exit:', reason);
+  console.error('Promise:', promise);
+  process.exit(1);
+});
+
+// Add explicit logging at the very start to confirm file execution
+console.log('📁 SERVER FILE EXECUTING: server/index.ts loaded successfully');
+console.log('🔧 Process ID:', process.pid);
+console.log('🔧 Node.js version:', process.version);
+console.log('🔧 Platform:', process.platform);
+
 const app = express();
 
 // Add CORS headers for sessions
@@ -73,8 +92,10 @@ app.get('/api/ready', (_req, res) => {
 
 (async () => {
   console.log('🚀 Starting LoadTracker Pro server...');
+  console.log('📊 STARTUP TRACE: Entering main server initialization function');
   
   try {
+    console.log('📊 STARTUP TRACE: Beginning try block for server startup');
     // Comprehensive environment variable validation for deployment
     console.log('🔧 Validating environment configuration...');
     
