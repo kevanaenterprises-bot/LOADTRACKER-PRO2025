@@ -3946,6 +3946,23 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Simple SMS test endpoint
+  app.post("/api/test-sms", async (req, res) => {
+    console.log("🔍 TEST SMS ENDPOINT HIT");
+    try {
+      const { phoneNumber, message } = req.body;
+      
+      console.log('🧪 SMS Debug Test:', { phoneNumber, message });
+      
+      await sendSMSToDriver(phoneNumber, message || 'Test message from LoadTracker Pro - Telnyx working!');
+      
+      res.json({ success: true, message: 'SMS sent successfully via Telnyx' });
+    } catch (error: any) {
+      console.error('❌ SMS Test Error:', error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   // Simple email test endpoint
   app.post("/api/test-email", async (req, res) => {
     console.log("🔍 TEST EMAIL ENDPOINT HIT");
