@@ -78,6 +78,7 @@
     "openid-client": "^6.6.4",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
+    "plivo": "^4.75.1",
     "puppeteer": "^24.17.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
