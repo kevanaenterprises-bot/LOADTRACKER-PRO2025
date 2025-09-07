@@ -3321,6 +3321,10 @@ Reply YES to confirm acceptance or NO to decline.`
         attachments
       });
       
+      // Update load status to awaiting_payment after successful email sending
+      await storage.updateLoadStatus(load.id, "awaiting_payment");
+      console.log(`📧 Invoice emailed successfully - Load ${load.number109} moved to AWAITING_PAYMENT`);
+      
       res.json({ 
         message: "Complete document package sent successfully",
         emailAddress,
@@ -3398,11 +3402,7 @@ Reply YES to confirm acceptance or NO to decline.`
         status: "pending",
       });
 
-      // Update load status to awaiting_payment after successful invoice generation
-      await storage.updateLoadStatus(load.id, "awaiting_payment");
-      
       console.log(`Manual invoice ${invoiceNumber} generated for load ${load.number109} by admin`);
-      console.log(`Load ${load.number109} status updated to awaiting_payment`);
       
       res.json(invoice);
     } catch (error) {
@@ -3601,12 +3601,8 @@ Reply YES to confirm acceptance or NO to decline.`
                 status: "pending",
               });
 
-              // Update load status to awaiting_payment after auto-invoice generation
-              await storage.updateLoadStatus(loadWithDetails.id, "awaiting_payment");
-              
               console.log(`🧾 ✅ Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109} - ready for admin inbox!`);
               console.log(`🧾 Invoice details: $${totalAmount} (Rate: $${flatRate}, Lumper: $${lumperCharge}, Extra stops: $${extraStopsCharge})`);
-              console.log(`🧾 Load ${loadWithDetails.number109} status updated to awaiting_payment`);
             } else {
               console.log("🧾 ❌ No rate found for location:", loadWithDetails.location.city, loadWithDetails.location.state);
             }
