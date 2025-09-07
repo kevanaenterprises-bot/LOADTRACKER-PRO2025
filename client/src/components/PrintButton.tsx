@@ -601,35 +601,22 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
           <div className="space-y-4">
             {invoice && load && (
               <div className="space-y-3">
-                <Card className="cursor-pointer hover:bg-gray-50 border-2 border-blue-200 bg-blue-50" onClick={handlePrintInvoice}>
+                <Card className="cursor-pointer hover:bg-gray-50 border-2 border-blue-200 bg-blue-50" onClick={handlePrintRateConAndInvoice}>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-blue-700" />
-                      Print Invoice & Rate Confirmation
+                      Print Complete Package
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <p className="text-xs text-gray-600">
                       Invoice: {invoice.invoiceNumber} • Load: {load.number_109 || load.number109} • ${invoice.totalAmount}
                     </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Includes: Rate Confirmation, Invoice{load.podDocumentPath ? ', and POD Documents' : ''}
+                    </p>
                   </CardContent>
                 </Card>
-
-                {load.podDocumentPath && (
-                  <Card className="cursor-pointer hover:bg-gray-50 border-2 border-orange-200 bg-orange-50" onClick={handlePrintPOD}>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm flex items-center">
-                        <Package className="h-4 w-4 mr-2 text-orange-700" />
-                        Print POD Document
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-xs text-gray-600">
-                        Proof of Delivery attachment
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
               </div>
             )}
           </div>
