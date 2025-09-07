@@ -337,6 +337,10 @@ export class DatabaseStorage implements IStorage {
     // Update specific timestamp fields based on status
     const now = timestamp || new Date();
     switch (status) {
+      case "in_progress":
+      case "in_transit":
+        updateData.confirmedAt = now;
+        break;
       case "en_route_pickup":
         updateData.enRoutePickupAt = now;
         break;
@@ -354,6 +358,12 @@ export class DatabaseStorage implements IStorage {
         break;
       case "delivered":
         updateData.deliveredAt = now;
+        break;
+      case "empty":
+        updateData.emptyAt = now;
+        break;
+      case "awaiting_invoicing":
+        updateData.awaitingInvoicingAt = now;
         break;
       case "completed":
         updateData.completedAt = now;
@@ -778,11 +788,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addStatusHistory(loadId: string, status: string, notes?: string): Promise<void> {
-    await db.insert(loadStatusHistory).values({
-      loadId,
-      status,
-      notes,
-    });
+    try {
+      // Check if load exists first to avoid foreign key constraint error
+      const [loadExists] = await db.select({ id: loads.id }).from(loads).where(eq(loads.id, loadId)).limit(1);
+      
+      if (!loadExists) {
+        console.error(`❌ Cannot add status history: Load ${loadId} not found`);
+        return; // Skip history if load doesn't exist
+      }
+
+      await db.insert(loadStatusHistory).values({
+        loadId,
+        status,
+        notes,
+      });
+      console.log(`✅ Status history added: Load ${loadId} → ${status}`);
+    } catch (error) {
+      console.error(`❌ Error adding status history for load ${loadId}:`, error);
+      // Don't throw - we don't want status updates to fail just because history fails
+    }
   }
 
   async getInvoice(invoiceNumber: string): Promise<Invoice | undefined> {
