@@ -384,14 +384,19 @@ export default function InvoiceInbox() {
                       Print This Preview
                     </Button>
                     <div className="flex items-center gap-2">
-                      <Select value={selectedEmail} onValueChange={setSelectedEmail}>
-                        <SelectTrigger className="w-[280px]">
-                          <SelectValue placeholder="Select customer to send invoice..." />
-                        </SelectTrigger>
-                        <SelectContent>
+                      <div style={{ display: 'contents' }}>
+                        <Select value={selectedEmail} onValueChange={setSelectedEmail}>
+                          <SelectTrigger className="w-[280px]" data-no-autofill="true">
+                            <SelectValue placeholder="Select customer to send invoice..." />
+                          </SelectTrigger>
+                        <SelectContent className="max-h-[200px] overflow-y-auto">
                           {Array.isArray(customersData) && customersData.length > 0 ? (
                             customersData.map((customer: any) => (
-                              <SelectItem key={customer.id} value={customer.email || customer.name}>
+                              <SelectItem 
+                                key={customer.id} 
+                                value={customer.email || customer.name}
+                                className="cursor-pointer hover:bg-gray-100"
+                              >
                                 {customer.name} {customer.email ? `- ${customer.email}` : '(no email)'}
                               </SelectItem>
                             ))
@@ -400,11 +405,12 @@ export default function InvoiceInbox() {
                               No customers available
                             </SelectItem>
                           )}
-                          <SelectItem value="custom">
+                          <SelectItem value="custom" className="cursor-pointer hover:bg-gray-100">
                             Enter Custom Email...
                           </SelectItem>
                         </SelectContent>
-                      </Select>
+                        </Select>
+                      </div>
                       
                       <Button
                         size="sm"
