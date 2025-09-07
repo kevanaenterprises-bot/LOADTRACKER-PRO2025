@@ -389,7 +389,7 @@ export default function InvoiceInbox() {
                           <SelectValue placeholder="Select customer to send invoice..." />
                         </SelectTrigger>
                         <SelectContent>
-                          {customersData && customersData.length > 0 ? (
+                          {Array.isArray(customersData) && customersData.length > 0 ? (
                             customersData.map((customer: any) => (
                               <SelectItem key={customer.id} value={customer.email || customer.name}>
                                 {customer.name} {customer.email ? `- ${customer.email}` : '(no email)'}
