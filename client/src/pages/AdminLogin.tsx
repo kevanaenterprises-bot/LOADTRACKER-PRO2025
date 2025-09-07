@@ -64,8 +64,8 @@ export default function AdminLogin() {
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
         
-        // Go directly to dashboard since bypass token is now set
-        window.location.href = "/admin-dashboard";
+        // Go directly to the working dashboard
+        window.location.href = "/direct-admin";
       } else {
         const data = await response.json();
         toast({
