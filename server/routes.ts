@@ -3621,10 +3621,11 @@ Reply YES to confirm acceptance or NO to decline.`
       // Update load with POD document path(s)
       const load = await storage.updateLoadPOD(req.params.id, finalPodPath);
       
-      // Update status to awaiting_invoicing when POD is uploaded
-      if (load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {
-        await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
-        console.log(`✅ Load ${req.params.id} moved to AWAITING_INVOICING status - ready for invoicing`);
+      // First set status to delivered when POD is uploaded
+      if (load.status !== "delivered" && load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {
+        await storage.updateLoadStatus(req.params.id, "delivered");
+        await storage.updateLoadDelivered(req.params.id, new Date());
+        console.log(`✅ Load ${req.params.id} marked as DELIVERED - POD uploaded successfully`);
       }
 
       // Automatically generate invoice when POD is uploaded

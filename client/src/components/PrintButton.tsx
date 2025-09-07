@@ -171,7 +171,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Print Preview - Complete Package</title>
+          <title>Print Preview - Invoice & POD</title>
           <style>
             body { margin: 0; font-family: Arial, sans-serif; }
             .preview-header { 
