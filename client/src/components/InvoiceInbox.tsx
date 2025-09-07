@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search, Mail } from "lucide-react";
+import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search, Mail, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 
 interface Invoice {
@@ -43,6 +43,7 @@ export default function InvoiceInbox() {
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [previewHTML, setPreviewHTML] = useState("");
   const [previewInvoice, setPreviewInvoice] = useState<Invoice | null>(null);
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<string>("");
   
@@ -384,43 +385,60 @@ export default function InvoiceInbox() {
                       Print This Preview
                     </Button>
                     <div className="flex items-center gap-2">
-                      <form autoComplete="off" style={{ display: 'contents' }}>
-                        <input type="text" style={{ display: 'none' }} autoComplete="off" />
-                        <input type="password" style={{ display: 'none' }} autoComplete="new-password" />
-                        <Select 
-                          value={selectedEmail} 
-                          onValueChange={setSelectedEmail}
-                          name="customer-select-ignore-autofill"
+                      <div className="relative">
+                        <button
+                          type="button"
+                          className="flex h-10 w-[280px] items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          onClick={() => setShowCustomerDropdown(!showCustomerDropdown)}
+                          data-testid="customer-email-select"
                         >
-                          <SelectTrigger 
-                            className="w-[280px]" 
-                            data-no-autofill="true"
-                            data-testid="customer-email-select"
-                          >
-                            <SelectValue placeholder="Select customer to send invoice..." />
-                          </SelectTrigger>
-                        <SelectContent className="max-h-[200px] overflow-y-auto">
-                          {Array.isArray(customersData) && customersData.length > 0 ? (
-                            customersData.map((customer: any) => (
-                              <SelectItem 
-                                key={customer.id} 
-                                value={customer.email || customer.name}
-                                className="cursor-pointer hover:bg-gray-100"
-                              >
-                                {customer.name} {customer.email ? `- ${customer.email}` : '(no email)'}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="no-customers" disabled>
-                              No customers available
-                            </SelectItem>
-                          )}
-                          <SelectItem value="custom" className="cursor-pointer hover:bg-gray-100">
-                            Enter Custom Email...
-                          </SelectItem>
-                        </SelectContent>
-                        </Select>
-                      </form>
+                          <span className={selectedEmail ? "" : "text-muted-foreground"}>
+                            {selectedEmail ? 
+                              (selectedEmail === 'custom' ? 'Enter Custom Email...' : 
+                               Array.isArray(customersData) ? 
+                                 customersData.find(c => c.email === selectedEmail || c.name === selectedEmail)?.name + 
+                                 (customersData.find(c => c.email === selectedEmail || c.name === selectedEmail)?.email ? 
+                                   ` - ${customersData.find(c => c.email === selectedEmail || c.name === selectedEmail)?.email}` : ' (no email)') 
+                                 : selectedEmail
+                              ) : 
+                              "Select customer to send invoice..."
+                            }
+                          </span>
+                          <ChevronDown className="h-4 w-4 opacity-50" />
+                        </button>
+                        
+                        {showCustomerDropdown && (
+                          <div className="absolute top-full left-0 z-50 w-full mt-1 bg-popover text-popover-foreground rounded-md border shadow-md max-h-[200px] overflow-y-auto">
+                            {Array.isArray(customersData) && customersData.length > 0 ? (
+                              customersData.map((customer: any) => (
+                                <div
+                                  key={customer.id}
+                                  className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                                  onClick={() => {
+                                    setSelectedEmail(customer.email || customer.name);
+                                    setShowCustomerDropdown(false);
+                                  }}
+                                >
+                                  {customer.name} {customer.email ? `- ${customer.email}` : '(no email)'}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm text-muted-foreground">
+                                No customers available
+                              </div>
+                            )}
+                            <div
+                              className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                              onClick={() => {
+                                setSelectedEmail('custom');
+                                setShowCustomerDropdown(false);
+                              }}
+                            >
+                              Enter Custom Email...
+                            </div>
+                          </div>
+                        )}
+                      </div>
                       
                       <Button
                         size="sm"
