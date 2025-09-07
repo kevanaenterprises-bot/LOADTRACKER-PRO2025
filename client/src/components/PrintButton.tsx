@@ -348,15 +348,29 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
       }
 
-      // Generate combined rate confirmation and invoice HTML
-      const combinedHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+      // Fetch combined invoice + POD preview from server (like email system does)
+      const response = await fetch(`/api/invoices/${invoiceId}/print-preview`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ loadId: load?.id })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate preview');
+      }
+
+      const { previewHTML: combinedHTML } = await response.json();
       
       // Create preview HTML with Print and Close buttons
       const previewHTML = `
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Print Preview - Rate Con & Invoice</title>
+          <title>Print Preview - Complete Package</title>
           <style>
             body { margin: 0; font-family: Arial, sans-serif; }
             .preview-header { 
@@ -409,7 +423,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         </head>
         <body>
           <div class="preview-header">
-            <div class="preview-title">📄 Print Preview - Rate Confirmation & Invoice</div>
+            <div class="preview-title">📄 Print Preview - Invoice, Rate Con & POD</div>
             <div class="preview-buttons">
               <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
               <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
@@ -427,7 +441,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 
       toast({
         title: "Preview Opened",
-        description: "Rate confirmation & invoice preview opened. Review and click Print when ready.",
+        description: "Complete package preview opened with Invoice, Rate Con & POD. Review and click Print when ready.",
       });
       
     } catch (error: any) {
