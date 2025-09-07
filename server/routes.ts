@@ -1425,40 +1425,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: "User"
         };
 
-        console.log("🔄 Session BEFORE save:", {
-          sessionId: req.sessionID,
-          hasSession: !!req.session,
-          adminAuth: (req.session as any).adminAuth
-        });
-
         // Force session save with explicit reload to ensure persistence
         req.session.save((err) => {
           if (err) {
-            console.error("❌ Session save error:", err);
+            console.error("Session save error:", err);
             return res.status(500).json({ message: "Session save failed" });
           }
-          
-          console.log("✅ Session saved successfully");
           
           // Reload session to verify save
           req.session.reload((reloadErr) => {
             if (reloadErr) {
-              console.error("❌ Session reload error:", reloadErr);
+              console.error("Session reload error:", reloadErr);
               return res.status(500).json({ message: "Session verification failed" });
             }
             
-            console.log("✅ Session reloaded and verified, adminAuth:", (req.session as any).adminAuth);
-            
-            // Double-check session persistence
-            if (!(req.session as any).adminAuth) {
-              console.error("❌ CRITICAL: Session adminAuth lost after reload!");
-              return res.status(500).json({ message: "Session persistence failed" });
-            }
-            
+            console.log("Session saved and verified, adminAuth:", (req.session as any).adminAuth);
             res.json({ 
               message: "Login successful", 
-              user: (req.session as any).adminAuth,
-              sessionId: req.sessionID
+              user: (req.session as any).adminAuth 
             });
           });
         });
@@ -1468,64 +1452,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Admin login error:", error);
-      res.status(500).json({ message: "Login failed" });
-    }
-  });
-
-  // Admin login endpoint that copies the working driver login pattern
-  app.post('/api/admin/login', async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      
-      console.log("Admin login attempt:", { 
-        username, 
-        usernameLength: username?.length,
-        password: password ? `[LENGTH:${password.length}]` : "[MISSING]",
-        passwordActual: JSON.stringify(password)
-      });
-      
-      if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
-      }
-
-      // Check for admin credentials (case insensitive, trim whitespace)
-      if (username.toLowerCase().trim() !== "admin" || password.trim() !== "go4fc2024") {
-        return res.status(401).json({ message: "Invalid username or password" });
-      }
-
-      console.log("✅ Admin credentials matched successfully");
-
-      // Create session for admin with complete user data (copy driver pattern exactly)
-      (req.session as any).adminAuth = {
-        userId: "admin-001",
-        id: "admin-001", 
-        username: "admin",
-        role: "admin",
-        firstName: "Admin",
-        lastName: "User"
-      };
-
-      // Force save session to ensure persistence (copy driver pattern)
-      req.session.save((err) => {
-        if (err) {
-          console.error("❌ Admin session save error:", err);
-        } else {
-          console.log("✅ Admin session saved successfully");
-        }
-      });
-
-      res.json({ 
-        message: "Login successful",
-        user: {
-          id: "admin-001",
-          username: "admin",
-          firstName: "Admin",
-          lastName: "User",
-          role: "admin"
-        }
-      });
-    } catch (error) {
-      console.error("❌ Admin login error:", error);
       res.status(500).json({ message: "Login failed" });
     }
   });
@@ -1544,23 +1470,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hasBypassToken: !!bypassToken
       });
       
-      // Check bypass token first (like driver auth does)
-      if (bypassToken === BYPASS_SECRET) {
+      if (adminUser) {
+        res.json(adminUser);
+      } else if (bypassToken === BYPASS_SECRET) {
         console.log("✅ BYPASS TOKEN: Valid bypass token for admin auth");
         res.json({ 
-          id: "admin-001",
-          userId: "admin-001",
+          id: "bypass-admin",
           username: "admin",
           role: "admin",
           firstName: "Admin",
           lastName: "User",
           authType: "bypass"
         });
-      } else if (adminUser) {
-        console.log("✅ SESSION: Valid admin session found");
-        res.json(adminUser);
       } else {
-        console.log("❌ No valid admin authentication found");
         res.status(401).json({ message: "Not authenticated" });
       }
     } catch (error) {

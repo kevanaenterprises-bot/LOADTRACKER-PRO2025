@@ -21,23 +21,18 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      // Copy the exact driver login pattern
-      const response = await fetch("/api/admin/login", {
+      const response = await fetch("/api/auth/admin-login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        // Setup bypass token immediately after successful login (copy driver pattern exactly)
+        // Automatically setup bypass token after successful login (makes production work like test pages)
         try {
-          console.log("🔑 Getting bypass token for admin after login");
           const bypassResponse = await fetch("/api/auth/browser-bypass", {
             method: "POST",
             credentials: "include",
@@ -45,10 +40,9 @@ export default function AdminLogin() {
           if (bypassResponse.ok) {
             const data = await bypassResponse.json();
             localStorage.setItem('bypass-token', data.token);
-            console.log("✅ Admin bypass token obtained after login");
           }
         } catch (error) {
-          console.error("❌ Failed to get bypass token:", error);
+          // Silent fail - will use normal authentication
         }
 
         toast({
@@ -56,16 +50,13 @@ export default function AdminLogin() {
           description: "Welcome to GO 4 Farms & Cattle Admin Portal",
         });
         
-        // Clear any redirect flags (like driver login does)
-        sessionStorage.removeItem('admin-redirecting');
-        
         // Invalidate auth queries to refresh the state
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/admin-user"] });
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
         
-        // Go directly to the working dashboard
-        window.location.href = "/direct-admin";
+        // Navigate to dashboard
+        setLocation("/dashboard");
       } else {
         const data = await response.json();
         toast({

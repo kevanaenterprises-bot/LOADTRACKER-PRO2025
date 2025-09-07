@@ -5,13 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
-import AdminDashboard from "@/pages/AdminDashboard";
-import AdminPortal from "@/pages/AdminPortal";
-import DirectAdminDashboard from "@/pages/DirectAdminDashboard";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
-import AdminTest from "@/pages/AdminTest";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -23,14 +19,8 @@ function Router() {
       
       {/* Main Application Pages */}
       <Route path="/dashboard" component={Dashboard} />
-      <Route path="/admin-dashboard" component={AdminDashboard} />
-      <Route path="/direct-admin" component={DirectAdminDashboard} />
-      <Route path="/admin-portal" component={AdminPortal} />
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
-      
-      {/* Test Pages */}
-      <Route path="/admin-test" component={AdminTest} />
       
       {/* Landing page */}
       <Route path="/" component={Landing} />
