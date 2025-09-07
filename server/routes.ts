@@ -2518,23 +2518,19 @@ Reply YES to confirm acceptance or NO to decline.`
       // Get complete load data with driver, location, and invoice details for UI
       const completeLoad = await storage.getLoad(loadId);
 
-      // Send SMS to driver if they have a phone number
+      // Send SMS notification via notification service (respects driver preferences)
       try {
-        const driver = await storage.getUser(driverId);
-        if (driver?.phoneNumber) {
-          const location = load.location;
-          await sendSMSToDriver(
-            driver.phoneNumber,
-            `NEW LOAD ASSIGNED - ${new Date().toLocaleDateString()}
-Load: ${load.number109}
-Destination: ${location?.name || (load.companyName || 'See load details')}
-${location?.city ? `City: ${location.city}` : ''}
-
-Reply YES to confirm acceptance or NO to decline.`
-          );
-        }
+        const location = load.location;
+        const destination = location?.name || (load.companyName || 'See load details');
+        await notificationService.sendLoadAssignmentNotification(
+          driverId,
+          load.number109,
+          destination,
+          loadId
+        );
+        console.log(`✅ SMS notification sent to driver ${driverId} for load ${load.number109}`);
       } catch (smsError) {
-        console.error("Failed to send SMS:", smsError);
+        console.error("Failed to send SMS notification:", smsError);
         // Don't fail the assignment if SMS fails
       }
 

@@ -61,8 +61,6 @@ const getNextAction = (status: string) => {
     case "at_receiver":
       return { status: "delivered", text: "Mark as Delivered", icon: "fa-check-circle" };
     case "delivered":
-      return { status: "empty", text: "Mark as Empty", icon: "fa-box-open" };
-    case "empty":
       return { status: "awaiting_invoicing", text: "Complete Load", icon: "fa-file-invoice" };
     default:
       return null;
@@ -258,7 +256,7 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
         <div className="flex gap-2 mt-6">
           {nextAction && (
             <Button 
-              className="flex-1"
+              className="flex-1 bg-green-600 hover:bg-green-700"
               onClick={handleStatusUpdate}
               disabled={updateStatusMutation.isPending}
             >
@@ -269,8 +267,8 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
                 </>
               ) : (
                 <>
-                  <i className={`fas ${nextAction.icon} mr-2`}></i>
-                  Update Status: {nextAction.text}
+                  <i className="fas fa-play mr-2"></i>
+                  Start Load & Tracking
                 </>
               )}
             </Button>
