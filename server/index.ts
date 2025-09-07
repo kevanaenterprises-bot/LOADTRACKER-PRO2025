@@ -2,24 +2,53 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
-// Process-level error handlers to catch any unhandled errors that might cause silent failures
+// DEPLOYMENT DEBUG: Immediate file execution confirmation
+console.log('🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing');
+console.log('🚨 DEPLOYMENT DEBUG: Current timestamp:', new Date().toISOString());
+console.log('🚨 DEPLOYMENT DEBUG: Process environment:', {
+  nodeEnv: process.env.NODE_ENV,
+  port: process.env.PORT,
+  hasDatabase: !!process.env.DATABASE_URL
+});
+
+// Enhanced process-level error handlers with more detailed logging
 process.on('uncaughtException', (error) => {
-  console.error('💥 UNCAUGHT EXCEPTION - Server will exit:', error);
-  console.error('Stack trace:', error.stack);
+  console.error('💥 UNCAUGHT EXCEPTION - CRITICAL ERROR - Server will exit:', error);
+  console.error('💥 Error name:', error.name);
+  console.error('💥 Error message:', error.message);
+  console.error('💥 Stack trace:', error.stack);
+  console.error('💥 Process will exit with code 1');
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('💥 UNHANDLED PROMISE REJECTION - Server will exit:', reason);
-  console.error('Promise:', promise);
+  console.error('💥 UNHANDLED PROMISE REJECTION - CRITICAL ERROR - Server will exit:', reason);
+  console.error('💥 Promise that was rejected:', promise);
+  console.error('💥 Reason type:', typeof reason);
+  console.error('💥 Process will exit with code 1');
   process.exit(1);
 });
 
-// Add explicit logging at the very start to confirm file execution
+// Additional process event handlers for deployment debugging
+process.on('exit', (code) => {
+  console.log('🚨 PROCESS EXITING with code:', code);
+});
+
+process.on('SIGTERM', () => {
+  console.log('🚨 SIGTERM received - graceful shutdown');
+});
+
+process.on('SIGINT', () => {
+  console.log('🚨 SIGINT received - graceful shutdown');
+});
+
+// Explicit file execution confirmation with enhanced details
 console.log('📁 SERVER FILE EXECUTING: server/index.ts loaded successfully');
 console.log('🔧 Process ID:', process.pid);
 console.log('🔧 Node.js version:', process.version);
 console.log('🔧 Platform:', process.platform);
+console.log('🔧 Architecture:', process.arch);
+console.log('🔧 Memory usage:', JSON.stringify(process.memoryUsage(), null, 2));
 
 const app = express();
 
@@ -90,22 +119,36 @@ app.get('/api/ready', (_req, res) => {
   res.status(200).json({ status: 'ready', timestamp: new Date().toISOString() });
 });
 
-(async () => {
-  console.log('🚀 Starting LoadTracker Pro server...');
-  console.log('📊 STARTUP TRACE: Entering main server initialization function');
+// Main server initialization function with enhanced error handling
+async function startServer() {
+  console.log('🚨 DEPLOYMENT DEBUG: Starting server initialization function');
+  console.log('🚨 DEPLOYMENT DEBUG: Function entry timestamp:', new Date().toISOString());
   
   try {
+    console.log('🚀 Starting LoadTracker Pro server...');
+    console.log('📊 STARTUP TRACE: Entering main server initialization function');
     console.log('📊 STARTUP TRACE: Beginning try block for server startup');
+    console.log('🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning');
     // Comprehensive environment variable validation for deployment
     console.log('🔧 Validating environment configuration...');
     
-    // Port validation
+    // Enhanced PORT validation for Cloud Run deployment
+    console.log('🚨 DEPLOYMENT DEBUG: Validating PORT environment variable');
     const portEnv = process.env.PORT;
+    console.log('🚨 DEPLOYMENT DEBUG: Raw PORT value:', portEnv);
+    console.log('🚨 DEPLOYMENT DEBUG: PORT type:', typeof portEnv);
+    
+    // Cloud Run sets PORT automatically, fallback to 5000 for local development
     const port = parseInt(portEnv || '5000', 10);
+    console.log('🚨 DEPLOYMENT DEBUG: Parsed PORT value:', port);
     
     if (isNaN(port) || port < 1 || port > 65535) {
-      throw new Error(`Invalid PORT value: ${portEnv}. PORT must be a valid number between 1 and 65535.`);
+      const errorMsg = `Invalid PORT value: ${portEnv}. PORT must be a valid number between 1 and 65535.`;
+      console.error('❌ DEPLOYMENT DEBUG: PORT validation failed:', errorMsg);
+      throw new Error(errorMsg);
     }
+    
+    console.log('✅ DEPLOYMENT DEBUG: PORT validation successful:', port);
     
     // Database validation
     if (!process.env.DATABASE_URL) {
@@ -210,8 +253,29 @@ app.get('/api/ready', (_req, res) => {
     });
     
   } catch (error) {
+    console.error('💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block');
     console.error('💥 Server startup failed:', error);
-    console.error('Stack trace:', error instanceof Error ? error.stack : error);
+    console.error('💥 Error type:', typeof error);
+    console.error('💥 Error name:', error instanceof Error ? error.name : 'Unknown');
+    console.error('💥 Error message:', error instanceof Error ? error.message : String(error));
+    console.error('💥 Stack trace:', error instanceof Error ? error.stack : error);
+    console.error('💥 Process will exit with code 1');
     process.exit(1);
   }
-})();
+}
+
+// Execute the server startup with additional error handling wrapper
+console.log('🚨 DEPLOYMENT DEBUG: About to call startServer function');
+console.log('🚨 DEPLOYMENT DEBUG: Pre-execution timestamp:', new Date().toISOString());
+
+startServer().catch((error) => {
+  console.error('💥 DEPLOYMENT DEBUG: startServer function threw an error');
+  console.error('💥 FATAL ERROR in server startup:', error);
+  console.error('💥 Error details:', {
+    name: error instanceof Error ? error.name : 'Unknown',
+    message: error instanceof Error ? error.message : String(error),
+    stack: error instanceof Error ? error.stack : 'No stack trace'
+  });
+  console.error('💥 Process will exit with code 1');
+  process.exit(1);
+});
