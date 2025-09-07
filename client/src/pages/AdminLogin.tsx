@@ -64,10 +64,8 @@ export default function AdminLogin() {
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
         
-        // Small delay to ensure session is established (copy driver pattern)
-        setTimeout(() => {
-          window.location.href = "/admin-portal";
-        }, 500);
+        // Go directly to dashboard since bypass token is now set
+        window.location.href = "/admin-dashboard";
       } else {
         const data = await response.json();
         toast({
