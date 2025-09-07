@@ -244,7 +244,7 @@ export default function LoadsTable() {
     refetchOnWindowFocus: false,
   });
 
-  const { data: availableDrivers = [] } = useQuery({
+  const { data: availableDrivers = [] } = useQuery<any[]>({
     queryKey: ["/api/drivers/available"],
     retry: false,
     refetchOnWindowFocus: false,
@@ -738,7 +738,7 @@ export default function LoadsTable() {
           {selectedLoad && (
             <div className="space-y-6">
               {editMode ? (
-                /* Edit Mode */
+                // Edit Mode
                 <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
                   
@@ -861,7 +861,7 @@ export default function LoadsTable() {
                   </div>
                 </div>
               ) : (
-                /* View Mode */
+                // View Mode
                 <>
                   {/* Load Information */}
                   <div className="grid grid-cols-2 gap-4">
@@ -1044,6 +1044,8 @@ export default function LoadsTable() {
                   </div>
                 </div>
               </div>
+                </>
+              )}
             </div>
           )}
         </DialogContent>
