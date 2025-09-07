@@ -224,7 +224,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         </head>
         <body>
           <div class="preview-header">
-            <div class="preview-title">📄 Print Preview - Invoice, Rate Con & POD</div>
+            <div class="preview-title">📄 Print Preview - Invoice & POD</div>
             <div class="preview-buttons">
               <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
               <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
@@ -242,7 +242,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 
       toast({
         title: "Preview Opened",
-        description: "Complete package preview opened with Invoice, Rate Con & POD. Review and click Print when ready.",
+        description: "Invoice and POD preview opened. Review and click Print when ready.",
       });
       
     } catch (error: any) {
