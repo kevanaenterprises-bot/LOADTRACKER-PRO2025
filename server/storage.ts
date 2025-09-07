@@ -369,6 +369,9 @@ export class DatabaseStorage implements IStorage {
       case "awaiting_invoicing":
         updateData.awaitingInvoicingAt = now;
         break;
+      case "awaiting_payment":
+        updateData.awaitingPaymentAt = now;
+        break;
       case "completed":
         updateData.completedAt = now;
         break;
