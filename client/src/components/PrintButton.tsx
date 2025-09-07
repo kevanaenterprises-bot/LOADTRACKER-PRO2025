@@ -149,22 +149,22 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
       }
 
-      // Generate combined rate confirmation and invoice HTML
-      let combinedHTML = generateCombinedRateConInvoiceHTML(invoice, load);
-      
-      // Add POD notice if POD exists (since we can't easily embed images in client-side preview)
-      if (load?.podDocumentPath) {
-        const podNoticeHTML = `
-          <div style="page-break-before: always; padding: 20px; text-align: center; background: #f8f9fa; border: 2px dashed #007bff; margin: 20px 0;">
-            <h2 style="color: #007bff; margin-bottom: 15px;">📋 POD Documents Available</h2>
-            <p style="font-size: 16px; margin-bottom: 10px;"><strong>Load:</strong> ${load.number109}</p>
-            <p style="color: #666; font-size: 14px;">POD documents are attached to this load and will be included when emailed to customers.</p>
-            <p style="color: #666; font-size: 12px; margin-top: 10px;"><em>Note: POD images are included in email packages but not in print preview.</em></p>
-          </div>
-        `;
-        // Insert POD notice before closing body tag
-        combinedHTML = combinedHTML.replace('</body>', podNoticeHTML + '</body>');
+      // Fetch invoice + POD preview from server (same logic as email system)
+      const response = await fetch(`/api/invoices/${invoiceId}/print-only-preview`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ loadId: load?.id })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate preview with POD');
       }
+
+      const { previewHTML: combinedHTML } = await response.json();
       
       // Create preview HTML with Print and Close buttons
       const previewHTML = `
@@ -406,7 +406,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-blue-700" />
-                      Print Complete Package
+                      Print Invoice & POD
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
@@ -414,7 +414,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                       Invoice: {invoice.invoiceNumber} • Load: {load.number_109 || load.number109} • ${invoice.totalAmount}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Includes: Rate Confirmation, Invoice{load.podDocumentPath ? ', and POD Documents' : ''}
+                      Includes: Invoice{load.podDocumentPath ? ' and POD Images' : ' only'}
                     </p>
                   </CardContent>
                 </Card>
