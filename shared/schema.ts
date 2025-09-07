@@ -128,12 +128,17 @@ export const rates = pgTable("rates", {
 export const customers = pgTable("customers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: varchar("name").notNull(),
-  contactPerson: varchar("contact_person"),
   email: varchar("email"),
-  phone: varchar("phone"),
+  contactName: varchar("contact_name"),
+  contactPhone: varchar("contact_phone"),
   address: text("address"),
+  city: varchar("city"),
+  state: varchar("state"),
+  zipCode: varchar("zip_code"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  contactPerson: varchar("contact_person"),
+  phone: varchar("phone"),
 });
 
 // Invoice counter for sequential numbering
