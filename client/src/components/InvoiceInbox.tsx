@@ -45,14 +45,6 @@ export default function InvoiceInbox() {
   const [previewInvoice, setPreviewInvoice] = useState<Invoice | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<string>("");
-  
-  // Customer email addresses for invoicing
-  const customerEmails = [
-    { value: "accounting@go4fc.com", label: "Accounting - accounting@go4fc.com" },
-    { value: "gofarmsbills@gmail.com", label: "Bills - gofarmsbills@gmail.com" },
-    { value: "both", label: "Send to Both Addresses" },
-    { value: "custom", label: "Enter Custom Email..." }
-  ];
 
   const { data: invoicesData, isLoading } = useQuery({
     queryKey: ["/api/invoices"],
@@ -392,11 +384,18 @@ export default function InvoiceInbox() {
                           <SelectValue placeholder="Select customer email..." />
                         </SelectTrigger>
                         <SelectContent>
-                          {customerEmails.map((email) => (
-                            <SelectItem key={email.value} value={email.value}>
-                              {email.label}
-                            </SelectItem>
-                          ))}
+                          <SelectItem value="accounting@go4fc.com">
+                            Accounting - accounting@go4fc.com
+                          </SelectItem>
+                          <SelectItem value="gofarmsbills@gmail.com">
+                            Bills - gofarmsbills@gmail.com
+                          </SelectItem>
+                          <SelectItem value="both">
+                            Send to Both Addresses
+                          </SelectItem>
+                          <SelectItem value="custom">
+                            Enter Custom Email...
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       
