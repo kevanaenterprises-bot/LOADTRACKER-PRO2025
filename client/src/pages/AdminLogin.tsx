@@ -66,7 +66,7 @@ export default function AdminLogin() {
         
         // Small delay to ensure session is established (copy driver pattern)
         setTimeout(() => {
-          window.location.href = "/admin-dashboard";
+          window.location.href = "/admin-portal";
         }, 500);
       } else {
         const data = await response.json();

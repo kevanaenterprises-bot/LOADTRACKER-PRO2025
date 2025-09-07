@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
+import AdminPortal from "@/pages/AdminPortal";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
@@ -22,6 +23,7 @@ function Router() {
       {/* Main Application Pages */}
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
+      <Route path="/admin-portal" component={AdminPortal} />
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
       
