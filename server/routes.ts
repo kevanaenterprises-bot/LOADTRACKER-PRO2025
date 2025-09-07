@@ -1544,19 +1544,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hasBypassToken: !!bypassToken
       });
       
-      if (adminUser) {
-        res.json(adminUser);
-      } else if (bypassToken === BYPASS_SECRET) {
+      // Check bypass token first (like driver auth does)
+      if (bypassToken === BYPASS_SECRET) {
         console.log("✅ BYPASS TOKEN: Valid bypass token for admin auth");
         res.json({ 
-          id: "bypass-admin",
+          id: "admin-001",
+          userId: "admin-001",
           username: "admin",
           role: "admin",
           firstName: "Admin",
           lastName: "User",
           authType: "bypass"
         });
+      } else if (adminUser) {
+        console.log("✅ SESSION: Valid admin session found");
+        res.json(adminUser);
       } else {
+        console.log("❌ No valid admin authentication found");
         res.status(401).json({ message: "Not authenticated" });
       }
     } catch (error) {

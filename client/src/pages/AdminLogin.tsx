@@ -35,6 +35,22 @@ export default function AdminLogin() {
       });
 
       if (response.ok) {
+        // Setup bypass token immediately after successful login (copy driver pattern exactly)
+        try {
+          console.log("🔑 Getting bypass token for admin after login");
+          const bypassResponse = await fetch("/api/auth/browser-bypass", {
+            method: "POST",
+            credentials: "include",
+          });
+          if (bypassResponse.ok) {
+            const data = await bypassResponse.json();
+            localStorage.setItem('bypass-token', data.token);
+            console.log("✅ Admin bypass token obtained after login");
+          }
+        } catch (error) {
+          console.error("❌ Failed to get bypass token:", error);
+        }
+
         toast({
           title: "Login Successful",
           description: "Welcome to GO 4 Farms & Cattle Admin Portal",

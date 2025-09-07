@@ -9,12 +9,20 @@ export function useAdminAuth() {
     queryFn: async () => {
       console.log("🔍 Admin auth: Checking authentication...");
 
-      // Check session with cookies (copy exact driver pattern)
+      // Check with bypass token first (copy exact driver pattern)
+      const bypassToken = localStorage.getItem('bypass-token');
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json"
+      };
+      
+      if (bypassToken) {
+        headers['x-bypass-token'] = bypassToken;
+        console.log("🔑 Admin auth: Using bypass token");
+      }
+
       const response = await fetch("/api/auth/admin-user", {
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        }
+        headers
       });
       
       console.log("🔍 Admin auth response:", response.status, response.statusText);
