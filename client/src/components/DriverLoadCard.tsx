@@ -153,6 +153,8 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
         title: "Status Updated",
         description: "Load status has been updated successfully!",
       });
+      // Invalidate both driver loads and general loads to ensure UI refresh
+      queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
     },
     onError: (error: Error) => {
