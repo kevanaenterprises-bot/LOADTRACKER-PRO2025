@@ -4270,89 +4270,8 @@ Reply YES to confirm acceptance or NO to decline.`
         podPath: load.podDocumentPath
       });
 
-      // Generate the base invoice HTML (no rate confirmation)
-      const baseHTML = generateInvoiceHTML(invoice, load);
-      
-      // Embed POD images if available
-      let previewHTML = baseHTML;
-      
-      if (load.podDocumentPath) {
-        try {
-          // Check if it's an object storage path
-          if (load.podDocumentPath.startsWith('/objects/')) {
-            const objectStorageService = new (await import('./objectStorage')).ObjectStorageService();
-            const objectFile = await objectStorageService.getObjectEntityFile(load.podDocumentPath);
-            const [fileBuffer] = await objectFile.download();
-            
-            // Convert to base64 for embedding
-            const base64Data = fileBuffer.toString('base64');
-            const mimeType = load.podDocumentPath.toLowerCase().includes('.pdf') ? 'application/pdf' : 'image/jpeg';
-
-            // Embed image in HTML (for images only, not PDFs)
-            if (mimeType.startsWith('image/')) {
-              const podImageHTML = `
-                <div style="page-break-before: always; padding: 20px; text-align: center;">
-                  <h2 style="color: #2d5aa0; margin-bottom: 20px;">Proof of Delivery (POD)</h2>
-                  <p style="margin-bottom: 20px;"><strong>Load:</strong> ${load.number109}</p>
-                  <img src="data:${mimeType};base64,${base64Data}" 
-                       style="max-width: 100%; max-height: 600px; border: 2px solid #ddd; border-radius: 8px;" 
-                       alt="POD Document" />
-                </div>
-              `;
-              previewHTML = previewHTML.replace('</body>', podImageHTML + '</body>');
-            } else {
-              // For PDFs, just show a note
-              const podNoteHTML = `
-                <div style="page-break-before: always; padding: 20px; text-align: center;">
-                  <h2 style="color: #2d5aa0; margin-bottom: 20px;">Proof of Delivery (POD)</h2>
-                  <p style="margin-bottom: 20px;"><strong>Load:</strong> ${load.number109}</p>
-                  <div style="padding: 40px; background: #f0f8ff; border: 2px dashed #2d5aa0; border-radius: 8px;">
-                    <p style="font-size: 18px; font-weight: bold;">PDF POD Document Available</p>
-                    <p>Full PDF will be included in printed package</p>
-                  </div>
-                </div>
-              `;
-              previewHTML = previewHTML.replace('</body>', podNoteHTML + '</body>');
-            }
-          } else {
-            // For test data or non-object storage paths, try to fetch as URL
-            try {
-              const podResponse = await fetch(load.podDocumentPath);
-              if (podResponse.ok) {
-                const podBuffer = await podResponse.arrayBuffer();
-                const base64Data = Buffer.from(podBuffer).toString('base64');
-                
-                const podImageHTML = `
-                  <div style="page-break-before: always; padding: 20px; text-align: center;">
-                    <h2 style="color: #2d5aa0; margin-bottom: 20px;">Proof of Delivery (POD)</h2>
-                    <p style="margin-bottom: 20px;"><strong>Load:</strong> ${load.number109}</p>
-                    <img src="data:image/jpeg;base64,${base64Data}" 
-                         style="max-width: 100%; max-height: 600px; border: 2px solid #ddd; border-radius: 8px;" 
-                         alt="POD Document" />
-                  </div>
-                `;
-                previewHTML = previewHTML.replace('</body>', podImageHTML + '</body>');
-              }
-            } catch (httpError) {
-              // If HTTP fetch fails, show POD placeholder
-              const podPlaceholderHTML = `
-                <div style="page-break-before: always; padding: 20px; text-align: center;">
-                  <h2 style="color: #2d5aa0; margin-bottom: 20px;">Proof of Delivery (POD)</h2>
-                  <p style="margin-bottom: 20px;"><strong>Load:</strong> ${load.number109}</p>
-                  <div style="padding: 40px; background: #f8f9fa; border: 2px dashed #007bff; border-radius: 8px;">
-                    <p style="font-size: 18px; font-weight: bold;">POD Document Available</p>
-                    <p>POD exists for this load</p>
-                  </div>
-                </div>
-              `;
-              previewHTML = previewHTML.replace('</body>', podPlaceholderHTML + '</body>');
-            }
-          }
-        } catch (error) {
-          console.error(`❌ Error embedding POD for print preview:`, error);
-          // Continue without POD embedding
-        }
-      }
+      // Use the exact same logic as the email system for invoice + POD generation
+      const previewHTML = await generateInvoiceOnlyWithPODHTML(invoice, load);
       
       res.json({
         previewHTML,
@@ -4535,6 +4454,62 @@ function generateInvoiceHTML(invoice: any, load: any): string {
     </body>
     </html>
   `;
+}
+
+// Generate invoice-only HTML with POD embedding (same as email system but no rate confirmation) 
+async function generateInvoiceOnlyWithPODHTML(invoice: any, load: any): Promise<string> {
+  const baseInvoiceHTML = generateInvoiceHTML(invoice, load);
+  
+  // If no POD, return just the invoice
+  if (!load.podDocumentPath) {
+    return baseInvoiceHTML;
+  }
+
+  // Copy the exact POD embedding logic from generateCombinedRateConInvoiceHTML
+  let htmlWithPOD = baseInvoiceHTML;
+
+  try {
+    // Handle multiple POD documents (comma-separated paths)
+    const podPaths = load.podDocumentPath.split(',').map((path: string) => path.trim()).filter(Boolean);
+    
+    for (let i = 0; i < podPaths.length; i++) {
+      const podPath = podPaths[i];
+      
+      if (podPath.startsWith('/objects/')) {
+        // Object storage path - use the same logic as email system
+        try {
+          const ObjectStorageService = (await import('./objectStorage')).ObjectStorageService;
+          const objectStorageService = new ObjectStorageService();
+          const objectFile = await objectStorageService.getObjectEntityFile(podPath);
+          const [fileBuffer] = await objectFile.download();
+          
+          const base64Data = fileBuffer.toString('base64');
+          const mimeType = podPath.toLowerCase().includes('.pdf') ? 'application/pdf' : 'image/jpeg';
+          
+          if (mimeType.startsWith('image/')) {
+            const podHTML = `
+              <div style="page-break-before: always; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+                  <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
+                  <p style="color: #666; margin: 5px 0;">Load ${load.number109 || load.number_109} - Page ${i + 1}</p>
+                </div>
+                <div style="text-align: center;">
+                  <img src="data:${mimeType};base64,${base64Data}" style="max-width: 100%; height: auto; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+              </div>
+            `;
+            htmlWithPOD = htmlWithPOD.replace('</body>', podHTML + '</body>');
+          }
+        } catch (error) {
+          console.error(`❌ Error loading POD from object storage: ${podPath}`, error);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`❌ Error processing POD documents:`, error);
+  }
+
+  return htmlWithPOD;
 }
 
 function generateCombinedRateConInvoiceHTML(invoice: any, load: any): string {
