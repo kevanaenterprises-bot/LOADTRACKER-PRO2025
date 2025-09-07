@@ -772,6 +772,7 @@ export default function LoadsTable() {
                 {hasInvoice(selectedLoad.id) && (
                   <div className="text-center">
                     <PrintButton 
+                      invoiceId={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id)?.id : undefined}
                       loadId={selectedLoad.id}
                       load={selectedLoad}
                       invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id) : undefined}
