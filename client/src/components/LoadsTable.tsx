@@ -27,7 +27,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Package, MapPin } from "lucide-react";
+import { Plus, Package, MapPin, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 import { LoadSection } from "@/components/LoadsTableSections";
@@ -987,49 +987,7 @@ export default function LoadsTable() {
                     />
                   </div>
                 </div>
-                  )}
-                </div>
               </div>
-
-              {/* Documents Status */}
-              <div>
-                <h4 className="font-semibold mb-2">Documents</h4>
-                <div className="text-sm">
-                  <div className="flex items-center space-x-2">
-                    <div className={`w-3 h-3 rounded-full ${selectedLoad.podDocumentPath ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span>POD Document {selectedLoad.podDocumentPath ? '✅' : '❌'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Invoice Fields - Lumper Fees and Extra Stops */}
-              <div>
-                <h4 className="font-semibold mb-2">Additional Charges for Invoice</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <label className="text-xs text-gray-600 block">Lumper Fees ($)</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      defaultValue={selectedLoad.lumperCharge || '0.00'}
-                      className="w-full px-2 py-1 text-sm border rounded mt-1"
-                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'lumperCharge', e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-600 block">Extra Stops ($)</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      defaultValue={selectedLoad.extraStops || '0.00'}
-                      className="w-full px-2 py-1 text-sm border rounded mt-1"
-                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-              </>
-              )}
 
               {/* Action Buttons */}
               <div className="pt-4 border-t space-y-4">
