@@ -261,6 +261,10 @@ export class DatabaseStorage implements IStorage {
     return newStop;
   }
 
+  async removeLoadStop(stopId: string): Promise<void> {
+    await db.delete(loadStops).where(eq(loadStops.id, stopId));
+  }
+
   async getLoads(): Promise<LoadWithDetails[]> {
     const result = await db
       .select({

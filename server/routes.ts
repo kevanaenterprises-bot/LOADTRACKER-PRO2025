@@ -2365,6 +2365,46 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Update existing load (comprehensive editing)
+  app.put("/api/loads/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      const updates = req.body;
+      
+      console.log(`📝 Updating load ${loadId} with:`, updates);
+      
+      // Verify load exists
+      const existingLoad = await storage.getLoad(loadId);
+      if (!existingLoad) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // Validate location if being updated
+      if (updates.locationId) {
+        const location = await storage.getLocation(updates.locationId);
+        if (!location) {
+          return res.status(400).json({ message: "Invalid location ID" });
+        }
+      }
+      
+      // Update the load
+      const updatedLoad = await storage.updateLoad(loadId, updates);
+      
+      console.log(`✅ Load ${loadId} updated successfully`);
+      res.json(updatedLoad);
+    } catch (error) {
+      console.error("Error updating load:", error);
+      res.status(500).json({ message: "Failed to update load" });
+    }
+  });
+
   // Add stops to an existing load
   app.post("/api/loads/:id/stops", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
@@ -2417,6 +2457,37 @@ Reply YES to confirm acceptance or NO to decline.`
     } catch (error) {
       console.error("Error adding stops to load:", error);
       res.status(500).json({ message: "Failed to add stops" });
+    }
+  });
+
+  // Remove stop from a load
+  app.delete("/api/loads/:loadId/stops/:stopId", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { loadId, stopId } = req.params;
+      
+      console.log(`🗑️ Removing stop ${stopId} from load ${loadId}`);
+      
+      // Verify load exists
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // Remove the stop
+      await storage.removeLoadStop(stopId);
+      
+      console.log(`✅ Stop ${stopId} removed from load ${loadId}`);
+      res.json({ success: true, message: "Stop removed successfully" });
+    } catch (error) {
+      console.error("Error removing stop:", error);
+      res.status(500).json({ message: "Failed to remove stop" });
     }
   });
 
