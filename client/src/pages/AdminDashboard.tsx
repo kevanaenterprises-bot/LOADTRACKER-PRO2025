@@ -12,7 +12,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices">("loads");
 
-  // Simple auth check - just verify session exists
+  // Simple auth check - use bypass token like driver auth (which works perfectly)
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ["/api/dashboard/stats"],
     retry: false
@@ -20,6 +20,30 @@ export default function AdminDashboard() {
 
   const { data: user } = useQuery({
     queryKey: ["/api/auth/admin-user"],
+    queryFn: async () => {
+      // Use the EXACT same bypass token approach that works for drivers
+      const bypassToken = localStorage.getItem('bypass-token');
+      console.log("🔧 AdminDashboard: Using bypass token auth", !!bypassToken);
+      
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json"
+      };
+      
+      if (bypassToken) {
+        headers["x-bypass-token"] = bypassToken;
+      }
+      
+      const response = await fetch("/api/auth/admin-user", {
+        credentials: "include",
+        headers
+      });
+      
+      if (!response.ok) {
+        throw new Error("Not authenticated");
+      }
+      
+      return response.json();
+    },
     retry: false
   });
 
