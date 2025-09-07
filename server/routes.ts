@@ -4264,10 +4264,18 @@ function generateInvoiceOnlyHTML(invoice: any, load: any): string {
     <head>
       <title>Invoice ${invoice?.invoiceNumber || 'N/A'}</title>
       <style>
+        @page {
+          size: letter;
+          margin: 0.5in;
+        }
         body {
           font-family: Arial, sans-serif;
-          margin: 20px;
+          margin: 0;
+          padding: 20px;
           line-height: 1.4;
+          width: 100%;
+          min-height: 100vh;
+          box-sizing: border-box;
         }
         .header {
           text-align: center;
@@ -4339,6 +4347,8 @@ function generateInvoiceOnlyHTML(invoice: any, load: any): string {
         </div>
         <div>
           <p><strong>Load #:</strong> ${load?.number109 || 'N/A'}</p>
+          <p><strong>BOL/POD #:</strong> ${load?.number374 || 'N/A'}</p>
+          <p><strong>Trip #:</strong> ${load?.tripNumber || 'N/A'}</p>
           <p><strong>Driver:</strong> ${load?.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'N/A'}</p>
         </div>
       </div>
