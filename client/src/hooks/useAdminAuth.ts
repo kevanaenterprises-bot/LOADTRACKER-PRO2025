@@ -9,28 +9,27 @@ export function useAdminAuth() {
     queryFn: async () => {
       console.log("🔍 Admin auth: Checking authentication...");
 
-      // Check with bypass token first (copy exact driver pattern)
+      // EXACTLY copy driver auth pattern - check bypass token but use apiRequest
       const bypassToken = localStorage.getItem('bypass-token');
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json"
-      };
-      
       console.log("🔑 Admin auth: Bypass token check:", { 
         hasToken: !!bypassToken, 
         tokenLength: bypassToken?.length,
         tokenPreview: bypassToken?.substring(0, 10) + '...'
       });
-      
-      if (bypassToken) {
-        headers['x-bypass-token'] = bypassToken;
-        console.log("🔑 Admin auth: Using bypass token in headers");
-      } else {
-        console.log("❌ Admin auth: No bypass token found in localStorage");
-      }
 
+      // Use apiRequest like other parts of the app - this handles bypass tokens automatically
       const response = await fetch("/api/auth/admin-user", {
         credentials: "include",
-        headers
+        headers: {
+          "Content-Type": "application/json",
+          "x-bypass-token": bypassToken || ""
+        }
+      });
+      
+      console.log("🔑 Admin auth: Request sent with headers:", {
+        hasContentType: true,
+        hasToken: !!bypassToken,
+        tokenPreview: bypassToken?.substring(0, 10) + '...'
       });
       
       console.log("🔍 Admin auth response:", response.status, response.statusText);
