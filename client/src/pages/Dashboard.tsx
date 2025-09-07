@@ -62,6 +62,16 @@ export default function Dashboard() {
   const [debugLog, setDebugLog] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
+  // DEBUG: Log authentication state to help debug white screen
+  console.log("🔧 DASHBOARD DEBUG:", {
+    user,
+    isAuthenticated,
+    isLoading,
+    authType,
+    userStringified: JSON.stringify(user),
+    bypassToken: !!localStorage.getItem('bypass-token')
+  });
+
   // Setup bypass token automatically when authenticated (just like test pages)
   useEffect(() => {
     const setupBypassToken = async () => {
@@ -88,14 +98,16 @@ export default function Dashboard() {
 
   // Redirect to login if not authenticated
   useEffect(() => {
+    console.log("🔧 DASHBOARD AUTH EFFECT:", { isLoading, isAuthenticated, authType });
     if (!isLoading && !isAuthenticated) {
+      console.log("🔧 DASHBOARD: Redirecting to admin-login");
       toast({
-        title: "Unauthorized",
+        title: "Unauthorized", 
         description: "You are logged out. Please log in...",
         variant: "destructive",
       });
       setTimeout(() => {
-        setLocation("/");
+        setLocation("/admin-login");
       }, 500);
       return;
     }

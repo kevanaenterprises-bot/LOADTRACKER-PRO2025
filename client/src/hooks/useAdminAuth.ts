@@ -15,9 +15,17 @@ export function useAdminAuth() {
         "Content-Type": "application/json"
       };
       
+      console.log("🔑 Admin auth: Bypass token check:", { 
+        hasToken: !!bypassToken, 
+        tokenLength: bypassToken?.length,
+        tokenPreview: bypassToken?.substring(0, 10) + '...'
+      });
+      
       if (bypassToken) {
         headers['x-bypass-token'] = bypassToken;
-        console.log("🔑 Admin auth: Using bypass token");
+        console.log("🔑 Admin auth: Using bypass token in headers");
+      } else {
+        console.log("❌ Admin auth: No bypass token found in localStorage");
       }
 
       const response = await fetch("/api/auth/admin-user", {
