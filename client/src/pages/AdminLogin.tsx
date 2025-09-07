@@ -21,59 +21,37 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/admin-login", {
+      // Copy the exact driver login pattern
+      const response = await fetch("/api/admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+        }),
       });
 
       if (response.ok) {
-        // Automatically setup bypass token after successful login (makes production work like test pages)
-        try {
-          const bypassResponse = await fetch("/api/auth/browser-bypass", {
-            method: "POST",
-            credentials: "include",
-          });
-          if (bypassResponse.ok) {
-            const data = await bypassResponse.json();
-            localStorage.setItem('bypass-token', data.token);
-          }
-        } catch (error) {
-          // Silent fail - will use normal authentication
-        }
-
-        // Setup bypass token immediately after successful login
-        try {
-          const bypassResponse = await fetch("/api/auth/browser-bypass", {
-            method: "POST",
-            credentials: "include",
-          });
-          if (bypassResponse.ok) {
-            const bypassData = await bypassResponse.json();
-            localStorage.setItem('bypass-token', bypassData.token);
-            console.log("✅ Admin bypass token obtained after login");
-          }
-        } catch (error) {
-          console.log("⚠️ Bypass token setup failed, but continuing with session auth");
-        }
-
         toast({
           title: "Login Successful",
           description: "Welcome to GO 4 Farms & Cattle Admin Portal",
         });
+        
+        // Clear any redirect flags (like driver login does)
+        sessionStorage.removeItem('admin-redirecting');
         
         // Invalidate auth queries to refresh the state
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/admin-user"] });
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
         
-        // Small delay to ensure session is properly established
+        // Small delay to ensure session is established (copy driver pattern)
         setTimeout(() => {
-          setLocation("/dashboard");
-        }, 250);
+          window.location.href = "/dashboard";
+        }, 500);
       } else {
         const data = await response.json();
         toast({

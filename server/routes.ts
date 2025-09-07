@@ -1472,6 +1472,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin login endpoint that copies the working driver login pattern
+  app.post('/api/admin/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      console.log("Admin login attempt:", { 
+        username, 
+        usernameLength: username?.length,
+        password: password ? `[LENGTH:${password.length}]` : "[MISSING]",
+        passwordActual: JSON.stringify(password)
+      });
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+
+      // Check for admin credentials (case insensitive, trim whitespace)
+      if (username.toLowerCase().trim() !== "admin" || password.trim() !== "go4fc2024") {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+
+      console.log("✅ Admin credentials matched successfully");
+
+      // Create session for admin with complete user data (copy driver pattern exactly)
+      (req.session as any).adminAuth = {
+        userId: "admin-001",
+        id: "admin-001", 
+        username: "admin",
+        role: "admin",
+        firstName: "Admin",
+        lastName: "User"
+      };
+
+      // Force save session to ensure persistence (copy driver pattern)
+      req.session.save((err) => {
+        if (err) {
+          console.error("❌ Admin session save error:", err);
+        } else {
+          console.log("✅ Admin session saved successfully");
+        }
+      });
+
+      res.json({ 
+        message: "Login successful",
+        user: {
+          id: "admin-001",
+          username: "admin",
+          firstName: "Admin",
+          lastName: "User",
+          role: "admin"
+        }
+      });
+    } catch (error) {
+      console.error("❌ Admin login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
   app.get("/api/auth/admin-user", async (req, res) => {
     try {
       const adminUser = (req.session as any)?.adminAuth;
