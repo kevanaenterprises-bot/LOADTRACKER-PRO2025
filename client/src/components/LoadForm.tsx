@@ -150,6 +150,7 @@ export default function LoadForm() {
   });
 
   const handleAddStop = () => {
+    console.log("🔘 Add Stop button clicked - opening dialog");
     setShowStopDialog(true);
     setCurrentStopType("pickup");
     setSelectedLocationId("");
