@@ -150,7 +150,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       }
 
       // Fetch invoice + POD preview from server (same logic as email system)
-      const response = await fetch(`/api/invoices/${invoiceId}/print-only-preview`, {
+      const response = await fetch(`/api/invoices/${invoiceId}/print-preview`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,12 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         throw new Error('Failed to generate preview with POD');
       }
 
-      const { previewHTML: combinedHTML } = await response.json();
+      const responseData = await response.json();
+      if (!responseData.success) {
+        throw new Error('Failed to generate preview');
+      }
+      
+      const combinedHTML = responseData.previewHTML;
       
       // Create preview HTML with Print and Close buttons
       const previewHTML = `

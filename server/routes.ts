@@ -4232,7 +4232,12 @@ Reply YES to confirm acceptance or NO to decline.`
         success: true,
         previewHTML,
         invoice,
-        load
+        load,
+        podAttachments: podImages.map((img, index) => ({
+          filename: `POD_${load.number109}_${index + 1}.jpg`,
+          contentType: img.type,
+          size: img.content.length
+        }))
       });
 
     } catch (error) {
