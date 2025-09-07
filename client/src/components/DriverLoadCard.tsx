@@ -13,8 +13,13 @@ interface DriverLoadCardProps {
 
 const getStatusText = (status: string) => {
   switch (status) {
+    case "assigned":
+      return "Assigned";
     case "created":
       return "Load Assigned";
+    case "in_progress":
+    case "in_transit":
+      return "In Progress";
     case "en_route_pickup":
       return "En Route to Pickup";
     case "at_shipper":
@@ -27,6 +32,10 @@ const getStatusText = (status: string) => {
       return "At Receiver";
     case "delivered":
       return "Delivered";
+    case "empty":
+      return "Empty - Ready for Next Load";
+    case "awaiting_invoicing":
+      return "Awaiting Invoicing";
     default:
       return status;
   }
@@ -34,7 +43,12 @@ const getStatusText = (status: string) => {
 
 const getNextAction = (status: string) => {
   switch (status) {
+    case "assigned":
+      return { status: "in_progress", text: "Start Trip", icon: "fa-play" };
     case "created":
+      return { status: "en_route_pickup", text: "En Route to Pickup", icon: "fa-route" };
+    case "in_progress":
+    case "in_transit":
       return { status: "en_route_pickup", text: "En Route to Pickup", icon: "fa-route" };
     case "en_route_pickup":
       return { status: "at_shipper", text: "Arrived at Shipper", icon: "fa-map-marker-alt" };
@@ -46,6 +60,10 @@ const getNextAction = (status: string) => {
       return { status: "at_receiver", text: "Arrived at Receiver", icon: "fa-map-marker-alt" };
     case "at_receiver":
       return { status: "delivered", text: "Mark as Delivered", icon: "fa-check-circle" };
+    case "delivered":
+      return { status: "empty", text: "Mark as Empty", icon: "fa-box-open" };
+    case "empty":
+      return { status: "awaiting_invoicing", text: "Complete Load", icon: "fa-file-invoice" };
     default:
       return null;
   }
@@ -53,16 +71,19 @@ const getNextAction = (status: string) => {
 
 const getProgressSteps = (currentStatus: string) => {
   const steps = [
-    { key: "created", label: "Load Created", time: "" },
+    { key: "assigned", label: "Assigned", time: "" },
+    { key: "in_progress", label: "In Progress", time: "" },
     { key: "en_route_pickup", label: "En Route to Pickup", time: "" },
     { key: "at_shipper", label: "At Shipper", time: "" },
     { key: "left_shipper", label: "Left Shipper", time: "" },
     { key: "en_route_receiver", label: "En Route to Receiver", time: "" },
     { key: "at_receiver", label: "At Receiver", time: "" },
     { key: "delivered", label: "Delivered", time: "" },
+    { key: "empty", label: "Empty", time: "" },
+    { key: "awaiting_invoicing", label: "Complete", time: "" },
   ];
 
-  const statusOrder = ["created", "en_route_pickup", "at_shipper", "left_shipper", "en_route_receiver", "at_receiver", "delivered"];
+  const statusOrder = ["assigned", "in_progress", "in_transit", "created", "en_route_pickup", "at_shipper", "left_shipper", "en_route_receiver", "at_receiver", "delivered", "empty", "awaiting_invoicing"];
   const currentIndex = statusOrder.indexOf(currentStatus);
 
   return steps.map((step, index) => ({
