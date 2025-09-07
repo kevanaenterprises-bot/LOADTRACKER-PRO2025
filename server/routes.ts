@@ -2900,7 +2900,7 @@ Reply YES to confirm acceptance or NO to decline.`
       let subject;
       
       if (includeRateConfirmation) {
-        emailHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+        emailHTML = generateInvoiceOnlyHTML(invoice, load);
         subject = `Rate Confirmation & Invoice ${invoice.invoiceNumber} - GO 4 Farms & Cattle`;
       } else {
         emailHTML = generateInvoiceHTML(invoice, load);
@@ -4130,14 +4130,9 @@ Reply YES to confirm acceptance or NO to decline.`
 
       console.log(`🖨️ Print preview requested for invoice: ${invoiceIdOrNumber}`);
 
-      // Get invoice data - check if it's UUID (ID) or invoice number
-      let invoice;
-      if (invoiceIdOrNumber.includes('-') && invoiceIdOrNumber.length === 36) {
-        const [invoiceById] = await db.select().from(invoices).where(eq(invoices.id, invoiceIdOrNumber));
-        invoice = invoiceById;
-      } else {
-        invoice = await storage.getInvoice(invoiceIdOrNumber);
-      }
+      // Get invoice data - simplified lookup
+      console.log(`🔍 Looking up invoice: ${invoiceIdOrNumber}`);
+      let invoice = await storage.getInvoice(invoiceIdOrNumber);
       
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
@@ -4163,8 +4158,8 @@ Reply YES to confirm acceptance or NO to decline.`
         hasPOD: !!load.podDocumentPath
       });
 
-      // Generate the base invoice HTML
-      const baseHTML = generateCombinedRateConInvoiceHTML(invoice, load);
+      // Generate the base invoice HTML (simplified - no rate confirmation)
+      const baseHTML = generateInvoiceOnlyHTML(invoice, load);
       
       // Embed POD images if available - USE SAME FUNCTION AS EMAIL
       let previewHTML = baseHTML;
@@ -4353,13 +4348,13 @@ function generateInvoiceOnlyHTML(invoice: any, load: any): string {
         <tbody>
           <tr>
             <td>Transportation Services - Load ${load?.number109 || 'N/A'}</td>
-            <td>$${(invoice?.totalAmount || 0).toFixed(2)}</td>
+            <td>$${(parseFloat(invoice?.totalAmount || '0')).toFixed(2)}</td>
           </tr>
         </tbody>
       </table>
 
       <div class="total-section">
-        <div class="total-amount">Total: $${(invoice?.totalAmount || 0).toFixed(2)}</div>
+        <div class="total-amount">Total: $${(parseFloat(invoice?.totalAmount || '0')).toFixed(2)}</div>
       </div>
     </body>
     </html>
@@ -4371,140 +4366,7 @@ function generateInvoiceHTML(invoice: any, load: any): string {
   return generateInvoiceOnlyHTML(invoice, load);
 }
 
-// Generate combined rate confirmation and invoice HTML
-function generateCombinedRateConInvoiceHTML(invoice: any, load: any): string {
-  const currentDate = new Date().toLocaleDateString();
-  
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Invoice ${invoice?.invoiceNumber || 'N/A'} - Complete Package</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-          line-height: 1.4;
-        }
-        .header {
-          text-align: center;
-          border-bottom: 2px solid #333;
-          padding-bottom: 20px;
-          margin-bottom: 30px;
-        }
-        .company-name {
-          font-size: 28px;
-          font-weight: bold;
-          color: #2d5aa0;
-          margin-bottom: 5px;
-        }
-        .company-info {
-          font-size: 14px;
-          color: #666;
-        }
-        .document-title {
-          font-size: 20px;
-          font-weight: bold;
-          color: #333;
-          margin: 20px 0;
-          text-align: center;
-        }
-        .invoice-details {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 30px;
-        }
-        .invoice-number {
-          font-size: 24px;
-          font-weight: bold;
-          color: #333;
-        }
-        .details-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 30px;
-        }
-        .details-table th,
-        .details-table td {
-          border: 1px solid #ddd;
-          padding: 12px;
-          text-align: left;
-        }
-        .details-table th {
-          background-color: #f5f5f5;
-          font-weight: bold;
-        }
-        .total-section {
-          margin-top: 30px;
-          text-align: right;
-        }
-        .total-amount {
-          font-size: 20px;
-          font-weight: bold;
-          color: #2d5aa0;
-        }
-        .page-break {
-          page-break-before: always;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="header">
-        <div class="company-name">GO 4 Farms & Cattle</div>
-        <div class="company-info">
-          1510 Crystal Valley Way<br>
-          Melissa, TX 75454<br>
-          Phone: 214-878-1230<br>
-          Email: accounting@go4fc.com
-        </div>
-      </div>
-
-      <div class="document-title">📄 Complete Document Package</div>
-
-      <div class="invoice-details">
-        <div>
-          <div class="invoice-number">Invoice ${invoice?.invoiceNumber || 'N/A'}</div>
-          <p><strong>Date:</strong> ${currentDate}</p>
-        </div>
-        <div>
-          <p><strong>Load #:</strong> ${load?.number109 || 'N/A'}</p>
-          <p><strong>Driver:</strong> ${load?.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'N/A'}</p>
-          <p><strong>BOL #:</strong> ${load?.bolNumber || 'N/A'}</p>
-        </div>
-      </div>
-
-      <table class="details-table">
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Details</th>
-            <th>Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Transportation Services</td>
-            <td>Load ${load?.number109 || 'N/A'}<br>
-                ${load?.location ? `To: ${load.location.name}, ${load.location.city}, ${load.location.state}` : 'Destination: N/A'}</td>
-            <td>$${(invoice?.totalAmount || 0).toFixed(2)}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="total-section">
-        <div class="total-amount">Total Amount: $${(invoice?.totalAmount || 0).toFixed(2)}</div>
-      </div>
-
-      <div style="margin-top: 40px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-        <h3 style="margin-top: 0; color: #2d5aa0;">Package Contents:</h3>
-        <p>✅ Invoice ${invoice?.invoiceNumber || 'N/A'}</p>
-        <p>✅ Rate Confirmation for Load ${load?.number109 || 'N/A'}</p>
-        <p>✅ Proof of Delivery (POD) Documents (attached below)</p>
-      </div>
-    </body>
-    </html>
-  `;
-}
+// Removed rate confirmation code as requested by user
 
 function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}>, loadNumber: string): string {
   const podImagesHTML = podImages.map((pod, index) => {
