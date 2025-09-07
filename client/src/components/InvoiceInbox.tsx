@@ -45,6 +45,11 @@ export default function InvoiceInbox() {
   const [previewInvoice, setPreviewInvoice] = useState<Invoice | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState<string>("");
+  
+  // Fetch actual customers from database for dropdown
+  const { data: customersData } = useQuery({
+    queryKey: ["/api/customers"],
+  });
 
   const { data: invoicesData, isLoading } = useQuery({
     queryKey: ["/api/invoices"],
@@ -381,18 +386,20 @@ export default function InvoiceInbox() {
                     <div className="flex items-center gap-2">
                       <Select value={selectedEmail} onValueChange={setSelectedEmail}>
                         <SelectTrigger className="w-[280px]">
-                          <SelectValue placeholder="Select customer email..." />
+                          <SelectValue placeholder="Select customer to send invoice..." />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="accounting@go4fc.com">
-                            Accounting - accounting@go4fc.com
-                          </SelectItem>
-                          <SelectItem value="gofarmsbills@gmail.com">
-                            Bills - gofarmsbills@gmail.com
-                          </SelectItem>
-                          <SelectItem value="both">
-                            Send to Both Addresses
-                          </SelectItem>
+                          {customersData && customersData.length > 0 ? (
+                            customersData.map((customer: any) => (
+                              <SelectItem key={customer.id} value={customer.email || customer.name}>
+                                {customer.name} {customer.email ? `- ${customer.email}` : '(no email)'}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-customers" disabled>
+                              No customers available
+                            </SelectItem>
+                          )}
                           <SelectItem value="custom">
                             Enter Custom Email...
                           </SelectItem>
@@ -420,73 +427,54 @@ export default function InvoiceInbox() {
                             }).then(response => response.json());
                           };
                           
-                          if (selectedEmail === 'both') {
-                            // Send to both customer addresses automatically
-                            Promise.all([
-                              sendEmail('accounting@go4fc.com'),
-                              sendEmail('gofarmsbills@gmail.com')
-                            ])
-                            .then(results => {
-                              const success = results.every(result => result.message && result.message.includes('successfully'));
-                              if (success) {
-                                toast({
-                                  title: "✅ Emails Sent!",
-                                  description: "Complete package sent to both customer addresses",
-                                });
-                              } else {
-                                throw new Error('One or more emails failed to send');
-                              }
-                            })
-                            .catch(error => {
-                              toast({
-                                title: "❌ Email Failed",
-                                description: "Failed to send to one or more addresses",
-                                variant: "destructive"
-                              });
-                            });
-                          } else if (selectedEmail === 'custom') {
+                          // Always send to internal addresses first
+                          const internalEmails = [
+                            'accounting@go4fc.com',
+                            'gofarmsbills@gmail.com'
+                          ];
+                          
+                          const emailsToSend = [...internalEmails];
+                          
+                          // Add customer email if selected
+                          if (selectedEmail === 'custom') {
                             const customEmail = prompt("Enter custom email address:");
                             if (customEmail) {
-                              sendEmail(customEmail)
-                              .then(data => {
-                                if (data.message && data.message.includes('successfully')) {
-                                  toast({
-                                    title: "✅ Email Sent!",
-                                    description: `Complete package sent to ${customEmail}`,
-                                  });
-                                } else {
-                                  throw new Error(data.message || 'Failed to send email');
-                                }
-                              })
-                              .catch(error => {
-                                toast({
-                                  title: "❌ Email Failed",
-                                  description: error.message || "Failed to send email",
-                                  variant: "destructive"
-                                });
+                              emailsToSend.push(customEmail);
+                            }
+                          } else if (selectedEmail !== 'no-customers') {
+                            // Add selected customer email
+                            emailsToSend.push(selectedEmail);
+                          }
+                          
+                          // Send to all addresses
+                          Promise.all(emailsToSend.map(email => sendEmail(email)))
+                          .then(results => {
+                            const successful = results.filter(result => result.message && result.message.includes('successfully'));
+                            const failed = results.length - successful.length;
+                            
+                            if (successful.length > 0) {
+                              const customerCount = emailsToSend.length - 2; // Subtract internal addresses
+                              toast({
+                                title: "✅ Emails Sent!",
+                                description: `Sent to internal accounting (2) ${customerCount > 0 ? `+ customer (${customerCount})` : ''}`,
                               });
                             }
-                          } else {
-                            // Send to selected single address
-                            sendEmail(selectedEmail)
-                            .then(data => {
-                              if (data.message && data.message.includes('successfully')) {
-                                toast({
-                                  title: "✅ Email Sent!",
-                                  description: `Complete package sent to ${selectedEmail}`,
-                                });
-                              } else {
-                                throw new Error(data.message || 'Failed to send email');
-                              }
-                            })
-                            .catch(error => {
+                            
+                            if (failed > 0) {
                               toast({
-                                title: "❌ Email Failed",
-                                description: error.message || "Failed to send email",
+                                title: "⚠️ Partial Success",
+                                description: `${successful.length} sent, ${failed} failed`,
                                 variant: "destructive"
                               });
+                            }
+                          })
+                          .catch(error => {
+                            toast({
+                              title: "❌ Email Failed",
+                              description: "Failed to send emails",
+                              variant: "destructive"
                             });
-                          }
+                          });
                         }}
                       >
                         <Mail className="h-4 w-4 mr-1" />
