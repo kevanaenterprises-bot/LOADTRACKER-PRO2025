@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search } from "lucide-react";
+import { Printer, Eye, DollarSign, Truck, FileText, Calendar, Search, Mail } from "lucide-react";
 import { format } from "date-fns";
 
 interface Invoice {
@@ -43,6 +44,15 @@ export default function InvoiceInbox() {
   const [previewHTML, setPreviewHTML] = useState("");
   const [previewInvoice, setPreviewInvoice] = useState<Invoice | null>(null);
   const [isPreviewing, setIsPreviewing] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState<string>("");
+  
+  // Customer email addresses for invoicing
+  const customerEmails = [
+    { value: "accounting@go4fc.com", label: "Accounting - accounting@go4fc.com" },
+    { value: "gofarmsbills@gmail.com", label: "Bills - gofarmsbills@gmail.com" },
+    { value: "both", label: "Send to Both Addresses" },
+    { value: "custom", label: "Enter Custom Email..." }
+  ];
 
   const { data: invoicesData, isLoading } = useQuery({
     queryKey: ["/api/invoices"],
@@ -376,48 +386,114 @@ export default function InvoiceInbox() {
                       <Printer className="h-4 w-4 mr-1" />
                       Print This Preview
                     </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        const email = prompt("Enter email address to send complete package:");
-                        if (email && previewInvoice) {
-                          // Use the existing email API endpoint
-                          fetch(`/api/invoices/${previewInvoice.id}/email-complete-package`, {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                              'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025'
-                            },
-                            credentials: 'include',
-                            body: JSON.stringify({ 
-                              emailAddress: email,
-                              loadId: previewInvoice.loadId 
+                    <div className="flex items-center gap-2">
+                      <Select value={selectedEmail} onValueChange={setSelectedEmail}>
+                        <SelectTrigger className="w-[280px]">
+                          <SelectValue placeholder="Select customer email..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {customerEmails.map((email) => (
+                            <SelectItem key={email.value} value={email.value}>
+                              {email.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      <Button
+                        size="sm"
+                        disabled={!selectedEmail}
+                        onClick={() => {
+                          if (!selectedEmail || !previewInvoice) return;
+                          
+                          const sendEmail = async (emailAddress: string) => {
+                            return fetch(`/api/invoices/${previewInvoice.id}/email-complete-package`, {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'X-Bypass-Token': 'LOADTRACKER_BYPASS_2025'
+                              },
+                              credentials: 'include',
+                              body: JSON.stringify({ 
+                                emailAddress: emailAddress,
+                                loadId: previewInvoice.loadId 
+                              })
+                            }).then(response => response.json());
+                          };
+                          
+                          if (selectedEmail === 'both') {
+                            // Send to both customer addresses automatically
+                            Promise.all([
+                              sendEmail('accounting@go4fc.com'),
+                              sendEmail('gofarmsbills@gmail.com')
+                            ])
+                            .then(results => {
+                              const success = results.every(result => result.message && result.message.includes('successfully'));
+                              if (success) {
+                                toast({
+                                  title: "✅ Emails Sent!",
+                                  description: "Complete package sent to both customer addresses",
+                                });
+                              } else {
+                                throw new Error('One or more emails failed to send');
+                              }
                             })
-                          })
-                          .then(response => response.json())
-                          .then(data => {
-                            if (data.message && data.message.includes('successfully')) {
+                            .catch(error => {
                               toast({
-                                title: "✅ Email Sent!",
-                                description: `Complete package sent to ${email}`,
+                                title: "❌ Email Failed",
+                                description: "Failed to send to one or more addresses",
+                                variant: "destructive"
                               });
-                            } else {
-                              throw new Error(data.message || 'Failed to send email');
-                            }
-                          })
-                          .catch(error => {
-                            toast({
-                              title: "❌ Email Failed",
-                              description: error.message || "Failed to send email",
-                              variant: "destructive"
                             });
-                          });
-                        }
-                      }}
-                    >
-                      <FileText className="h-4 w-4 mr-1" />
-                      Send as Email
-                    </Button>
+                          } else if (selectedEmail === 'custom') {
+                            const customEmail = prompt("Enter custom email address:");
+                            if (customEmail) {
+                              sendEmail(customEmail)
+                              .then(data => {
+                                if (data.message && data.message.includes('successfully')) {
+                                  toast({
+                                    title: "✅ Email Sent!",
+                                    description: `Complete package sent to ${customEmail}`,
+                                  });
+                                } else {
+                                  throw new Error(data.message || 'Failed to send email');
+                                }
+                              })
+                              .catch(error => {
+                                toast({
+                                  title: "❌ Email Failed",
+                                  description: error.message || "Failed to send email",
+                                  variant: "destructive"
+                                });
+                              });
+                            }
+                          } else {
+                            // Send to selected single address
+                            sendEmail(selectedEmail)
+                            .then(data => {
+                              if (data.message && data.message.includes('successfully')) {
+                                toast({
+                                  title: "✅ Email Sent!",
+                                  description: `Complete package sent to ${selectedEmail}`,
+                                });
+                              } else {
+                                throw new Error(data.message || 'Failed to send email');
+                              }
+                            })
+                            .catch(error => {
+                              toast({
+                                title: "❌ Email Failed",
+                                description: error.message || "Failed to send email",
+                                variant: "destructive"
+                              });
+                            });
+                          }
+                        }}
+                      >
+                        <Mail className="h-4 w-4 mr-1" />
+                        Send Email
+                      </Button>
+                    </div>
                   </div>
                 </div>
                 
