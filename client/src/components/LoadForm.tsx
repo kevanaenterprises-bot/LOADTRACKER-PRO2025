@@ -42,8 +42,8 @@ import { HelpButton } from "@/components/HelpTooltip";
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
   locationId: z.string().min(1, "Location is required"),
+  pickupLocationId: z.string().optional(),
   estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
-  pickupAddress: z.string().optional(),
 }).omit({ driverId: true });
 
 type FormData = z.infer<typeof formSchema>;
@@ -74,7 +74,7 @@ export default function LoadForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       number109: "109",
-      pickupAddress: "",
+      pickupLocationId: "",
       locationId: "",
       estimatedMiles: 0,
       specialInstructions: "",
@@ -291,18 +291,38 @@ export default function LoadForm() {
 
               <FormField
                 control={form.control}
-                name="pickupAddress"
+                name="pickupLocationId"
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-2">
                       <FormLabel>Pickup Location</FormLabel>
                       <HelpButton 
-                        content="Enter the pickup address where the load should be collected. This can be a full address or just the company/location name."
+                        content="Select the pickup location where the load should be collected. This uses the same location database as delivery locations."
                       />
                     </div>
-                    <FormControl>
-                      <Input {...field} placeholder="e.g., ABC Company, 123 Main St, Dallas, TX 75201" />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Pickup Location (Optional)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">
+                          No specific pickup location
+                        </SelectItem>
+                        {locations.length > 0 ? (
+                          locations.map((location: any) => (
+                            <SelectItem key={location.id} value={location.id}>
+                              {location.name} - {location.city}, {location.state}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-locations" disabled>
+                            No locations available - Add locations first
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
