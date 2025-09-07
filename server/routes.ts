@@ -4166,59 +4166,54 @@ Reply YES to confirm acceptance or NO to decline.`
       // Generate the base invoice HTML
       const baseHTML = generateCombinedRateConInvoiceHTML(invoice, load);
       
-      // Embed POD images if available
+      // Embed POD images if available - COPY EMAIL FUNCTIONALITY EXACTLY
       let previewHTML = baseHTML;
       const podAttachments: any[] = [];
+      const podImages: Array<{content: Buffer, type: string}> = [];
       
       if (load.podDocumentPath) {
+        console.log(`🖨️ Processing POD for print preview: ${load.podDocumentPath}`);
         try {
-          // Check if it's an object storage path
+          // Check if it's an object storage path (SAME AS EMAIL)
           if (load.podDocumentPath.startsWith('/objects/')) {
+            console.log(`🖨️ Fetching POD from object storage...`);
             const objectStorageService = new (await import('./objectStorage')).ObjectStorageService();
             const objectFile = await objectStorageService.getObjectEntityFile(load.podDocumentPath);
             const [fileBuffer] = await objectFile.download();
+            const contentType = load.podDocumentPath.toLowerCase().includes('.pdf') ? 'application/pdf' : 'image/jpeg';
             
-            // Convert to base64 for embedding
-            const base64Data = fileBuffer.toString('base64');
-            const mimeType = load.podDocumentPath.toLowerCase().includes('.pdf') ? 'application/pdf' : 'image/jpeg';
-            
-            podAttachments.push({
-              filename: `POD_${load.number109}.${mimeType === 'application/pdf' ? 'pdf' : 'jpg'}`,
+            // Add to podImages array (SAME AS EMAIL)
+            podImages.push({
               content: fileBuffer,
-              contentType: mimeType,
-              base64: base64Data
+              type: contentType
             });
-
-            // Embed image in HTML (for images only, not PDFs)
-            if (mimeType.startsWith('image/')) {
-              const podImageHTML = `
-                <div style="page-break-before: always; padding: 20px; text-align: center;">
-                  <h2 style="color: #2d5aa0; margin-bottom: 20px;">Proof of Delivery (POD)</h2>
-                  <p style="margin-bottom: 20px;"><strong>Load:</strong> ${load.number109}</p>
-                  <img src="data:${mimeType};base64,${base64Data}" 
-                       style="max-width: 100%; max-height: 600px; border: 2px solid #ddd; border-radius: 8px;" 
-                       alt="POD Document" />
-                </div>
-              `;
-              previewHTML = previewHTML.replace('</body>', podImageHTML + '</body>');
-            } else {
-              // For PDFs, just show a note
-              const podNoteHTML = `
-                <div style="page-break-before: always; padding: 20px; text-align: center;">
-                  <h2 style="color: #2d5aa0; margin-bottom: 20px;">Proof of Delivery (POD)</h2>
-                  <p style="margin-bottom: 20px;"><strong>Load:</strong> ${load.number109}</p>
-                  <div style="padding: 40px; background: #f0f8ff; border: 2px dashed #2d5aa0; border-radius: 8px;">
-                    <i class="fas fa-file-pdf" style="font-size: 48px; color: #dc3545; margin-bottom: 20px;"></i>
-                    <p style="font-size: 18px; font-weight: bold;">PDF POD Document Attached</p>
-                    <p>Filename: POD_${load.number109}.pdf</p>
-                  </div>
-                </div>
-              `;
-              previewHTML = previewHTML.replace('</body>', podNoteHTML + '</body>');
-            }
+            console.log(`✅ POD prepared for print preview embedding: ${fileBuffer.length} bytes`);
+            
           } else {
-            // For test data or non-object storage paths, show demo POD  
-            console.log(`🖨️ Using demo POD for test data: ${load.podDocumentPath}`);
+            // For test data or non-object storage paths, use fallback (SAME AS EMAIL)
+            console.log(`🖨️ Using fallback fetch for POD: ${load.podDocumentPath}`);
+            try {
+              const podUrl = load.podDocumentPath.startsWith('/') ? load.podDocumentPath : `/${load.podDocumentPath}`;
+              const response = await fetch(`http://localhost:5000${podUrl}`, {
+                headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
+              });
+              
+              if (response.ok) {
+                const fileBuffer = Buffer.from(await response.arrayBuffer());
+                const contentType = response.headers.get('content-type') || 'image/jpeg';
+                
+                podImages.push({
+                  content: fileBuffer,
+                  type: contentType
+                });
+                console.log(`✅ POD prepared for embedding via fallback: ${fileBuffer.length} bytes`);
+              } else {
+                console.error(`❌ Fallback HTTP fetch failed: ${response.status} - ${await response.text()}`);
+              }
+            } catch (fetchError) {
+              console.error(`❌ Fallback fetch error:`, fetchError);
+            }
+          }
             
             const demoImageData = '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';
             
@@ -4253,14 +4248,21 @@ Reply YES to confirm acceptance or NO to decline.`
           }
         } catch (error) {
           console.error(`❌ Error processing POD for preview:`, error);
-          // Add error note to HTML
-          const errorHTML = `
-            <div style="page-break-before: always; padding: 20px; text-align: center;">
-              <h2 style="color: #dc3545; margin-bottom: 20px;">POD Document Issue</h2>
-              <p style="color: #dc3545;">Error loading POD: ${(error as Error).message}</p>
-            </div>
-          `;
-          previewHTML = previewHTML.replace('</body>', errorHTML + '</body>');
+        }
+      } else {
+        console.log(`⚠️ No POD document uploaded for load ${load.number109} - preview will show invoice only`);
+      }
+      
+      // Embed POD images into the preview HTML if available - USE SAME FUNCTION AS EMAIL
+      if (podImages.length > 0) {
+        console.log(`🔗 Embedding ${podImages.length} POD image(s) into print preview...`);
+        try {
+          const podSectionHTML = generatePODSectionHTML(podImages, load.number109);
+          previewHTML = previewHTML.replace('</body>', `${podSectionHTML}</body>`);
+          console.log(`✅ POD images embedded into print preview using same function as email`);
+        } catch (embedError) {
+          console.error(`❌ Failed to embed POD images in print preview:`, embedError);
+          console.log(`⚠️ Falling back to preview without POD`);
         }
       } else {
         // Show "No POD" message
