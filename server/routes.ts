@@ -3322,8 +3322,13 @@ Reply YES to confirm acceptance or NO to decline.`
       });
       
       // Update load status to awaiting_payment after successful email sending
+      console.log(`🔄 BEFORE STATUS UPDATE: Load ${load.number109} has status: ${load.status}`);
       await storage.updateLoadStatus(load.id, "awaiting_payment");
       console.log(`📧 Invoice emailed successfully - Load ${load.number109} moved to AWAITING_PAYMENT`);
+      
+      // Verify the status was actually updated
+      const updatedLoad = await storage.getLoad(load.id);
+      console.log(`✅ AFTER STATUS UPDATE: Load ${load.number109} now has status: ${updatedLoad?.status}`);
       
       res.json({ 
         message: "Complete document package sent successfully",
