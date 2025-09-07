@@ -149,8 +149,12 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
       }
 
+      // Get the correct invoice number - use invoice.invoiceNumber if available, fallback to invoiceId
+      const invoiceIdentifier = invoice?.invoiceNumber || invoiceId;
+      console.log(`🖨️ Print button using invoice identifier: ${invoiceIdentifier}`);
+      
       // Fetch invoice + POD preview from server (same logic as email system)
-      const response = await fetch(`/api/invoices/${invoiceId}/print-preview`, {
+      const response = await fetch(`/api/invoices/${invoiceIdentifier}/print-preview`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,7 +165,9 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate preview with POD');
+        const errorText = await response.text();
+        console.error(`❌ Print preview API error: ${response.status} - ${errorText}`);
+        throw new Error(`Failed to generate preview: ${response.status} - ${errorText}`);
       }
 
       const responseData = await response.json();
