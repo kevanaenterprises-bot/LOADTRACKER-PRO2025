@@ -109,6 +109,9 @@ export default function LoadsTable() {
   const [selectedLoad, setSelectedLoad] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [assigningDriver, setAssigningDriver] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editFormData, setEditFormData] = useState<any>({});
+  const [loadStops, setLoadStops] = useState<any[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [loadToDelete, setLoadToDelete] = useState<any>(null);
   const [addingStops, setAddingStops] = useState(false);
@@ -121,6 +124,74 @@ export default function LoadsTable() {
   const [existingStops, setExistingStops] = useState<any[]>([]);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState("");
+
+  // Function to fetch load stops for editing
+  const fetchLoadStops = async (loadId: string) => {
+    try {
+      const response = await fetch(`/api/loads/${loadId}/stops`, {
+        credentials: 'include',
+        headers: {
+          'x-bypass-token': localStorage.getItem('bypass-token') || '',
+        }
+      });
+      if (response.ok) {
+        const stops = await response.json();
+        setLoadStops(stops);
+      }
+    } catch (error) {
+      console.error("Error fetching load stops:", error);
+    }
+  };
+
+  // Function to update load details
+  const updateLoadMutation = useMutation({
+    mutationFn: async (updates: any) => {
+      return apiRequest(`/api/loads/${selectedLoad?.id}`, "PUT", updates);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Load updated successfully!"
+      });
+      setEditMode(false);
+      setEditFormData({});
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      // Refresh the selected load data
+      if (selectedLoad) {
+        queryClient.invalidateQueries({ queryKey: [`/api/loads/${selectedLoad.id}`] });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update load",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Function to remove a stop
+  const removeStopMutation = useMutation({
+    mutationFn: async (stopId: string) => {
+      return apiRequest(`/api/loads/${selectedLoad?.id}/stops/${stopId}`, "DELETE");
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Stop removed successfully!"
+      });
+      if (selectedLoad) {
+        fetchLoadStops(selectedLoad.id);
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove stop",
+        variant: "destructive"
+      });
+    }
+  });
 
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
@@ -636,24 +707,176 @@ export default function LoadsTable() {
 
       {/* Load Details Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>Load Details - {selectedLoad?.number109}</DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle>Load Details - {selectedLoad?.number109}</DialogTitle>
+              <Button 
+                variant={editMode ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => {
+                  if (editMode) {
+                    setEditMode(false);
+                    setEditFormData({});
+                  } else {
+                    setEditMode(true);
+                    setEditFormData({
+                      locationId: selectedLoad?.locationId || '',
+                      estimatedMiles: selectedLoad?.estimatedMiles || 0,
+                      specialInstructions: selectedLoad?.specialInstructions || ''
+                    });
+                    // Load stops for editing
+                    fetchLoadStops(selectedLoad?.id);
+                  }
+                }}
+              >
+                {editMode ? 'Cancel Edit' : 'Edit Load'}
+              </Button>
+            </div>
           </DialogHeader>
           
           {selectedLoad && (
             <div className="space-y-6">
-              {/* Load Information */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-semibold mb-2">Load Information</h4>
-                  <div className="space-y-2 text-sm">
-                    <div><strong>109 Number:</strong> {selectedLoad.number109}</div>
-                    <div><strong>Status:</strong> <Badge className={getStatusColor(selectedLoad.status)}>{getStatusText(selectedLoad.status)}</Badge></div>
-                    <div><strong>Created:</strong> {new Date(selectedLoad.createdAt).toLocaleDateString()}</div>
-                    {selectedLoad.bolNumber && <div><strong>BOL Number:</strong> {selectedLoad.bolNumber}</div>}
+              {editMode ? (
+                /* Edit Mode */
+                <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
+                  
+                  {/* Edit Form */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Primary Delivery Location</label>
+                      <Select 
+                        value={editFormData.locationId} 
+                        onValueChange={(value) => setEditFormData({...editFormData, locationId: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select destination" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(locations) && locations.map((location: any) => (
+                            <SelectItem key={location.id} value={location.id}>
+                              {location.name} - {location.city}, {location.state}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Estimated Miles</label>
+                      <Input
+                        type="number"
+                        value={editFormData.estimatedMiles}
+                        onChange={(e) => setEditFormData({...editFormData, estimatedMiles: parseInt(e.target.value) || 0})}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Special Instructions</label>
+                    <Textarea
+                      value={editFormData.specialInstructions}
+                      onChange={(e) => setEditFormData({...editFormData, specialInstructions: e.target.value})}
+                      placeholder="Any special delivery instructions..."
+                      rows={3}
+                    />
+                  </div>
+                  
+                  {/* Stops Management */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="block text-sm font-medium">Additional Stops</label>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowStopDialog(true)}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add Stop
+                      </Button>
+                    </div>
+                    
+                    {loadStops.length > 0 && (
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {loadStops.map((stop: any, index: number) => (
+                          <div 
+                            key={stop.id} 
+                            className="flex items-center justify-between p-3 bg-white rounded border"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs font-medium px-2 py-1 bg-gray-100 rounded">
+                                #{index + 1}
+                              </span>
+                              {stop.stopType === 'pickup' ? (
+                                <Package className="h-4 w-4 text-blue-500" />
+                              ) : (
+                                <MapPin className="h-4 w-4 text-green-500" />
+                              )}
+                              <div className="text-sm">
+                                <div className="font-medium">{stop.location?.name || 'Custom Location'}</div>
+                                <div className="text-gray-600">{stop.stopType}</div>
+                              </div>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeStopMutation.mutate(stop.id)}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Save/Cancel buttons */}
+                  <div className="flex justify-end gap-3 pt-4 border-t">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setEditMode(false);
+                        setEditFormData({});
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={() => updateLoadMutation.mutate(editFormData)}
+                      disabled={updateLoadMutation.isPending}
+                    >
+                      {updateLoadMutation.isPending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Saving...
+                        </>
+                      ) : (
+                        'Save Changes'
+                      )}
+                    </Button>
                   </div>
                 </div>
+              ) : (
+                /* View Mode */
+                <>
+                  {/* Load Information */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-semibold mb-2">Load Information</h4>
+                      <div className="space-y-2 text-sm">
+                        <div><strong>109 Number:</strong> {selectedLoad.number109}</div>
+                        <div><strong>Status:</strong> <Badge className={getStatusColor(selectedLoad.status)}>{getStatusText(selectedLoad.status)}</Badge></div>
+                        <div><strong>Created:</strong> {new Date(selectedLoad.createdAt).toLocaleDateString()}</div>
+                        {selectedLoad.bolNumber && <div><strong>BOL Number:</strong> {selectedLoad.bolNumber}</div>}
+                        {selectedLoad.specialInstructions && (
+                          <div><strong>Instructions:</strong> {selectedLoad.specialInstructions}</div>
+                        )}
+                      </div>
+                    </div>
                 
                 <div>
                   <h4 className="font-semibold mb-2">Driver & Destination</h4>
@@ -764,7 +987,49 @@ export default function LoadsTable() {
                     />
                   </div>
                 </div>
+                  )}
+                </div>
               </div>
+
+              {/* Documents Status */}
+              <div>
+                <h4 className="font-semibold mb-2">Documents</h4>
+                <div className="text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${selectedLoad.podDocumentPath ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <span>POD Document {selectedLoad.podDocumentPath ? '✅' : '❌'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Invoice Fields - Lumper Fees and Extra Stops */}
+              <div>
+                <h4 className="font-semibold mb-2">Additional Charges for Invoice</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <label className="text-xs text-gray-600 block">Lumper Fees ($)</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      defaultValue={selectedLoad.lumperCharge || '0.00'}
+                      className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'lumperCharge', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 block">Extra Stops ($)</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      defaultValue={selectedLoad.extraStops || '0.00'}
+                      className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+              </>
+              )}
 
               {/* Action Buttons */}
               <div className="pt-4 border-t space-y-4">
