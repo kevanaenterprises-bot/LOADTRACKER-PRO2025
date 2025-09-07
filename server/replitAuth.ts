@@ -26,21 +26,32 @@ const getOidcConfig = memoize(
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
+  
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
     createTableIfMissing: true,
     ttl: sessionTtl / 1000, // TTL in seconds
     tableName: "sessions",
+    // Add error handling for session store
+    errorLog: (error: Error) => {
+      console.error('Session store error:', error);
+    }
+  });
+  
+  // Handle session store errors
+  sessionStore.on('error', (error) => {
+    console.error('Session store connection error:', error);
   });
   
   return session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET || 'loadtracker-default-secret-change-in-production',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Don't create sessions for unauthenticated users
+    rolling: true, // Reset expiration on activity
     cookie: {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       maxAge: sessionTtl,
       sameSite: "lax",
     },
@@ -134,7 +145,8 @@ export async function setupAuth(app: Express) {
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const user = req.user as any;
 
-  if (!req.isAuthenticated() || !user.expires_at) {
+  if (!req.isAuthenticated() || !user?.expires_at) {
+    console.log('Authentication failed: No user or expiration');
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -145,6 +157,7 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 
   const refreshToken = user.refresh_token;
   if (!refreshToken) {
+    console.log('Authentication failed: No refresh token');
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
@@ -153,8 +166,10 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
     const config = await getOidcConfig();
     const tokenResponse = await client.refreshTokenGrant(config, refreshToken);
     updateUserSession(user, tokenResponse);
+    console.log('Token refreshed successfully');
     return next();
   } catch (error) {
+    console.error('Token refresh failed:', error);
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
