@@ -384,9 +384,19 @@ export default function InvoiceInbox() {
                       Print This Preview
                     </Button>
                     <div className="flex items-center gap-2">
-                      <div style={{ display: 'contents' }}>
-                        <Select value={selectedEmail} onValueChange={setSelectedEmail}>
-                          <SelectTrigger className="w-[280px]" data-no-autofill="true">
+                      <form autoComplete="off" style={{ display: 'contents' }}>
+                        <input type="text" style={{ display: 'none' }} autoComplete="off" />
+                        <input type="password" style={{ display: 'none' }} autoComplete="new-password" />
+                        <Select 
+                          value={selectedEmail} 
+                          onValueChange={setSelectedEmail}
+                          name="customer-select-ignore-autofill"
+                        >
+                          <SelectTrigger 
+                            className="w-[280px]" 
+                            data-no-autofill="true"
+                            data-testid="customer-email-select"
+                          >
                             <SelectValue placeholder="Select customer to send invoice..." />
                           </SelectTrigger>
                         <SelectContent className="max-h-[200px] overflow-y-auto">
@@ -410,7 +420,7 @@ export default function InvoiceInbox() {
                           </SelectItem>
                         </SelectContent>
                         </Select>
-                      </div>
+                      </form>
                       
                       <Button
                         size="sm"
