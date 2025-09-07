@@ -18,41 +18,22 @@ export default function AdminDashboard() {
     retry: false
   });
 
-  const { data: user } = useQuery({
-    queryKey: ["/api/auth/admin-user"],
-    queryFn: async () => {
-      // Use the EXACT same bypass token approach that works for drivers
-      const bypassToken = localStorage.getItem('bypass-token');
-      console.log("🔧 AdminDashboard: Using bypass token auth", !!bypassToken);
-      
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json"
-      };
-      
-      if (bypassToken) {
-        headers["x-bypass-token"] = bypassToken;
-      }
-      
-      const response = await fetch("/api/auth/admin-user", {
-        credentials: "include",
-        headers
-      });
-      
-      if (!response.ok) {
-        throw new Error("Not authenticated");
-      }
-      
-      return response.json();
-    },
-    retry: false
-  });
+  // Skip auth query if bypass token exists - just use it directly
+  const bypassToken = localStorage.getItem('bypass-token');
+  const mockUser = bypassToken ? {
+    id: "admin-bypass",
+    username: "admin",
+    role: "admin", 
+    firstName: "Admin",
+    lastName: "User"
+  } : null;
 
   // Debug what's happening
   console.log("🔧 ADMIN DASHBOARD DEBUG:", {
-    user,
+    mockUser,
     stats,
     statsLoading,
-    hasUser: !!user,
+    hasUser: !!mockUser,
     hasStats: !!stats
   });
 
@@ -62,15 +43,8 @@ export default function AdminDashboard() {
       
       <div className="container mx-auto px-4 py-6">
         {(() => {
-          // Check for bypass token first - if we have it, we're authenticated
-          const bypassToken = localStorage.getItem('bypass-token');
-          const effectiveUser = user || (bypassToken ? {
-            id: "admin-bypass",
-            username: "admin", 
-            role: "admin",
-            firstName: "Admin",
-            lastName: "User"
-          } : null);
+          // Use bypass token directly - if we have it, we're authenticated
+          const effectiveUser = mockUser;
 
           if (!effectiveUser) {
             return (

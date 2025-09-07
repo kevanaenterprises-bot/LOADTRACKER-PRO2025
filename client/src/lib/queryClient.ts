@@ -16,7 +16,7 @@ export async function apiRequest(
   const staticBypassToken = 'LOADTRACKER_BYPASS_2025';
   
   const headers: any = data ? { "Content-Type": "application/json" } : {};
-  headers['X-Bypass-Token'] = staticBypassToken;
+  headers['x-bypass-token'] = staticBypassToken;
   
   console.log(`🔄 API Request: ${method} ${url}`);
 
@@ -66,7 +66,7 @@ export const getQueryFn: <T>(options: {
     
     const headers: any = {};
     if (bypassToken) {
-      headers['X-Bypass-Token'] = bypassToken;
+      headers['x-bypass-token'] = bypassToken;
     }
 
     const res = await fetch(queryKey.join("/") as string, {
