@@ -28,40 +28,109 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const handlePrintInvoice = async () => {
     setIsPrinting(true);
     try {
-      // Create a new window for printing
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
+      // Create a new window for preview
+      const previewWindow = window.open('', '_blank');
+      if (!previewWindow) {
         throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
       }
 
       // Generate invoice HTML
       const invoiceHTML = generateInvoiceHTML(invoice, load);
       
-      printWindow.document.write(invoiceHTML);
-      printWindow.document.close();
+      // Create preview HTML with Print and Close buttons
+      const previewHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Print Preview - Invoice</title>
+          <style>
+            body { margin: 0; font-family: Arial, sans-serif; }
+            .preview-header { 
+              background: #f8f9fa; 
+              padding: 15px; 
+              border-bottom: 1px solid #dee2e6;
+              position: sticky;
+              top: 0;
+              z-index: 1000;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .preview-title { 
+              font-size: 18px; 
+              font-weight: bold; 
+              color: #333;
+            }
+            .preview-buttons { 
+              display: flex; 
+              gap: 10px; 
+            }
+            .btn { 
+              padding: 8px 16px; 
+              border: none; 
+              border-radius: 4px; 
+              cursor: pointer; 
+              font-size: 14px;
+              font-weight: 500;
+            }
+            .btn-primary { 
+              background: #007bff; 
+              color: white; 
+            }
+            .btn-secondary { 
+              background: #6c757d; 
+              color: white; 
+            }
+            .btn:hover { 
+              opacity: 0.9; 
+            }
+            .document-content { 
+              padding: 20px; 
+            }
+            @media print {
+              .preview-header { display: none; }
+              .document-content { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="preview-header">
+            <div class="preview-title">🧾 Print Preview - Invoice</div>
+            <div class="preview-buttons">
+              <button class="btn btn-primary" onclick="window.print(); markAsPrinted();">🖨️ Print</button>
+              <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
+            </div>
+          </div>
+          <div class="document-content">
+            ${invoiceHTML}
+          </div>
+          <script>
+            async function markAsPrinted() {
+              try {
+                await fetch('/api/invoices/${invoiceId}/mark-printed', {
+                  method: 'PATCH',
+                  credentials: 'include'
+                });
+              } catch (e) {
+                console.log('Could not mark as printed:', e);
+              }
+            }
+          </script>
+        </body>
+        </html>
+      `;
       
-      // Wait for content to load then print
-      printWindow.onload = () => {
-        printWindow.print();
-        printWindow.close();
-      };
-
-      // Mark invoice as printed
-      if (invoiceId) {
-        await fetch(`/api/invoices/${invoiceId}/mark-printed`, {
-          method: 'PATCH',
-          credentials: 'include'
-        });
-      }
+      previewWindow.document.write(previewHTML);
+      previewWindow.document.close();
 
       toast({
-        title: "Invoice Sent to Printer",
-        description: "Invoice has been prepared for printing and marked as printed.",
+        title: "Preview Opened",
+        description: "Invoice preview opened. Review and click Print when ready.",
       });
       
     } catch (error: any) {
       toast({
-        title: "Print Failed",
+        title: "Preview Failed",
         description: error.message,
         variant: "destructive",
       });
@@ -130,40 +199,97 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const handlePrintRateConAndInvoice = async () => {
     setIsPrinting(true);
     try {
-      // Create a new window for printing
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
+      // Create a new window for preview
+      const previewWindow = window.open('', '_blank');
+      if (!previewWindow) {
         throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
       }
 
       // Generate combined rate confirmation and invoice HTML
       const combinedHTML = generateCombinedRateConInvoiceHTML(invoice, load);
       
-      printWindow.document.write(combinedHTML);
-      printWindow.document.close();
+      // Create preview HTML with Print and Close buttons
+      const previewHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Print Preview - Rate Con & Invoice</title>
+          <style>
+            body { margin: 0; font-family: Arial, sans-serif; }
+            .preview-header { 
+              background: #f8f9fa; 
+              padding: 15px; 
+              border-bottom: 1px solid #dee2e6;
+              position: sticky;
+              top: 0;
+              z-index: 1000;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .preview-title { 
+              font-size: 18px; 
+              font-weight: bold; 
+              color: #333;
+            }
+            .preview-buttons { 
+              display: flex; 
+              gap: 10px; 
+            }
+            .btn { 
+              padding: 8px 16px; 
+              border: none; 
+              border-radius: 4px; 
+              cursor: pointer; 
+              font-size: 14px;
+              font-weight: 500;
+            }
+            .btn-primary { 
+              background: #007bff; 
+              color: white; 
+            }
+            .btn-secondary { 
+              background: #6c757d; 
+              color: white; 
+            }
+            .btn:hover { 
+              opacity: 0.9; 
+            }
+            .document-content { 
+              padding: 20px; 
+            }
+            @media print {
+              .preview-header { display: none; }
+              .document-content { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="preview-header">
+            <div class="preview-title">📄 Print Preview - Rate Confirmation & Invoice</div>
+            <div class="preview-buttons">
+              <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+              <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
+            </div>
+          </div>
+          <div class="document-content">
+            ${combinedHTML}
+          </div>
+        </body>
+        </html>
+      `;
       
-      // Wait for content to load then print
-      printWindow.onload = () => {
-        printWindow.print();
-        printWindow.close();
-      };
-
-      // Mark invoice as printed if available
-      if (invoiceId) {
-        await fetch(`/api/invoices/${invoiceId}/mark-printed`, {
-          method: 'PATCH',
-          credentials: 'include'
-        });
-      }
+      previewWindow.document.write(previewHTML);
+      previewWindow.document.close();
 
       toast({
-        title: "Rate Con & Invoice Sent to Printer",
-        description: "Rate confirmation and invoice have been prepared for printing.",
+        title: "Preview Opened",
+        description: "Rate confirmation & invoice preview opened. Review and click Print when ready.",
       });
       
     } catch (error: any) {
       toast({
-        title: "Print Failed",
+        title: "Preview Failed",
         description: error.message,
         variant: "destructive",
       });
