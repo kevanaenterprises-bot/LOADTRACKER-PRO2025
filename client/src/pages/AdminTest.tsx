@@ -10,16 +10,22 @@ export default function AdminTest() {
   };
 
   const testBypassToken = () => {
+    addResult("=== BYPASS TOKEN TEST ===");
     const token = localStorage.getItem('bypass-token');
-    addResult(`Bypass token in localStorage: ${token ? 'EXISTS' : 'MISSING'}`);
+    addResult(`Bypass token in localStorage: ${token ? '✅ EXISTS' : '❌ MISSING'}`);
     if (token) {
-      addResult(`Token length: ${token.length}`);
+      addResult(`Token length: ${token.length} characters`);
       addResult(`Token preview: ${token.substring(0, 20)}...`);
+      addResult(`Full token: ${token}`);
+    } else {
+      addResult("No bypass token found - this might be why dashboard shows white screen");
     }
+    addResult("=== END BYPASS TOKEN TEST ===");
   };
 
   const testAdminAuth = async () => {
     try {
+      addResult("=== ADMIN AUTH TEST ===");
       addResult("Testing admin auth endpoint...");
       const bypassToken = localStorage.getItem('bypass-token');
       
@@ -30,26 +36,35 @@ export default function AdminTest() {
       if (bypassToken) {
         headers["x-bypass-token"] = bypassToken;
         addResult("✅ Sending bypass token in headers");
+        addResult(`Token being sent: ${bypassToken.substring(0, 20)}...`);
       } else {
-        addResult("❌ No bypass token to send");
+        addResult("❌ No bypass token to send - using session auth only");
       }
+      
+      addResult("Sending request to /api/auth/admin-user...");
       
       const response = await fetch("/api/auth/admin-user", {
         credentials: "include",
         headers
       });
       
-      addResult(`Response status: ${response.status}`);
+      addResult(`Response status: ${response.status} ${response.statusText}`);
       
       if (response.ok) {
         const data = await response.json();
-        addResult(`✅ SUCCESS: ${JSON.stringify(data)}`);
+        addResult(`✅ SUCCESS - Admin authenticated!`);
+        addResult(`User data: ${JSON.stringify(data, null, 2)}`);
+        addResult("This means admin auth is working properly!");
       } else {
         const error = await response.text();
-        addResult(`❌ FAILED: ${error}`);
+        addResult(`❌ FAILED - Auth rejected`);
+        addResult(`Error details: ${error}`);
+        addResult("This explains why dashboard might show white screen");
       }
+      addResult("=== END ADMIN AUTH TEST ===");
     } catch (error) {
-      addResult(`❌ ERROR: ${error}`);
+      addResult(`❌ NETWORK ERROR: ${error}`);
+      addResult("=== END ADMIN AUTH TEST ===");
     }
   };
 
