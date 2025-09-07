@@ -43,6 +43,7 @@ const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
   locationId: z.string().min(1, "Location is required"),
   estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
+  pickupAddress: z.string().optional(),
 }).omit({ driverId: true });
 
 type FormData = z.infer<typeof formSchema>;
@@ -73,6 +74,7 @@ export default function LoadForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       number109: "109",
+      pickupAddress: "",
       locationId: "",
       estimatedMiles: 0,
       specialInstructions: "",
@@ -286,6 +288,25 @@ export default function LoadForm() {
                   </p>
                 </div>
               )}
+
+              <FormField
+                control={form.control}
+                name="pickupAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center gap-2">
+                      <FormLabel>Pickup Location</FormLabel>
+                      <HelpButton 
+                        content="Enter the pickup address where the load should be collected. This can be a full address or just the company/location name."
+                      />
+                    </div>
+                    <FormControl>
+                      <Input {...field} placeholder="e.g., ABC Company, 123 Main St, Dallas, TX 75201" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
