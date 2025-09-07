@@ -45,6 +45,21 @@ export default function AdminLogin() {
           // Silent fail - will use normal authentication
         }
 
+        // Setup bypass token immediately after successful login
+        try {
+          const bypassResponse = await fetch("/api/auth/browser-bypass", {
+            method: "POST",
+            credentials: "include",
+          });
+          if (bypassResponse.ok) {
+            const bypassData = await bypassResponse.json();
+            localStorage.setItem('bypass-token', bypassData.token);
+            console.log("✅ Admin bypass token obtained after login");
+          }
+        } catch (error) {
+          console.log("⚠️ Bypass token setup failed, but continuing with session auth");
+        }
+
         toast({
           title: "Login Successful",
           description: "Welcome to GO 4 Farms & Cattle Admin Portal",
@@ -55,8 +70,10 @@ export default function AdminLogin() {
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
         
-        // Navigate to dashboard
-        setLocation("/dashboard");
+        // Small delay to ensure session is properly established
+        setTimeout(() => {
+          setLocation("/dashboard");
+        }, 250);
       } else {
         const data = await response.json();
         toast({

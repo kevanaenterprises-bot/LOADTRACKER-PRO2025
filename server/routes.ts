@@ -1425,24 +1425,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: "User"
         };
 
+        console.log("🔄 Session BEFORE save:", {
+          sessionId: req.sessionID,
+          hasSession: !!req.session,
+          adminAuth: (req.session as any).adminAuth
+        });
+
         // Force session save with explicit reload to ensure persistence
         req.session.save((err) => {
           if (err) {
-            console.error("Session save error:", err);
+            console.error("❌ Session save error:", err);
             return res.status(500).json({ message: "Session save failed" });
           }
+          
+          console.log("✅ Session saved successfully");
           
           // Reload session to verify save
           req.session.reload((reloadErr) => {
             if (reloadErr) {
-              console.error("Session reload error:", reloadErr);
+              console.error("❌ Session reload error:", reloadErr);
               return res.status(500).json({ message: "Session verification failed" });
             }
             
-            console.log("Session saved and verified, adminAuth:", (req.session as any).adminAuth);
+            console.log("✅ Session reloaded and verified, adminAuth:", (req.session as any).adminAuth);
+            
+            // Double-check session persistence
+            if (!(req.session as any).adminAuth) {
+              console.error("❌ CRITICAL: Session adminAuth lost after reload!");
+              return res.status(500).json({ message: "Session persistence failed" });
+            }
+            
             res.json({ 
               message: "Login successful", 
-              user: (req.session as any).adminAuth 
+              user: (req.session as any).adminAuth,
+              sessionId: req.sessionID
             });
           });
         });
