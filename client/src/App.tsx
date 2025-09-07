@@ -8,6 +8,7 @@ import Dashboard from "@/pages/Dashboard";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
+import AdminTest from "@/pages/AdminTest";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,9 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
+      
+      {/* Test Pages */}
+      <Route path="/admin-test" component={AdminTest} />
       
       {/* Landing page */}
       <Route path="/" component={Landing} />

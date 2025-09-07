@@ -17,13 +17,21 @@ export function useAdminAuth() {
         tokenPreview: bypassToken?.substring(0, 10) + '...'
       });
 
-      // Use apiRequest like other parts of the app - this handles bypass tokens automatically
+      // Send bypass token ONLY if it exists (don't send empty header)
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json"
+      };
+      
+      if (bypassToken) {
+        headers["x-bypass-token"] = bypassToken;
+        console.log("🔑 Admin auth: SENDING bypass token in header");
+      } else {
+        console.log("❌ Admin auth: NO bypass token to send");
+      }
+      
       const response = await fetch("/api/auth/admin-user", {
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          "x-bypass-token": bypassToken || ""
-        }
+        headers
       });
       
       console.log("🔑 Admin auth: Request sent with headers:", {
