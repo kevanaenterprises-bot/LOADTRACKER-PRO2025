@@ -813,7 +813,7 @@ function generateBOLHTML(load: any): string {
   `;
 }
 
-function generateCombinedRateConInvoiceHTML(invoice: any, load: any): string {
+function generateCombinedRateConInvoiceHTML_OLD_DEPRECATED(invoice: any, load: any): string {
   const currentDate = new Date().toLocaleDateString();
   
   return `
