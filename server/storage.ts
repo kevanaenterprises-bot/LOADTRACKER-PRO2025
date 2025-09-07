@@ -194,24 +194,7 @@ export class DatabaseStorage implements IStorage {
       return user;
     } catch (error) {
       console.error("Database error in getDriverByUsername:", error);
-      // Return a hardcoded test user if database fails (handle various formats)
-      const normalizedUsername = username.toLowerCase().trim();
-      if (normalizedUsername === "john_doe" || normalizedUsername === "john doe" || normalizedUsername.replace(/[_\s]/g, "_") === "john_doe") {
-        return {
-          id: "test-driver-001",
-          username: username.toLowerCase(), // Use provided username but normalized
-          firstName: "John",
-          lastName: "Doe", 
-          role: "driver",
-          phoneNumber: "1234567890",
-          password: "1234567890",
-          email: null,
-          profileImageUrl: null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-      }
-      return undefined;
+      throw new Error(`Database connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
