@@ -288,7 +288,7 @@ export default function LoadsTable() {
     mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
       console.log("🚀 Starting driver assignment:", { loadId, driverId });
       try {
-        const result = await apiRequest(`/api/loads/${loadId}/assign-driver`, "POST", { driverId });
+        const result = await apiRequest(`/api/loads/${loadId}/assign`, "PATCH", { driverId });
         console.log("✅ Driver assignment API success:", result);
         return result;
       } catch (error) {

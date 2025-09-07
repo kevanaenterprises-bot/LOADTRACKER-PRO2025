@@ -48,7 +48,7 @@ export function LoadSection({
 
   const assignDriverMutation = useMutation({
     mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
-      return apiRequest(`/api/loads/${loadId}/assign-driver`, "POST", { driverId });
+      return apiRequest(`/api/loads/${loadId}/assign`, "PATCH", { driverId });
     },
     onSuccess: (data, variables) => {
       toast({
