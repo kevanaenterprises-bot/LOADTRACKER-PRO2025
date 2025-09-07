@@ -142,52 +142,195 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const handlePrintPOD = async () => {
     setIsPrinting(true);
     try {
+      // Create a new window for preview
+      const previewWindow = window.open('', '_blank');
+      if (!previewWindow) {
+        throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
+      }
+
       // Check if POD document exists as attachment
       if (load?.podDocumentPath) {
-        // If POD document exists, open it for printing
-        const podUrl = `/objects/${load.podDocumentPath}`;
-        const printWindow = window.open(podUrl, '_blank');
-        if (!printWindow) {
-          throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
-        }
+        // Create preview with embedded POD document (authenticated)
+        const previewHTML = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Print Preview - POD Document</title>
+            <style>
+              body { margin: 0; font-family: Arial, sans-serif; }
+              .preview-header { 
+                background: #f8f9fa; 
+                padding: 15px; 
+                border-bottom: 1px solid #dee2e6;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              }
+              .preview-title { 
+                font-size: 18px; 
+                font-weight: bold; 
+                color: #333;
+              }
+              .preview-buttons { 
+                display: flex; 
+                gap: 10px; 
+              }
+              .btn { 
+                padding: 8px 16px; 
+                border: none; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                font-size: 14px;
+                font-weight: 500;
+              }
+              .btn-primary { 
+                background: #007bff; 
+                color: white; 
+              }
+              .btn-secondary { 
+                background: #6c757d; 
+                color: white; 
+              }
+              .btn:hover { 
+                opacity: 0.9; 
+              }
+              .document-content { 
+                padding: 0; 
+                height: calc(100vh - 60px);
+              }
+              .document-frame {
+                width: 100%;
+                height: 100%;
+                border: none;
+              }
+              @media print {
+                .preview-header { display: none; }
+                .document-content { padding: 0; height: auto; }
+                .document-frame { height: auto; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="preview-header">
+              <div class="preview-title">📋 Print Preview - POD Document</div>
+              <div class="preview-buttons">
+                <button class="btn btn-primary" onclick="printDocument()">🖨️ Print</button>
+                <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
+              </div>
+            </div>
+            <div class="document-content">
+              <iframe class="document-frame" src="/objects/${load.podDocumentPath}"></iframe>
+            </div>
+            <script>
+              function printDocument() {
+                try {
+                  const iframe = document.querySelector('.document-frame');
+                  iframe.contentWindow.print();
+                } catch (e) {
+                  window.print();
+                }
+              }
+            </script>
+          </body>
+          </html>
+        `;
         
-        // Wait for document to load then trigger print
-        printWindow.onload = () => {
-          setTimeout(() => {
-            printWindow.print();
-          }, 1000); // Give it time to load
-        };
+        previewWindow.document.write(previewHTML);
+        previewWindow.document.close();
         
         toast({
-          title: "POD Document Opened",
-          description: "POD document attachment has been opened for printing.",
+          title: "POD Preview Opened",
+          description: "POD document preview opened. Review and click Print when ready.",
         });
       } else {
-        // If no document attachment, print POD form template
-        const printWindow = window.open('', '_blank');
-        if (!printWindow) {
-          throw new Error('Pop-up blocked. Please allow pop-ups for this site.');
-        }
-
+        // If no document attachment, show POD template preview
         const podHTML = generatePODHTML(load);
         
-        printWindow.document.write(podHTML);
-        printWindow.document.close();
+        const previewHTML = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Print Preview - POD Template</title>
+            <style>
+              body { margin: 0; font-family: Arial, sans-serif; }
+              .preview-header { 
+                background: #f8f9fa; 
+                padding: 15px; 
+                border-bottom: 1px solid #dee2e6;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              }
+              .preview-title { 
+                font-size: 18px; 
+                font-weight: bold; 
+                color: #333;
+              }
+              .preview-buttons { 
+                display: flex; 
+                gap: 10px; 
+              }
+              .btn { 
+                padding: 8px 16px; 
+                border: none; 
+                border-radius: 4px; 
+                cursor: pointer; 
+                font-size: 14px;
+                font-weight: 500;
+              }
+              .btn-primary { 
+                background: #007bff; 
+                color: white; 
+              }
+              .btn-secondary { 
+                background: #6c757d; 
+                color: white; 
+              }
+              .btn:hover { 
+                opacity: 0.9; 
+              }
+              .document-content { 
+                padding: 20px; 
+              }
+              @media print {
+                .preview-header { display: none; }
+                .document-content { padding: 0; }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="preview-header">
+              <div class="preview-title">📋 Print Preview - POD Template</div>
+              <div class="preview-buttons">
+                <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+                <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
+              </div>
+            </div>
+            <div class="document-content">
+              ${podHTML}
+            </div>
+          </body>
+          </html>
+        `;
         
-        printWindow.onload = () => {
-          printWindow.print();
-          printWindow.close();
-        };
+        previewWindow.document.write(previewHTML);
+        previewWindow.document.close();
 
         toast({
-          title: "POD Template Sent to Printer",
-          description: "Proof of Delivery template has been prepared for printing.",
+          title: "POD Template Preview Opened",
+          description: "POD template preview opened. Review and click Print when ready.",
         });
       }
       
     } catch (error: any) {
       toast({
-        title: "Print Failed",
+        title: "Preview Failed",
         description: error.message,
         variant: "destructive",
       });
