@@ -3624,7 +3624,11 @@ Reply YES to confirm acceptance or NO to decline.`
       // First set status to delivered when POD is uploaded
       if (load.status !== "delivered" && load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {
         await storage.updateLoadStatus(req.params.id, "delivered");
-        await storage.updateLoadDelivered(req.params.id, new Date());
+        // Set delivered timestamp using direct database update
+        await db.update(loads).set({ 
+          deliveredAt: new Date(),
+          updatedAt: new Date() 
+        }).where(eq(loads.id, req.params.id));
         console.log(`✅ Load ${req.params.id} marked as DELIVERED - POD uploaded successfully`);
       }
 
@@ -3660,6 +3664,10 @@ Reply YES to confirm acceptance or NO to decline.`
             });
 
             console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109}`);
+            
+            // Move to awaiting_invoicing after generating invoice
+            await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
+            console.log(`✅ Load ${req.params.id} moved to AWAITING_INVOICING - invoice generated`);
           }
         }
       } catch (invoiceError) {
