@@ -41,7 +41,8 @@ import { HelpButton } from "@/components/HelpTooltip";
 
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
-  locationId: z.string().min(1, "Location is required"),
+  locationId: z.string().min(1, "Delivery location is required"),
+  pickupLocationId: z.string().optional(),
   estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
 }).omit({ driverId: true });
 
@@ -74,6 +75,7 @@ export default function LoadForm() {
     defaultValues: {
       number109: "109",
       locationId: "",
+      pickupLocationId: "",
       estimatedMiles: 0,
       specialInstructions: "",
       status: "created",
@@ -106,6 +108,7 @@ export default function LoadForm() {
       form.reset({
         number109: "109",
         locationId: "",
+        pickupLocationId: "",
         estimatedMiles: 0,
         specialInstructions: "",
         status: "created",
@@ -289,6 +292,43 @@ export default function LoadForm() {
 
               <FormField
                 control={form.control}
+                name="pickupLocationId"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center gap-2">
+                      <FormLabel>Pickup Location</FormLabel>
+                      <HelpButton 
+                        content="Select where the load will be picked up from. This is optional - leave blank if pickup details are in special instructions."
+                      />
+                    </div>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Pickup Location (Optional)" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="">No specific pickup location</SelectItem>
+                        {locations.length > 0 ? (
+                          locations.map((location: any) => (
+                            <SelectItem key={location.id} value={location.id}>
+                              {location.name} - {location.city}, {location.state}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-locations" disabled>
+                            No locations available - Add locations first
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="locationId"
                 render={({ field }) => (
                   <FormItem>
@@ -301,7 +341,7 @@ export default function LoadForm() {
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Location" />
+                          <SelectValue placeholder="Select Delivery Location" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
