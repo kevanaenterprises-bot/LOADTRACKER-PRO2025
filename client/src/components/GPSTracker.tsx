@@ -130,7 +130,7 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
 
   // Auto-start tracking if load is already confirmed
   useEffect(() => {
-    if (load.status === 'confirmed' && load.trackingEnabled && watchId === null) {
+    if ((load.status === 'confirmed' || load.status === 'assigned') && load.trackingEnabled && watchId === null) {
       startTracking();
     }
 
@@ -144,6 +144,7 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
   const getStatusInfo = () => {
     switch (load.status) {
       case 'created':
+      case 'assigned':
         return { color: 'bg-gray-500', text: 'Awaiting Confirmation', icon: Clock };
       case 'confirmed':
         return { color: 'bg-blue-500', text: 'Confirmed - Tracking Active', icon: Navigation };
@@ -186,7 +187,7 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
       
       <CardContent className="space-y-4">
         {/* Load confirmation */}
-        {load.status === 'created' && (
+        {(load.status === 'created' || load.status === 'assigned') && (
           <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
             <h4 className="font-medium text-blue-900 mb-2">Confirm Load Receipt</h4>
             <p className="text-sm text-blue-700 mb-3">
@@ -204,7 +205,7 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
         )}
 
         {/* GPS Permission Status */}
-        {load.status !== 'created' && permissionStatus !== 'granted' && (
+        {load.status !== 'created' && load.status !== 'assigned' && permissionStatus !== 'granted' && (
           <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
             <div className="flex items-center">
               <AlertCircle className="w-5 h-5 text-yellow-600 mr-2" />
