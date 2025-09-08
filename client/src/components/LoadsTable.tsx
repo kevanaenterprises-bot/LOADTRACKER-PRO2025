@@ -449,6 +449,22 @@ export default function LoadsTable() {
       }, 1000);
     },
     onError: (error: any) => {
+      console.error("❌ DELETE ERROR DETAILS:", error);
+      
+      // If load doesn't exist, it might already be deleted - refresh the UI
+      if (error.message?.includes("Load not found") || error.message?.includes("404")) {
+        toast({
+          title: "Load Already Deleted",
+          description: "This load was already removed. Refreshing the page...",
+          variant: "default",
+        });
+        // Force refresh to sync UI with database
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        return;
+      }
+      
       toast({
         title: "Delete Failed",
         description: error.message || "Failed to delete load. Please try again.",
