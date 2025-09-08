@@ -249,11 +249,20 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getLoadStops(loadId: string): Promise<LoadStop[]> {
-    return await db
-      .select()
+    const result = await db
+      .select({
+        stop: loadStops,
+        location: locations,
+      })
       .from(loadStops)
+      .leftJoin(locations, eq(loadStops.locationId, locations.id))
       .where(eq(loadStops.loadId, loadId))
       .orderBy(loadStops.stopSequence);
+
+    return result.map(row => ({
+      ...row.stop,
+      location: row.location || undefined,
+    }));
   }
   
   async createLoadStop(stop: InsertLoadStop): Promise<LoadStop> {

@@ -420,11 +420,14 @@ export default function LoadsTable() {
       const response = await fetch(`/api/loads/${loadId}`, {
         method: 'DELETE',
         headers: {
+          'Content-Type': 'application/json',
           'x-bypass-token': localStorage.getItem('bypass-token') || '',
         },
+        credentials: 'include',
       });
       if (!response.ok) {
-        throw new Error('Failed to delete load');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to delete load');
       }
       return response.json();
     },
@@ -817,7 +820,7 @@ export default function LoadsTable() {
                                 <MapPin className="h-4 w-4 text-green-500" />
                               )}
                               <div className="text-sm">
-                                <div className="font-medium">{stop.location?.name || 'Custom Location'}</div>
+                                <div className="font-medium">{stop.location?.name || stop.companyName || 'Custom Location'}</div>
                                 <div className="text-gray-600">{stop.stopType}</div>
                               </div>
                             </div>
