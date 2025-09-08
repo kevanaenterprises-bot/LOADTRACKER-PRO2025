@@ -112,7 +112,7 @@ export function LoadSection({
               <TableHead>109 Number</TableHead>
               {showDriverAssign && <TableHead>Assign Driver</TableHead>}
               {!showDriverAssign && <TableHead>Driver</TableHead>}
-              <TableHead>Destination</TableHead>
+              <TableHead>Primary Location</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -179,7 +179,16 @@ export function LoadSection({
                   </TableCell>
                 )}
                 
-                <TableCell>{load.location?.name || 'N/A'}</TableCell>
+                <TableCell>
+                  <div className="text-sm">
+                    {load.location?.name || 'N/A'}
+                    {load.location?.city && (
+                      <div className="text-xs text-gray-500">
+                        {load.location.city}, {load.location.state}
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
                 
                 <TableCell>
                   <Badge className={getStatusColor(load.status)}>

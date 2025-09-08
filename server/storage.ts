@@ -279,12 +279,21 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .orderBy(desc(loads.createdAt));
 
-    return result.map(row => ({
-      ...row.load,
-      driver: row.driver || undefined,
-      location: row.location || undefined,
-      invoice: row.invoice || undefined,
-    }));
+    // Get stops for each load
+    const loadsWithStops = await Promise.all(
+      result.map(async (row) => {
+        const stops = await this.getLoadStops(row.load.id);
+        return {
+          ...row.load,
+          driver: row.driver || undefined,
+          location: row.location || undefined,
+          invoice: row.invoice || undefined,
+          stops: stops || [],
+        };
+      })
+    );
+
+    return loadsWithStops;
   }
 
   async getLoad(id: string): Promise<LoadWithDetails | undefined> {
