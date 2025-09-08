@@ -957,32 +957,62 @@ export default function LoadsTable() {
                         <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                         <h5 className="font-semibold text-blue-800">Pickup Location</h5>
                       </div>
-                      {selectedLoad.pickupLocation ? (
-                        <div className="space-y-1">
-                          <div><strong>Company:</strong> {selectedLoad.pickupLocation.name}</div>
-                          {selectedLoad.pickupLocation.address && (
-                            <div><strong>Address:</strong> {selectedLoad.pickupLocation.address}</div>
-                          )}
-                          {(selectedLoad.pickupLocation.city || selectedLoad.pickupLocation.state) && (
-                            <div><strong>Location:</strong> {selectedLoad.pickupLocation.city}, {selectedLoad.pickupLocation.state}</div>
-                          )}
-                          {selectedLoad.pickupLocation.contactName && (
-                            <div><strong>Contact:</strong> {selectedLoad.pickupLocation.contactName}</div>
-                          )}
-                          {selectedLoad.pickupLocation.contactPhone && (
-                            <div><strong>Phone:</strong> {selectedLoad.pickupLocation.contactPhone}</div>
-                          )}
-                        </div>
-                      ) : selectedLoad.pickupAddress ? (
-                        <div className="space-y-1">
-                          <div><strong>Address:</strong> {selectedLoad.pickupAddress}</div>
-                          {selectedLoad.companyName && (
-                            <div><strong>Company:</strong> {selectedLoad.companyName}</div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="text-gray-500 italic">No pickup location specified</div>
-                      )}
+                      {(() => {
+                        // Find first pickup stop
+                        const pickupStop = selectedLoad.stops?.find(stop => stop.stopType === 'pickup');
+                        
+                        if (pickupStop) {
+                          return (
+                            <div className="space-y-1">
+                              <div><strong>Company:</strong> {pickupStop.location?.name || pickupStop.companyName || 'Custom Location'}</div>
+                              {(pickupStop.location?.address || pickupStop.address) && (
+                                <div><strong>Address:</strong> {pickupStop.location?.address || pickupStop.address}</div>
+                              )}
+                              {(pickupStop.location?.city || pickupStop.location?.state) && (
+                                <div><strong>Location:</strong> {pickupStop.location?.city}, {pickupStop.location?.state}</div>
+                              )}
+                              {(pickupStop.location?.contactName || pickupStop.contactName) && (
+                                <div><strong>Contact:</strong> {pickupStop.location?.contactName || pickupStop.contactName}</div>
+                              )}
+                              {(pickupStop.location?.contactPhone || pickupStop.contactPhone) && (
+                                <div><strong>Phone:</strong> {pickupStop.location?.contactPhone || pickupStop.contactPhone}</div>
+                              )}
+                              {pickupStop.notes && (
+                                <div><strong>Notes:</strong> {pickupStop.notes}</div>
+                              )}
+                            </div>
+                          );
+                        } else if (selectedLoad.pickupLocation) {
+                          return (
+                            <div className="space-y-1">
+                              <div><strong>Company:</strong> {selectedLoad.pickupLocation.name}</div>
+                              {selectedLoad.pickupLocation.address && (
+                                <div><strong>Address:</strong> {selectedLoad.pickupLocation.address}</div>
+                              )}
+                              {(selectedLoad.pickupLocation.city || selectedLoad.pickupLocation.state) && (
+                                <div><strong>Location:</strong> {selectedLoad.pickupLocation.city}, {selectedLoad.pickupLocation.state}</div>
+                              )}
+                              {selectedLoad.pickupLocation.contactName && (
+                                <div><strong>Contact:</strong> {selectedLoad.pickupLocation.contactName}</div>
+                              )}
+                              {selectedLoad.pickupLocation.contactPhone && (
+                                <div><strong>Phone:</strong> {selectedLoad.pickupLocation.contactPhone}</div>
+                              )}
+                            </div>
+                          );
+                        } else if (selectedLoad.pickupAddress) {
+                          return (
+                            <div className="space-y-1">
+                              <div><strong>Address:</strong> {selectedLoad.pickupAddress}</div>
+                              {selectedLoad.companyName && (
+                                <div><strong>Company:</strong> {selectedLoad.companyName}</div>
+                              )}
+                            </div>
+                          );
+                        } else {
+                          return <div className="text-gray-500 italic">No pickup location specified</div>;
+                        }
+                      })()}
                     </div>
 
                     {/* Delivery Location */}
