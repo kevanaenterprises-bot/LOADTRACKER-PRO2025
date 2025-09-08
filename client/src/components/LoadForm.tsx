@@ -42,7 +42,6 @@ import { HelpButton } from "@/components/HelpTooltip";
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
   locationId: z.string().min(1, "Delivery location is required"),
-  pickupLocationId: z.string().optional(),
   estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
 }).omit({ driverId: true });
 
@@ -75,7 +74,7 @@ export default function LoadForm() {
     defaultValues: {
       number109: "109",
       locationId: "",
-      pickupLocationId: "",
+      pickupLocationId: undefined,
       estimatedMiles: 0,
       specialInstructions: "",
       status: "created",
@@ -108,7 +107,7 @@ export default function LoadForm() {
       form.reset({
         number109: "109",
         locationId: "",
-        pickupLocationId: "",
+        pickupLocationId: undefined,
         estimatedMiles: 0,
         specialInstructions: "",
         status: "created",
