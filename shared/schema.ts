@@ -86,6 +86,15 @@ export const loads = pgTable("loads", {
   // Driver confirmation tracking
   driverConfirmed: boolean("driver_confirmed").default(false),
   driverConfirmedAt: timestamp("driver_confirmed_at"),
+  // GPS tracking fields
+  trackingEnabled: boolean("tracking_enabled").default(false),
+  currentLatitude: decimal("current_latitude", { precision: 10, scale: 8 }),
+  currentLongitude: decimal("current_longitude", { precision: 11, scale: 8 }),
+  shipperLatitude: decimal("shipper_latitude", { precision: 10, scale: 8 }),
+  shipperLongitude: decimal("shipper_longitude", { precision: 11, scale: 8 }),
+  receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
+  receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
+  lastLocationUpdate: timestamp("last_location_update"),
 });
 
 // Load stops table for multiple pickups and deliveries

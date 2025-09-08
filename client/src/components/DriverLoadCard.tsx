@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import GPSTracker from "@/components/GPSTracker";
 
 interface DriverLoadCardProps {
   load: any;
@@ -253,26 +254,31 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
           </div>
         </div>
 
-        <div className="flex gap-2 mt-6">
-          {nextAction && (
-            <Button 
-              className="flex-1 bg-green-600 hover:bg-green-700"
-              onClick={handleStatusUpdate}
-              disabled={updateStatusMutation.isPending}
-            >
-              {updateStatusMutation.isPending ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-play mr-2"></i>
-                  Start Load & Tracking
-                </>
-              )}
-            </Button>
-          )}
+        <div className="space-y-4 mt-6">
+          {/* GPS Tracking Component */}
+          <GPSTracker load={load} driverId={load.driverId} />
+          
+          <div className="flex gap-2">
+            {nextAction && (
+              <Button 
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                onClick={handleStatusUpdate}
+                disabled={updateStatusMutation.isPending}
+              >
+                {updateStatusMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <i className="fas fa-play mr-2"></i>
+                    Update Status
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
           
           {/* Unassign from Load Button */}
           <AlertDialog>
