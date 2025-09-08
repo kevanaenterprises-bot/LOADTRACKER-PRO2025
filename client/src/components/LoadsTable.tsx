@@ -978,7 +978,7 @@ export default function LoadsTable() {
                           )}
                         </div>
                       ) : (
-                        <div className="text-gray-500 italic">Default: 1800 East Plano Parkway, Plano, TX</div>
+                        <div className="text-gray-500 italic">No pickup location specified</div>
                       )}
                     </div>
 
