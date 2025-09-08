@@ -354,6 +354,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load> {
+    // CRITICAL BUSINESS RULE: Cannot move to awaiting_payment without an invoice
+    if (status === "awaiting_payment") {
+      const existingInvoices = await this.getInvoices();
+      const hasInvoice = existingInvoices.some(invoice => invoice.loadId === id);
+      
+      if (!hasInvoice) {
+        console.error(`❌ BUSINESS RULE VIOLATION: Attempted to move load ${id} to awaiting_payment without an invoice!`);
+        throw new Error("Cannot move load to awaiting payment status - no invoice has been generated yet. Please generate an invoice first.");
+      }
+      
+      console.log(`✅ BUSINESS RULE VALIDATED: Load ${id} has invoice, allowing move to awaiting_payment`);
+    }
+    
     const updateData: any = { status, updatedAt: new Date() };
     
     // Update specific timestamp fields based on status
