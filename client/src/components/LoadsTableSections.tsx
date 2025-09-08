@@ -10,13 +10,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { HelpButton } from "@/components/HelpTooltip";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { BatchPODUpload } from "@/components/BatchPODUpload";
-import { Upload } from "lucide-react";
 
 interface LoadSectionProps {
   loads: any[];
@@ -26,7 +23,6 @@ interface LoadSectionProps {
   showDriverAssign?: boolean;
   showInvoiceButton?: boolean;
   showPaymentButton?: boolean;
-  showPODUpload?: boolean;
   availableDrivers?: any[];
   onLoadClick?: (load: any) => void;
   onGenerateInvoice?: (load: any) => void;
@@ -41,7 +37,6 @@ export function LoadSection({
   showDriverAssign = false,
   showInvoiceButton = false,
   showPaymentButton = false,
-  showPODUpload = false,
   availableDrivers = [],
   onLoadClick,
   onGenerateInvoice,
@@ -50,8 +45,6 @@ export function LoadSection({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [assigningDriverFor, setAssigningDriverFor] = useState<string | null>(null);
-  const [showPODDialog, setShowPODDialog] = useState(false);
-  const [selectedLoadForPOD, setSelectedLoadForPOD] = useState<any>(null);
 
   const assignDriverMutation = useMutation({
     mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
@@ -90,18 +83,6 @@ export function LoadSection({
     } catch (error) {
       toast({ title: "Failed to mark as paid", variant: "destructive" });
     }
-  };
-
-  const handleUploadPOD = (load: any) => {
-    setSelectedLoadForPOD(load);
-    setShowPODDialog(true);
-  };
-
-  const handlePODUploadComplete = () => {
-    setShowPODDialog(false);
-    setSelectedLoadForPOD(null);
-    toast({ title: "POD uploaded successfully" });
-    queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
   };
 
   if (loads.length === 0) {
@@ -208,18 +189,6 @@ export function LoadSection({
                 
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <div className="flex gap-2">
-                    {showPODUpload && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleUploadPOD(load)}
-                        className="text-blue-600 hover:text-blue-700"
-                      >
-                        <Upload className="w-4 h-4 mr-1" />
-                        Upload POD
-                      </Button>
-                    )}
-                    
                     {showInvoiceButton && (
                       <Button
                         size="sm"
@@ -258,22 +227,6 @@ export function LoadSection({
           </TableBody>
         </Table>
       </div>
-
-      {/* POD Upload Dialog */}
-      <Dialog open={showPODDialog} onOpenChange={setShowPODDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Upload POD for Load {selectedLoadForPOD?.number109}</DialogTitle>
-          </DialogHeader>
-          {selectedLoadForPOD && (
-            <BatchPODUpload
-              loadId={selectedLoadForPOD.id}
-              loadNumber={selectedLoadForPOD.number109}
-              onUploadComplete={handlePODUploadComplete}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

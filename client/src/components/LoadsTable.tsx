@@ -654,7 +654,6 @@ export default function LoadsTable() {
           color="text-purple-700"
           helpText="POD has been uploaded. These loads are ready to be invoiced."
           showInvoiceButton={true}
-          showPODUpload={true}
           onLoadClick={handleLoadClick}
           onGenerateInvoice={() => {
             if (awaitingInvoicingLoads.length > 0) {
@@ -672,7 +671,6 @@ export default function LoadsTable() {
           color="text-orange-700"
           helpText="Invoiced loads waiting for payment from customers."
           showPaymentButton={true}
-          showPODUpload={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
         />
