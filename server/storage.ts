@@ -556,6 +556,51 @@ export class DatabaseStorage implements IStorage {
     console.log(`🗑️ DELETING LOAD: Starting deletion process for load ID: ${id}`);
     
     try {
+      // Step 0: Get load details to check for file attachments
+      console.log(`🗑️ Step 0: Getting load details to check for attachments`);
+      const load = await this.getLoad(id);
+      if (!load) {
+        throw new Error("Load not found");
+      }
+      
+      // Step 0.5: Delete object storage files if they exist
+      if (load.podDocumentPath || load.bolDocumentPath) {
+        console.log(`🗑️ Step 0.5: Deleting object storage files for load ${id}`);
+        try {
+          const { ObjectStorageService } = await import('./objectStorage');
+          const objectStorage = new ObjectStorageService();
+          
+          if (load.podDocumentPath) {
+            console.log(`🗑️ Deleting POD file: ${load.podDocumentPath}`);
+            try {
+              const podFile = await objectStorage.getObjectEntityFile(load.podDocumentPath);
+              await podFile.delete();
+              console.log(`✅ POD file deleted: ${load.podDocumentPath}`);
+            } catch (fileErr) {
+              console.warn(`⚠️ Could not delete POD file: ${load.podDocumentPath}`, fileErr);
+            }
+          }
+          
+          if (load.bolDocumentPath) {
+            console.log(`🗑️ Deleting BOL file: ${load.bolDocumentPath}`);
+            try {
+              const bolFile = await objectStorage.getObjectEntityFile(load.bolDocumentPath);
+              await bolFile.delete();
+              console.log(`✅ BOL file deleted: ${load.bolDocumentPath}`);
+            } catch (fileErr) {
+              console.warn(`⚠️ Could not delete BOL file: ${load.bolDocumentPath}`, fileErr);
+            }
+          }
+          
+          console.log(`✅ Object storage files deleted successfully`);
+        } catch (fileError) {
+          console.warn(`⚠️ Warning: Failed to delete some files from object storage:`, fileError);
+          // Continue with database deletion even if file deletion fails
+        }
+      } else {
+        console.log(`📄 No file attachments found for load ${id}`);
+      }
+      
       // Delete related records first to maintain referential integrity
       console.log(`🗑️ Step 1: Deleting load status history for load ${id}`);
       await db.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
@@ -572,7 +617,7 @@ export class DatabaseStorage implements IStorage {
       console.log(`🗑️ Step 5: Deleting the main load record for ${id}`);
       await db.delete(loads).where(eq(loads.id, id));
       
-      console.log(`✅ SUCCESS: Load ${id} deleted successfully`);
+      console.log(`✅ SUCCESS: Load ${id} deleted successfully with all attachments cleaned up`);
     } catch (error) {
       console.error(`❌ DELETE ERROR: Failed to delete load ${id}:`, error);
       throw error;
