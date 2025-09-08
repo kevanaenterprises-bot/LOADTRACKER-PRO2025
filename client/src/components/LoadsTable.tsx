@@ -633,7 +633,6 @@ export default function LoadsTable() {
           title="Driver Assigned"
           color="text-blue-700"
           helpText="Loads with assigned drivers waiting to start transit."
-          showPODUpload={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
         />
@@ -643,8 +642,7 @@ export default function LoadsTable() {
           loads={inTransitLoads}
           title="In Transit"
           color="text-yellow-700"
-          helpText="Loads currently being transported. Drivers are on the road! Upload POD if driver missed it."
-          showPODUpload={true}
+          helpText="Loads currently being transported. Drivers are on the road!"
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
         />
@@ -654,8 +652,9 @@ export default function LoadsTable() {
           loads={awaitingInvoicingLoads}
           title="Awaiting Invoicing"
           color="text-purple-700"
-          helpText="POD has been uploaded. These loads are ready to be invoiced."
+          helpText="Load has been delivered. Upload POD documents if driver missed uploading them, then generate invoice."
           showInvoiceButton={true}
+          showPODUpload={true}
           onLoadClick={handleLoadClick}
           onGenerateInvoice={() => {
             if (awaitingInvoicingLoads.length > 0) {
