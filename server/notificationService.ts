@@ -144,7 +144,7 @@ export class NotificationService {
     await this.sendNotification({
       driverId,
       type: 'load_assignment',
-      message: `🚛 NEW LOAD ASSIGNED: ${loadNumber} to ${destination}. Check your driver portal for details.`,
+      message: `🚛 NEW LOAD ASSIGNED: ${loadNumber} to ${destination}. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.`,
       loadId,
     });
   }
