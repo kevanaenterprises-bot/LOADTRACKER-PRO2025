@@ -880,7 +880,7 @@ export default function LoadsTable() {
                     </div>
                 
                 <div>
-                  <h4 className="font-semibold mb-2">Driver & Destination</h4>
+                  <h4 className="font-semibold mb-2">Driver Assignment</h4>
                   <div className="space-y-3 text-sm">
                     <div>
                       <strong>Driver:</strong> 
@@ -941,13 +941,92 @@ export default function LoadsTable() {
                         </div>
                       )}
                     </div>
-                    
-                    {selectedLoad.location && (
-                      <div><strong>Destination:</strong> {selectedLoad.location.name}</div>
-                    )}
-                    {selectedLoad.estimatedMiles && (
-                      <div><strong>Miles:</strong> {selectedLoad.estimatedMiles}</div>
-                    )}
+                  </div>
+                </div>
+
+                {/* Pickup & Delivery Locations - New comprehensive section */}
+                <div>
+                  <h4 className="font-semibold mb-3">Pickup & Delivery Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    {/* Pickup Location */}
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center mb-2">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <h5 className="font-semibold text-blue-800">Pickup Location</h5>
+                      </div>
+                      {selectedLoad.pickupLocation ? (
+                        <div className="space-y-1">
+                          <div><strong>Company:</strong> {selectedLoad.pickupLocation.name}</div>
+                          {selectedLoad.pickupLocation.address && (
+                            <div><strong>Address:</strong> {selectedLoad.pickupLocation.address}</div>
+                          )}
+                          {(selectedLoad.pickupLocation.city || selectedLoad.pickupLocation.state) && (
+                            <div><strong>Location:</strong> {selectedLoad.pickupLocation.city}, {selectedLoad.pickupLocation.state}</div>
+                          )}
+                          {selectedLoad.pickupLocation.contactName && (
+                            <div><strong>Contact:</strong> {selectedLoad.pickupLocation.contactName}</div>
+                          )}
+                          {selectedLoad.pickupLocation.contactPhone && (
+                            <div><strong>Phone:</strong> {selectedLoad.pickupLocation.contactPhone}</div>
+                          )}
+                        </div>
+                      ) : selectedLoad.pickupAddress ? (
+                        <div className="space-y-1">
+                          <div><strong>Address:</strong> {selectedLoad.pickupAddress}</div>
+                          {selectedLoad.companyName && (
+                            <div><strong>Company:</strong> {selectedLoad.companyName}</div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-gray-500 italic">Default: 1800 East Plano Parkway, Plano, TX</div>
+                      )}
+                    </div>
+
+                    {/* Delivery Location */}
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-center mb-2">
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                        <h5 className="font-semibold text-green-800">Delivery Location</h5>
+                      </div>
+                      {selectedLoad.location ? (
+                        <div className="space-y-1">
+                          <div><strong>Company:</strong> {selectedLoad.location.name}</div>
+                          {selectedLoad.location.address && (
+                            <div><strong>Address:</strong> {selectedLoad.location.address}</div>
+                          )}
+                          {(selectedLoad.location.city || selectedLoad.location.state) && (
+                            <div><strong>Location:</strong> {selectedLoad.location.city}, {selectedLoad.location.state}</div>
+                          )}
+                          {selectedLoad.location.contactName && (
+                            <div><strong>Contact:</strong> {selectedLoad.location.contactName}</div>
+                          )}
+                          {selectedLoad.location.contactPhone && (
+                            <div><strong>Phone:</strong> {selectedLoad.location.contactPhone}</div>
+                          )}
+                        </div>
+                      ) : selectedLoad.deliveryAddress ? (
+                        <div className="space-y-1">
+                          <div><strong>Address:</strong> {selectedLoad.deliveryAddress}</div>
+                        </div>
+                      ) : (
+                        <div className="text-gray-500 italic">No delivery location specified</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Miles Information */}
+                  <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold text-yellow-800">Total Distance:</span>
+                        <span className="ml-2 text-lg">{selectedLoad.estimatedMiles || 0} miles</span>
+                      </div>
+                      {selectedLoad.appointmentTime && (
+                        <div className="text-sm text-yellow-700">
+                          <strong>Appointment:</strong> {selectedLoad.appointmentTime}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
