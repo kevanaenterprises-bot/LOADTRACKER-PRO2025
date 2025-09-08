@@ -20,12 +20,17 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
   const [showLoadDetails, setShowLoadDetails] = useState(false);
 
   // Fetch driver's assigned loads
-  const { data: loads = [], isLoading } = useQuery<any[]>({
+  const { data: allLoads = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/drivers", driverId, "loads"],
     retry: false,
     refetchOnWindowFocus: false,
     refetchInterval: 30000, // Refresh every 30 seconds
   });
+
+  // Filter out loads that have been completed (POD uploaded)
+  const loads = allLoads.filter((load: any) => 
+    !['delivered', 'awaiting_invoicing', 'awaiting_payment', 'completed', 'paid'].includes(load.status)
+  );
 
   // Status update mutation
   const statusUpdateMutation = useMutation({

@@ -4356,7 +4356,7 @@ function generateInvoiceOnlyHTML(invoice: any, load: any): string {
         </div>
         <div>
           <p><strong>Load #:</strong> ${load?.number109 || 'N/A'}</p>
-          <p><strong>BOL/POD #:</strong> ${load?.number374 || 'N/A'}</p>
+          <p><strong>BOL/POD #:</strong> ${load?.bolNumber || 'N/A'}</p>
           <p><strong>Trip #:</strong> ${load?.tripNumber || 'N/A'}</p>
           <p><strong>Driver:</strong> ${load?.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'N/A'}</p>
         </div>
