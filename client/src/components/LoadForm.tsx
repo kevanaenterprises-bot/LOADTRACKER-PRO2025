@@ -150,6 +150,42 @@ export default function LoadForm() {
     },
   });
 
+  const handleAddLocationAsStop = () => {
+    const selectedLocationId = form.watch("locationId");
+    if (!selectedLocationId) {
+      toast({
+        title: "Error",
+        description: "Please select a location first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedLocation = locations.find((loc: any) => loc.id === selectedLocationId);
+    
+    const newStop: LoadStop = {
+      stopType: locationType === "shipper" ? "pickup" : "dropoff",
+      stopSequence: stops.length + 1,
+      locationId: selectedLocationId,
+      companyName: selectedLocation?.name || "",
+      address: selectedLocation?.address || "",
+      contactName: selectedLocation?.contactName || "",
+      contactPhone: selectedLocation?.contactPhone || "",
+      notes: "",
+    };
+
+    setStops([...stops, newStop]);
+    
+    // Reset the form for next location
+    form.setValue("locationId", "");
+    setLocationType("receiver");
+    
+    toast({
+      title: "Stop Added",
+      description: `${locationType === "shipper" ? "Pickup" : "Delivery"} stop added successfully`,
+    });
+  };
+
   const handleAddStop = () => {
     console.log("🔘 Add Stop button clicked - opening dialog");
     setShowStopDialog(true);
@@ -325,34 +361,48 @@ export default function LoadForm() {
                 )}
               />
 
-              {/* Location Type Selection */}
+              {/* Location Type Selection and Add Button */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Label className="text-sm font-medium">This location is a:</Label>
                   <HelpButton 
-                    content="Choose whether this location is where you pick up the load (shipper) or deliver the load (receiver)."
+                    content="Choose whether this location is where you pick up the load (shipper) or deliver the load (receiver), then click 'Add as Stop'."
                   />
                 </div>
-                <RadioGroup
-                  value={locationType}
-                  onValueChange={(value: "shipper" | "receiver") => setLocationType(value)}
-                  className="flex gap-6"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="shipper" id="shipper" />
-                    <Label htmlFor="shipper" className="text-sm">Shipper (Pickup)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="receiver" id="receiver" />
-                    <Label htmlFor="receiver" className="text-sm">Receiver (Delivery)</Label>
-                  </div>
-                </RadioGroup>
+                <div className="flex items-center justify-between">
+                  <RadioGroup
+                    value={locationType}
+                    onValueChange={(value: "shipper" | "receiver") => setLocationType(value)}
+                    className="flex gap-6"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="shipper" id="shipper" />
+                      <Label htmlFor="shipper" className="text-sm">Shipper (Pickup)</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="receiver" id="receiver" />
+                      <Label htmlFor="receiver" className="text-sm">Receiver (Delivery)</Label>
+                    </div>
+                  </RadioGroup>
+                  
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    onClick={handleAddLocationAsStop}
+                    disabled={!form.watch("locationId")}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add as Stop
+                  </Button>
+                </div>
               </div>
 
-              {/* Extra Stops Section */}
+              {/* Stops Section */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <Label className="text-base font-semibold">Additional Stops</Label>
+                  <Label className="text-base font-semibold">Stops for this Load</Label>
                   <Button
                     type="button"
                     variant="outline"
@@ -361,7 +411,7 @@ export default function LoadForm() {
                     className="flex items-center gap-2"
                   >
                     <Plus className="h-4 w-4" />
-                    Add Stop
+                    Add Another Stop
                   </Button>
                 </div>
 
