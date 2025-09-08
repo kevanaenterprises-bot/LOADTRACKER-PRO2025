@@ -633,6 +633,7 @@ export default function LoadsTable() {
           title="Driver Assigned"
           color="text-blue-700"
           helpText="Loads with assigned drivers waiting to start transit."
+          showPODUpload={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
         />
@@ -642,7 +643,8 @@ export default function LoadsTable() {
           loads={inTransitLoads}
           title="In Transit"
           color="text-yellow-700"
-          helpText="Loads currently being transported. Drivers are on the road!"
+          helpText="Loads currently being transported. Drivers are on the road! Upload POD if driver missed it."
+          showPODUpload={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
         />

@@ -10,10 +10,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { HelpButton } from "@/components/HelpTooltip";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { BatchPODUpload } from "@/components/BatchPODUpload";
+import { Upload } from "lucide-react";
 
 interface LoadSectionProps {
   loads: any[];
@@ -23,6 +26,7 @@ interface LoadSectionProps {
   showDriverAssign?: boolean;
   showInvoiceButton?: boolean;
   showPaymentButton?: boolean;
+  showPODUpload?: boolean;
   availableDrivers?: any[];
   onLoadClick?: (load: any) => void;
   onGenerateInvoice?: (load: any) => void;
@@ -37,6 +41,7 @@ export function LoadSection({
   showDriverAssign = false,
   showInvoiceButton = false,
   showPaymentButton = false,
+  showPODUpload = false,
   availableDrivers = [],
   onLoadClick,
   onGenerateInvoice,
@@ -45,6 +50,8 @@ export function LoadSection({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [assigningDriverFor, setAssigningDriverFor] = useState<string | null>(null);
+  const [podUploadDialogOpen, setPodUploadDialogOpen] = useState(false);
+  const [selectedLoadForPOD, setSelectedLoadForPOD] = useState<any>(null);
 
   const assignDriverMutation = useMutation({
     mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
@@ -239,6 +246,42 @@ export function LoadSection({
                         <i className="fas fa-check-circle mr-1"></i>
                         Mark as Paid
                       </Button>
+                    )}
+
+                    {showPODUpload && !load.podDocumentPath && (
+                      <Dialog open={podUploadDialogOpen} onOpenChange={setPodUploadDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setSelectedLoadForPOD(load)}
+                            className="text-blue-600 hover:text-blue-700"
+                          >
+                            <Upload className="h-4 w-4 mr-1" />
+                            Upload POD
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle>Upload POD Documents - Load {selectedLoadForPOD?.number109}</DialogTitle>
+                          </DialogHeader>
+                          {selectedLoadForPOD && (
+                            <BatchPODUpload
+                              loadId={selectedLoadForPOD.id}
+                              loadNumber={selectedLoadForPOD.number109}
+                              onUploadComplete={() => {
+                                setPodUploadDialogOpen(false);
+                                setSelectedLoadForPOD(null);
+                                queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+                                toast({
+                                  title: "POD Uploaded",
+                                  description: `POD documents uploaded successfully for load ${selectedLoadForPOD.number109}`,
+                                });
+                              }}
+                            />
+                          )}
+                        </DialogContent>
+                      </Dialog>
                     )}
                     
                     <Button
