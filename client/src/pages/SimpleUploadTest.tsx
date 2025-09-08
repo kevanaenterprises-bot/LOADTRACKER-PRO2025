@@ -98,7 +98,7 @@ export default function SimpleUploadTest() {
                 <h3 className="font-semibold mb-2">Select File to Upload</h3>
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.heic,.heif"
                   onChange={handleFileSelect}
                   className="border border-gray-300 rounded p-2 w-full"
                 />

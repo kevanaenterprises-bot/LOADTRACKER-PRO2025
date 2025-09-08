@@ -83,7 +83,7 @@ export default function QuickUploadPage() {
             <div>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,.heic,.heif"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) uploadFile(file);

@@ -128,7 +128,7 @@ export default function UploadTest() {
           <div>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,.heic,.heif"
               onChange={(e) => setFile(e.target.files?.[0] || null)}
               className="mb-2"
             />

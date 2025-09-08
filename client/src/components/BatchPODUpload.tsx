@@ -256,14 +256,14 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
             </span>
             <span className="text-sm text-gray-500 block">or drag and drop</span>
             <span className="text-xs text-gray-400 block mt-1">
-              Images (JPG, PNG, etc.) and PDF files only
+              Images (JPG, PNG, HEIC, etc.) and PDF files only
             </span>
           </label>
           <Input
             id="pod-files"
             type="file"
             multiple
-            accept="image/*,.pdf"
+            accept="image/*,.pdf,.heic,.heif"
             onChange={handleFileSelect}
             className="hidden"
             disabled={isUploading}

@@ -75,7 +75,7 @@ export function SimpleFileUpload({ onUploadComplete, loadId }: SimpleFileUploadP
     <div className="space-y-3">
       <Input
         type="file"
-        accept="image/*,.pdf"
+        accept="image/*,.pdf,.heic,.heif"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) handleUpload(file);

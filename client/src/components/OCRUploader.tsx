@@ -192,7 +192,7 @@ export function OCRUploader() {
             </p>
             <input
               type="file"
-              accept="image/*,.pdf"
+              accept="image/*,.pdf,.heic,.heif"
               onChange={handleFileInput}
               className="hidden"
               id="ocr-file-input"
