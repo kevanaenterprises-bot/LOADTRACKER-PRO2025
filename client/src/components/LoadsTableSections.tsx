@@ -112,7 +112,7 @@ export function LoadSection({
               <TableHead>109 Number</TableHead>
               {showDriverAssign && <TableHead>Assign Driver</TableHead>}
               {!showDriverAssign && <TableHead>Driver</TableHead>}
-              <TableHead>Primary Location</TableHead>
+              <TableHead>Destinations</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -181,11 +181,31 @@ export function LoadSection({
                 
                 <TableCell>
                   <div className="text-sm">
-                    {load.location?.name || 'N/A'}
-                    {load.location?.city && (
-                      <div className="text-xs text-gray-500">
-                        {load.location.city}, {load.location.state}
-                      </div>
+                    {load.stops && load.stops.length > 0 ? (
+                      // Show delivery destinations from stops
+                      load.stops
+                        .filter((stop: any) => stop.stopType === 'dropoff')
+                        .slice(0, 2)
+                        .map((stop: any, index: number, filteredStops: any[]) => (
+                          <div key={stop.id} className="mb-1">
+                            <div className="font-medium">{stop.companyName}</div>
+                            {index === 0 && filteredStops.length > 1 && (
+                              <div className="text-xs text-gray-500">
+                                +{filteredStops.length - 1} more destination{filteredStops.length > 2 ? 's' : ''}
+                              </div>
+                            )}
+                          </div>
+                        ))
+                    ) : (
+                      // Fallback to primary location if no stops
+                      <>
+                        {load.location?.name || 'No destinations'}
+                        {load.location?.city && (
+                          <div className="text-xs text-gray-500">
+                            {load.location.city}, {load.location.state}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </TableCell>
