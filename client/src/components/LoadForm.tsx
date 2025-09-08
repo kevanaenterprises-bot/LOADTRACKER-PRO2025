@@ -68,13 +68,13 @@ export default function LoadForm() {
   const [stopNotes, setStopNotes] = useState("");
   const [showOverride, setShowOverride] = useState(false);
   const [overridePassword, setOverridePassword] = useState("");
+  const [locationType, setLocationType] = useState<"shipper" | "receiver">("receiver");
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       number109: "109",
       locationId: "",
-      pickupLocationId: undefined,
       estimatedMiles: 0,
       specialInstructions: "",
       status: "created",
@@ -107,7 +107,6 @@ export default function LoadForm() {
       form.reset({
         number109: "109",
         locationId: "",
-        pickupLocationId: undefined,
         estimatedMiles: 0,
         specialInstructions: "",
         status: "created",
@@ -289,25 +288,25 @@ export default function LoadForm() {
                 </div>
               )}
 
+
               <FormField
                 control={form.control}
-                name="pickupLocationId"
+                name="locationId"
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center gap-2">
-                      <FormLabel>Pickup Location</FormLabel>
+                      <FormLabel>Location</FormLabel>
                       <HelpButton 
-                        content="Select where the load will be picked up from. This is optional - leave blank if pickup details are in special instructions."
+                        content="Select a location, then choose whether it's a shipper (pickup) or receiver (delivery) below."
                       />
                     </div>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Pickup Location (Optional)" />
+                          <SelectValue placeholder="Select Location" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="">No specific pickup location</SelectItem>
                         {locations.length > 0 ? (
                           locations.map((location: any) => (
                             <SelectItem key={location.id} value={location.id}>
@@ -326,41 +325,29 @@ export default function LoadForm() {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="locationId"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center gap-2">
-                      <FormLabel>Primary Delivery Location</FormLabel>
-                      <HelpButton 
-                        content="Select the main delivery destination. You can add more stops using the 'Add Stop' button below."
-                      />
-                    </div>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Delivery Location" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {locations.length > 0 ? (
-                          locations.map((location: any) => (
-                            <SelectItem key={location.id} value={location.id}>
-                              {location.name} - {location.city}, {location.state}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-locations" disabled>
-                            No locations available - Add locations first
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Location Type Selection */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Label className="text-sm font-medium">This location is a:</Label>
+                  <HelpButton 
+                    content="Choose whether this location is where you pick up the load (shipper) or deliver the load (receiver)."
+                  />
+                </div>
+                <RadioGroup
+                  value={locationType}
+                  onValueChange={(value: "shipper" | "receiver") => setLocationType(value)}
+                  className="flex gap-6"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="shipper" id="shipper" />
+                    <Label htmlFor="shipper" className="text-sm">Shipper (Pickup)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="receiver" id="receiver" />
+                    <Label htmlFor="receiver" className="text-sm">Receiver (Delivery)</Label>
+                  </div>
+                </RadioGroup>
+              </div>
 
               {/* Extra Stops Section */}
               <div className="space-y-3">
