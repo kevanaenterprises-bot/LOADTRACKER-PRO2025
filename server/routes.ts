@@ -3351,6 +3351,44 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // TEMPORARY: Fix loads in awaiting_payment without invoices
+  app.post("/api/admin/fix-payment-status", async (req, res) => {
+    try {
+      console.log("🔧 FIXING LOADS: Checking for loads in awaiting_payment without invoices");
+      
+      // Get all loads and invoices
+      const allLoads = await storage.getLoads();
+      const allInvoices = await storage.getInvoices();
+      
+      // Find loads in awaiting_payment without invoices
+      const problemLoads = allLoads.filter(load => {
+        const hasInvoice = allInvoices.some(invoice => invoice.loadId === load.id);
+        return load.status === "awaiting_payment" && !hasInvoice;
+      });
+      
+      console.log(`Found ${problemLoads.length} problematic loads in awaiting_payment without invoices:`, 
+        problemLoads.map(load => load.number109));
+      
+      // Fix them by moving back to awaiting_invoicing
+      const fixedLoads = [];
+      for (const load of problemLoads) {
+        await storage.updateLoadStatus(load.id, "awaiting_invoicing");
+        fixedLoads.push(load.number109);
+        console.log(`✅ Fixed load ${load.number109}: moved from awaiting_payment → awaiting_invoicing`);
+      }
+      
+      res.json({
+        message: `Fixed ${problemLoads.length} loads with incorrect status`,
+        fixedLoads,
+        action: "Moved from awaiting_payment → awaiting_invoicing (they need invoices generated first)"
+      });
+      
+    } catch (error) {
+      console.error("Error fixing load statuses:", error);
+      res.status(500).json({ message: "Failed to fix load statuses", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Manual invoice generation endpoint - COMPLETELY OPEN FOR TESTING
   app.post("/api/loads/:id/generate-invoice", async (req, res) => {
     try {
