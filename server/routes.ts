@@ -4163,9 +4163,18 @@ Reply YES to confirm acceptance or NO to decline.`
 
       console.log(`🖨️ POD Status for preview:`, {
         loadNumber: load.number109,
+        loadId: load.id,
         podDocumentPath: load.podDocumentPath,
-        hasPOD: !!load.podDocumentPath
+        hasPOD: !!load.podDocumentPath,
+        createdAt: load.createdAt,
+        updatedAt: load.updatedAt
       });
+
+      // Check if this load has any POD but the path is broken/orphaned
+      if (!load.podDocumentPath) {
+        console.log(`⚠️ NO POD DOCUMENTS - Load ${load.number109} (ID: ${load.id}) has no POD attachments`);
+        console.log(`💡 This could be due to load deletion/recreation cycle - check if load was recently recreated`);
+      }
 
       // Generate the base invoice HTML (simplified - no rate confirmation)
       const baseHTML = generateInvoiceOnlyHTML(invoice, load);
@@ -4221,7 +4230,11 @@ Reply YES to confirm acceptance or NO to decline.`
           console.error(`❌ Error processing POD for preview:`, error);
         }
       } else {
-        console.log(`⚠️ No POD document uploaded for load ${load.number109} - preview will show invoice only`);
+        console.log(`⚠️ No POD document uploaded for load ${load.number109} (ID: ${load.id}) - preview will show invoice only`);
+        console.log(`🔍 DIAGNOSIS: If POD was recently uploaded but not showing:`);
+        console.log(`   - Check if load was deleted and recreated (new ID breaks POD links)`);
+        console.log(`   - Verify POD upload completed successfully`);
+        console.log(`   - Check object storage for orphaned files`);
       }
       
       // Embed POD images into the preview HTML if available - USE SAME FUNCTION AS EMAIL
