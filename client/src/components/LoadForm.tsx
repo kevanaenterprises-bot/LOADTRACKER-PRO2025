@@ -61,29 +61,14 @@ type LoadStop = {
 export default function LoadForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [stops, setStops] = useState<LoadStop[]>([]);
-  const [showStopDialog, setShowStopDialog] = useState(false);
+  
+  // Simplified state for the new workflow
+  const [loadNumber, setLoadNumber] = useState("109-");
+  const [currentLocationId, setCurrentLocationId] = useState("");
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
-  const [selectedLocationId, setSelectedLocationId] = useState("");
-  const [stopNotes, setStopNotes] = useState("");
+  const [stops, setStops] = useState<LoadStop[]>([]);
   const [showOverride, setShowOverride] = useState(false);
   const [overridePassword, setOverridePassword] = useState("");
-  const [locationType, setLocationType] = useState<"shipper" | "receiver">("receiver");
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      number109: "109",
-      locationId: "",
-      estimatedMiles: 0,
-      specialInstructions: "",
-      status: "created",
-      flatRate: "0.00",
-      lumperCharge: "0.00", 
-      extraStops: "0.00",
-      driverConfirmed: false,
-    },
-  });
 
   const { data: locations = [] } = useQuery<any[]>({
     queryKey: ["/api/locations"],
@@ -92,10 +77,10 @@ export default function LoadForm() {
   });
 
   const createLoadMutation = useMutation({
-    mutationFn: async (data: FormData & { stops?: LoadStop[]; overridePassword?: string }) => {
+    mutationFn: async (data: { number109: string; stops: LoadStop[]; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
-      if (!data.locationId) {
-        throw new Error("Please select a location");
+      if (data.stops.length === 0) {
+        throw new Error("Please add at least one stop");
       }
       return await apiRequest("/api/loads", "POST", data);
     },
@@ -104,13 +89,9 @@ export default function LoadForm() {
         title: "Success", 
         description: "Load created successfully! You can now assign a driver from the loads table.",
       });
-      form.reset({
-        number109: "109",
-        locationId: "",
-        estimatedMiles: 0,
-        specialInstructions: "",
-        status: "created",
-      });
+      setLoadNumber("109-");
+      setCurrentLocationId("");
+      setCurrentStopType("pickup");
       setStops([]);
       setShowOverride(false);
       setOverridePassword("");
@@ -150,9 +131,8 @@ export default function LoadForm() {
     },
   });
 
-  const handleAddLocationAsStop = () => {
-    const selectedLocationId = form.watch("locationId");
-    if (!selectedLocationId) {
+  const handleAddStop = () => {
+    if (!currentLocationId) {
       toast({
         title: "Error",
         description: "Please select a location first",
@@ -161,12 +141,12 @@ export default function LoadForm() {
       return;
     }
 
-    const selectedLocation = locations.find((loc: any) => loc.id === selectedLocationId);
+    const selectedLocation = locations.find((loc: any) => loc.id === currentLocationId);
     
     const newStop: LoadStop = {
-      stopType: locationType === "shipper" ? "pickup" : "dropoff",
+      stopType: currentStopType,
       stopSequence: stops.length + 1,
-      locationId: selectedLocationId,
+      locationId: currentLocationId,
       companyName: selectedLocation?.name || "",
       address: selectedLocation?.address || "",
       contactName: selectedLocation?.contactName || "",
@@ -176,49 +156,41 @@ export default function LoadForm() {
 
     setStops([...stops, newStop]);
     
-    // Reset the form for next location
-    form.setValue("locationId", "");
-    setLocationType("receiver");
+    // Reset for next stop
+    setCurrentLocationId("");
+    setCurrentStopType("pickup"); // Start with pickup for next stop
     
     toast({
       title: "Stop Added",
-      description: `${locationType === "shipper" ? "Pickup" : "Delivery"} stop added successfully`,
+      description: `${currentStopType === "pickup" ? "Pickup" : "Delivery"} stop added successfully`,
     });
   };
 
-  const handleAddStop = () => {
-    console.log("🔘 Add Stop button clicked - opening dialog");
-    setShowStopDialog(true);
-    setCurrentStopType("pickup");
-    setSelectedLocationId("");
-    setStopNotes("");
-  };
-
-  const confirmAddStop = () => {
-    if (!selectedLocationId) {
+  const handleCreateLoad = () => {
+    if (!loadNumber.trim()) {
       toast({
         title: "Error",
-        description: "Please select a company/location for this stop",
+        description: "Please enter a load number",
         variant: "destructive",
       });
       return;
     }
 
-    const selectedLocation = locations.find((loc: any) => loc.id === selectedLocationId);
-    
-    const newStop: LoadStop = {
-      stopType: currentStopType,
-      stopSequence: stops.length + 1,
-      locationId: selectedLocationId,
-      companyName: selectedLocation?.name || "",
-      address: selectedLocation?.address || "",
-      contactName: selectedLocation?.contactName || "",
-      contactPhone: selectedLocation?.contactPhone || "",
-      notes: stopNotes,
-    };
+    if (stops.length === 0) {
+      toast({
+        title: "Error", 
+        description: "Please add at least one stop before creating the load",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    setStops([...stops, newStop]);
-    setShowStopDialog(false);
+    const submitData = {
+      number109: loadNumber,
+      stops,
+      ...(showOverride && overridePassword ? { overridePassword } : {}),
+    };
+    createLoadMutation.mutate(submitData);
   };
 
   const removeStop = (index: number) => {
@@ -231,387 +203,180 @@ export default function LoadForm() {
     setStops(resequencedStops);
   };
 
-  const moveStopUp = (index: number) => {
-    if (index === 0) return; // Can't move first item up
-    
-    const newStops = [...stops];
-    // Swap with previous item
-    [newStops[index - 1], newStops[index]] = [newStops[index], newStops[index - 1]];
-    
-    // Update sequence numbers
-    const resequencedStops = newStops.map((stop, i) => ({
-      ...stop,
-      stopSequence: i + 1,
-    }));
-    setStops(resequencedStops);
-  };
-
-  const moveStopDown = (index: number) => {
-    if (index === stops.length - 1) return; // Can't move last item down
-    
-    const newStops = [...stops];
-    // Swap with next item
-    [newStops[index], newStops[index + 1]] = [newStops[index + 1], newStops[index]];
-    
-    // Update sequence numbers
-    const resequencedStops = newStops.map((stop, i) => ({
-      ...stop,
-      stopSequence: i + 1,
-    }));
-    setStops(resequencedStops);
-  };
-
-  const onSubmit = (data: FormData) => {
-    const submitData = {
-      ...data,
-      stops,
-      ...(showOverride && overridePassword ? { overridePassword } : {}),
-    };
-    createLoadMutation.mutate(submitData);
-  };
-
   return (
-    <>
-      <Card className="material-card">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span>Create New Load</span>
-              <HelpButton 
-                title="Creating Loads"
-                content="Start by entering the load number, select the primary destination, add estimated miles, and optionally add multiple pickup/dropoff stops."
-              />
-            </div>
-            <i className="fas fa-plus-circle text-primary text-xl"></i>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="number109"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center gap-2">
-                      <FormLabel>109 Number</FormLabel>
-                      <HelpButton 
-                        content="Enter your unique load number. It can be any format like 109-12345, ABC-5678, or any broker's numbering system."
-                      />
-                    </div>
-                    <FormControl>
-                      <Input {...field} placeholder="109-2024-001" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <Card className="material-card">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span>Create New Load</span>
+            <HelpButton 
+              title="Simple Load Creation"
+              content="1. Enter load number 2. Select location 3. Choose pickup or delivery 4. Click Add Stop 5. Repeat for more stops 6. Click Create Load"
+            />
+          </div>
+          <i className="fas fa-plus-circle text-primary text-xl"></i>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        
+        {/* Step 1: Load Number */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Step 1: Load Number</Label>
+          <Input
+            value={loadNumber}
+            onChange={(e) => setLoadNumber(e.target.value)}
+            placeholder="109-2024-001"
+            className="text-lg"
+          />
+        </div>
 
-              {/* Override Password Field - shown when duplicate detected */}
-              {showOverride && (
-                <div className="space-y-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <Label className="text-yellow-800">Override Password Required</Label>
-                  <Input
-                    type="password"
-                    value={overridePassword}
-                    onChange={(e) => setOverridePassword(e.target.value)}
-                    placeholder="Enter override password"
-                    className="bg-white"
-                  />
-                  <p className="text-sm text-yellow-700">
-                    This 109 number already exists. Enter the override password to recreate it.
-                  </p>
-                </div>
-              )}
+        {/* Override Password Field - shown when duplicate detected */}
+        {showOverride && (
+          <div className="space-y-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <Label className="text-yellow-800">Override Password Required</Label>
+            <Input
+              type="password"
+              value={overridePassword}
+              onChange={(e) => setOverridePassword(e.target.value)}
+              placeholder="Enter override password"
+              className="bg-white"
+            />
+            <p className="text-sm text-yellow-700">
+              This load number already exists. Enter the override password to recreate it.
+            </p>
+          </div>
+        )}
 
-
-              <FormField
-                control={form.control}
-                name="locationId"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center gap-2">
-                      <FormLabel>Location</FormLabel>
-                      <HelpButton 
-                        content="Select a location, then choose whether it's a shipper (pickup) or receiver (delivery) below."
-                      />
-                    </div>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Location" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {locations.length > 0 ? (
-                          locations.map((location: any) => (
-                            <SelectItem key={location.id} value={location.id}>
-                              {location.name} - {location.city}, {location.state}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <SelectItem value="no-locations" disabled>
-                            No locations available - Add locations first
-                          </SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Location Type Selection and Add Button */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Label className="text-sm font-medium">This location is a:</Label>
-                  <HelpButton 
-                    content="Choose whether this location is where you pick up the load (shipper) or deliver the load (receiver), then click 'Add as Stop'."
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <RadioGroup
-                    value={locationType}
-                    onValueChange={(value: "shipper" | "receiver") => setLocationType(value)}
-                    className="flex gap-6"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="shipper" id="shipper" />
-                      <Label htmlFor="shipper" className="text-sm">Shipper (Pickup)</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="receiver" id="receiver" />
-                      <Label htmlFor="receiver" className="text-sm">Receiver (Delivery)</Label>
-                    </div>
-                  </RadioGroup>
-                  
-                  <Button
-                    type="button"
-                    variant="default"
-                    size="sm"
-                    onClick={handleAddLocationAsStop}
-                    disabled={!form.watch("locationId")}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add as Stop
-                  </Button>
-                </div>
-              </div>
-
-              {/* Stops Section */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-base font-semibold">Stops for this Load</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddStop}
-                    className="flex items-center gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Another Stop
-                  </Button>
-                </div>
-
-                {stops.length > 0 && (
-                  <div className="space-y-2 p-3 bg-gray-50 rounded-lg">
-                    {stops.map((stop, index) => (
-                      <div 
-                        key={index}
-                        className="flex items-center justify-between p-3 bg-white rounded-md border"
-                      >
-                        <div className="flex items-center gap-3">
-                          {stop.stopType === "pickup" ? (
-                            <Package className="h-5 w-5 text-blue-500" />
-                          ) : (
-                            <MapPin className="h-5 w-5 text-green-500" />
-                          )}
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant={stop.stopType === "pickup" ? "secondary" : "default"}>
-                                Stop {stop.stopSequence}: {stop.stopType === "pickup" ? "Pickup" : "Drop-off"}
-                              </Badge>
-                              <span className="font-medium">{stop.companyName}</span>
-                            </div>
-                            {stop.notes && (
-                              <p className="text-sm text-gray-600 mt-1">{stop.notes}</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => moveStopUp(index)}
-                            disabled={index === 0}
-                          >
-                            <ArrowUp className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => moveStopDown(index)}
-                            disabled={index === stops.length - 1}
-                          >
-                            <ArrowDown className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeStop(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Driver assignment note */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-700">
-                  <strong>Note:</strong> Driver assignment has been moved to after load creation.
-                  Once you create this load, you can assign a driver from the loads table.
-                </p>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="estimatedMiles"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estimated Miles</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="0" {...field} placeholder="0" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="specialInstructions"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Special Instructions</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        {...field} 
-                        value={field.value || ""}
-                        rows={3}
-                        placeholder="Any special delivery instructions..."
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={createLoadMutation.isPending}
-              >
-                {createLoadMutation.isPending ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-plus mr-2"></i>
-                    Create Load
-                  </>
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-
-      {/* Add Stop Dialog */}
-      <Dialog open={showStopDialog} onOpenChange={setShowStopDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Additional Stop</DialogTitle>
-            <DialogDescription>
-              Configure the details for this extra stop in your load route.
-            </DialogDescription>
-          </DialogHeader>
+        {/* Step 2: Add Stops */}
+        <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
+          <Label className="text-sm font-medium">Step 2: Add Stops</Label>
           
-          <div className="space-y-4 py-4">
-            <div className="space-y-3">
-              <Label>Stop Type</Label>
-              <RadioGroup value={currentStopType} onValueChange={(value) => setCurrentStopType(value as "pickup" | "dropoff")}>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="pickup" id="pickup" />
-                  <Label htmlFor="pickup" className="cursor-pointer flex items-center gap-2">
-                    <Package className="h-4 w-4 text-blue-500" />
-                    Pickup
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="dropoff" id="dropoff" />
-                  <Label htmlFor="dropoff" className="cursor-pointer flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-green-500" />
-                    Drop-off
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Company/Location</Label>
-              <Select value={selectedLocationId} onValueChange={setSelectedLocationId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select company for this stop" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.length > 0 ? (
-                    locations.map((location: any) => (
-                      <SelectItem key={location.id} value={location.id}>
-                        {location.name} - {location.city}, {location.state}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="no-locations" disabled>
-                      No locations available
+          {/* Location Selection */}
+          <div className="space-y-2">
+            <Label className="text-xs text-gray-600">Location</Label>
+            <Select value={currentLocationId} onValueChange={setCurrentLocationId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Location" />
+              </SelectTrigger>
+              <SelectContent>
+                {locations.length > 0 ? (
+                  locations.map((location: any) => (
+                    <SelectItem key={location.id} value={location.id}>
+                      {location.name} - {location.city}, {location.state}
                     </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+                  ))
+                ) : (
+                  <SelectItem value="no-locations" disabled>
+                    No locations available
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
 
+          {/* Pickup or Delivery */}
+          <div className="space-y-2">
+            <Label className="text-xs text-gray-600">Type</Label>
+            <RadioGroup
+              value={currentStopType}
+              onValueChange={(value: "pickup" | "dropoff") => setCurrentStopType(value)}
+              className="flex gap-6"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pickup" id="current-pickup" />
+                <Label htmlFor="current-pickup" className="text-sm flex items-center gap-2">
+                  <Package className="h-4 w-4 text-blue-500" />
+                  Pickup
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="dropoff" id="current-dropoff" />
+                <Label htmlFor="current-dropoff" className="text-sm flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-green-500" />
+                  Delivery
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Add Stop Button */}
+          <Button
+            type="button"
+            onClick={handleAddStop}
+            disabled={!currentLocationId}
+            className="w-full"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Stop
+          </Button>
+        </div>
+
+        {/* Step 3: Added Stops */}
+        {stops.length > 0 && (
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Added Stops ({stops.length})</Label>
             <div className="space-y-2">
-              <Label htmlFor="stop-notes">Special Instructions (Optional)</Label>
-              <Textarea 
-                id="stop-notes"
-                value={stopNotes}
-                onChange={(e) => setStopNotes(e.target.value)}
-                placeholder="Any special instructions for this stop..."
-                rows={2}
-              />
+              {stops.map((stop, index) => (
+                <div 
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-white rounded-md border"
+                >
+                  <div className="flex items-center gap-3">
+                    {stop.stopType === "pickup" ? (
+                      <Package className="h-5 w-5 text-blue-500" />
+                    ) : (
+                      <MapPin className="h-5 w-5 text-green-500" />
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={stop.stopType === "pickup" ? "secondary" : "default"}>
+                          {stop.stopSequence}. {stop.stopType === "pickup" ? "Pickup" : "Delivery"}
+                        </Badge>
+                        <span className="font-medium">{stop.companyName}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeStop(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
             </div>
           </div>
+        )}
 
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setShowStopDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={confirmAddStop}>
-              Add Stop
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+        {/* Step 4: Create Load */}
+        <Button 
+          onClick={handleCreateLoad}
+          disabled={createLoadMutation.isPending || stops.length === 0}
+          className="w-full text-lg py-6"
+          size="lg"
+        >
+          {createLoadMutation.isPending ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+              Creating Load...
+            </>
+          ) : (
+            <>
+              <i className="fas fa-plus mr-2"></i>
+              Create Load ({stops.length} stops)
+            </>
+          )}
+        </Button>
+
+        {stops.length === 0 && (
+          <p className="text-sm text-gray-500 text-center">
+            Add at least one stop to create the load
+          </p>
+        )}
+
+      </CardContent>
+    </Card>
   );
 }
