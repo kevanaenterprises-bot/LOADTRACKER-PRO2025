@@ -553,14 +553,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteLoad(id: string): Promise<void> {
-    // Delete related records first to maintain referential integrity
-    await db.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
-    await db.delete(bolNumbers).where(eq(bolNumbers.loadId, id));
-    await db.delete(invoices).where(eq(invoices.loadId, id));
-    await db.delete(loadStops).where(eq(loadStops.loadId, id)); // Delete load stops
+    console.log(`🗑️ DELETING LOAD: Starting deletion process for load ID: ${id}`);
     
-    // Finally delete the load itself
-    await db.delete(loads).where(eq(loads.id, id));
+    try {
+      // Delete related records first to maintain referential integrity
+      console.log(`🗑️ Step 1: Deleting load status history for load ${id}`);
+      await db.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
+      
+      console.log(`🗑️ Step 2: Deleting BOL numbers for load ${id}`);
+      await db.delete(bolNumbers).where(eq(bolNumbers.loadId, id));
+      
+      console.log(`🗑️ Step 3: Deleting invoices for load ${id}`);
+      await db.delete(invoices).where(eq(invoices.loadId, id));
+      
+      console.log(`🗑️ Step 4: Deleting load stops for load ${id}`);
+      await db.delete(loadStops).where(eq(loadStops.loadId, id));
+      
+      console.log(`🗑️ Step 5: Deleting the main load record for ${id}`);
+      await db.delete(loads).where(eq(loads.id, id));
+      
+      console.log(`✅ SUCCESS: Load ${id} deleted successfully`);
+    } catch (error) {
+      console.error(`❌ DELETE ERROR: Failed to delete load ${id}:`, error);
+      throw error;
+    }
   }
 
   async checkBOLExists(bolNumber: string): Promise<boolean> {

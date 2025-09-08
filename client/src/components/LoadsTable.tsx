@@ -436,10 +436,17 @@ export default function LoadsTable() {
         title: "Load Deleted",
         description: `Load ${data.deletedLoad} has been successfully deleted.`,
       });
+      // Force immediate refresh of all data
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.refetchQueries({ queryKey: ["/api/loads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       setDeleteDialogOpen(false);
       setLoadToDelete(null);
+      
+      // Force page refresh as backup
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     },
     onError: (error: any) => {
       toast({
