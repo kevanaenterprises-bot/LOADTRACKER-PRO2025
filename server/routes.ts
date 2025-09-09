@@ -3148,7 +3148,11 @@ Reply YES to confirm acceptance or NO to decline.`
                 console.error(`❌ Failed to download POD document ${load.podDocumentPath} from object storage:`, storageError);
                 console.log(`📄 Trying fallback HTTP fetch for POD embedding...`);
                 try {
-                  const response = await fetch(`http://localhost:5000${podUrl}`, {
+                  // Use proper host resolution for production environments  
+                  const baseUrl = process.env.NODE_ENV === 'production' ? 
+                    `${req.protocol}://${req.get('host')}` : 
+                    'http://localhost:5000';
+                  const response = await fetch(`${baseUrl}${podUrl}`, {
                     headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
                   });
                   
@@ -4266,7 +4270,11 @@ Reply YES to confirm acceptance or NO to decline.`
             console.log(`🖨️ Using fallback fetch for POD: ${load.podDocumentPath}`);
             try {
               const podUrl = load.podDocumentPath.startsWith('/') ? load.podDocumentPath : `/${load.podDocumentPath}`;
-              const response = await fetch(`http://localhost:5000${podUrl}`, {
+              // Use proper host resolution for production environments
+              const baseUrl = process.env.NODE_ENV === 'production' ? 
+                `${req.protocol}://${req.get('host')}` : 
+                'http://localhost:5000';
+              const response = await fetch(`${baseUrl}${podUrl}`, {
                 headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
               });
               
