@@ -3995,7 +3995,29 @@ Reply YES to confirm acceptance or NO to decline.`
   }
 
   // Serve private objects (POD documents)
-  app.get("/objects/:objectPath(*)", isAuthenticated, async (req, res) => {
+  app.get("/objects/:objectPath(*)", (req, res, next) => {
+    // Support Replit auth, driver auth, or bypass token for object access
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
+    const hasDriverAuth = (req.session as any)?.driverAuth;
+    const hasAuth = hasReplitAuth || hasDriverAuth || hasTokenBypass;
+    
+    console.log("Object access auth check:", {
+      path: req.path,
+      hasReplitAuth,
+      hasDriverAuth,
+      hasTokenBypass,
+      finalAuth: hasAuth
+    });
+    
+    if (hasAuth) {
+      next();
+    } else {
+      console.error("❌ Object access denied - no valid authentication");
+      res.status(401).json({ message: "Unauthorized" });
+    }
+  }, async (req, res) => {
     const userId = (req.user as any)?.claims?.sub;
     const objectStorageService = new ObjectStorageService();
     
