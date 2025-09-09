@@ -668,7 +668,8 @@ export default function LoadsTable() {
           loads={inTransitLoads}
           title="In Transit"
           color="text-yellow-700"
-          helpText="Loads currently being transported. Drivers are on the road!"
+          helpText="Loads currently being transported. Upload POD documents if available."
+          showPODUpload={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
         />
@@ -696,8 +697,9 @@ export default function LoadsTable() {
           loads={awaitingPaymentLoads}
           title="Awaiting Payment"
           color="text-orange-700"
-          helpText="Invoiced loads waiting for payment from customers."
+          helpText="Invoiced loads waiting for payment. Upload additional POD documents if needed."
           showPaymentButton={true}
+          showPODUpload={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
         />

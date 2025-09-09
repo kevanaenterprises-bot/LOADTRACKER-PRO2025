@@ -248,7 +248,7 @@ export function LoadSection({
                       </Button>
                     )}
 
-                    {showPODUpload && !load.podDocumentPath && (
+                    {showPODUpload && (
                       <Dialog open={podUploadDialogOpen} onOpenChange={setPodUploadDialogOpen}>
                         <DialogTrigger asChild>
                           <Button
@@ -258,7 +258,7 @@ export function LoadSection({
                             className="text-blue-600 hover:text-blue-700"
                           >
                             <Upload className="h-4 w-4 mr-1" />
-                            Upload POD
+                            {load.podDocumentPath ? 'Add More POD' : 'Upload POD'}
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl">
