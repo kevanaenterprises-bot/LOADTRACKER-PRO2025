@@ -434,7 +434,7 @@ export default function LoadsTable() {
         const errorText = await response.text();
         console.error(`🗑️ FRONTEND DELETE ERROR: Status ${response.status}, Response: ${errorText}`);
         
-        let errorData = {};
+        let errorData: any = {};
         try {
           errorData = JSON.parse(errorText);
         } catch (e) {

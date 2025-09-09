@@ -2756,12 +2756,12 @@ Reply YES to confirm acceptance or NO to decline.`
         message: "Load deleted successfully",
         deletedLoad: load.number109
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("🗑️ SERVER DELETE: Error deleting load:", error);
-      console.error("🗑️ SERVER DELETE: Error stack:", error.stack);
+      console.error("🗑️ SERVER DELETE: Error stack:", error?.stack);
       res.status(500).json({ 
         message: "Failed to delete load", 
-        error: error.message,
+        error: error?.message || 'Unknown error',
         loadId: req.params.id 
       });
     }
