@@ -417,6 +417,8 @@ export default function LoadsTable() {
   // Delete load mutation
   const deleteLoadMutation = useMutation({
     mutationFn: async (loadId: string) => {
+      console.log(`🗑️ FRONTEND DELETE: Attempting to delete load with ID: ${loadId}`);
+      
       const response = await fetch(`/api/loads/${loadId}`, {
         method: 'DELETE',
         headers: {
@@ -425,9 +427,22 @@ export default function LoadsTable() {
         },
         credentials: 'include',
       });
+      
+      console.log(`🗑️ FRONTEND DELETE: Response status: ${response.status}`);
+      
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to delete load');
+        const errorText = await response.text();
+        console.error(`🗑️ FRONTEND DELETE ERROR: Status ${response.status}, Response: ${errorText}`);
+        
+        let errorData = {};
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          // If response isn't JSON, use the text as error message
+          errorData = { message: errorText };
+        }
+        
+        throw new Error(errorData.message || `Delete failed: ${response.status} - ${errorText}`);
       }
       return response.json();
     },
@@ -560,6 +575,11 @@ export default function LoadsTable() {
 
   const confirmDeleteLoad = () => {
     if (loadToDelete) {
+      console.log(`🗑️ FRONTEND DELETE: Confirming deletion of load:`, {
+        id: loadToDelete.id,
+        number109: loadToDelete.number109,
+        fullLoadObject: loadToDelete
+      });
       deleteLoadMutation.mutate(loadToDelete.id);
     }
   };

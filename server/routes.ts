@@ -2717,40 +2717,53 @@ Reply YES to confirm acceptance or NO to decline.`
     const hasAdminAuth = (req.session as any)?.adminAuth;
     const hasAuth = hasReplitAuth || hasAdminAuth || hasTokenBypass;
     
-    console.log("Load deletion auth check:", {
+    console.log("🗑️ SERVER DELETE: Load deletion auth check:", {
+      loadId: req.params.id,
       hasReplitAuth,
       hasAdminAuth,
       hasTokenBypass,
+      bypassTokenProvided: !!bypassToken,
+      bypassTokenMatches: bypassToken === BYPASS_SECRET,
       finalAuth: hasAuth
     });
     
     if (hasAuth) {
       next();
     } else {
+      console.error("🗑️ SERVER DELETE: Authentication failed for load deletion");
       res.status(401).json({ message: "Unauthorized - admin access required for load deletion" });
     }
   }, async (req, res) => {
     try {
       const loadId = req.params.id;
+      console.log(`🗑️ SERVER DELETE: Processing deletion request for load ID: ${loadId}`);
       
       // Get load details before deletion
       const load = await storage.getLoad(loadId);
       if (!load) {
+        console.error(`🗑️ SERVER DELETE: Load not found with ID: ${loadId}`);
         return res.status(404).json({ message: "Load not found" });
       }
+      
+      console.log(`🗑️ SERVER DELETE: Found load ${load.number109} (ID: ${loadId}), proceeding with deletion`);
       
       // Delete the load
       await storage.deleteLoad(loadId);
       
-      console.log(`🗑️ Load ${load.number109} deleted by admin`);
+      console.log(`🗑️ SERVER DELETE: Successfully deleted load ${load.number109}`);
       
       res.json({
         message: "Load deleted successfully",
         deletedLoad: load.number109
       });
     } catch (error) {
-      console.error("Error deleting load:", error);
-      res.status(500).json({ message: "Failed to delete load" });
+      console.error("🗑️ SERVER DELETE: Error deleting load:", error);
+      console.error("🗑️ SERVER DELETE: Error stack:", error.stack);
+      res.status(500).json({ 
+        message: "Failed to delete load", 
+        error: error.message,
+        loadId: req.params.id 
+      });
     }
   });
 
