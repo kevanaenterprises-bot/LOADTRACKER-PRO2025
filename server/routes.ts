@@ -3758,38 +3758,49 @@ Reply YES to confirm acceptance or NO to decline.`
       try {
         const loadWithDetails = await storage.getLoad(req.params.id);
         if (loadWithDetails && loadWithDetails.location?.city && loadWithDetails.location?.state) {
-          // Get rate for the location
-          const rate = await storage.getRateByLocation(
-            loadWithDetails.location.city, 
-            loadWithDetails.location.state
-          );
           
-          if (rate) {
-            // Calculate invoice amount based on flat rate system
-            const flatRate = parseFloat(rate.flatRate.toString());
-            const lumperCharge = parseFloat(loadWithDetails.lumperCharge?.toString() || "0");
-            const extraStops = parseFloat(loadWithDetails.extraStops?.toString() || "0");
-            const extraStopsCharge = extraStops * 50;
-            const totalAmount = flatRate + lumperCharge + extraStopsCharge;
-
-            // Auto-generate invoice with sequential GO6000 series
-            const invoiceNumber = await storage.getNextInvoiceNumber();
-            await storage.createInvoice({
-              loadId: loadWithDetails.id,
-              invoiceNumber,
-              flatRate: rate.flatRate,
-              lumperCharge: loadWithDetails.lumperCharge || "0.00",
-              extraStopsCharge: extraStopsCharge.toString(),
-              extraStopsCount: parseFloat(loadWithDetails.extraStops?.toString() || "0"),
-              totalAmount: totalAmount.toString(),
-              status: "pending",
-            });
-
-            console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109}`);
+          // Check if invoice already exists for this load (PREVENT DUPLICATES)
+          const existingInvoices = await storage.getInvoices();
+          const hasInvoice = existingInvoices.some((inv: any) => inv.loadId === loadWithDetails.id);
+          
+          if (!hasInvoice) {
+            console.log(`📄 No existing invoice found - generating new invoice for load ${loadWithDetails.number109}`);
             
-            // Move to awaiting_invoicing after generating invoice
-            await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
-            console.log(`✅ Load ${req.params.id} moved to AWAITING_INVOICING - invoice generated`);
+            // Get rate for the location
+            const rate = await storage.getRateByLocation(
+              loadWithDetails.location.city, 
+              loadWithDetails.location.state
+            );
+            
+            if (rate) {
+              // Calculate invoice amount based on flat rate system
+              const flatRate = parseFloat(rate.flatRate.toString());
+              const lumperCharge = parseFloat(loadWithDetails.lumperCharge?.toString() || "0");
+              const extraStops = parseFloat(loadWithDetails.extraStops?.toString() || "0");
+              const extraStopsCharge = extraStops * 50;
+              const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+
+              // Auto-generate invoice with sequential GO6000 series
+              const invoiceNumber = await storage.getNextInvoiceNumber();
+              await storage.createInvoice({
+                loadId: loadWithDetails.id,
+                invoiceNumber,
+                flatRate: rate.flatRate,
+                lumperCharge: loadWithDetails.lumperCharge || "0.00",
+                extraStopsCharge: extraStopsCharge.toString(),
+                extraStopsCount: parseFloat(loadWithDetails.extraStops?.toString() || "0"),
+                totalAmount: totalAmount.toString(),
+                status: "pending",
+              });
+
+              console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109}`);
+              
+              // Move to awaiting_invoicing after generating invoice
+              await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
+              console.log(`✅ Load ${req.params.id} moved to AWAITING_INVOICING - invoice generated`);
+            }
+          } else {
+            console.log(`📄 Invoice already exists for load ${loadWithDetails.number109} - skipping invoice generation`);
           }
         }
       } catch (invoiceError) {
