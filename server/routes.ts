@@ -3371,6 +3371,98 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // DEBUG: Check specific load POD and invoice status 
+  app.get("/api/debug/load/:loadNumber", (req, res, next) => {
+    // Admin/Replit auth only for debugging operations
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required for debugging operations" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadNumber = req.params.loadNumber;
+      console.log(`🔍 DEBUG: Checking load ${loadNumber}`);
+      
+      // Find load by number
+      const allLoads = await storage.getLoads();
+      const load = allLoads.find(l => l.number109 === loadNumber);
+      
+      if (!load) {
+        return res.json({
+          found: false,
+          message: `Load ${loadNumber} not found`,
+          totalLoads: allLoads.length
+        });
+      }
+      
+      // Check for invoice
+      const allInvoices = await storage.getInvoices();
+      const invoice = allInvoices.find(inv => inv.loadId === load.id);
+      
+      // Check POD status
+      let podStatus = {
+        hasPOD: !!load.podDocumentPath,
+        podPath: load.podDocumentPath,
+        podType: null as string | null,
+        podAccessible: false,
+        podSize: 0
+      };
+      
+      if (load.podDocumentPath) {
+        try {
+          if (load.podDocumentPath.startsWith('/objects/')) {
+            // Try to access object storage POD
+            const objectStorageService = new ObjectStorageService();
+            const objectFile = await objectStorageService.getObjectEntityFile(load.podDocumentPath);
+            const [metadata] = await objectFile.getMetadata();
+            podStatus.podAccessible = true;
+            podStatus.podType = metadata.contentType || 'unknown';
+            podStatus.podSize = parseInt(metadata.size?.toString() || '0') || 0;
+          }
+        } catch (podError) {
+          console.error(`❌ POD access error for ${loadNumber}:`, podError);
+          podStatus.podAccessible = false;
+        }
+      }
+      
+      res.json({
+        found: true,
+        loadData: {
+          id: load.id,
+          number109: load.number109,
+          status: load.status,
+          createdAt: load.createdAt,
+          updatedAt: load.updatedAt,
+          driverId: load.driverId,
+          locationId: load.locationId
+        },
+        podStatus,
+        invoiceData: invoice ? {
+          id: invoice.id,
+          invoiceNumber: invoice.invoiceNumber,
+          totalAmount: invoice.totalAmount,
+          status: invoice.status,
+          generatedAt: invoice.generatedAt
+        } : null,
+        diagnosis: {
+          hasInvoice: !!invoice,
+          shouldHaveInvoice: !!load.podDocumentPath,
+          autoInvoiceWorked: !!invoice && !!load.podDocumentPath,
+          statusAllowsInvoice: ['completed', 'delivered', 'awaiting_invoicing', 'awaiting_payment'].includes(load.status)
+        }
+      });
+      
+    } catch (error) {
+      console.error("❌ Debug operation failed:", error);
+      res.status(500).json({ 
+        message: "Debug operation failed", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
   // MAINTENANCE: Backfill invoices for loads with PODs but no invoices
   app.post("/api/maintenance/backfill-pod-invoices", (req, res, next) => {
     // STRICT admin auth only for maintenance operations - no driver access
