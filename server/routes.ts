@@ -3499,18 +3499,45 @@ Reply YES to confirm acceptance or NO to decline.`
       console.log(`Found ${problemLoads.length} problematic loads in awaiting_payment without invoices:`, 
         problemLoads.map(load => load.number109));
       
-      // Fix them by moving back to awaiting_invoicing
+      // Fix them by generating missing invoices and keeping in awaiting_payment
       const fixedLoads = [];
       for (const load of problemLoads) {
-        await storage.updateLoadStatus(load.id, "awaiting_invoicing");
-        fixedLoads.push(load.number109);
-        console.log(`✅ Fixed load ${load.number109}: moved from awaiting_payment → awaiting_invoicing`);
+        // Generate invoice if missing (similar to backfill logic)
+        if (load.location?.city && load.location?.state) {
+          const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+          if (rate) {
+            const flatRate = parseFloat(rate.flatRate.toString());
+            const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
+            const extraStops = parseFloat(load.extraStops?.toString() || "0");
+            const extraStopsCharge = extraStops * 50;
+            const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+
+            const invoiceNumber = await storage.getNextInvoiceNumber();
+            await storage.createInvoice({
+              loadId: load.id,
+              invoiceNumber,
+              flatRate: rate.flatRate,
+              lumperCharge: load.lumperCharge || "0.00",
+              extraStopsCharge: extraStopsCharge.toString(),
+              extraStopsCount: extraStops,
+              totalAmount: totalAmount.toString(),
+              status: "pending",
+            });
+            
+            fixedLoads.push(`${load.number109} (generated invoice ${invoiceNumber})`);
+            console.log(`✅ Fixed load ${load.number109}: generated missing invoice ${invoiceNumber}`);
+          } else {
+            fixedLoads.push(`${load.number109} (no rate found)`);
+          }
+        } else {
+          fixedLoads.push(`${load.number109} (no location data)`);
+        }
       }
       
       res.json({
-        message: `Fixed ${problemLoads.length} loads with incorrect status`,
+        message: `Fixed ${problemLoads.length} loads with missing invoices`,
         fixedLoads,
-        action: "Moved from awaiting_payment → awaiting_invoicing (they need invoices generated first)"
+        action: "Generated missing invoices for loads in awaiting_payment"
       });
       
     } catch (error) {
