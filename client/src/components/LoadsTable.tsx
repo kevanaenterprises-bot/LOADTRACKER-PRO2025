@@ -231,12 +231,25 @@ export default function LoadsTable() {
     }
   };
 
-  const { data: loads, isLoading } = useQuery({
+  const { data: loads, isLoading, refetch } = useQuery({
     queryKey: ["/api/loads"],
     retry: false,
     refetchOnWindowFocus: false,
     staleTime: 0, // Always consider data stale to allow quick updates
   });
+
+  // Force clear cache and refresh loads
+  const clearCacheAndRefresh = async () => {
+    console.log("🔄 CACHE CLEAR: Forcing cache invalidation and refresh");
+    await queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+    await queryClient.refetchQueries({ queryKey: ["/api/loads"] });
+    console.log("✅ CACHE CLEAR: Cache cleared and data refreshed");
+    toast({
+      title: "Cache Cleared",
+      description: "Load data refreshed from database",
+      variant: "default",
+    });
+  };
 
   const { data: invoices = [] } = useQuery({
     queryKey: ["/api/invoices"],
