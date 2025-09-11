@@ -3371,6 +3371,116 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // MAINTENANCE: Backfill invoices for loads with PODs but no invoices
+  app.post("/api/maintenance/backfill-pod-invoices", (req, res, next) => {
+    // STRICT admin auth only for maintenance operations - no driver access
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    if (hasAdminAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Admin authentication required for maintenance operations" });
+    }
+  }, async (req, res) => {
+    try {
+      console.log("🔧 BACKFILL: Starting POD invoice backfill process...");
+      
+      const allLoads = await storage.getLoads();
+      const allInvoices = await storage.getInvoices();
+      
+      // Find loads with PODs but no invoices
+      const problemLoads = allLoads.filter(load => {
+        const hasInvoice = allInvoices.some((inv: any) => inv.loadId === load.id);
+        const hasPOD = load.podDocumentPath && load.podDocumentPath.trim() !== '';
+        const validStatus = ['awaiting_invoicing', 'completed', 'delivered'].includes(load.status);
+        
+        return hasPOD && !hasInvoice && validStatus;
+      });
+      
+      console.log(`Found ${problemLoads.length} loads with PODs but no invoices:`, 
+        problemLoads.map(load => ({ 
+          id: load.id, 
+          number109: load.number109, 
+          status: load.status,
+          hasPOD: !!load.podDocumentPath
+        }))
+      );
+      
+      const results = [];
+      
+      for (const load of problemLoads) {
+        try {
+          // Get rate for the location
+          if (load.location?.city && load.location?.state) {
+            const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+            
+            if (rate) {
+              // Calculate invoice amount
+              const flatRate = parseFloat(rate.flatRate.toString());
+              const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
+              const extraStops = parseFloat(load.extraStops?.toString() || "0");
+              const extraStopsCharge = extraStops * 50;
+              const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+
+              // Generate invoice
+              const invoiceNumber = await storage.getNextInvoiceNumber();
+              await storage.createInvoice({
+                loadId: load.id,
+                invoiceNumber,
+                flatRate: rate.flatRate,
+                lumperCharge: load.lumperCharge || "0.00",
+                extraStopsCharge: extraStopsCharge.toString(),
+                extraStopsCount: extraStops,
+                totalAmount: totalAmount.toString(),
+                status: "pending",
+              });
+
+              // Move to awaiting_payment
+              await storage.updateLoadStatus(load.id, "awaiting_payment");
+              
+              results.push({
+                loadId: load.id,
+                loadNumber: load.number109,
+                invoiceNumber,
+                totalAmount,
+                action: "Generated invoice and moved to awaiting_payment"
+              });
+              
+              console.log(`✅ Generated invoice ${invoiceNumber} for load ${load.number109}`);
+            } else {
+              results.push({
+                loadId: load.id,
+                loadNumber: load.number109,
+                action: "Skipped - no rate found for location"
+              });
+            }
+          } else {
+            results.push({
+              loadId: load.id,
+              loadNumber: load.number109,
+              action: "Skipped - no location data"
+            });
+          }
+        } catch (error) {
+          console.error(`❌ Failed to process load ${load.number109}:`, error);
+          results.push({
+            loadId: load.id,
+            loadNumber: load.number109,
+            action: `Failed: ${error instanceof Error ? error.message : "Unknown error"}`
+          });
+        }
+      }
+      
+      res.json({
+        message: `Backfill completed. Processed ${problemLoads.length} loads.`,
+        results
+      });
+      
+    } catch (error) {
+      console.error("❌ Backfill operation failed:", error);
+      res.status(500).json({ message: "Backfill operation failed", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  });
+
   // TEMPORARY: Fix loads in awaiting_payment without invoices
   app.post("/api/admin/fix-payment-status", async (req, res) => {
     try {
@@ -3574,7 +3684,14 @@ Reply YES to confirm acceptance or NO to decline.`
     try {
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      res.json({ uploadURL });
+      
+      // Generate the permanent object path from the upload URL
+      const publicPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      
+      res.json({ 
+        uploadURL,
+        publicPath // Send permanent path that frontend should use
+      });
     } catch (error) {
       console.error("Error getting upload URL:", error);
       res.status(500).json({ message: "Failed to get upload URL" });
@@ -3773,7 +3890,9 @@ Reply YES to confirm acceptance or NO to decline.`
       // Automatically generate invoice when POD is uploaded
       try {
         const loadWithDetails = await storage.getLoad(req.params.id);
-        if (loadWithDetails && loadWithDetails.location?.city && loadWithDetails.location?.state) {
+        const validStatusesForInvoice = ['completed', 'delivered', 'awaiting_invoicing'];
+        
+        if (loadWithDetails && loadWithDetails.location?.city && loadWithDetails.location?.state && validStatusesForInvoice.includes(loadWithDetails.status)) {
           
           // Check if invoice already exists for this load (PREVENT DUPLICATES)
           const existingInvoices = await storage.getInvoices();
@@ -3811,9 +3930,9 @@ Reply YES to confirm acceptance or NO to decline.`
 
               console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109}`);
               
-              // Move to awaiting_invoicing after generating invoice
-              await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
-              console.log(`✅ Load ${req.params.id} moved to AWAITING_INVOICING - invoice generated`);
+              // Move to awaiting_payment after generating invoice (invoice now exists)
+              await storage.updateLoadStatus(req.params.id, "awaiting_payment");
+              console.log(`✅ Load ${req.params.id} moved to AWAITING_PAYMENT - invoice generated and ready for processing`);
             }
           } else {
             console.log(`📄 Invoice already exists for load ${loadWithDetails.number109} - skipping invoice generation`);

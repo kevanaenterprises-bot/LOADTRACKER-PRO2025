@@ -117,7 +117,7 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
         throw new Error(`Failed to get upload URL: ${urlResponse.status}`);
       }
 
-      const { uploadURL } = await urlResponse.json();
+      const { uploadURL, publicPath } = await urlResponse.json();
       
       // Update progress
       setFiles(prev => prev.map(f => 
@@ -137,10 +137,10 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
 
       // Update progress
       setFiles(prev => prev.map(f => 
-        f.id === fileItem.id ? { ...f, progress: 80, url: uploadURL } : f
+        f.id === fileItem.id ? { ...f, progress: 80, url: publicPath } : f
       ));
 
-      return uploadURL;
+      return publicPath;
     } catch (error) {
       setFiles(prev => prev.map(f => 
         f.id === fileItem.id ? { ...f, status: 'error', progress: 0 } : f
