@@ -3687,7 +3687,7 @@ Reply YES to confirm acceptance or NO to decline.`
               const flatRate = parseFloat(rate.flatRate.toString());
               const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
               const extraStops = parseFloat(load.extraStops?.toString() || "0");
-              const extraStopsCharge = extraStops * 50;
+              const extraStopsCharge = extraStops; // Use raw dollar amount entered, not multiplied by $50
               const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
               // Generate invoice
@@ -3778,7 +3778,7 @@ Reply YES to confirm acceptance or NO to decline.`
             const flatRate = parseFloat(rate.flatRate.toString());
             const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
             const extraStops = parseFloat(load.extraStops?.toString() || "0");
-            const extraStopsCharge = extraStops * 50;
+            const extraStopsCharge = extraStops; // Use raw dollar amount entered, not multiplied by $50
             const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
             const invoiceNumber = await storage.getNextInvoiceNumber();
@@ -4061,7 +4061,7 @@ Reply YES to confirm acceptance or NO to decline.`
               const flatRate = parseFloat(rate.flatRate.toString());
               const lumperCharge = parseFloat(loadWithDetails.lumperCharge?.toString() || "0");
               const extraStops = parseFloat(loadWithDetails.extraStops?.toString() || "0");
-              const extraStopsCharge = extraStops * 50;
+              const extraStopsCharge = extraStops; // Use raw dollar amount entered, not multiplied by $50
               const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
               // Auto-generate invoice with sequential GO6000 series
@@ -4208,7 +4208,7 @@ Reply YES to confirm acceptance or NO to decline.`
               const flatRate = parseFloat(rate.flatRate.toString());
               const lumperCharge = parseFloat(loadWithDetails.lumperCharge?.toString() || "0");
               const extraStops = parseFloat(loadWithDetails.extraStops?.toString() || "0");
-              const extraStopsCharge = extraStops * 50;
+              const extraStopsCharge = extraStops; // Use raw dollar amount entered, not multiplied by $50
               const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
               // Auto-generate invoice with sequential GO6000 series
@@ -4268,7 +4268,7 @@ Reply YES to confirm acceptance or NO to decline.`
       const flatRate = parseFloat(rate.flatRate.toString());
       const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
       const extraStops = parseFloat(load.extraStops?.toString() || "0");
-      const extraStopsCharge = extraStops * 50; // $50 per extra stop
+      const extraStopsCharge = extraStops; // Use raw dollar amount entered, not multiplied by $50
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
       // Auto-generate invoice with sequential GO6000 series

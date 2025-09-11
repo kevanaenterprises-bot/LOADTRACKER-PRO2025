@@ -406,6 +406,9 @@ export class DatabaseStorage implements IStorage {
       case "completed":
         updateData.completedAt = now;
         break;
+      case "paid":
+        updateData.paidAt = now;
+        break;
     }
 
     const [updatedLoad] = await db

@@ -53,6 +53,28 @@ export function LoadSection({
   const [podUploadDialogOpen, setPodUploadDialogOpen] = useState(false);
   const [selectedLoadForPOD, setSelectedLoadForPOD] = useState<any>(null);
 
+  // FIXED: Missing markAsPaid function - this was causing the cash button to do nothing
+  const markAsPaidMutation = useMutation({
+    mutationFn: async (loadId: string) => {
+      return apiRequest(`/api/loads/${loadId}/status`, "PATCH", { status: "paid" });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Load Marked as Paid",
+        description: "Load has been marked as paid successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Payment Update Failed",
+        description: error.message || "Failed to mark load as paid",
+        variant: "destructive",
+      });
+    },
+  });
+
   const assignDriverMutation = useMutation({
     mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
       return apiRequest(`/api/loads/${loadId}/assign`, "PATCH", { driverId });
@@ -240,7 +262,7 @@ export function LoadSection({
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => markAsPaid(load.id)}
+                        onClick={() => markAsPaidMutation.mutate(load.id)}
                         className="text-green-600 hover:text-green-700"
                       >
                         <i className="fas fa-check-circle mr-1"></i>
