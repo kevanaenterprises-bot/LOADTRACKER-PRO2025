@@ -3501,6 +3501,53 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // CENTRALIZED AUTO-INVOICE FUNCTION - Used by both POD upload routes
+  async function ensureAutoInvoice(load: any): Promise<void> {
+    if (!['delivered', 'completed', 'awaiting_invoicing'].includes(load.status)) {
+      console.log(`💰 No auto-invoice for ${load.number109}: Status is ${load.status} (need delivered/completed)`);
+      return;
+    }
+    
+    console.log(`💰 Auto-invoice check for ${load.number109}: Status is ${load.status}`);
+    
+    // Check if invoice already exists
+    const allInvoices = await storage.getInvoices();
+    const existingInvoice = allInvoices.find(inv => inv.loadId === load.id);
+    
+    if (existingInvoice) {
+      console.log(`💰 Invoice already exists for ${load.number109}: ${existingInvoice.invoiceNumber}`);
+      return;
+    }
+    
+    console.log(`💰 Creating automatic invoice for ${load.number109}...`);
+    
+    try {
+      // Generate sequential invoice number
+      const invoiceNumber = await storage.getNextInvoiceNumber();
+      
+      const invoice = await storage.createInvoice({
+        loadId: load.id,
+        invoiceNumber,
+        status: 'pending',
+        lumperCharge: load.lumperCharge || '0.00',
+        flatRate: load.flatRate || '0.00',
+        customerId: null, // Will be populated from load data
+        extraStopsCharge: load.extraStops || '0.00',
+        extraStopsCount: 0, // Default value
+        totalAmount: load.flatRate || '0.00', // Use flat rate as default
+        printedAt: null
+      });
+      
+      // Update load status to awaiting_payment
+      await storage.updateLoadStatus(load.id, 'awaiting_payment');
+      
+      console.log(`✅ Auto-invoice created: ${invoice.invoiceNumber} for ${load.number109}`);
+    } catch (invoiceError) {
+      console.error(`❌ Failed to create auto-invoice for ${load.number109}:`, invoiceError);
+      throw invoiceError;
+    }
+  }
+
   // RESTORED: 109-number-based POD attachment system (was working 2 weeks ago)
   app.post("/api/loads/by-number/:number109/pod", (req, res, next) => {
     // Allow driver, admin, or bypass token authentication
@@ -3572,44 +3619,8 @@ Reply YES to confirm acceptance or NO to decline.`
       // Update load with POD document path(s) using the load ID
       const updatedLoad = await storage.updateLoadPOD(load.id, finalPodPath);
       
-      // CENTRALIZED AUTO-INVOICE GENERATION - Auto-create invoice if load is delivered/completed
-      if (['delivered', 'completed', 'awaiting_invoicing'].includes(updatedLoad.status)) {
-        console.log(`💰 Auto-invoice check for ${number109}: Status is ${updatedLoad.status}`);
-        
-        // Check if invoice already exists
-        const allInvoices = await storage.getInvoices();
-        const existingInvoice = allInvoices.find(inv => inv.loadId === updatedLoad.id);
-        
-        if (!existingInvoice) {
-          console.log(`💰 Creating automatic invoice for ${number109}...`);
-          
-          try {
-            const invoice = await storage.createInvoice({
-              loadId: updatedLoad.id,
-              status: 'draft',
-              lumperCharge: updatedLoad.lumperCharge || '0.00',
-              flatRate: updatedLoad.flatRate || '0.00',
-              customerId: null, // Will be populated from load data
-              extraStopsCharge: updatedLoad.extraStops || '0.00',
-              extraStopsCount: 0, // Default value
-              totalAmount: updatedLoad.flatRate || '0.00', // Use flat rate as default
-              generatedAt: new Date(),
-              printedAt: null
-            });
-            
-            // Update load status to awaiting_payment
-            await storage.updateLoadStatus(updatedLoad.id, 'awaiting_payment');
-            
-            console.log(`✅ Auto-invoice created: ${invoice.invoiceNumber} for ${number109}`);
-          } catch (invoiceError) {
-            console.error(`❌ Failed to create auto-invoice for ${number109}:`, invoiceError);
-          }
-        } else {
-          console.log(`💰 Invoice already exists for ${number109}: ${existingInvoice.invoiceNumber}`);
-        }
-      } else {
-        console.log(`💰 No auto-invoice for ${number109}: Status is ${updatedLoad.status} (need delivered/completed)`);
-      }
+      // CENTRALIZED AUTO-INVOICE GENERATION
+      await ensureAutoInvoice(updatedLoad);
       
       console.log(`✅ POD successfully attached to load ${number109}`);
       
