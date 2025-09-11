@@ -3371,6 +3371,44 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // PRODUCTION HEALTH CHECK - Verify database environment
+  app.get("/api/prod/health", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const allLoads = await storage.getLoads();
+      const allLocations = await storage.getLocations();
+      const allInvoices = await storage.getInvoices();
+      
+      // Sample load numbers to verify this is production data
+      const sampleLoadNumbers = allLoads.slice(0, 5).map(load => load.number109);
+      
+      res.json({
+        environment: process.env.NODE_ENV || 'unknown',
+        databaseUrl: process.env.DATABASE_URL?.split('@')[1] || 'unknown', // Hide credentials
+        entityCounts: {
+          loads: allLoads.length,
+          locations: allLocations.length, 
+          invoices: allInvoices.length
+        },
+        sampleLoadNumbers,
+        loadsWithPODs: allLoads.filter(l => l.podDocumentPath).length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("❌ Production health check failed:", error);
+      res.status(500).json({ 
+        message: "Health check failed", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
   // DEBUG: Check specific load POD and invoice status 
   app.get("/api/debug/load/:loadNumber", (req, res, next) => {
     // Admin/Replit auth only for debugging operations
@@ -3458,6 +3496,134 @@ Reply YES to confirm acceptance or NO to decline.`
       console.error("❌ Debug operation failed:", error);
       res.status(500).json({ 
         message: "Debug operation failed", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
+  // RESTORED: 109-number-based POD attachment system (was working 2 weeks ago)
+  app.post("/api/loads/by-number/:number109/pod", (req, res, next) => {
+    // Allow driver, admin, or bypass token authentication
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || 
+                    (req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { number109 } = req.params;
+      const { podDocumentURL } = req.body;
+      
+      console.log(`📄 POD ATTACHMENT BY 109 NUMBER: ${number109}`);
+      console.log(`📄 POD Document URL: ${podDocumentURL}`);
+      
+      if (!podDocumentURL) {
+        return res.status(400).json({ message: "POD document URL is required" });
+      }
+      
+      // Find load by 109 number
+      const allLoads = await storage.getLoads();
+      const load = allLoads.find(l => l.number109 === number109);
+      
+      if (!load) {
+        console.error(`❌ Load not found: ${number109}`);
+        return res.status(404).json({ message: `Load ${number109} not found` });
+      }
+      
+      console.log(`✅ Found load: ${load.number109} (ID: ${load.id})`);
+      
+      // Get user ID for ACL
+      const userId = (req.user as any)?.claims?.sub || 
+                    (req.session as any)?.driverAuth?.id || 
+                    'system-upload';
+      
+      // Handle multiple POD documents (comma-separated URLs)
+      const podUrls = podDocumentURL.split(',').map((url: string) => url.trim());
+      const processedPaths: string[] = [];
+      
+      console.log(`📄 Processing ${podUrls.length} POD document(s) for ${number109}`);
+      
+      // Process each document with error handling
+      for (const url of podUrls) {
+        if (url) {
+          try {
+            const objectStorageService = new ObjectStorageService();
+            const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+              url,
+              {
+                owner: userId,
+                visibility: "private", // POD documents should be private
+              }
+            );
+            processedPaths.push(objectPath);
+            console.log(`✅ POD document processed: ${objectPath}`);
+          } catch (aclError) {
+            console.error(`⚠️ ACL policy error for ${url}, using direct path:`, aclError);
+            processedPaths.push(url);
+          }
+        }
+      }
+      
+      // Store all POD document paths as comma-separated string
+      const finalPodPath = processedPaths.join(',');
+      
+      // Update load with POD document path(s) using the load ID
+      const updatedLoad = await storage.updateLoadPOD(load.id, finalPodPath);
+      
+      // CENTRALIZED AUTO-INVOICE GENERATION - Auto-create invoice if load is delivered/completed
+      if (['delivered', 'completed', 'awaiting_invoicing'].includes(updatedLoad.status)) {
+        console.log(`💰 Auto-invoice check for ${number109}: Status is ${updatedLoad.status}`);
+        
+        // Check if invoice already exists
+        const allInvoices = await storage.getInvoices();
+        const existingInvoice = allInvoices.find(inv => inv.loadId === updatedLoad.id);
+        
+        if (!existingInvoice) {
+          console.log(`💰 Creating automatic invoice for ${number109}...`);
+          
+          try {
+            const invoice = await storage.createInvoice({
+              loadId: updatedLoad.id,
+              status: 'draft',
+              lumperCharge: updatedLoad.lumperCharge || '0.00',
+              flatRate: updatedLoad.flatRate || '0.00',
+              customerId: null, // Will be populated from load data
+              extraStopsCharge: updatedLoad.extraStops || '0.00',
+              extraStopsCount: 0, // Default value
+              totalAmount: updatedLoad.flatRate || '0.00', // Use flat rate as default
+              generatedAt: new Date(),
+              printedAt: null
+            });
+            
+            // Update load status to awaiting_payment
+            await storage.updateLoadStatus(updatedLoad.id, 'awaiting_payment');
+            
+            console.log(`✅ Auto-invoice created: ${invoice.invoiceNumber} for ${number109}`);
+          } catch (invoiceError) {
+            console.error(`❌ Failed to create auto-invoice for ${number109}:`, invoiceError);
+          }
+        } else {
+          console.log(`💰 Invoice already exists for ${number109}: ${existingInvoice.invoiceNumber}`);
+        }
+      } else {
+        console.log(`💰 No auto-invoice for ${number109}: Status is ${updatedLoad.status} (need delivered/completed)`);
+      }
+      
+      console.log(`✅ POD successfully attached to load ${number109}`);
+      
+      res.json({
+        success: true,
+        message: `POD attached to load ${number109}`,
+        load: updatedLoad,
+        podDocuments: processedPaths.length
+      });
+      
+    } catch (error) {
+      console.error(`❌ Error attaching POD to load ${req.params.number109}:`, error);
+      res.status(500).json({ 
+        message: "Failed to attach POD", 
         error: error instanceof Error ? error.message : "Unknown error" 
       });
     }
