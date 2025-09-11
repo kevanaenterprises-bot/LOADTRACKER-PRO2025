@@ -27,7 +27,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Package, MapPin, X } from "lucide-react";
+import { Plus, Package, MapPin, X, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 import { LoadSection } from "@/components/LoadsTableSections";
@@ -238,15 +238,28 @@ export default function LoadsTable() {
     staleTime: 0, // Always consider data stale to allow quick updates
   });
 
-  // Force clear cache and refresh loads
+  // Force clear cache and refresh loads  
   const clearCacheAndRefresh = async () => {
-    console.log("🔄 CACHE CLEAR: Forcing cache invalidation and refresh");
-    await queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+    console.log("🔄 CACHE CLEAR: Comprehensive cache invalidation starting");
+    
+    // Clear all load-related cache entries
+    await queryClient.resetQueries({ predicate: (query) => {
+      const key = query.queryKey[0];
+      return typeof key === 'string' && (
+        key.includes('/api/loads') || 
+        key.includes('/api/drivers') ||
+        key.includes('/api/invoices') ||
+        key.includes('/api/dashboard')
+      );
+    }});
+    
+    // Force fresh fetch of loads
     await queryClient.refetchQueries({ queryKey: ["/api/loads"] });
-    console.log("✅ CACHE CLEAR: Cache cleared and data refreshed");
+    
+    console.log("✅ CACHE CLEAR: All related cache cleared and data refreshed from database");
     toast({
-      title: "Cache Cleared",
-      description: "Load data refreshed from database",
+      title: "🔄 Cache Completely Cleared",
+      description: "All load data refreshed from database - ghost loads should now be gone!",
       variant: "default",
     });
   };
@@ -638,6 +651,16 @@ export default function LoadsTable() {
             />
           </div>
           <div className="flex space-x-2">
+            <Button
+              onClick={clearCacheAndRefresh}
+              variant="outline" 
+              size="sm"
+              className="bg-orange-500 text-white hover:bg-orange-600"
+              data-testid="button-clear-cache"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Clear Cache
+            </Button>
             <Button 
               variant="outline" 
               size="sm"

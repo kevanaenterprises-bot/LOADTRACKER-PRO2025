@@ -2913,10 +2913,11 @@ Reply YES to confirm acceptance or NO to decline.`
       let subject;
       
       if (includeRateConfirmation) {
-        emailHTML = generateInvoiceOnlyHTML(invoice, load);
+        const invoiceContext = await computeInvoiceContext(load);
+        emailHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
         subject = `Rate Confirmation & Invoice ${invoice.invoiceNumber} - GO 4 Farms & Cattle`;
       } else {
-        emailHTML = generateInvoiceHTML(invoice, load);
+        emailHTML = await generateInvoiceHTML(invoice, load);
         subject = `Invoice ${invoice.invoiceNumber} - GO 4 Farms & Cattle`;
       }
 
@@ -3055,7 +3056,8 @@ Reply YES to confirm acceptance or NO to decline.`
       const attachments = [];
       
       // Generate INVOICE ONLY (no rate con) with POD embedded  
-      let combinedHTML = generateInvoiceOnlyHTML(invoice, load);
+      const invoiceContext = await computeInvoiceContext(load);
+      let combinedHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       let podImages: Array<{content: Buffer, type: string}> = [];
       
       // Handle POD documents - Attach ONLY the actual uploaded files
@@ -3221,7 +3223,8 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`⚠️  Attempting fallback with simpler HTML...`);
         
         // Fallback: Generate simple invoice-only PDF without POD embedding
-        const fallbackHTML = generateInvoiceOnlyHTML(invoice, load);
+        const invoiceContext = await computeInvoiceContext(load);
+        const fallbackHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
         combinedPDF = await generatePDF(fallbackHTML);
         console.log(`✅ Fallback PDF generation successful`);
       }
@@ -4265,7 +4268,8 @@ Reply YES to confirm acceptance or NO to decline.`
       }
 
       // Generate the base invoice HTML (simplified - no rate confirmation)
-      const baseHTML = generateInvoiceOnlyHTML(invoice, load);
+      const invoiceContext = await computeInvoiceContext(load);
+      const baseHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       
       // Embed POD images if available - USE SAME FUNCTION AS EMAIL
       let previewHTML = baseHTML;
@@ -4368,8 +4372,41 @@ function getFileExtension(filename: string): string {
   return filename.split('.').pop()?.toLowerCase() || '';
 }
 
+// Helper function to compute invoice context (delivery location and BOL/POD text)
+async function computeInvoiceContext(load: any): Promise<{ deliveryLocationText: string, bolPodText: string }> {
+  let deliveryLocationText = 'Delivery Location N/A';
+  let bolPodText = 'N/A';
+  
+  try {
+    // Get delivery location from last dropoff stop
+    const stops = await storage.getLoadStops(load.id);
+    const dropoffStops = stops.filter((stop: any) => stop.stopType === 'dropoff')
+                             .sort((a: any, b: any) => b.stopSequence - a.stopSequence); // highest sequence first
+    
+    const finalDelivery = dropoffStops[0]; // Last delivery stop
+    
+    if ((finalDelivery as any)?.location) {
+      const loc = (finalDelivery as any).location;
+      deliveryLocationText = `${loc.name || 'N/A'}, ${loc.city || 'N/A'} ${loc.state || 'N/A'}`;
+    } else if (finalDelivery?.companyName || finalDelivery?.address) {
+      // Fallback to stop info if no location joined
+      deliveryLocationText = `${finalDelivery.companyName || 'N/A'}, ${finalDelivery.address || 'N/A'}`;
+    } else if (load?.location) {
+      deliveryLocationText = `${load.location.name || 'N/A'}, ${load.location.city || 'N/A'} ${load.location.state || 'N/A'}`;
+    }
+    
+    // Get BOL/POD number - prioritize bolNumber from load, fallback to N/A
+    bolPodText = load?.bolNumber || 'N/A';
+    
+  } catch (error) {
+    console.error('Error computing invoice context:', error);
+  }
+  
+  return { deliveryLocationText, bolPodText };
+}
+
 // Generate invoice-only HTML
-function generateInvoiceOnlyHTML(invoice: any, load: any): string {
+function generateInvoiceOnlyHTML(invoice: any, load: any, deliveryLocationText: string, bolPodText: string): string {
   const currentDate = new Date().toLocaleDateString();
   
   return `
@@ -4476,7 +4513,7 @@ function generateInvoiceOnlyHTML(invoice: any, load: any): string {
         </thead>
         <tbody>
           <tr>
-            <td>Transportation Services - Load ${load?.number109 || 'N/A'}</td>
+            <td>Transportation Services - ${deliveryLocationText} - BOL/POD: ${bolPodText}</td>
             <td>$${(parseFloat(invoice?.totalAmount || '0')).toFixed(2)}</td>
           </tr>
         </tbody>
@@ -4491,8 +4528,9 @@ function generateInvoiceOnlyHTML(invoice: any, load: any): string {
 }
 
 // Generate basic invoice HTML
-function generateInvoiceHTML(invoice: any, load: any): string {
-  return generateInvoiceOnlyHTML(invoice, load);
+async function generateInvoiceHTML(invoice: any, load: any): Promise<string> {
+  const invoiceContext = await computeInvoiceContext(load);
+  return generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
 }
 
 // Removed rate confirmation code as requested by user
