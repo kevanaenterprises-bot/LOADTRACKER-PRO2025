@@ -139,6 +139,7 @@ export function LoadSection({
           <TableHeader>
             <TableRow>
               <TableHead>109 Number</TableHead>
+              <TableHead data-testid="th-bol-374">BOL (374)</TableHead>
               {showDriverAssign && <TableHead>Assign Driver</TableHead>}
               {!showDriverAssign && <TableHead>Driver</TableHead>}
               <TableHead>Destinations</TableHead>
@@ -159,6 +160,11 @@ export function LoadSection({
                     <div className="text-xs text-gray-500">
                       {new Date(load.createdAt).toLocaleDateString()}
                     </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm font-medium" data-testid={`text-bol-number-${load.id}`}>
+                    {load.bolNumber || <span className="text-gray-400 italic">Not set</span>}
                   </div>
                 </TableCell>
                 
