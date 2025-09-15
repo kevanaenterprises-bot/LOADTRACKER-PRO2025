@@ -795,29 +795,54 @@ export default function LoadsTable() {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <div className="flex items-center justify-between">
-              <DialogTitle>Load Details - {selectedLoad?.number109}</DialogTitle>
-              <Button 
-                variant={editMode ? "secondary" : "outline"}
-                size="sm"
-                onClick={() => {
-                  if (editMode) {
-                    setEditMode(false);
-                    setEditFormData({});
-                  } else {
-                    setEditMode(true);
-                    setEditFormData({
-                      locationId: selectedLoad?.locationId || '',
-                      estimatedMiles: selectedLoad?.estimatedMiles || 0,
-                      specialInstructions: selectedLoad?.specialInstructions || ''
-                    });
-                    // Load stops for editing
-                    fetchLoadStops(selectedLoad?.id);
-                  }
-                }}
-              >
-                {editMode ? 'Cancel Edit' : 'Edit Load'}
-              </Button>
+              <DialogTitle className="text-sm sm:text-base">Load Details - {selectedLoad?.number109}</DialogTitle>
+              <div className="flex items-center gap-2">
+                {/* Mobile-Accessible Print Button */}
+                {hasInvoice(selectedLoad?.id) && (
+                  <div className="md:hidden">
+                    <PrintButton 
+                      invoiceId={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad?.id)?.id : undefined}
+                      loadId={selectedLoad?.id}
+                      load={selectedLoad}
+                      invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad?.id) : undefined}
+                      variant="outline"
+                      size="sm"
+                    />
+                  </div>
+                )}
+                <Button 
+                  variant={editMode ? "secondary" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    if (editMode) {
+                      setEditMode(false);
+                      setEditFormData({});
+                    } else {
+                      setEditMode(true);
+                      setEditFormData({
+                        locationId: selectedLoad?.locationId || '',
+                        estimatedMiles: selectedLoad?.estimatedMiles || 0,
+                        specialInstructions: selectedLoad?.specialInstructions || ''
+                      });
+                      // Load stops for editing
+                      fetchLoadStops(selectedLoad?.id);
+                    }
+                  }}
+                >
+                  {editMode ? 'Cancel Edit' : 'Edit Load'}
+                </Button>
+              </div>
             </div>
+            
+            {/* Mobile Print Button Alert */}
+            {hasInvoice(selectedLoad?.id) && (
+              <div className="md:hidden mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-2 text-sm text-blue-800">
+                  <i className="fas fa-info-circle"></i>
+                  <span className="font-medium">Print invoice & rate confirmation available above</span>
+                </div>
+              </div>
+            )}
           </DialogHeader>
           
           {selectedLoad && (
