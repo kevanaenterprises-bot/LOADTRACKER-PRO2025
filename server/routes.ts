@@ -2280,6 +2280,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         validatedStops = stops;
         console.log("Load creation - stops validated:", validatedStops.length);
+
+        // DESTINATION FIX: Set main load's locationId to first delivery stop for display purposes
+        const firstDeliveryStop = stops.find(stop => stop.stopType === "dropoff");
+        if (firstDeliveryStop && firstDeliveryStop.locationId) {
+          validatedData.locationId = firstDeliveryStop.locationId;
+          console.log("Load creation - setting main locationId to first delivery stop:", firstDeliveryStop.locationId);
+        }
       }
 
       const load = await storage.createLoad(validatedData, validatedStops);
