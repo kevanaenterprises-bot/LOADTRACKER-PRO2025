@@ -2767,6 +2767,86 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Bulk delete loads (Ghost Load Cleanup) - ADMIN ONLY
+  app.post("/api/loads/bulk-delete", (req, res, next) => {
+    // CRITICAL SECURITY: Only allow admin or Replit authenticated users for bulk deletion
+    // Removed bypass token option for security - bulk deletion requires proper authentication
+    const hasReplitAuth = !!req.user;
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasAuth = hasReplitAuth || hasAdminAuth;
+    
+    console.log("🗑️ BULK DELETE: Secure auth check (admin only):", {
+      hasReplitAuth,
+      hasAdminAuth,
+      finalAuth: hasAuth,
+      userId: req.user?.id || 'none'
+    });
+    
+    if (hasAuth) {
+      next();
+    } else {
+      console.error("🗑️ BULK DELETE: Authentication failed - admin access required");
+      res.status(401).json({ message: "Unauthorized - admin authentication required for bulk deletion" });
+    }
+  }, async (req, res) => {
+    try {
+      const { loadIds, confirmationText } = req.body;
+      
+      // Validate input
+      if (!Array.isArray(loadIds) || loadIds.length === 0) {
+        return res.status(400).json({ message: "No load IDs provided" });
+      }
+      
+      if (confirmationText !== "DELETE ALL SELECTED LOADS") {
+        return res.status(400).json({ message: "Invalid confirmation text" });
+      }
+      
+      console.log(`🗑️ BULK DELETE: Starting bulk deletion for ${loadIds.length} loads`);
+      
+      const results = {
+        successful: [] as Array<{ loadId: string; loadNumber: string }>,
+        failed: [] as Array<{ loadId: string; error: string; loadNumber: string }>,
+        total: loadIds.length
+      };
+      
+      // Delete loads one by one to handle errors gracefully
+      for (const loadId of loadIds) {
+        try {
+          const load = await storage.getLoad(loadId);
+          if (!load) {
+            results.failed.push({ loadId, error: "Load not found", loadNumber: "Unknown" });
+            continue;
+          }
+          
+          console.log(`🗑️ BULK DELETE: Deleting load ${load.number109} (ID: ${loadId})`);
+          await storage.deleteLoad(loadId);
+          results.successful.push({ loadId, loadNumber: load.number109 });
+          console.log(`🗑️ BULK DELETE: Successfully deleted load ${load.number109}`);
+        } catch (error: any) {
+          console.error(`🗑️ BULK DELETE: Failed to delete load ${loadId}:`, error);
+          results.failed.push({ 
+            loadId, 
+            error: error.message || 'Unknown error',
+            loadNumber: "Unknown"
+          });
+        }
+      }
+      
+      console.log(`🗑️ BULK DELETE: Completed bulk deletion - ${results.successful.length} successful, ${results.failed.length} failed`);
+      
+      res.json({
+        message: `Bulk deletion completed: ${results.successful.length} successful, ${results.failed.length} failed`,
+        results
+      });
+    } catch (error: any) {
+      console.error("🗑️ BULK DELETE: Error in bulk deletion:", error);
+      res.status(500).json({ 
+        message: "Failed to complete bulk deletion", 
+        error: error?.message || 'Unknown error'
+      });
+    }
+  });
+
   // Update load financial details
   app.patch("/api/loads/:id/financials", (req, res, next) => {
     // Flexible authentication for financial updates
