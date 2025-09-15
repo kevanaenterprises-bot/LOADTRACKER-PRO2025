@@ -604,21 +604,28 @@ export class DatabaseStorage implements IStorage {
         console.log(`📄 No file attachments found for load ${id}`);
       }
       
-      // Delete related records first to maintain referential integrity
-      console.log(`🗑️ Step 1: Deleting load status history for load ${id}`);
-      await db.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
-      
-      console.log(`🗑️ Step 2: Deleting BOL numbers for load ${id}`);
-      await db.delete(bolNumbers).where(eq(bolNumbers.loadId, id));
-      
-      console.log(`🗑️ Step 3: Deleting invoices for load ${id}`);
-      await db.delete(invoices).where(eq(invoices.loadId, id));
-      
-      console.log(`🗑️ Step 4: Deleting load stops for load ${id}`);
-      await db.delete(loadStops).where(eq(loadStops.loadId, id));
-      
-      console.log(`🗑️ Step 5: Deleting the main load record for ${id}`);
-      await db.delete(loads).where(eq(loads.id, id));
+      // CRITICAL FIX: Use database transaction to ensure atomicity
+      await db.transaction(async (tx) => {
+        console.log(`🗑️ TRANSACTION: Starting database transaction for load ${id}`);
+        
+        // Delete related records first to maintain referential integrity
+        console.log(`🗑️ Step 1: Deleting load status history for load ${id}`);
+        await tx.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
+        
+        console.log(`🗑️ Step 2: Deleting BOL numbers for load ${id}`);
+        await tx.delete(bolNumbers).where(eq(bolNumbers.loadId, id));
+        
+        console.log(`🗑️ Step 3: Deleting invoices for load ${id}`);
+        await tx.delete(invoices).where(eq(invoices.loadId, id));
+        
+        console.log(`🗑️ Step 4: Deleting load stops for load ${id}`);
+        await tx.delete(loadStops).where(eq(loadStops.loadId, id));
+        
+        console.log(`🗑️ Step 5: Deleting the main load record for ${id}`);
+        await tx.delete(loads).where(eq(loads.id, id));
+        
+        console.log(`🗑️ TRANSACTION: All database operations completed successfully for load ${id}`);
+      });
       
       console.log(`✅ SUCCESS: Load ${id} deleted successfully with all attachments cleaned up`);
     } catch (error) {
