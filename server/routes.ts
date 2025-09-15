@@ -2779,7 +2779,7 @@ Reply YES to confirm acceptance or NO to decline.`
       hasReplitAuth,
       hasAdminAuth,
       finalAuth: hasAuth,
-      userId: req.user?.id || 'none'
+      userInfo: req.user ? 'authenticated' : 'none'
     });
     
     if (hasAuth) {
