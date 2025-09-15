@@ -47,8 +47,8 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
   try {
     const transporter = createTransporter();
     
-    // Always include accounting@go4fc.com in CC
-    const ccList = [...cc, 'accounting@go4fc.com'];
+    // Always include both in-house email addresses in CC
+    const ccList = [...cc, 'accounting@go4fc.com', 'gofarmsbills@gmail.com'];
     
     const mailOptions = {
       from: `"GO 4 Farms & Cattle" <${process.env.OUTLOOK_EMAIL}>`,
