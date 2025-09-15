@@ -109,13 +109,15 @@ export default function Landing() {
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Business Details</h3>
                   <div className="text-sm space-y-1">
                     <p data-testid="text-company-name"><strong>Business Name:</strong> Go Farms & Cattle</p>
-                    <p data-testid="text-address"><strong>Address:</strong> Melissa, Texas</p>
+                    <p data-testid="text-address"><strong>Address:</strong> 1510 Crystal Valley Way, Melissa, Texas</p>
                     <p data-testid="text-services"><strong>Services:</strong> Transportation & Logistics</p>
                   </div>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Contact Information</h3>
                   <div className="text-sm space-y-1">
+                    <p data-testid="text-email"><strong>Email:</strong> accounting@go4fc.com</p>
+                    <p data-testid="text-phone"><strong>Phone:</strong> (214) 878-1230</p>
                     <p><strong>Support Hours:</strong> Monday-Friday, 8AM-5PM CST</p>
                     <p><strong>Business Type:</strong> Transportation Company</p>
                     <p><strong>Last Updated:</strong> {new Date().toLocaleDateString()}</p>
