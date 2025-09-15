@@ -1,9 +1,30 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
 import logoUrl from "../assets/go-farms-logo.png";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+  
+  // Feature flag for temporary Telnyx company information
+  const showTelnyxInfo = import.meta.env.VITE_SHOW_TELNYX_INFO === 'true';
+  
+  useEffect(() => {
+    if (showTelnyxInfo) {
+      document.title = "Go Farms & Cattle - LoadTracker Pro | Transportation & Logistics";
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', 'Go Farms & Cattle transportation and logistics services. Professional load management and dispatch solutions based in Melissa, Texas.');
+      } else {
+        const meta = document.createElement('meta');
+        meta.name = 'description';
+        meta.content = 'Go Farms & Cattle transportation and logistics services. Professional load management and dispatch solutions based in Melissa, Texas.';
+        document.head.appendChild(meta);
+      }
+    }
+  }, [showTelnyxInfo]);
 
   const handleAdminLogin = () => {
     setLocation("/admin-login");
@@ -68,6 +89,82 @@ export default function Landing() {
 
         </div>
       </div>
+      
+      {/* BEGIN TEMP TELNYX COMPLIANCE - Temporary company information for messaging service verification */}
+      {showTelnyxInfo && (
+        <div className="mt-8 w-full max-w-2xl">
+          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-2 border-blue-200 dark:border-blue-700">
+            <CardHeader className="text-center">
+              <CardTitle className="text-lg font-semibold text-blue-800 dark:text-blue-200" data-testid="text-company-section-title">
+                Company Information
+              </CardTitle>
+              <CardDescription className="text-sm text-gray-600 dark:text-gray-400">
+                Temporary display while main website is under maintenance
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Business Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Business Details</h3>
+                  <div className="text-sm space-y-1">
+                    <p data-testid="text-company-name"><strong>Business Name:</strong> Go Farms & Cattle</p>
+                    <p data-testid="text-address"><strong>Address:</strong> Melissa, Texas</p>
+                    <p data-testid="text-services"><strong>Services:</strong> Transportation & Logistics</p>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Contact Information</h3>
+                  <div className="text-sm space-y-1">
+                    <p><strong>Support Hours:</strong> Monday-Friday, 8AM-5PM CST</p>
+                    <p><strong>Business Type:</strong> Transportation Company</p>
+                    <p><strong>Last Updated:</strong> {new Date().toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* SMS Messaging Compliance */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
+                <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">SMS Messaging Information</h3>
+                <div className="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                  <p data-testid="text-sms-disclosure">
+                    <strong>Messaging Disclosure:</strong> By engaging with our service you agree to receive SMS notifications. 
+                    Message and data rates may apply. Message frequency varies.
+                  </p>
+                  <p data-testid="text-optout">
+                    <strong>Opt-out Instructions:</strong> Reply STOP to opt out of messages. Reply HELP for help.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Expandable Policies */}
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="privacy-policy">
+                  <AccordionTrigger data-testid="link-privacy" className="text-left text-sm">
+                    Privacy Policy & Terms
+                  </AccordionTrigger>
+                  <AccordionContent className="text-xs text-gray-600 dark:text-gray-400 space-y-2">
+                    <p><strong>Privacy:</strong> We collect minimal information necessary for transportation services. 
+                    Contact information is used solely for load coordination and delivery notifications.</p>
+                    <p><strong>SMS Terms:</strong> SMS notifications are sent for load updates, delivery confirmations, 
+                    and service-related communications. Standard messaging rates apply. We do not share your phone number 
+                    with third parties for marketing purposes.</p>
+                    <p><strong>Data Retention:</strong> Contact information is retained for business record requirements 
+                    and may be used to improve our transportation services.</p>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              
+              <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  This information is temporarily displayed for business verification purposes while our main website undergoes maintenance.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      {/* END TEMP TELNYX COMPLIANCE */}
     </div>
   );
 }
