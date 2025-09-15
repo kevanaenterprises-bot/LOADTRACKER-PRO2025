@@ -129,3 +129,86 @@
 .border-error {
   border-color: hsl(0, 84%, 60%);
 }
+
+/* Mobile Optimizations for LoadTracker Pro */
+@layer utilities {
+  /* Touch targets for mobile */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Hide scrollbars while keeping functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Mobile-friendly button spacing */
+  .mobile-button {
+    padding: 12px 16px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* Improved mobile form inputs */
+  .mobile-input {
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  /* Mobile-friendly table scrolling */
+  .mobile-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Better mobile spacing */
+  .mobile-spacing {
+    padding: 8px 12px;
+  }
+
+  /* Mobile card improvements */
+  .mobile-card {
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  /* Better mobile touch experience */
+  @media (max-width: 768px) {
+    /* Ensure minimum touch targets */
+    button, .btn, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Better mobile text sizing */
+    .mobile-text {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    /* Mobile-friendly modals and dialogs */
+    .mobile-modal {
+      margin: 8px;
+      max-height: calc(100vh - 16px);
+      overflow-y: auto;
+    }
+
+    /* Improve mobile table responsiveness */
+    table {
+      font-size: 14px;
+    }
+
+    /* Better mobile form styling */
+    input, select, textarea {
+      font-size: 16px !important; /* Prevents zoom on iOS */
+      border-radius: 8px;
+    }
+  }
+}

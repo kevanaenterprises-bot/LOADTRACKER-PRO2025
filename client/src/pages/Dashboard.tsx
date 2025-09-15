@@ -308,45 +308,51 @@ export default function Dashboard() {
       {/* Header with Logo */}
       <Header title="LoadTracker Pro" />
       
-      {/* Navigation Bar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-3 sticky top-[72px] z-40">
+      {/* Mobile-Optimized Navigation Bar */}
+      <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sticky top-[72px] z-40">
         <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <nav className="flex space-x-8">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <nav className="flex space-x-2 sm:space-x-8">
               <button 
-                className="text-blue-600 hover:text-blue-800 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-blue-600"
+                className="text-blue-600 hover:text-blue-800 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium border-b-2 border-blue-600"
               >
-                Office Dashboard
+                <span className="hidden sm:inline">Office Dashboard</span>
+                <span className="sm:hidden">Dashboard</span>
               </button>
               {user?.role === "office" && (
                 <button 
                   onClick={switchToDriverView}
-                  className="text-gray-500 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-500 hover:text-blue-600 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium"
                 >
-                  Driver Portal
+                  <span className="hidden sm:inline">Driver Portal</span>
+                  <span className="sm:hidden">Driver</span>
                 </button>
               )}
             </nav>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <img 
-                className="h-8 w-8 rounded-full bg-blue-600" 
+                className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-blue-600" 
                 src={user?.profileImageUrl || `https://ui-avatars.io/api/?name=${user?.firstName || 'User'}+${user?.lastName || 'User'}&background=1976D2&color=fff`}
                 alt="User avatar" 
               />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="hidden sm:inline text-sm font-medium text-gray-700">
                 {user?.firstName || 'User'} {user?.lastName || ''}
               </span>
+              <span className="sm:hidden text-xs font-medium text-gray-700">
+                {(user?.firstName || 'User').substring(0, 1)}{(user?.lastName || '').substring(0, 1)}
+              </span>
             </div>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              Logout
+            <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm px-2 sm:px-3">
+              <span className="hidden sm:inline">Logout</span>
+              <span className="sm:hidden">Exit</span>
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto py-3 sm:py-6 px-2 sm:px-4 lg:px-8">
         {/* Dashboard Stats */}
         <StatsCards 
           stats={stats as any} 
@@ -354,73 +360,118 @@ export default function Dashboard() {
           onActiveLoadsClick={() => setActiveTab("loads")}
         />
         
-        {/* Cache Debugger Component */}
-        <CacheDebugger />
+        {/* Cache Debugger Component - Hidden on mobile for space */}
+        <div className="hidden sm:block">
+          <CacheDebugger />
+        </div>
         
-        {/* Driver Debug Button - Always Visible */}
-        <div className="mt-4 flex justify-center">
+        {/* Driver Debug Button - Smaller on mobile */}
+        <div className="mt-2 sm:mt-4 flex justify-center">
           <Button 
             onClick={() => window.open('/driver-debug-test', '_blank')}
             variant="outline"
-            size="lg"
-            className="bg-red-50 border-red-200 text-red-800 hover:bg-red-100"
+            size="sm"
+            className="bg-red-50 border-red-200 text-red-800 hover:bg-red-100 text-xs sm:text-sm px-2 sm:px-4"
           >
-            🔧 Debug Driver Creation Issue
+            🔧 <span className="hidden sm:inline">Debug Driver Creation Issue</span><span className="sm:hidden">Debug</span>
           </Button>
         </div>
 
 
-        {/* Main Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-8">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 h-auto gap-1">
-            <TabsTrigger value="loads" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-blue-700 hover:text-blue-900 font-semibold">
-              <i className="fas fa-truck text-lg md:text-base text-blue-600"></i>
-              <span className="text-center leading-tight">Load Management</span>
-            </TabsTrigger>
-            <TabsTrigger value="tracking" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-green-700 hover:text-green-900 font-semibold">
-              <i className="fas fa-map text-lg md:text-base text-green-600"></i>
-              <span className="text-center leading-tight">Real-Time Tracking</span>
-            </TabsTrigger>
-            <TabsTrigger value="ocr" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-purple-700 hover:text-purple-900 font-semibold">
-              <i className="fas fa-camera text-lg md:text-base text-purple-600"></i>
-              <span className="text-center leading-tight">Rate Con Scanner</span>
-            </TabsTrigger>
-            <TabsTrigger value="drivers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-orange-700 hover:text-orange-900 font-semibold">
-              <i className="fas fa-users text-lg md:text-base text-orange-600"></i>
-              <span className="text-center leading-tight">Driver Management</span>
-            </TabsTrigger>
-            <TabsTrigger value="customers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-indigo-700 hover:text-indigo-900 font-semibold">
-              <i className="fas fa-building text-lg md:text-base text-indigo-600"></i>
-              <span className="text-center leading-tight">Customers</span>
-            </TabsTrigger>
-            <TabsTrigger value="locations" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-purple-700 hover:text-purple-900 font-semibold">
-              <i className="fas fa-map-marker-alt text-lg md:text-base text-purple-600"></i>
-              <span className="text-center leading-tight">Locations</span>
-            </TabsTrigger>
-            <TabsTrigger value="rates" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-green-700 hover:text-green-900 font-semibold">
-              <i className="fas fa-dollar-sign text-lg md:text-base text-green-600"></i>
-              <span className="text-center leading-tight">Rates</span>
-            </TabsTrigger>
-            <TabsTrigger value="paid-invoices" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-emerald-700 hover:text-emerald-900 font-semibold">
-              <i className="fas fa-check-circle text-lg md:text-base text-emerald-600"></i>
-              <span className="text-center leading-tight">Paid Invoices</span>
-            </TabsTrigger>
-            <TabsTrigger value="cleanup" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-red-700 hover:text-red-900 font-semibold">
-              <i className="fas fa-trash text-lg md:text-base text-red-600"></i>
-              <span className="text-center leading-tight">Ghost Load Cleanup</span>
-            </TabsTrigger>
-          </TabsList>
+        {/* Mobile-Optimized Main Navigation Tabs */}
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-4 sm:mt-8">
+          {/* Mobile: Show horizontal scrolling tabs, Desktop: Grid layout */}
+          <div className="overflow-x-auto scrollbar-hide">
+            <TabsList className="hidden md:grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 h-auto gap-1">
+              <TabsTrigger value="loads" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-blue-700 hover:text-blue-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-truck text-lg md:text-base text-blue-600"></i>
+                <span className="text-center leading-tight">Load Management</span>
+              </TabsTrigger>
+              <TabsTrigger value="tracking" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-green-700 hover:text-green-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-map text-lg md:text-base text-green-600"></i>
+                <span className="text-center leading-tight">Real-Time Tracking</span>
+              </TabsTrigger>
+              <TabsTrigger value="ocr" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-purple-700 hover:text-purple-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-camera text-lg md:text-base text-purple-600"></i>
+                <span className="text-center leading-tight">Rate Con Scanner</span>
+              </TabsTrigger>
+              <TabsTrigger value="drivers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-orange-700 hover:text-orange-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-users text-lg md:text-base text-orange-600"></i>
+                <span className="text-center leading-tight">Driver Management</span>
+              </TabsTrigger>
+              <TabsTrigger value="customers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-indigo-700 hover:text-indigo-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-building text-lg md:text-base text-indigo-600"></i>
+                <span className="text-center leading-tight">Customers</span>
+              </TabsTrigger>
+              <TabsTrigger value="locations" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-purple-700 hover:text-purple-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-map-marker-alt text-lg md:text-base text-purple-600"></i>
+                <span className="text-center leading-tight">Locations</span>
+              </TabsTrigger>
+              <TabsTrigger value="rates" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-green-700 hover:text-green-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-dollar-sign text-lg md:text-base text-green-600"></i>
+                <span className="text-center leading-tight">Rates</span>
+              </TabsTrigger>
+              <TabsTrigger value="paid-invoices" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-emerald-700 hover:text-emerald-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-check-circle text-lg md:text-base text-emerald-600"></i>
+                <span className="text-center leading-tight">Paid Invoices</span>
+              </TabsTrigger>
+              <TabsTrigger value="cleanup" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-red-700 hover:text-red-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-trash text-lg md:text-base text-red-600"></i>
+                <span className="text-center leading-tight">Ghost Load Cleanup</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            {/* Mobile: Horizontal scrolling tabs */}
+            <TabsList className="md:hidden flex w-max min-w-full h-auto gap-2 p-2">
+              <TabsTrigger value="loads" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-truck text-xl text-blue-600"></i>
+                <span className="text-center leading-tight">Loads</span>
+              </TabsTrigger>
+              <TabsTrigger value="tracking" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-map text-xl text-green-600"></i>
+                <span className="text-center leading-tight">Tracking</span>
+              </TabsTrigger>
+              <TabsTrigger value="ocr" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-camera text-xl text-purple-600"></i>
+                <span className="text-center leading-tight">Scanner</span>
+              </TabsTrigger>
+              <TabsTrigger value="drivers" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-users text-xl text-orange-600"></i>
+                <span className="text-center leading-tight">Drivers</span>
+              </TabsTrigger>
+              <TabsTrigger value="customers" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-building text-xl text-indigo-600"></i>
+                <span className="text-center leading-tight">Customers</span>
+              </TabsTrigger>
+              <TabsTrigger value="locations" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-map-marker-alt text-xl text-purple-600"></i>
+                <span className="text-center leading-tight">Locations</span>
+              </TabsTrigger>
+              <TabsTrigger value="rates" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-dollar-sign text-xl text-green-600"></i>
+                <span className="text-center leading-tight">Rates</span>
+              </TabsTrigger>
+              <TabsTrigger value="paid-invoices" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-check-circle text-xl text-emerald-600"></i>
+                <span className="text-center leading-tight">Paid</span>
+              </TabsTrigger>
+              <TabsTrigger value="cleanup" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-trash text-xl text-red-600"></i>
+                <span className="text-center leading-tight">Cleanup</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Load Management Tab */}
-          <TabsContent value="loads" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <TabsContent value="loads" className="mt-4 sm:mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
               {/* Create New Load Form */}
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 order-2 lg:order-1">
                 <LoadForm />
               </div>
 
-              {/* Active Loads Table */}
-              <div className="lg:col-span-2">
+              {/* Active Loads Table - Show first on mobile */}
+              <div className="lg:col-span-2 order-1 lg:order-2">
                 <LoadsTable />
               </div>
             </div>
