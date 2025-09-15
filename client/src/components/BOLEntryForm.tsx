@@ -143,7 +143,7 @@ export default function BOLEntryForm({ load }: BOLEntryFormProps) {
 
   const updatePODMutation = useMutation({
     mutationFn: async (podDocumentURL: string) => {
-      await apiRequest("PATCH", `/api/loads/${load.id}/pod`, { podDocumentURL });
+      await apiRequest(`/api/loads/${load.id}/pod`, "PATCH", { podDocumentURL });
     },
     onSuccess: () => {
       toast({
