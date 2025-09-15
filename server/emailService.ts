@@ -21,10 +21,6 @@ const createTransporter = () => {
     tls: {
       rejectUnauthorized: false
     },
-    // Force HTML email composition
-    defaults: {
-      encoding: 'utf8'
-    },
     debug: true, // Enable debug logging
     logger: true // Enable logger
   });
