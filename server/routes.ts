@@ -4202,24 +4202,13 @@ Reply YES to confirm acceptance or NO to decline.`
   });
 
   app.patch("/api/loads/:id/pod", (req, res, next) => {
-    // Flexible authentication for POD document uploads
-    const bypassToken = req.headers['x-bypass-token'];
-    const hasTokenBypass = bypassToken === BYPASS_SECRET;
-    const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
-    const hasDriverAuth = (req.session as any)?.driverAuth;
-    const hasAuth = hasReplitAuth || hasDriverAuth || hasTokenBypass;
-    
-    console.log("POD upload auth check:", {
-      hasReplitAuth,
-      hasDriverAuth,
-      hasTokenBypass,
-      finalAuth: hasAuth
-    });
-    
+    // Simplified authentication check
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || 
+                    (req.session as any)?.driverAuth || isBypassActive(req);
     if (hasAuth) {
       next();
     } else {
-      res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Authentication required" });
     }
   }, async (req, res) => {
     try {
@@ -4229,62 +4218,12 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(400).json({ message: "POD document URL is required" });
       }
 
-      // Get user ID with fallback
-      const userId = (req.user as any)?.claims?.sub || 
-                    (req.session as any)?.driverAuth?.id || 
-                    'system-upload';
-                    
-      console.log(`📄 POD upload initiated by user: ${userId}`);
+      // SIMPLIFIED: Just save the POD URL directly
+      console.log(`📄 POD upload for load ${req.params.id}: ${podDocumentURL}`);
       
-      // Handle multiple POD documents (comma-separated URLs)
-      const podUrls = podDocumentURL.split(',').map((url: string) => url.trim());
-      const processedPaths: string[] = [];
-      
-      console.log(`📄 Processing ${podUrls.length} POD document(s) for load ${req.params.id}`);
-      
-      // Process each document with error handling
-      for (const url of podUrls) {
-        if (url) {
-          try {
-            const objectStorageService = new ObjectStorageService();
-            const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
-              url,
-              {
-                owner: userId,
-                visibility: "private", // POD documents should be private
-              }
-            );
-            processedPaths.push(objectPath);
-            console.log(`✅ POD document processed: ${objectPath}`);
-          } catch (aclError) {
-            console.error(`⚠️ ACL policy error for ${url}, using direct path:`, aclError);
-            // If ACL fails, still save the path
-            processedPaths.push(url);
-          }
-        }
-      }
-
-      // Store all POD document paths as comma-separated string
-      const finalPodPath = processedPaths.join(',');
-      
-      // DEBUG: Log POD path storage details
-      console.log(`📄 POD STORAGE DEBUG:`, {
-        originalURLs: podUrls,
-        processedPaths,
-        finalPodPath,
-        loadId: req.params.id
-      });
-      
-      // Update load with POD document path(s)
-      const load = await storage.updateLoadPOD(req.params.id, finalPodPath);
-      
-      // Verify the POD path was actually stored
-      const verificationLoad = await storage.getLoad(req.params.id);
-      console.log(`✅ POD VERIFICATION:`, {
-        loadNumber: verificationLoad?.number109,
-        storedPodPath: verificationLoad?.podDocumentPath,
-        pathMatches: verificationLoad?.podDocumentPath === finalPodPath
-      });
+      // Update load with POD document path
+      const load = await storage.updateLoadPOD(req.params.id, podDocumentURL);
+      console.log(`✅ POD saved for load: ${load.number109}`);
       
       // First set status to delivered when POD is uploaded
       if (load.status !== "delivered" && load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {
