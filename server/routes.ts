@@ -3022,6 +3022,12 @@ Reply YES to confirm acceptance or NO to decline.`
         html: emailHTML
       });
       
+      // WORKFLOW FIX: Move load to awaiting_payment when invoice is actually emailed
+      if (load.status === "awaiting_invoicing") {
+        await storage.updateLoadStatus(load.id, "awaiting_payment");
+        console.log(`📧 Invoice emailed - Load ${load.number109} moved from AWAITING_INVOICING to AWAITING_PAYMENT`);
+      }
+      
       res.json({ 
         message: "Invoice email sent successfully",
         emailAddress,
@@ -4261,8 +4267,24 @@ Reply YES to confirm acceptance or NO to decline.`
       // Store all POD document paths as comma-separated string
       const finalPodPath = processedPaths.join(',');
       
+      // DEBUG: Log POD path storage details
+      console.log(`📄 POD STORAGE DEBUG:`, {
+        originalURLs: podUrls,
+        processedPaths,
+        finalPodPath,
+        loadId: req.params.id
+      });
+      
       // Update load with POD document path(s)
       const load = await storage.updateLoadPOD(req.params.id, finalPodPath);
+      
+      // Verify the POD path was actually stored
+      const verificationLoad = await storage.getLoad(req.params.id);
+      console.log(`✅ POD VERIFICATION:`, {
+        loadNumber: verificationLoad?.number109,
+        storedPodPath: verificationLoad?.podDocumentPath,
+        pathMatches: verificationLoad?.podDocumentPath === finalPodPath
+      });
       
       // First set status to delivered when POD is uploaded
       if (load.status !== "delivered" && load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {
@@ -4275,55 +4297,59 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`✅ Load ${req.params.id} marked as DELIVERED - POD uploaded successfully`);
       }
 
-      // Automatically generate invoice when POD is uploaded
+      // FIXED WORKFLOW: Set to awaiting_invoicing first, then auto-generate
+      const loadWithDetails = await storage.getLoad(req.params.id);
+      if (loadWithDetails && loadWithDetails.status === "delivered") {
+        await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
+        console.log(`📋 Load ${req.params.id} moved to AWAITING_INVOICING - ready for invoice generation`);
+      }
+
+      // Automatically generate invoice when POD is uploaded  
       try {
-        const loadWithDetails = await storage.getLoad(req.params.id);
-        const validStatusesForInvoice = ['completed', 'delivered', 'awaiting_invoicing'];
+        const loadForInvoice = await storage.getLoad(req.params.id);
+        const validStatusesForInvoice = ['awaiting_invoicing'];
         
-        if (loadWithDetails && loadWithDetails.location?.city && loadWithDetails.location?.state && validStatusesForInvoice.includes(loadWithDetails.status)) {
+        if (loadForInvoice && loadForInvoice.location?.city && loadForInvoice.location?.state && validStatusesForInvoice.includes(loadForInvoice.status)) {
           
           // Check if invoice already exists for this load (PREVENT DUPLICATES)
           const existingInvoices = await storage.getInvoices();
-          const hasInvoice = existingInvoices.some((inv: any) => inv.loadId === loadWithDetails.id);
+          const hasInvoice = existingInvoices.some((inv: any) => inv.loadId === loadForInvoice.id);
           
           if (!hasInvoice) {
-            console.log(`📄 No existing invoice found - generating new invoice for load ${loadWithDetails.number109}`);
+            console.log(`📄 No existing invoice found - generating new invoice for load ${loadForInvoice.number109}`);
             
             // Get rate for the location
             const rate = await storage.getRateByLocation(
-              loadWithDetails.location.city, 
-              loadWithDetails.location.state
+              loadForInvoice.location.city, 
+              loadForInvoice.location.state
             );
             
             if (rate) {
               // Calculate invoice amount based on flat rate system
               const flatRate = parseFloat(rate.flatRate.toString());
-              const lumperCharge = parseFloat(loadWithDetails.lumperCharge?.toString() || "0");
-              const extraStops = parseFloat(loadWithDetails.extraStops?.toString() || "0");
+              const lumperCharge = parseFloat(loadForInvoice.lumperCharge?.toString() || "0");
+              const extraStops = parseFloat(loadForInvoice.extraStops?.toString() || "0");
               const extraStopsCharge = extraStops; // Use raw dollar amount entered, not multiplied by $50
               const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
               // Auto-generate invoice with sequential GO6000 series
               const invoiceNumber = await storage.getNextInvoiceNumber();
               await storage.createInvoice({
-                loadId: loadWithDetails.id,
+                loadId: loadForInvoice.id,
                 invoiceNumber,
                 flatRate: rate.flatRate,
-                lumperCharge: loadWithDetails.lumperCharge || "0.00",
+                lumperCharge: loadForInvoice.lumperCharge || "0.00",
                 extraStopsCharge: extraStopsCharge.toString(),
-                extraStopsCount: parseFloat(loadWithDetails.extraStops?.toString() || "0"),
+                extraStopsCount: parseFloat(loadForInvoice.extraStops?.toString() || "0"),
                 totalAmount: totalAmount.toString(),
                 status: "pending",
               });
 
-              console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109}`);
-              
-              // Move to awaiting_payment after generating invoice (invoice now exists)
-              await storage.updateLoadStatus(req.params.id, "awaiting_payment");
-              console.log(`✅ Load ${req.params.id} moved to AWAITING_PAYMENT - invoice generated and ready for processing`);
+              console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadForInvoice.number109}`);
+              console.log(`📋 Load ${req.params.id} stays in AWAITING_INVOICING - invoice ready to be emailed`);
             }
           } else {
-            console.log(`📄 Invoice already exists for load ${loadWithDetails.number109} - skipping invoice generation`);
+            console.log(`📄 Invoice already exists for load ${loadForInvoice.number109} - skipping invoice generation`);
           }
         }
       } catch (invoiceError) {
