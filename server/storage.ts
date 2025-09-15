@@ -604,25 +604,30 @@ export class DatabaseStorage implements IStorage {
         console.log(`📄 No file attachments found for load ${id}`);
       }
       
-      // CRITICAL FIX: Use database transaction to ensure atomicity
+      // CRITICAL FIX: Use database transaction with correct deletion order
       await db.transaction(async (tx) => {
         console.log(`🗑️ TRANSACTION: Starting database transaction for load ${id}`);
         
-        // Delete related records first to maintain referential integrity
+        // Delete related records first in strict dependency order
         console.log(`🗑️ Step 1: Deleting load status history for load ${id}`);
-        await tx.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
+        const statusHistoryResult = await tx.delete(loadStatusHistory).where(eq(loadStatusHistory.loadId, id));
+        console.log(`🗑️ Step 1 completed: Deleted ${statusHistoryResult.rowCount || 0} status history records`);
         
-        console.log(`🗑️ Step 2: Deleting BOL numbers for load ${id}`);
-        await tx.delete(bolNumbers).where(eq(bolNumbers.loadId, id));
+        console.log(`🗑️ Step 2: Deleting load stops for load ${id}`);
+        const stopsResult = await tx.delete(loadStops).where(eq(loadStops.loadId, id));
+        console.log(`🗑️ Step 2 completed: Deleted ${stopsResult.rowCount || 0} load stops`);
         
         console.log(`🗑️ Step 3: Deleting invoices for load ${id}`);
-        await tx.delete(invoices).where(eq(invoices.loadId, id));
+        const invoicesResult = await tx.delete(invoices).where(eq(invoices.loadId, id));
+        console.log(`🗑️ Step 3 completed: Deleted ${invoicesResult.rowCount || 0} invoices`);
         
-        console.log(`🗑️ Step 4: Deleting load stops for load ${id}`);
-        await tx.delete(loadStops).where(eq(loadStops.loadId, id));
+        console.log(`🗑️ Step 4: Deleting BOL numbers for load ${id}`);
+        const bolResult = await tx.delete(bolNumbers).where(eq(bolNumbers.loadId, id));
+        console.log(`🗑️ Step 4 completed: Deleted ${bolResult.rowCount || 0} BOL numbers`);
         
         console.log(`🗑️ Step 5: Deleting the main load record for ${id}`);
-        await tx.delete(loads).where(eq(loads.id, id));
+        const loadResult = await tx.delete(loads).where(eq(loads.id, id));
+        console.log(`🗑️ Step 5 completed: Deleted ${loadResult.rowCount || 0} load record`);
         
         console.log(`🗑️ TRANSACTION: All database operations completed successfully for load ${id}`);
       });
