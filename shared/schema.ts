@@ -169,7 +169,11 @@ export const invoices = pgTable("invoices", {
   extraStopsCharge: decimal("extra_stops_charge", { precision: 10, scale: 2 }).default("0.00"), // $50 * number of extra stops
   extraStopsCount: integer("extra_stops_count").default(0),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
-  status: varchar("status").default("pending"), // pending, printed
+  status: varchar("status").default("draft"), // draft, awaiting_pod, finalized, printed, emailed
+  podUrl: varchar("pod_url"), // POD document path attached to this invoice
+  podChecksum: varchar("pod_checksum"), // SHA256 checksum for data integrity
+  podAttachedAt: timestamp("pod_attached_at"), // When POD was attached to invoice
+  finalizedAt: timestamp("finalized_at"), // When invoice was finalized with POD
   generatedAt: timestamp("generated_at").defaultNow(),
   printedAt: timestamp("printed_at"),
 });

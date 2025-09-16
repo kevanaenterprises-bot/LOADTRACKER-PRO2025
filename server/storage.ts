@@ -97,6 +97,11 @@ export interface IStorage {
   updateInvoice(invoiceNumber: string, updates: Partial<Invoice>): Promise<Invoice>;
   markInvoicePrinted(invoiceId: string): Promise<Invoice>;
   getNextInvoiceNumber(): Promise<string>;
+  
+  // Invoice-POD integration operations
+  attachPODToInvoice(invoiceId: string, podUrl: string, podChecksum: string): Promise<Invoice>;
+  finalizeInvoice(invoiceId: string): Promise<Invoice>;
+  findOrCreateInvoiceForLoad(loadId: string): Promise<Invoice>;
 
   // Notification methods
   getNotificationPreferences(driverId: string): Promise<NotificationPreferences | null>;
@@ -966,6 +971,69 @@ export class DatabaseStorage implements IStorage {
     }
     
     return `GO${nextNumber}`;
+  }
+
+  // Invoice-POD integration methods
+  async attachPODToInvoice(invoiceId: string, podUrl: string, podChecksum: string): Promise<Invoice> {
+    const [updatedInvoice] = await db
+      .update(invoices)
+      .set({
+        podUrl,
+        podChecksum,
+        podAttachedAt: new Date(),
+        status: "awaiting_pod" // Update status to indicate POD is attached but not finalized
+      })
+      .where(eq(invoices.id, invoiceId))
+      .returning();
+    return updatedInvoice;
+  }
+
+  async finalizeInvoice(invoiceId: string): Promise<Invoice> {
+    const [finalizedInvoice] = await db
+      .update(invoices)
+      .set({
+        status: "finalized",
+        finalizedAt: new Date()
+      })
+      .where(eq(invoices.id, invoiceId))
+      .returning();
+    return finalizedInvoice;
+  }
+
+  async findOrCreateInvoiceForLoad(loadId: string): Promise<Invoice> {
+    // First try to find existing invoice for this load
+    const [existingInvoice] = await db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.loadId, loadId))
+      .limit(1);
+
+    if (existingInvoice) {
+      return existingInvoice;
+    }
+
+    // Get load details to create invoice
+    const load = await this.getLoad(loadId);
+    if (!load) {
+      throw new Error(`Load ${loadId} not found`);
+    }
+
+    // Create new invoice for the load
+    const invoiceNumber = await this.getNextInvoiceNumber();
+    
+    const newInvoice: InsertInvoice = {
+      loadId,
+      customerId: load.customerId || undefined,
+      invoiceNumber,
+      flatRate: load.flatRate ? parseFloat(load.flatRate.toString()) : 0,
+      lumperCharge: load.lumperCharge ? parseFloat(load.lumperCharge.toString()) : 0,
+      extraStopsCharge: load.extraStopsCharge ? parseFloat(load.extraStopsCharge.toString()) : 0,
+      extraStopsCount: load.extraStopsCount || 0,
+      totalAmount: load.totalAmount ? parseFloat(load.totalAmount.toString()) : 0,
+      status: "draft"
+    };
+
+    return this.createInvoice(newInvoice);
   }
 
   // Notification preferences methods
