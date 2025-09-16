@@ -5009,21 +5009,108 @@ async function generateInvoiceHTML(invoice: any, load: any): Promise<string> {
 
 function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}>, loadNumber: string): string {
   const podImagesHTML = podImages.map((pod, index) => {
-    // Convert image buffer to base64 data URL
-    const base64Data = pod.content.toString('base64');
-    const dataUrl = `data:${pod.type};base64,${base64Data}`;
-    
-    return `
-      <div style="page-break-before: always; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
-          <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
-          <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
+    try {
+      // Enhanced debugging and validation
+      console.log(`🖼️ Processing POD image ${index + 1} for load ${loadNumber}:`, {
+        contentType: pod.type,
+        bufferSize: pod.content.length,
+        bufferIsValid: Buffer.isBuffer(pod.content),
+        hasContent: pod.content.length > 0
+      });
+
+      if (!Buffer.isBuffer(pod.content) || pod.content.length === 0) {
+        console.error(`❌ Invalid POD buffer for image ${index + 1}`);
+        return `
+          <div style="page-break-before: always; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+              <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
+              <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
+            </div>
+            <div style="text-align: center; padding: 40px; background: #f8f9fa; border: 2px dashed #dee2e6;">
+              <p style="color: #dc3545; font-weight: bold;">❌ POD Image Failed to Load</p>
+              <p style="color: #6c757d; font-size: 14px;">Image buffer is invalid or empty</p>
+            </div>
+          </div>
+        `;
+      }
+
+      // Normalize content type
+      let contentType = pod.type || 'image/jpeg';
+      if (contentType === 'application/pdf') {
+        console.log(`⚠️ PDF content detected for POD ${index + 1} - converting display`);
+        contentType = 'application/pdf';
+      } else if (!contentType.startsWith('image/')) {
+        console.log(`🔧 Unknown content type "${contentType}" - defaulting to image/jpeg`);
+        contentType = 'image/jpeg';
+      }
+
+      // Convert image buffer to base64 data URL with error handling
+      let base64Data, dataUrl;
+      try {
+        base64Data = pod.content.toString('base64');
+        dataUrl = `data:${contentType};base64,${base64Data}`;
+        
+        // Validate base64 string
+        if (base64Data.length < 100) {
+          throw new Error(`Base64 string too short: ${base64Data.length} characters`);
+        }
+        
+        console.log(`✅ POD image ${index + 1} converted successfully:`, {
+          base64Length: base64Data.length,
+          dataUrlPreview: dataUrl.substring(0, 50) + '...'
+        });
+        
+      } catch (encodingError: any) {
+        console.error(`❌ Base64 encoding failed for POD ${index + 1}:`, encodingError);
+        return `
+          <div style="page-break-before: always; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+              <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
+              <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
+            </div>
+            <div style="text-align: center; padding: 40px; background: #f8f9fa; border: 2px dashed #dee2e6;">
+              <p style="color: #dc3545; font-weight: bold;">❌ POD Image Encoding Failed</p>
+              <p style="color: #6c757d; font-size: 14px;">Error: ${encodingError?.message || 'Unknown encoding error'}</p>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Generate the HTML with the image
+      return `
+        <div style="page-break-before: always; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+            <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
+            <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
+          </div>
+          <div style="text-align: center;">
+            <img src="${dataUrl}" 
+                 style="max-width: 100%; height: auto; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" 
+                 alt="POD Document Page ${index + 1}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <div style="display: none; padding: 40px; background: #f8f9fa; border: 2px dashed #dee2e6;">
+              <p style="color: #dc3545; font-weight: bold;">❌ POD Image Failed to Display</p>
+              <p style="color: #6c757d; font-size: 14px;">Image data may be corrupted or invalid format</p>
+              <p style="color: #6c757d; font-size: 12px;">Content Type: ${contentType} | Size: ${pod.content.length} bytes</p>
+            </div>
+          </div>
         </div>
-        <div style="text-align: center;">
-          <img src="${dataUrl}" style="max-width: 100%; height: auto; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+      `;
+    } catch (error: any) {
+      console.error(`❌ Error generating POD HTML for image ${index + 1}:`, error);
+      return `
+        <div style="page-break-before: always; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+            <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
+            <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
+          </div>
+          <div style="text-align: center; padding: 40px; background: #f8f9fa; border: 2px dashed #dee2e6;">
+            <p style="color: #dc3545; font-weight: bold;">❌ POD Generation Error</p>
+            <p style="color: #6c757d; font-size: 14px;">Error: ${error?.message || 'Unknown error'}</p>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    }
   }).join('');
 
   return podImagesHTML;
