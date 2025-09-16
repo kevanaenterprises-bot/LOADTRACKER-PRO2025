@@ -18,9 +18,11 @@ import {
   insertUserSchema,
   insertCustomerSchema,
   insertChatMessageSchema,
+  insertInvoiceSchema,
   type Load,
   type User,
   type Location,
+  type InsertInvoice,
   invoices
 } from "@shared/schema";
 import { db } from "./db";
@@ -29,6 +31,72 @@ import { loads } from "@shared/schema";
 
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
+
+// Helper function to fetch POD data from object storage and convert to base64
+async function fetchPodSnapshot(podDocumentPath: string): Promise<{
+  contentBase64: string;
+  contentType: string;
+  size: number;
+  sourcePath: string;
+  attachedAt: string;
+} | null> {
+  if (!podDocumentPath || podDocumentPath === 'test-pod-document.pdf') {
+    console.log('📄 No valid POD document path provided');
+    return null;
+  }
+
+  try {
+    console.log('📄 Fetching POD for snapshot:', podDocumentPath);
+    
+    // Initialize object storage service
+    const objectStorageService = new ObjectStorageService();
+    
+    // Handle multiple POD documents (comma-separated)
+    const podPaths = podDocumentPath.includes(',') 
+      ? podDocumentPath.split(',').map(path => path.trim())
+      : [podDocumentPath];
+    
+    // Use the first POD document for the snapshot
+    const firstPodPath = podPaths[0];
+    
+    // Normalize the path if it's a full URL
+    const normalizedPath = objectStorageService.normalizeObjectEntityPath(firstPodPath);
+    console.log('📄 Normalized POD path:', normalizedPath);
+    
+    // Get the file object from object storage
+    const podFile = await objectStorageService.getObjectEntityFile(normalizedPath);
+    const [metadata] = await podFile.getMetadata();
+    
+    // Read the file content into a buffer
+    const chunks: Buffer[] = [];
+    const stream = podFile.createReadStream();
+    
+    await new Promise<void>((resolve, reject) => {
+      stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+      stream.on('error', reject);
+      stream.on('end', resolve);
+    });
+    
+    const buffer = Buffer.concat(chunks);
+    const contentBase64 = buffer.toString('base64');
+    
+    const podSnapshot = {
+      contentBase64,
+      contentType: metadata.contentType || 'application/octet-stream',
+      size: parseInt(metadata.size || '0'),
+      sourcePath: firstPodPath,
+      attachedAt: new Date().toISOString()
+    };
+    
+    console.log(`✅ POD snapshot created: ${podSnapshot.size} bytes, type: ${podSnapshot.contentType}`);
+    return podSnapshot;
+    
+  } catch (error) {
+    console.error('❌ Failed to fetch POD snapshot:', error);
+    // Return null rather than throwing to allow invoice creation to continue
+    return null;
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Serve static files from public directory
@@ -3782,6 +3850,16 @@ Reply YES to confirm acceptance or NO to decline.`
         invoiceData.podAttachedAt = now;
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized"; // Set to finalized since POD is embedded
+        
+        // Fetch POD snapshot data for embedding
+        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+        if (podSnapshot) {
+          invoiceData.podSnapshot = podSnapshot;
+          console.log(`📄 POD snapshot embedded into auto invoice for load ${load.number109}`);
+        } else {
+          console.log(`⚠️ POD snapshot fetch failed for auto invoice of load ${load.number109}`);
+        }
+        
         console.log(`📄 POD found and embedded into auto invoice for load ${load.number109}`);
       }
       
@@ -3941,7 +4019,8 @@ Reply YES to confirm acceptance or NO to decline.`
 
               // Generate invoice
               const invoiceNumber = await storage.getNextInvoiceNumber();
-              await storage.createInvoice({
+              const now = new Date();
+              const invoiceData: any = {
                 loadId: load.id,
                 invoiceNumber,
                 flatRate: rate.flatRate,
@@ -3950,7 +4029,26 @@ Reply YES to confirm acceptance or NO to decline.`
                 extraStopsCount: extraStops,
                 totalAmount: totalAmount.toString(),
                 status: "pending",
-              });
+              };
+              
+              // Embed POD if available on the load
+              if (load.podDocumentPath) {
+                invoiceData.podUrl = load.podDocumentPath;
+                invoiceData.podAttachedAt = now;
+                invoiceData.finalizedAt = now;
+                invoiceData.status = "finalized";
+                
+                // Fetch POD snapshot data for embedding
+                const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+                if (podSnapshot) {
+                  invoiceData.podSnapshot = podSnapshot;
+                  console.log(`📄 POD snapshot embedded into backfill invoice for load ${load.number109}`);
+                } else {
+                  console.log(`⚠️ POD snapshot fetch failed for backfill invoice of load ${load.number109}`);
+                }
+              }
+              
+              await storage.createInvoice(invoiceData);
 
               // Move to awaiting_payment
               await storage.updateLoadStatus(load.id, "awaiting_payment");
@@ -4031,7 +4129,8 @@ Reply YES to confirm acceptance or NO to decline.`
             const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
             const invoiceNumber = await storage.getNextInvoiceNumber();
-            await storage.createInvoice({
+            const now = new Date();
+            const invoiceData: any = {
               loadId: load.id,
               invoiceNumber,
               flatRate: rate.flatRate,
@@ -4040,7 +4139,26 @@ Reply YES to confirm acceptance or NO to decline.`
               extraStopsCount: extraStops,
               totalAmount: totalAmount.toString(),
               status: "pending",
-            });
+            };
+            
+            // Embed POD if available on the load
+            if (load.podDocumentPath) {
+              invoiceData.podUrl = load.podDocumentPath;
+              invoiceData.podAttachedAt = now;
+              invoiceData.finalizedAt = now;
+              invoiceData.status = "finalized";
+              
+              // Fetch POD snapshot data for embedding
+              const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+              if (podSnapshot) {
+                invoiceData.podSnapshot = podSnapshot;
+                console.log(`📄 POD snapshot embedded into fix-payment invoice for load ${load.number109}`);
+              } else {
+                console.log(`⚠️ POD snapshot fetch failed for fix-payment invoice of load ${load.number109}`);
+              }
+            }
+            
+            await storage.createInvoice(invoiceData);
             
             fixedLoads.push(`${load.number109} (generated invoice ${invoiceNumber})`);
             console.log(`✅ Fixed load ${load.number109}: generated missing invoice ${invoiceNumber}`);
@@ -4129,6 +4247,16 @@ Reply YES to confirm acceptance or NO to decline.`
         invoiceData.podAttachedAt = now;
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized"; // Set to finalized since POD is embedded
+        
+        // Fetch POD snapshot data for embedding
+        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+        if (podSnapshot) {
+          invoiceData.podSnapshot = podSnapshot;
+          console.log(`📄 POD snapshot embedded into manual invoice for load ${load.number109}`);
+        } else {
+          console.log(`⚠️ POD snapshot fetch failed for manual invoice of load ${load.number109}`);
+        }
+        
         console.log(`📄 POD found and embedded into manual invoice for load ${load.number109}`);
       }
       
@@ -4330,7 +4458,7 @@ Reply YES to confirm acceptance or NO to decline.`
               // Auto-generate invoice with sequential GO6000 series
               const invoiceNumber = await storage.getNextInvoiceNumber();
               const now = new Date();
-              const invoice = await storage.createInvoice({
+              const invoiceData: any = {
                 loadId: loadWithDetails.id,
                 invoiceNumber,
                 flatRate: rate.flatRate,
@@ -4342,7 +4470,18 @@ Reply YES to confirm acceptance or NO to decline.`
                 podUrl: bolDocumentURL, // Embed BOL/POD directly into invoice
                 podAttachedAt: now, // Mark when BOL/POD was attached
                 finalizedAt: now, // Mark as finalized immediately since BOL/POD is embedded
-              });
+              };
+              
+              // Fetch POD snapshot data for embedding
+              const podSnapshot = await fetchPodSnapshot(bolDocumentURL);
+              if (podSnapshot) {
+                invoiceData.podSnapshot = podSnapshot;
+                console.log(`📄 POD snapshot embedded into BOL-triggered invoice for load ${loadWithDetails.number109}`);
+              } else {
+                console.log(`⚠️ POD snapshot fetch failed for BOL-triggered invoice of load ${loadWithDetails.number109}`);
+              }
+              
+              const invoice = await storage.createInvoice(invoiceData);
 
               console.log(`🧾 ✅ Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109} - ready for admin inbox!`);
               console.log(`🧾 Invoice details: $${totalAmount} (Rate: $${flatRate}, Lumper: $${lumperCharge}, Extra stops: $${extraStopsCharge})`);
@@ -4443,7 +4582,7 @@ Reply YES to confirm acceptance or NO to decline.`
               // Auto-generate invoice with sequential GO6000 series
               const invoiceNumber = await storage.getNextInvoiceNumber();
               const now = new Date();
-              await storage.createInvoice({
+              const invoiceData: any = {
                 loadId: loadForInvoice.id,
                 invoiceNumber,
                 flatRate: rate.flatRate,
@@ -4455,7 +4594,18 @@ Reply YES to confirm acceptance or NO to decline.`
                 podUrl: podDocumentURL, // Embed POD directly into invoice
                 podAttachedAt: now, // Mark when POD was attached
                 finalizedAt: now, // Mark as finalized immediately since POD is embedded
-              });
+              };
+              
+              // Fetch POD snapshot data for embedding
+              const podSnapshot = await fetchPodSnapshot(podDocumentURL);
+              if (podSnapshot) {
+                invoiceData.podSnapshot = podSnapshot;
+                console.log(`📄 POD snapshot embedded into POD-triggered invoice for load ${loadForInvoice.number109}`);
+              } else {
+                console.log(`⚠️ POD snapshot fetch failed for POD-triggered invoice of load ${loadForInvoice.number109}`);
+              }
+              
+              await storage.createInvoice(invoiceData);
 
               console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadForInvoice.number109}`);
               console.log(`📋 Load ${req.params.id} stays in AWAITING_INVOICING - invoice ready to be emailed`);
@@ -4503,7 +4653,8 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Auto-generate invoice with sequential GO6000 series
       const invoiceNumber = await storage.getNextInvoiceNumber();
-      await storage.createInvoice({
+      const now = new Date();
+      const invoiceData: any = {
         loadId: load.id,
         invoiceNumber,
         flatRate: rate.flatRate,
@@ -4512,7 +4663,26 @@ Reply YES to confirm acceptance or NO to decline.`
         extraStopsCount: parseFloat(load.extraStops?.toString() || "0"),
         totalAmount: totalAmount.toString(),
         status: "pending",
-      });
+      };
+      
+      // Embed POD if available on the load
+      if (load.podDocumentPath) {
+        invoiceData.podUrl = load.podDocumentPath;
+        invoiceData.podAttachedAt = now;
+        invoiceData.finalizedAt = now;
+        invoiceData.status = "finalized";
+        
+        // Fetch POD snapshot data for embedding
+        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+        if (podSnapshot) {
+          invoiceData.podSnapshot = podSnapshot;
+          console.log(`📄 POD snapshot embedded into complete-load invoice for load ${load.number109}`);
+        } else {
+          console.log(`⚠️ POD snapshot fetch failed for complete-load invoice of load ${load.number109}`);
+        }
+      }
+      
+      await storage.createInvoice(invoiceData);
 
       // Update load status to completed
       const updatedLoad = await storage.updateLoadStatus(load.id, "completed");
@@ -5590,6 +5760,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       });
     }
   });
+
 
   // Create and return HTTP server
   const server = createServer(app);
