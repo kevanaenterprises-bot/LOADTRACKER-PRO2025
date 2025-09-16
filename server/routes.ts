@@ -4244,7 +4244,7 @@ Reply YES to confirm acceptance or NO to decline.`
           console.log(`📄 Generating invoice for load ${loadForInvoice.number109}`);
           
           // Get rate for calculation
-          const rate = await storage.getRate(loadForInvoice.location.city, loadForInvoice.location.state);
+          const rate = await storage.getRateByLocation(loadForInvoice.location.city, loadForInvoice.location.state);
           if (rate) {
             const flatRate = parseFloat(rate.flatRate);
             const lumperCharge = parseFloat(rate.lumperCharge || "0");
