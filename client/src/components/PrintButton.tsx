@@ -301,7 +301,15 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         throw new Error("No invoice identifier found. Please try refreshing the page.");
       }
       
+      console.log("📧 Email Debug - POD Snapshot Check:", {
+        invoiceHasPodSnapshot: !!(invoice?.podSnapshot),
+        podSnapshotSize: invoice?.podSnapshot?.size || 0,
+        podSnapshotContentType: invoice?.podSnapshot?.contentType || 'none',
+        loadPodDocumentPath: load?.podDocumentPath || 'none'
+      });
+      
       // Send complete document package - invoice + POD/BOL + rate confirmation (if available)
+      // Backend will prioritize invoice.podSnapshot over object storage fetching
       await apiRequest(`/api/invoices/${invoiceIdentifier}/email-complete-package`, "POST", {
         emailAddress,
         loadId: loadId,

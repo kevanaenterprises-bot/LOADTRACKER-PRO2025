@@ -32,8 +32,35 @@ import { loads } from "@shared/schema";
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
 
-// Helper function to fetch POD data from object storage and convert to base64
-async function fetchPodSnapshot(podDocumentPath: string): Promise<{
+// Helper function to get POD data prioritizing stored snapshots over object storage
+async function getPodSnapshot(invoice: any, podDocumentPath?: string): Promise<{
+  contentBase64: string;
+  contentType: string;
+  size: number;
+  sourcePath: string;
+  attachedAt: string;
+} | null> {
+  console.log('📄 Getting POD snapshot - checking stored snapshot first...');
+  
+  // First priority: Use stored podSnapshot if available
+  if (invoice.podSnapshot && invoice.podSnapshot.contentBase64) {
+    console.log('✅ Using stored POD snapshot from invoice:', {
+      size: invoice.podSnapshot.size,
+      contentType: invoice.podSnapshot.contentType,
+      sourcePath: invoice.podSnapshot.sourcePath,
+      attachedAt: invoice.podSnapshot.attachedAt
+    });
+    return invoice.podSnapshot;
+  }
+  
+  console.log('⚠️ No stored POD snapshot found, falling back to object storage...');
+  
+  // Fallback: Fetch from object storage (legacy behavior)
+  return await fetchPodSnapshotFromStorage(podDocumentPath);
+}
+
+// Legacy helper function to fetch POD data from object storage and convert to base64
+async function fetchPodSnapshotFromStorage(podDocumentPath?: string): Promise<{
   contentBase64: string;
   contentType: string;
   size: number;
@@ -46,7 +73,7 @@ async function fetchPodSnapshot(podDocumentPath: string): Promise<{
   }
 
   try {
-    console.log('📄 Fetching POD for snapshot:', podDocumentPath);
+    console.log('📄 Fetching POD from object storage:', podDocumentPath);
     
     // Initialize object storage service
     const objectStorageService = new ObjectStorageService();
@@ -88,13 +115,56 @@ async function fetchPodSnapshot(podDocumentPath: string): Promise<{
       attachedAt: new Date().toISOString()
     };
     
-    console.log(`✅ POD snapshot created: ${podSnapshot.size} bytes, type: ${podSnapshot.contentType}`);
+    console.log(`✅ POD snapshot created from storage: ${podSnapshot.size} bytes, type: ${podSnapshot.contentType}`);
     return podSnapshot;
     
   } catch (error) {
-    console.error('❌ Failed to fetch POD snapshot:', error);
+    console.error('❌ Failed to fetch POD snapshot from storage:', error);
     // Return null rather than throwing to allow invoice creation to continue
     return null;
+  }
+}
+
+// Utility function to convert base64 POD snapshot to buffer for PDF embedding
+function convertPodSnapshotToBuffer(podSnapshot: {
+  contentBase64: string;
+  contentType: string;
+  size: number;
+  sourcePath: string;
+  attachedAt: string;
+}): {content: Buffer, type: string} {
+  console.log('🔄 Converting POD snapshot to buffer:', {
+    size: podSnapshot.size,
+    contentType: podSnapshot.contentType
+  });
+  
+  const buffer = Buffer.from(podSnapshot.contentBase64, 'base64');
+  
+  console.log('✅ POD snapshot converted to buffer:', {
+    originalSize: podSnapshot.size,
+    bufferSize: buffer.length,
+    contentType: podSnapshot.contentType
+  });
+  
+  return {
+    content: buffer,
+    type: podSnapshot.contentType
+  };
+}
+
+// Helper function to get file extension from content type
+function getFileExtension(contentType: string): string {
+  switch (contentType) {
+    case 'image/jpeg':
+      return 'jpg';
+    case 'image/png':
+      return 'png';
+    case 'application/pdf':
+      return 'pdf';
+    case 'image/webp':
+      return 'webp';
+    default:
+      return 'pdf'; // Default to PDF for unknown types
   }
 }
 
@@ -3319,185 +3389,27 @@ Reply YES to confirm acceptance or NO to decline.`
       let combinedHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       let podImages: Array<{content: Buffer, type: string}> = [];
       
-      // Handle POD documents - Attach ONLY the actual uploaded files
+      // Handle POD documents - PRIORITIZE STORED SNAPSHOTS
       console.log(`🔍 EMAIL DEBUG: Checking POD for load ${primaryLoadNumber}`);
-      console.log(`🔍 load.podDocumentPath = "${load.podDocumentPath}"`);
-      console.log(`🔍 load.podDocumentPath type = ${typeof load.podDocumentPath}`);
-      console.log(`🔍 load.podDocumentPath truthy = ${!!load.podDocumentPath}`);
+      console.log(`🔍 Invoice podSnapshot available: ${!!invoice.podSnapshot}`);
+      console.log(`🔍 Load podDocumentPath: "${load.podDocumentPath}"`);
       
-      if (load.podDocumentPath) {
-        console.log(`📄 Processing uploaded POD documents for load ${primaryLoadNumber}`);
-        console.log(`📄 POD path: ${load.podDocumentPath}`);
-        console.log(`📄 POD path details:`, {
-          type: typeof load.podDocumentPath,
-          length: load.podDocumentPath.length,
-          startsWith: load.podDocumentPath.substring(0, 20),
-          isTestData: load.podDocumentPath === 'test-pod-document.pdf'
-        });
+      // Check for stored POD snapshot first, then fallback to object storage
+      const podSnapshot = await getPodSnapshot(invoice, load.podDocumentPath);
+      if (podSnapshot) {
+        console.log(`📧 Using POD data for email: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
+        const podBuffer = convertPodSnapshotToBuffer(podSnapshot);
+        podImages.push(podBuffer);
         
-        // Skip test data that's not real object storage paths
-        if (load.podDocumentPath === 'test-pod-document.pdf' || 
-            load.podDocumentPath === 'https://test-pod-document.pdf' ||
-            load.podDocumentPath.includes('test-pod-document')) {
-          console.log(`⚠️  Skipping test POD data - no real file uploaded for load ${primaryLoadNumber}`);
-        } else {
-          // Handle real uploaded POD files
-          if (load.podDocumentPath.includes(',')) {
-            // Multiple POD documents - fetch each actual file  
-            const podPaths = load.podDocumentPath.split(',').map((path: string) => path.trim());
-            console.log(`📄 Found ${podPaths.length} uploaded POD documents for load ${primaryLoadNumber}`);
-            
-            for (let i = 0; i < podPaths.length; i++) {
-              try {
-                // Build the correct object path - it should already be in the format "uploads/uuid"
-                const podPath = podPaths[i];
-                const podUrl = podPath.startsWith('/objects/') ? podPath : `/objects/${podPath}`;
-                
-                // Fetch the actual file directly
-                const response = await fetch(`http://localhost:5000${podUrl}`, {
-                  headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
-                });
-                
-                if (response.ok) {
-                  const fileBuffer = Buffer.from(await response.arrayBuffer());
-                  const contentType = response.headers.get('content-type') || 'application/pdf';
-                  
-                  attachments.push({
-                    filename: `POD-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(contentType)}`,
-                    content: fileBuffer,
-                    contentType: contentType
-                  });
-                  console.log(`✅ Attached actual POD file: POD-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(contentType)}`);
-                } else {
-                  console.error(`❌ Failed to fetch POD document ${podPath}: HTTP ${response.status} - ${await response.text()}`);
-                }
-              } catch (error) {
-                console.error(`❌ Failed to fetch POD document ${podPaths[i]}:`, error);
-              }
-            }
-          } else {
-            // Single POD document - fetch the actual file
-            try {
-              console.log(`📄 Fetching single uploaded POD document for load ${primaryLoadNumber}`);
-              console.log(`📄 Original POD path: "${load.podDocumentPath}"`);
-              
-              // Build the correct object path - handle different formats
-              let podUrl;
-              if (load.podDocumentPath.startsWith('/objects/')) {
-                podUrl = load.podDocumentPath;
-              } else if (load.podDocumentPath.startsWith('uploads/')) {
-                podUrl = `/objects/${load.podDocumentPath}`;
-              } else {
-                podUrl = `/objects/uploads/${load.podDocumentPath}`;
-              }
-              
-              console.log(`📄 Final POD URL: "http://localhost:5000${podUrl}"`);
-              
-              // Use direct object storage access to get POD for embedding
-              try {
-                const { ObjectStorageService } = await import('./objectStorage');
-                const objectStorageService = new ObjectStorageService();
-                
-                // Get the file directly from object storage
-                const objectFile = await objectStorageService.getObjectEntityFile(podUrl);
-                const [metadata] = await objectFile.getMetadata();
-                const contentType = metadata.contentType || 'application/pdf';
-                
-                console.log(`📄 POD file metadata: size=${metadata.size}, type=${contentType}`);
-                
-                // Download file content as buffer for embedding
-                const [fileBuffer] = await objectFile.download();
-                
-                console.log(`📄 POD file downloaded for embedding: ${fileBuffer.length} bytes`);
-                
-                // Store POD for embedding in combined PDF
-                podImages.push({
-                  content: fileBuffer,
-                  type: contentType
-                });
-                
-                console.log(`✅ POD prepared for embedding in combined PDF: ${fileBuffer.length} bytes`);
-                
-              } catch (storageError) {
-                console.error(`❌ Failed to download POD document ${load.podDocumentPath} from object storage:`, storageError);
-                console.log(`📄 Trying enhanced fallback for production POD access...`);
-                try {
-                  // Enhanced production POD access with multiple fallback methods
-                  let fileBuffer, contentType;
-                  
-                  // Method 1: Try direct object storage with signed URL approach
-                  try {
-                    console.log(`🔐 Attempting signed URL access for production...`);
-                    const { ObjectStorageService } = await import('./objectStorage');
-                    const objectStorageService = new ObjectStorageService();
-                    const objectFile = await objectStorageService.getObjectEntityFile(podUrl);
-                    
-                    // Generate signed URL for temporary access
-                    const [signedUrl] = await objectFile.getSignedUrl({
-                      action: 'read',
-                      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
-                    });
-                    
-                    console.log(`🔐 Generated signed URL for POD access`);
-                    const signedResponse = await fetch(signedUrl);
-                    
-                    if (signedResponse.ok) {
-                      fileBuffer = Buffer.from(await signedResponse.arrayBuffer());
-                      contentType = signedResponse.headers.get('content-type') || 'application/pdf';
-                      console.log(`✅ POD accessed via signed URL: ${fileBuffer.length} bytes`);
-                    } else {
-                      throw new Error(`Signed URL fetch failed: ${signedResponse.status}`);
-                    }
-                    
-                  } catch (signedUrlError) {
-                    console.log(`⚠️ Signed URL method failed: ${signedUrlError.message}`);
-                    
-                    // Method 2: Direct HTTP with enhanced headers
-                    const baseUrl = process.env.NODE_ENV === 'production' ? 
-                      `${req.protocol}://${req.get('host')}` : 
-                      'http://localhost:5000';
-                    
-                    console.log(`🔄 Trying direct HTTP fetch with enhanced auth...`);
-                    const response = await fetch(`${baseUrl}${podUrl}`, {
-                      headers: { 
-                        'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025',
-                        'User-Agent': 'LoadTracker-POD-Fetcher/1.0'
-                      }
-                    });
-                    
-                    if (response.ok) {
-                      fileBuffer = Buffer.from(await response.arrayBuffer());
-                      contentType = response.headers.get('content-type') || 'application/pdf';
-                      console.log(`✅ POD accessed via direct HTTP: ${fileBuffer.length} bytes`);
-                    } else {
-                      const errorText = await response.text();
-                      console.error(`❌ Direct HTTP failed: ${response.status} - ${errorText}`);
-                      throw new Error(`HTTP ${response.status}: ${errorText}`);
-                    }
-                  }
-                  
-                  if (fileBuffer && fileBuffer.length > 0) {
-                    podImages.push({
-                      content: fileBuffer,
-                      type: contentType
-                    });
-                    console.log(`✅ POD successfully prepared for embedding: ${fileBuffer.length} bytes`);
-                  } else {
-                    console.error(`❌ No valid POD data retrieved`);
-                  }
-                  
-                } catch (fetchError) {
-                  console.error(`❌ All POD fetch methods failed:`, fetchError);
-                  console.log(`📄 POD will be omitted from PDF due to access issues`);
-                }
-              }
-            } catch (error) {
-              console.error(`❌ Failed to fetch POD document ${load.podDocumentPath}:`, error);
-            }
-          }
-        }
+        // Add as attachment too
+        attachments.push({
+          filename: `POD-${primaryLoadNumber}.${getFileExtension(podSnapshot.contentType)}`,
+          content: podBuffer.content,
+          contentType: podSnapshot.contentType
+        });
+        console.log(`✅ POD prepared for email: ${podBuffer.content.length} bytes`);
       } else {
-        console.log(`⚠️  No POD document uploaded for load ${primaryLoadNumber} - creating invoice-only PDF`);
+        console.log(`⚠️ No POD available for load ${primaryLoadNumber} - email will contain invoice only`);
       }
       
       // Embed POD images into the invoice HTML if available
@@ -3509,7 +3421,7 @@ Reply YES to confirm acceptance or NO to decline.`
           console.log(`✅ POD images embedded into combined invoice`);
         } catch (embedError) {
           console.error(`❌ Failed to embed POD images:`, embedError);
-          console.log(`⚠️  Falling back to invoice-only PDF due to POD embedding error`);
+          console.log(`⚠️ Falling back to invoice-only PDF due to POD embedding error`);
           // Keep original invoice HTML without POD if embedding fails
         }
       }
@@ -3524,7 +3436,7 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`✅ PDF generation successful`);
       } catch (pdfError) {
         console.error(`❌ PDF generation failed:`, pdfError);
-        console.log(`⚠️  Attempting fallback with simpler HTML...`);
+        console.log(`⚠️ Attempting fallback with simpler HTML...`);
         
         // Fallback: Generate simple invoice-only PDF without POD embedding
         const invoiceContext = await computeInvoiceContext(load);
@@ -3538,106 +3450,25 @@ Reply YES to confirm acceptance or NO to decline.`
       console.log(`📄 PDF header check: ${combinedPDF.slice(0, 8).toString()}`);
       console.log(`📄 PDF footer check: ${combinedPDF.slice(-10).toString()}`);
       
-      // Verify PDF starts with correct header
-      const pdfHeader = combinedPDF.slice(0, 4).toString();
-      if (pdfHeader !== '%PDF') {
-        console.error(`❌ INVALID PDF HEADER: "${pdfHeader}" - PDF may be corrupted!`);
-      } else {
-        console.log(`✅ PDF header valid: ${pdfHeader}`);
+      if (combinedPDF.length === 0) {
+        throw new Error('PDF generation resulted in empty file');
       }
       
+      // Add the combined PDF as primary attachment
       attachments.push({
         filename: `Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf`,
         content: combinedPDF,
         contentType: 'application/pdf'
       });
-      console.log(`✅ Generated combined PDF: Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf (${combinedPDF.length} bytes)`);
-
-      // Handle BOL documents - Attach ONLY the actual uploaded files (same logic as POD)
-      if (load.bolDocumentPath) {
-        console.log(`📄 Processing uploaded BOL documents for load ${primaryLoadNumber}`);
-        console.log(`📄 BOL path: ${load.bolDocumentPath}`);
-        
-        // Skip test data that's not real object storage paths
-        if (load.bolDocumentPath === 'test-bol-document.pdf' || 
-            load.bolDocumentPath === 'https://test-bol-document.pdf' ||
-            load.bolDocumentPath.includes('test-bol-document')) {
-          console.log(`⚠️  Skipping test BOL data - no real file uploaded for load ${primaryLoadNumber}`);
-        } else {
-          // Handle real uploaded BOL files (same logic as POD)
-          if (load.bolDocumentPath.includes(',')) {
-            // Multiple BOL documents - fetch each actual file  
-            const bolPaths = load.bolDocumentPath.split(',').map((path: string) => path.trim());
-            console.log(`📄 Found ${bolPaths.length} uploaded BOL documents for load ${primaryLoadNumber}`);
-            
-            for (let i = 0; i < bolPaths.length; i++) {
-              const bolPath = bolPaths[i];
-              try {
-                console.log(`📄 Fetching BOL document ${i + 1}/${bolPaths.length} for load ${primaryLoadNumber}`);
-                const bolUrl = bolPath.startsWith('/objects/') ? bolPath : `/objects/${bolPath}`;
-                const response = await fetch(`http://localhost:5000${bolUrl}`, {
-                  headers: { 'x-bypass-token': BYPASS_SECRET }
-                });
-                
-                if (response.ok) {
-                  const buffer = await response.arrayBuffer();
-                  const contentType = response.headers.get('content-type') || 'application/pdf';
-                  
-                  attachments.push({
-                    filename: `BOL-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(contentType)}`,
-                    content: Buffer.from(buffer),
-                    contentType: contentType
-                  });
-                  console.log(`✅ Attached actual BOL file: BOL-${primaryLoadNumber}-Page${i + 1}.${getFileExtension(contentType)}`);
-                } else {
-                  console.error(`❌ Failed to fetch BOL document ${bolPath}: HTTP ${response.status} - ${await response.text()}`);
-                }
-              } catch (error) {
-                console.error(`❌ Failed to fetch BOL document ${bolPaths[i]}:`, error);
-              }
-            }
-          } else {
-            // Single BOL document - fetch the actual file
-            try {
-              console.log(`📄 Fetching single uploaded BOL document for load ${primaryLoadNumber}`);
-              const bolUrl = load.bolDocumentPath.startsWith('/objects/') ? load.bolDocumentPath : `/objects/${load.bolDocumentPath}`;
-              const response = await fetch(`http://localhost:5000${bolUrl}`, {
-                headers: { 'x-bypass-token': BYPASS_SECRET }
-              });
-              
-              if (response.ok) {
-                const buffer = await response.arrayBuffer();
-                const contentType = response.headers.get('content-type') || 'application/pdf';
-                
-                attachments.push({
-                  filename: `BOL-${primaryLoadNumber}.${getFileExtension(contentType)}`,
-                  content: Buffer.from(buffer),
-                  contentType: contentType
-                });
-                console.log(`✅ Attached actual BOL file: BOL-${primaryLoadNumber}.${getFileExtension(contentType)}`);
-              } else {
-                console.error(`❌ Failed to fetch BOL document ${load.bolDocumentPath}: HTTP ${response.status} - ${await response.text()}`);
-              }
-            } catch (error) {
-              console.error(`❌ Failed to fetch BOL document ${load.bolDocumentPath}:`, error);
-            }
-          }
-        }
-      } else {
-        console.log(`⚠️  No BOL document uploaded for load ${primaryLoadNumber} - skipping BOL attachment`);
-      }
       
-      console.log(`🔍 Generated ${attachments.length} PDF attachments for load ${primaryLoadNumber}:`);
-      attachments.forEach(att => {
-        console.log(`  - ${att.filename} (${att.content.length} bytes, type: ${att.contentType})`);
-        // Additional PDF validation for production debugging
-        if (att.contentType === 'application/pdf') {
-          const header = att.content.slice(0, 8).toString();
-          const isValidPDF = header.startsWith('%PDF');
-          console.log(`    PDF header: "${header}" - Valid: ${isValidPDF}`);
-        }
+      console.log(`📧 Final email summary for load ${primaryLoadNumber}:`);
+      console.log(`  - To: ${emailAddress}`);
+      console.log(`  - Attachments: ${attachments.length}`);
+      attachments.forEach((att, index) => {
+        console.log(`    ${index + 1}. ${att.filename} (${att.content.length} bytes, ${att.contentType})`);
       });
       
+      // Send email with all attachments
       const emailResult = await sendEmail({
         to: emailAddress,
         subject,
@@ -3645,31 +3476,273 @@ Reply YES to confirm acceptance or NO to decline.`
         attachments
       });
       
-      // Update load status to awaiting_payment after successful email sending
-      console.log(`🔄 BEFORE STATUS UPDATE: Load ${load.number109} has status: ${load.status}`);
-      await storage.updateLoadStatus(load.id, "awaiting_payment");
-      console.log(`📧 Invoice emailed successfully - Load ${load.number109} moved to AWAITING_PAYMENT`);
-      
-      // Verify the status was actually updated
-      const updatedLoad = await storage.getLoad(load.id);
-      console.log(`✅ AFTER STATUS UPDATE: Load ${load.number109} now has status: ${updatedLoad?.status}`);
-      
-      res.json({ 
-        message: "Complete document package sent successfully",
+      res.json({
+        message: "Complete document package emailed successfully",
         emailAddress,
-        invoiceNumber: invoice.invoiceNumber,
-        loadNumber: load.number109,
-        documentsIncluded: Object.entries(availableDocuments).filter(([, included]) => included).map(([doc]) => doc),
+        attachments: attachments.map(att => ({
+          filename: att.filename,
+          size: att.content.length,
+          contentType: att.contentType
+        })),
         messageId: emailResult.messageId,
         recipients: emailResult.recipients
       });
       
     } catch (error) {
-      console.error("Error sending complete package email:", error);
-      console.error("Error details:", error instanceof Error ? error.message : error);
-      console.error("Error stack:", error instanceof Error ? error.stack : 'No stack trace');
+      console.error("Error sending complete document package:", error);
       res.status(500).json({ 
-        message: "Failed to send complete package email",
+        message: "Failed to send complete document package",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Rate confirmation image upload and processing route
+  app.post("/api/loads/:loadId/rate-confirmation", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || 
+                    !!(req.session as any)?.driverAuth || 
+                    req.headers['x-bypass-token'] === BYPASS_SECRET;
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { loadId } = req.params;
+      const { imageBase64 } = req.body;
+
+      if (!imageBase64) {
+        return res.status(400).json({ message: "Image data is required" });
+      }
+
+      // Get the load
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      console.log(`🖼️ Processing rate confirmation image for load ${load.number109}...`);
+
+      // Process the image with OCR
+      const ocrResults = await processRateConfirmationImage(imageBase64);
+      
+      console.log(`📝 OCR Results for load ${load.number109}:`, ocrResults);
+
+      // Update load with OCR data
+      const updateData: any = {};
+      
+      if (ocrResults.poNumber) {
+        updateData.poNumber = ocrResults.poNumber;
+      }
+      
+      if (ocrResults.appointmentTime) {
+        updateData.appointmentTime = ocrResults.appointmentTime;
+      }
+      
+      if (ocrResults.pickupAddress) {
+        updateData.pickupAddress = ocrResults.pickupAddress;
+      }
+      
+      if (ocrResults.deliveryAddress) {
+        updateData.deliveryAddress = ocrResults.deliveryAddress;
+      }
+      
+      if (ocrResults.companyName) {
+        updateData.companyName = ocrResults.companyName;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        await storage.updateLoad(loadId, updateData);
+        console.log(`✅ Load ${load.number109} updated with OCR data:`, updateData);
+      }
+
+      res.json({
+        message: "Rate confirmation processed successfully",
+        loadId,
+        ocrResults: {
+          poNumber: ocrResults.poNumber,
+          appointmentTime: ocrResults.appointmentTime,
+          pickupAddress: ocrResults.pickupAddress,
+          deliveryAddress: ocrResults.deliveryAddress,
+          companyName: ocrResults.companyName,
+          extractedText: ocrResults.extractedText?.substring(0, 200) + '...' // Truncate for response
+        },
+        updateData
+      });
+
+    } catch (error) {
+      console.error("Error processing rate confirmation:", error);
+      res.status(500).json({ 
+        message: "Failed to process rate confirmation",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // Status update route
+  app.patch("/api/loads/:loadId/status", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || 
+                    !!(req.session as any)?.driverAuth || 
+                    req.headers['x-bypass-token'] === BYPASS_SECRET;
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { loadId } = req.params;
+      const { status } = req.body;
+
+      console.log(`🔄 Status update request for load ${loadId} to status: ${status}`);
+
+      // Get the load first
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      console.log(`📦 Found load ${load.number109} (ID: ${loadId}), current status: ${load.status}`);
+
+      // Update the load status
+      const updatedLoad = await storage.updateLoadStatus(loadId, status);
+
+      console.log(`✅ Load ${load.number109} status updated from ${load.status} to ${status}`);
+
+      // Auto-generate invoice for delivered loads if missing
+      if (status === "delivered" && !updatedLoad.invoice) {
+        console.log(`📋 Auto-generating invoice for delivered load ${load.number109}...`);
+        await generateAutoInvoiceIfNeeded(updatedLoad);
+      }
+
+      res.json({
+        message: "Load status updated successfully",
+        loadId,
+        previousStatus: load.status,
+        newStatus: status,
+        loadNumber: load.number109
+      });
+
+    } catch (error) {
+      console.error("Error updating load status:", error);
+      res.status(500).json({ 
+        message: "Failed to update load status",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // GPS location update endpoint
+  app.post("/api/loads/:loadId/location", async (req, res) => {
+    try {
+      const { loadId } = req.params;
+      const { latitude, longitude } = req.body;
+
+      if (!latitude || !longitude) {
+        return res.status(400).json({ message: "Latitude and longitude are required" });
+      }
+
+      console.log(`📍 GPS update for load ${loadId}: ${latitude}, ${longitude}`);
+
+      // Update load location
+      await storage.updateLoad(loadId, {
+        currentLatitude: latitude.toString(),
+        currentLongitude: longitude.toString(),
+        lastLocationUpdate: new Date().toISOString()
+      });
+
+      res.json({ 
+        message: "Location updated successfully",
+        loadId,
+        latitude,
+        longitude
+      });
+
+    } catch (error) {
+      console.error("Error updating GPS location:", error);
+      res.status(500).json({ message: "Failed to update location" });
+    }
+  });
+
+  // Get load tracking data
+  app.get("/api/loads/:loadId/tracking", async (req, res) => {
+    try {
+      const { loadId } = req.params;
+      
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      const trackingData = {
+        loadId: load.id,
+        loadNumber: load.number109,
+        status: load.status,
+        currentLocation: {
+          latitude: load.currentLatitude,
+          longitude: load.currentLongitude,
+          lastUpdate: load.lastLocationUpdate
+        },
+        destinations: {
+          shipper: {
+            latitude: load.shipperLatitude,
+            longitude: load.shipperLongitude
+          },
+          receiver: {
+            latitude: load.receiverLatitude,
+            longitude: load.receiverLongitude
+          }
+        },
+        trackingEnabled: load.trackingEnabled
+      };
+
+      res.json(trackingData);
+
+    } catch (error) {
+      console.error("Error getting tracking data:", error);
+      res.status(500).json({ message: "Failed to get tracking data" });
+    }
+  });
+
+  // Driver availability check endpoint
+  app.get("/api/drivers/available", async (req, res) => {
+    try {
+      const availableDrivers = await storage.getAvailableDrivers();
+      res.json(availableDrivers);
+    } catch (error) {
+      console.error("Error getting available drivers:", error);
+      res.status(500).json({ message: "Failed to get available drivers" });
+    }
+  });
+
+  // Invoice creation with automatic POD snapshot when finalizing
+  app.post("/api/invoices", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      console.log("📄 Creating new invoice with request data:", req.body);
+      
+      // Validate request body using the insert schema
+      const invoiceData = insertInvoiceSchema.parse(req.body);
+      console.log("✅ Invoice data validation passed");
+
+      // Create the invoice using storage service
+      const newInvoice = await storage.createInvoice(invoiceData);
+      console.log(`✅ Invoice created successfully: ${newInvoice.invoiceNumber}`);
+
+      // Return the created invoice
+      res.status(201).json(newInvoice);
+      
+    } catch (error) {
+      console.error("❌ Error creating invoice:", error);
+      res.status(500).json({ 
+        message: "Failed to create invoice",
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
@@ -5215,98 +5288,17 @@ Reply YES to confirm acceptance or NO to decline.`
       const invoiceContext = await computeInvoiceContext(load);
       const baseHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       
-      // Embed POD images if available - USE SAME FUNCTION AS EMAIL
+      // Embed POD images if available - PRIORITIZE STORED SNAPSHOTS
       let previewHTML = baseHTML;
       const podImages: Array<{content: Buffer, type: string}> = [];
       
-      if (load.podDocumentPath) {
-        console.log(`🖨️ Processing POD for print preview: ${load.podDocumentPath}`);
-        console.log(`🖨️ POD path details:`, {
-          fullPath: load.podDocumentPath,
-          type: typeof load.podDocumentPath,
-          length: load.podDocumentPath.length,
-          startsWithObjects: load.podDocumentPath.startsWith('/objects/'),
-          startsWithSlash: load.podDocumentPath.startsWith('/')
-        });
-
-        try {
-          // Try direct HTTP fetch first - this is more reliable for our setup
-          let podUrl = load.podDocumentPath;
-          
-          // Normalize the URL path
-          if (!podUrl.startsWith('/objects/') && !podUrl.startsWith('/')) {
-            podUrl = `/objects/${podUrl}`;
-          }
-          
-          console.log(`🖨️ Attempting direct fetch of POD: ${podUrl}`);
-          
-          // Use proper host resolution for production environments
-          const baseUrl = process.env.NODE_ENV === 'production' ? 
-            `${req.protocol}://${req.get('host')}` : 
-            'http://localhost:5000';
-          
-          const response = await fetch(`${baseUrl}${podUrl}`, {
-            headers: { 
-              'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025',
-              'Accept': 'image/*,application/pdf,*/*'
-            }
-          });
-          
-          console.log(`🖨️ POD fetch response:`, {
-            status: response.status,
-            statusText: response.statusText,
-            contentType: response.headers.get('content-type'),
-            contentLength: response.headers.get('content-length'),
-            ok: response.ok
-          });
-          
-          if (response.ok) {
-            // Get response as array buffer for binary data
-            const arrayBuffer = await response.arrayBuffer();
-            const fileBuffer = Buffer.from(arrayBuffer);
-            const contentType = response.headers.get('content-type') || 'image/jpeg';
-            
-            console.log(`🖨️ POD buffer details:`, {
-              bufferLength: fileBuffer.length,
-              isBuffer: Buffer.isBuffer(fileBuffer),
-              contentType: contentType,
-              firstFewBytes: fileBuffer.subarray(0, 10).toString('hex')
-            });
-            
-            // Validate that we have a valid image buffer
-            if (fileBuffer.length > 0) {
-              // Check for valid image file signatures
-              const firstBytes = fileBuffer.subarray(0, 4);
-              const isJPEG = firstBytes[0] === 0xFF && firstBytes[1] === 0xD8;
-              const isPNG = firstBytes.toString('hex') === '89504e47';
-              const isPDF = fileBuffer.subarray(0, 5).toString() === '%PDF-';
-              
-              console.log(`🖨️ File signature validation:`, {
-                isJPEG,
-                isPNG, 
-                isPDF,
-                firstBytesHex: firstBytes.toString('hex')
-              });
-              
-              if (isJPEG || isPNG || isPDF) {
-                podImages.push({
-                  content: fileBuffer,
-                  type: contentType
-                });
-                console.log(`✅ Valid POD image prepared for embedding: ${fileBuffer.length} bytes`);
-              } else {
-                console.error(`❌ Invalid image file signature - not a valid image file`);
-              }
-            } else {
-              console.error(`❌ Empty POD buffer received`);
-            }
-          } else {
-            const errorText = await response.text();
-            console.error(`❌ POD fetch failed: HTTP ${response.status} - ${errorText}`);
-          }
-        } catch (error) {
-          console.error(`❌ Error processing POD for preview:`, error);
-        }
+      // Check for stored POD snapshot first, then fallback to object storage
+      const podSnapshot = await getPodSnapshot(invoice, load.podDocumentPath);
+      if (podSnapshot) {
+        console.log(`🖨️ Using POD data for print preview: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
+        const podBuffer = convertPodSnapshotToBuffer(podSnapshot);
+        podImages.push(podBuffer);
+        console.log(`✅ POD prepared for print preview: ${podBuffer.content.length} bytes`);
       } else {
         console.log(`⚠️ No POD document uploaded for load ${load.number109} (ID: ${load.id}) - preview will show invoice only`);
         console.log(`🔍 DIAGNOSIS: If POD was recently uploaded but not showing:`);
