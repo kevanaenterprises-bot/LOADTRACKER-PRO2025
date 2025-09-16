@@ -36,7 +36,6 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number"),
   username: varchar("username").unique(), // For driver login
   password: varchar("password"), // For driver login (phone number)
-  truckNumber: varchar("truck_number"), // Truck number for drivers
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -58,7 +57,6 @@ export const loads = pgTable("loads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   number109: varchar("number_109").notNull().unique(),
   driverId: varchar("driver_id").references(() => users.id),
-  truckNumber: varchar("truck_number"), // Truck number assigned to this load
   locationId: varchar("location_id").references(() => locations.id),
   pickupLocationId: varchar("pickup_location_id").references(() => locations.id),
   estimatedMiles: integer("estimated_miles"),
@@ -173,7 +171,6 @@ export const invoices = pgTable("invoices", {
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
   status: varchar("status").default("draft"), // draft, awaiting_pod, finalized, printed, emailed
   podUrl: varchar("pod_url"), // POD document path attached to this invoice
-  podData: text("pod_data"), // Base64 encoded POD content embedded directly in invoice
   podChecksum: varchar("pod_checksum"), // SHA256 checksum for data integrity
   podAttachedAt: timestamp("pod_attached_at"), // When POD was attached to invoice
   finalizedAt: timestamp("finalized_at"), // When invoice was finalized with POD
@@ -250,7 +247,6 @@ export const insertUserSchema = createInsertSchema(users).pick({
   phoneNumber: true,
   username: true,
   password: true,
-  truckNumber: true, // Added truck number support for driver creation
 });
 
 export const insertLocationSchema = createInsertSchema(locations).omit({

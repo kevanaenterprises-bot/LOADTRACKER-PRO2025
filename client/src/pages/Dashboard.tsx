@@ -22,7 +22,6 @@ import RateManagement from "@/components/RateManagement";
 import { CacheDebugger } from "@/components/CacheDebugger";
 import { PaidInvoices } from "@/components/PaidInvoices";
 import GhostLoadCleanup from "@/components/GhostLoadCleanup";
-import Chat from "@/pages/Chat";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,7 +36,6 @@ const driverSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   username: z.string().min(1, "Username is required"),
-  truckNumber: z.string().optional(), // Optional truck number for driver
 });
 
 const locationSchema = z.object({
@@ -58,7 +56,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices" | "cleanup" | "ai-assistant">("loads");
+  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices" | "cleanup">("loads");
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
@@ -117,7 +115,6 @@ export default function Dashboard() {
       lastName: "",
       phoneNumber: "",
       username: "",
-      truckNumber: "",
     },
   });
 
@@ -422,10 +419,6 @@ export default function Dashboard() {
                 <i className="fas fa-trash text-lg md:text-base text-red-600"></i>
                 <span className="text-center leading-tight">Ghost Load Cleanup</span>
               </TabsTrigger>
-              <TabsTrigger value="ai-assistant" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-blue-700 hover:text-blue-900 font-semibold min-h-[60px] touch-target" data-testid="tab-ai-assistant">
-                <i className="fas fa-robot text-lg md:text-base text-blue-600"></i>
-                <span className="text-center leading-tight">AI Assistant</span>
-              </TabsTrigger>
             </TabsList>
             
             {/* Mobile: Horizontal scrolling tabs */}
@@ -465,10 +458,6 @@ export default function Dashboard() {
               <TabsTrigger value="cleanup" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
                 <i className="fas fa-trash text-xl text-red-600"></i>
                 <span className="text-center leading-tight">Cleanup</span>
-              </TabsTrigger>
-              <TabsTrigger value="ai-assistant" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target" data-testid="tab-ai-assistant-mobile">
-                <i className="fas fa-robot text-xl text-blue-600"></i>
-                <span className="text-center leading-tight">AI Chat</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -589,19 +578,6 @@ export default function Dashboard() {
                                 <FormLabel>Username (for driver login)</FormLabel>
                                 <FormControl>
                                   <Input placeholder="john_smith" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={driverForm.control}
-                            name="truckNumber"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Truck Number (Optional)</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="TR-101, 1234, etc." {...field} data-testid="input-driver-truck-number" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -772,18 +748,6 @@ export default function Dashboard() {
           {/* Ghost Load Cleanup Tab */}
           <TabsContent value="cleanup" className="mt-6">
             <GhostLoadCleanup />
-          </TabsContent>
-
-          {/* AI Assistant Tab */}
-          <TabsContent value="ai-assistant" className="mt-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2">AI Assistant</h2>
-              <p className="text-gray-600">
-                Chat with your intelligent assistant powered by Anthropic Claude. Ask questions about your loads, 
-                get help with logistics, or discuss any trucking-related topics.
-              </p>
-            </div>
-            <Chat />
           </TabsContent>
 
         </Tabs>

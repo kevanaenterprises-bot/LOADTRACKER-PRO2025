@@ -50,7 +50,6 @@ export function LoadSection({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [assigningDriverFor, setAssigningDriverFor] = useState<string | null>(null);
-  const [assignmentTruckNumber, setAssignmentTruckNumber] = useState("");
   const [podUploadDialogOpen, setPodUploadDialogOpen] = useState(false);
   const [selectedLoadForPOD, setSelectedLoadForPOD] = useState<any>(null);
 
@@ -77,12 +76,8 @@ export function LoadSection({
   });
 
   const assignDriverMutation = useMutation({
-    mutationFn: async ({ loadId, driverId, truckNumber }: { loadId: string; driverId: string; truckNumber?: string }) => {
-      const payload: any = { driverId };
-      if (truckNumber) {
-        payload.truckNumber = truckNumber;
-      }
-      return apiRequest(`/api/loads/${loadId}/assign`, "PATCH", payload);
+    mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
+      return apiRequest(`/api/loads/${loadId}/assign`, "PATCH", { driverId });
     },
     onSuccess: (data, variables) => {
       toast({
@@ -91,7 +86,6 @@ export function LoadSection({
       });
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       setAssigningDriverFor(null);
-      setAssignmentTruckNumber(""); // Clear truck number after assignment
       // Update load status to assigned
       apiRequest(`/api/loads/${variables.loadId}/status`, "PATCH", { status: "assigned" });
     },
@@ -106,11 +100,7 @@ export function LoadSection({
 
   const handleAssignDriver = (loadId: string, driverId: string) => {
     if (driverId) {
-      assignDriverMutation.mutate({ 
-        loadId, 
-        driverId, 
-        truckNumber: assignmentTruckNumber || undefined 
-      });
+      assignDriverMutation.mutate({ loadId, driverId });
     }
   };
 
@@ -150,7 +140,6 @@ export function LoadSection({
             <TableRow>
               <TableHead>109 Number</TableHead>
               <TableHead data-testid="th-bol-374">BOL (374)</TableHead>
-              <TableHead>Truck #</TableHead>
               {showDriverAssign && <TableHead>Assign Driver</TableHead>}
               {!showDriverAssign && <TableHead>Driver</TableHead>}
               <TableHead>Destinations</TableHead>
@@ -179,50 +168,29 @@ export function LoadSection({
                   </div>
                 </TableCell>
                 
-                <TableCell>
-                  <div className="text-sm font-medium" data-testid={`text-truck-number-${load.id}`}>
-                    {load.truckNumber || <span className="text-gray-400 italic">Not assigned</span>}
-                  </div>
-                </TableCell>
-                
                 {showDriverAssign ? (
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     {assigningDriverFor === load.id ? (
-                      <div className="flex flex-col gap-2 p-2 bg-gray-50 rounded border">
-                        <div className="flex items-center gap-2">
-                          <Select onValueChange={(value) => handleAssignDriver(load.id, value)}>
-                            <SelectTrigger className="w-40">
-                              <SelectValue placeholder="Select driver..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {availableDrivers.map((driver: any) => (
-                                <SelectItem key={driver.id} value={driver.id}>
-                                  {driver.firstName} {driver.lastName}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              setAssigningDriverFor(null);
-                              setAssignmentTruckNumber("");
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            placeholder="Truck # (optional)"
-                            value={assignmentTruckNumber}
-                            onChange={(e) => setAssignmentTruckNumber(e.target.value)}
-                            className="w-40 text-sm"
-                            data-testid="input-assignment-truck-number"
-                          />
-                          <span className="text-xs text-gray-500">Optional truck number</span>
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <Select onValueChange={(value) => handleAssignDriver(load.id, value)}>
+                          <SelectTrigger className="w-40">
+                            <SelectValue placeholder="Select driver..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableDrivers.map((driver: any) => (
+                              <SelectItem key={driver.id} value={driver.id}>
+                                {driver.firstName} {driver.lastName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setAssigningDriverFor(null)}
+                        >
+                          Cancel
+                        </Button>
                       </div>
                     ) : (
                       <Button
@@ -249,26 +217,20 @@ export function LoadSection({
                 <TableCell>
                   <div className="text-sm">
                     {load.stops && load.stops.length > 0 ? (
-                      // Show delivery destinations from stops - prioritize FINAL destination
-                      (() => {
-                        const dropoffStops = load.stops.filter((stop: any) => stop.stopType === 'dropoff');
-                        const finalStop = dropoffStops[dropoffStops.length - 1]; // Get LAST stop
-                        const totalStops = dropoffStops.length;
-                        
-                        if (totalStops === 0) return <span className="text-gray-500">No deliveries</span>;
-                        
-                        return (
-                          <div className="mb-1">
-                            <div className="font-medium">{finalStop.companyName}</div>
-                            <div className="text-xs text-gray-500">
-                              {totalStops === 1 
-                                ? 'Final destination' 
-                                : `Last stop ${totalStops} of ${totalStops}`
-                              }
-                            </div>
+                      // Show delivery destinations from stops
+                      load.stops
+                        .filter((stop: any) => stop.stopType === 'dropoff')
+                        .slice(0, 2)
+                        .map((stop: any, index: number, filteredStops: any[]) => (
+                          <div key={stop.id} className="mb-1">
+                            <div className="font-medium">{stop.companyName}</div>
+                            {index === 0 && filteredStops.length > 1 && (
+                              <div className="text-xs text-gray-500">
+                                +{filteredStops.length - 1} more destination{filteredStops.length > 2 ? 's' : ''}
+                              </div>
+                            )}
                           </div>
-                        );
-                      })())
+                        ))
                     ) : (
                       // Fallback to primary location if no stops
                       <>

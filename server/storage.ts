@@ -102,7 +102,7 @@ export interface IStorage {
   getNextInvoiceNumber(): Promise<string>;
   
   // Invoice-POD integration operations
-  embedPODDataInInvoice(invoiceId: string, podData: string, podUrl?: string): Promise<Invoice>;
+  attachPODToInvoice(invoiceId: string, podUrl: string, podChecksum: string): Promise<Invoice>;
   finalizeInvoice(invoiceId: string): Promise<Invoice>;
   findOrCreateInvoiceForLoad(loadId: string): Promise<Invoice>;
 
@@ -982,15 +982,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Invoice-POD integration methods
-  async embedPODDataInInvoice(invoiceId: string, podData: string, podUrl?: string): Promise<Invoice> {
+  async attachPODToInvoice(invoiceId: string, podUrl: string, podChecksum: string): Promise<Invoice> {
     const [updatedInvoice] = await db
       .update(invoices)
       .set({
-        podData,
-        podUrl: podUrl || null,
-        podChecksum: podData ? Buffer.from(podData).toString('base64').slice(0, 32) : null,
+        podUrl,
+        podChecksum,
         podAttachedAt: new Date(),
-        status: "finalized" // Mark as finalized since POD data is now embedded
+        status: "awaiting_pod" // Update status to indicate POD is attached but not finalized
       })
       .where(eq(invoices.id, invoiceId))
       .returning();

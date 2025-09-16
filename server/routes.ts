@@ -2579,7 +2579,7 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   }, async (req, res) => {
     try {
-      const { driverId, truckNumber } = req.body;
+      const { driverId } = req.body;
       const loadId = req.params.id;
       
       if (!driverId) {
@@ -2592,12 +2592,8 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(404).json({ message: "Load not found" });
       }
 
-      // Update the load with driver assignment and optional truck number
-      const updateData: any = { driverId };
-      if (truckNumber) {
-        updateData.truckNumber = truckNumber;
-      }
-      await storage.updateLoad(loadId, updateData);
+      // Update the load with driver assignment
+      await storage.updateLoad(loadId, { driverId });
 
       // Get complete load data with driver, location, and invoice details for UI
       const completeLoad = await storage.getLoad(loadId);
@@ -4224,80 +4220,88 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(400).json({ message: "POD document URL is required" });
       }
 
-      console.log(`📄 PRODUCTION FIX: POD upload for load ${req.params.id}: ${podDocumentURL}`);
+      // SIMPLIFIED: Just save the POD URL directly
+      console.log(`📄 POD upload for load ${req.params.id}: ${podDocumentURL}`);
       
-      // STEP 1: Save the POD URL to the load (keeps driver assignment intact)
+      // Update load with POD document path
       const load = await storage.updateLoadPOD(req.params.id, podDocumentURL);
-      console.log(`✅ POD saved for load: ${load.number109} - Driver: ${load.driverId}`);
+      console.log(`✅ POD saved for load: ${load.number109}`);
       
-      // STEP 2: Set status to delivered (if not already in final states)
-      if (!["delivered", "awaiting_invoicing", "awaiting_payment", "paid", "completed"].includes(load.status)) {
+      // First set status to delivered when POD is uploaded
+      if (load.status !== "delivered" && load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {
         await storage.updateLoadStatus(req.params.id, "delivered");
-        console.log(`✅ Load ${req.params.id} marked as DELIVERED`);
+        // Set delivered timestamp using direct database update
+        await db.update(loads).set({ 
+          deliveredAt: new Date(),
+          updatedAt: new Date() 
+        }).where(eq(loads.id, req.params.id));
+        console.log(`✅ Load ${req.params.id} marked as DELIVERED - POD uploaded successfully`);
       }
 
-      // STEP 3: Generate invoice if needed (simple check)
-      const loadForInvoice = await storage.getLoad(req.params.id);
-      if (loadForInvoice?.location?.city && loadForInvoice?.location?.state) {
-        
-        // Check if invoice already exists
-        const existingInvoices = await storage.getInvoices();
-        const hasInvoice = existingInvoices.some((inv: any) => inv.loadId === loadForInvoice.id);
-        
-        if (!hasInvoice) {
-          console.log(`📄 Generating invoice for load ${loadForInvoice.number109}`);
-          
-          // Get rate for calculation
-          const rate = await storage.getRateByLocation(loadForInvoice.location.city, loadForInvoice.location.state);
-          if (rate) {
-            const flatRate = parseFloat(rate.flatRate);
-            const lumperCharge = parseFloat(rate.lumperCharge || "0");
-            const extraStopsCharge = (loadForInvoice.extraStops?.length || 0) * 100;
-            const totalAmount = flatRate + lumperCharge + extraStopsCharge;
-            
-            // Try to embed POD data in the invoice for print preview
-            let podDataBase64 = null;
-            try {
-              console.log(`📄 Fetching POD for embedding: ${podDocumentURL}`);
-              const response = await fetch(podDocumentURL);
-              if (response.ok) {
-                const buffer = await response.arrayBuffer();
-                const bytes = new Uint8Array(buffer);
-                const base64String = Buffer.from(bytes).toString('base64');
-                const contentType = response.headers.get('content-type') || 'image/jpeg';
-                podDataBase64 = `data:${contentType};base64,${base64String}`;
-                console.log(`✅ POD embedded for print preview (${Math.round(base64String.length / 1024)}KB)`);
-              }
-            } catch (embedError) {
-              console.warn(`⚠️ POD embedding failed (non-critical):`, embedError);
-            }
+      // FIXED WORKFLOW: Set to awaiting_invoicing first, then auto-generate
+      const loadWithDetails = await storage.getLoad(req.params.id);
+      if (loadWithDetails && loadWithDetails.status === "delivered") {
+        await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
+        console.log(`📋 Load ${req.params.id} moved to AWAITING_INVOICING - ready for invoice generation`);
+      }
 
-            const invoiceData = {
-              loadId: loadForInvoice.id,
-              invoiceNumber: `INV-${Date.now()}`,
-              amount: totalAmount.toString(),
-              generatedAt: new Date(),
-              status: "generated" as const,
-              podData: podDataBase64, // Embed POD for print preview
-              podUrl: podDocumentURL,  // Keep URL for reference
-            };
+      // Automatically generate invoice when POD is uploaded  
+      try {
+        const loadForInvoice = await storage.getLoad(req.params.id);
+        const validStatusesForInvoice = ['awaiting_invoicing'];
+        
+        if (loadForInvoice && loadForInvoice.location?.city && loadForInvoice.location?.state && validStatusesForInvoice.includes(loadForInvoice.status)) {
+          
+          // Check if invoice already exists for this load (PREVENT DUPLICATES)
+          const existingInvoices = await storage.getInvoices();
+          const hasInvoice = existingInvoices.some((inv: any) => inv.loadId === loadForInvoice.id);
+          
+          if (!hasInvoice) {
+            console.log(`📄 No existing invoice found - generating new invoice for load ${loadForInvoice.number109}`);
             
-            await storage.createInvoice(invoiceData);
-            await storage.updateLoadStatus(req.params.id, "awaiting_payment");
-            console.log(`✅ Invoice generated: ${invoiceData.invoiceNumber} for $${totalAmount}`);
+            // Get rate for the location
+            const rate = await storage.getRateByLocation(
+              loadForInvoice.location.city, 
+              loadForInvoice.location.state
+            );
+            
+            if (rate) {
+              // Calculate invoice amount based on flat rate system
+              const flatRate = parseFloat(rate.flatRate.toString());
+              const lumperCharge = parseFloat(loadForInvoice.lumperCharge?.toString() || "0");
+              const extraStops = parseFloat(loadForInvoice.extraStops?.toString() || "0");
+              const extraStopsCharge = extraStops; // Use raw dollar amount entered, not multiplied by $50
+              const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+
+              // Auto-generate invoice with sequential GO6000 series
+              const invoiceNumber = await storage.getNextInvoiceNumber();
+              await storage.createInvoice({
+                loadId: loadForInvoice.id,
+                invoiceNumber,
+                flatRate: rate.flatRate,
+                lumperCharge: loadForInvoice.lumperCharge || "0.00",
+                extraStopsCharge: extraStopsCharge.toString(),
+                extraStopsCount: parseFloat(loadForInvoice.extraStops?.toString() || "0"),
+                totalAmount: totalAmount.toString(),
+                status: "pending",
+              });
+
+              console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadForInvoice.number109}`);
+              console.log(`📋 Load ${req.params.id} stays in AWAITING_INVOICING - invoice ready to be emailed`);
+            }
+          } else {
+            console.log(`📄 Invoice already exists for load ${loadForInvoice.number109} - skipping invoice generation`);
           }
         }
+      } catch (invoiceError) {
+        console.error("Failed to auto-generate invoice:", invoiceError);
+        // Don't fail the POD upload if invoice generation fails
       }
-      
-      // Return success response
-      res.json({ 
-        message: "POD uploaded successfully", 
-        load: await storage.getLoad(req.params.id)
-      });
-      
+
+      res.json(load);
     } catch (error) {
-      console.error("❌ POD upload error:", error);
-      res.status(500).json({ message: "Failed to upload POD document" });
+      console.error("Error updating POD:", error);
+      res.status(500).json({ message: "Failed to update POD document" });
     }
   });
 
@@ -4349,33 +4353,8 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  // Flexible auth middleware for chat routes
-  const flexibleAuth = async (req: any, res: any, next: any) => {
-    // Check bypass token first
-    const bypassToken = req.headers['x-bypass-token'];
-    if (bypassToken === BYPASS_SECRET) {
-      console.log("✅ BYPASS TOKEN: Chat route accessed with bypass token");
-      // Set consistent user object for bypass token
-      req.user = { 
-        id: "bypass-user",
-        authType: "bypass"
-      };
-      return next();
-    }
-    
-    // Check if user is already authenticated via Replit
-    if (req.isAuthenticated() && req.user) {
-      console.log("✅ REPLIT AUTH: Chat route accessed with Replit authentication");
-      return next();
-    }
-    
-    // No valid authentication found
-    console.log("❌ CHAT AUTH: No valid authentication (bypass token or Replit auth)");
-    return res.status(401).json({ message: "Unauthorized" });
-  };
-
   // Chat AI Assistant routes
-  app.post("/api/chat", flexibleAuth, async (req, res) => {
+  app.post("/api/chat", isAuthenticated, async (req, res) => {
     try {
       // Validate input using Zod
       const chatInputSchema = insertChatMessageSchema.extend({
@@ -4386,8 +4365,8 @@ Reply YES to confirm acceptance or NO to decline.`
       
       const { message, sessionId: clientSessionId } = chatInputSchema.parse(req.body);
       
-      // Create user-bound session ID - handle both Replit auth and bypass token
-      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub || (req.user as any)?.username || 'anonymous';
+      // Create user-bound session ID
+      const userId = req.user?.claims?.sub || 'anonymous';
       const sessionId = clientSessionId || `user-${userId}-${Date.now()}`;
       const userBoundSessionId = `${userId}-${sessionId}`;
 
@@ -4405,7 +4384,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Save user message
       await storage.createChatMessage({
-        userId: (req.user as any)?.id || (req.user as any)?.claims?.sub || (req.user as any)?.username,
+        userId: req.user?.claims?.sub,
         sessionId: userBoundSessionId,
         role: 'user',
         content: message
@@ -4413,7 +4392,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Save AI response
       await storage.createChatMessage({
-        userId: (req.user as any)?.id || (req.user as any)?.claims?.sub || (req.user as any)?.username,
+        userId: req.user?.claims?.sub,
         sessionId: userBoundSessionId,
         role: 'assistant',
         content: aiResponse
@@ -4434,9 +4413,9 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  app.get("/api/chat/:sessionId", flexibleAuth, async (req, res) => {
+  app.get("/api/chat/:sessionId", isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub || (req.user as any)?.username || 'anonymous';
+      const userId = req.user?.claims?.sub || 'anonymous';
       const userBoundSessionId = `${userId}-${req.params.sessionId}`;
       const messages = await storage.getChatMessages(userBoundSessionId);
       res.json(messages);
@@ -4446,9 +4425,9 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  app.delete("/api/chat/:sessionId", flexibleAuth, async (req, res) => {
+  app.delete("/api/chat/:sessionId", isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub || (req.user as any)?.username || 'anonymous';
+      const userId = req.user?.claims?.sub || 'anonymous';
       const userBoundSessionId = `${userId}-${req.params.sessionId}`;
       await storage.deleteChatSession(userBoundSessionId);
       res.status(204).send();
@@ -4895,54 +4874,12 @@ Reply YES to confirm acceptance or NO to decline.`
       const invoiceContext = await computeInvoiceContext(load);
       const baseHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       
-      // Embed POD images if available - PRIORITIZE EMBEDDED POD DATA FROM INVOICE
+      // Embed POD images if available - USE SAME FUNCTION AS EMAIL
       let previewHTML = baseHTML;
       const podImages: Array<{content: Buffer, type: string}> = [];
       
-      console.log(`🖨️ POD Status Check:`, {
-        invoiceId: invoice.id,
-        invoiceNumber: invoice.invoiceNumber,
-        hasEmbeddedPOD: !!invoice.podData,
-        hasLoadPODPath: !!load.podDocumentPath,
-        podDataLength: invoice.podData ? Math.round(invoice.podData.length / 1024) + 'KB' : 'none'
-      });
-      
-      // PRIORITIZE EMBEDDED POD DATA FROM INVOICE
-      if (invoice.podData) {
-        console.log(`✅ Using embedded POD data from invoice ${invoice.invoiceNumber}`);
-        try {
-          // Parse the data URL (format: "data:image/jpeg;base64,...")
-          const dataUrlMatch = invoice.podData.match(/^data:([^;]+);base64,(.+)$/);
-          if (dataUrlMatch) {
-            const contentType = dataUrlMatch[1];
-            const base64Data = dataUrlMatch[2];
-            const fileBuffer = Buffer.from(base64Data, 'base64');
-            
-            console.log(`🖨️ Embedded POD details:`, {
-              contentType,
-              bufferSize: fileBuffer.length,
-              base64Length: base64Data.length
-            });
-            
-            if (fileBuffer.length > 0) {
-              podImages.push({
-                content: fileBuffer,
-                type: contentType
-              });
-              console.log(`✅ Embedded POD data loaded successfully: ${fileBuffer.length} bytes`);
-            } else {
-              console.error(`❌ Empty buffer from embedded POD data`);
-            }
-          } else {
-            console.error(`❌ Invalid embedded POD data format - not a valid data URL`);
-          }
-        } catch (error) {
-          console.error(`❌ Error processing embedded POD data:`, error);
-        }
-      }
-      // FALLBACK: Try object storage if no embedded data
-      else if (load.podDocumentPath) {
-        console.log(`⚠️ No embedded POD data found, falling back to object storage: ${load.podDocumentPath}`);
+      if (load.podDocumentPath) {
+        console.log(`🖨️ Processing POD for print preview: ${load.podDocumentPath}`);
         console.log(`🖨️ POD path details:`, {
           fullPath: load.podDocumentPath,
           type: typeof load.podDocumentPath,
@@ -5030,8 +4967,11 @@ Reply YES to confirm acceptance or NO to decline.`
           console.error(`❌ Error processing POD for preview:`, error);
         }
       } else {
-        console.log(`⚠️ No POD data available (neither embedded nor in object storage) for load ${load.number109} (ID: ${load.id})`);
-        console.log(`💡 NEW WORKFLOW: POD data should now be embedded directly in invoices when uploaded`);
+        console.log(`⚠️ No POD document uploaded for load ${load.number109} (ID: ${load.id}) - preview will show invoice only`);
+        console.log(`🔍 DIAGNOSIS: If POD was recently uploaded but not showing:`);
+        console.log(`   - Check if load was deleted and recreated (new ID breaks POD links)`);
+        console.log(`   - Verify POD upload completed successfully`);
+        console.log(`   - Check object storage for orphaned files`);
       }
       
       // Embed POD images into the preview HTML if available - USE SAME FUNCTION AS EMAIL
