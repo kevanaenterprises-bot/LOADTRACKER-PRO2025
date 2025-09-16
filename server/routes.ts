@@ -4921,6 +4921,16 @@ Reply YES to confirm acceptance or NO to decline.`
   app.patch("/api/invoices/:id/print", isAdminAuthenticated, async (req, res) => {
     try {
       const invoice = await storage.markInvoicePrinted(req.params.id);
+      
+      // WORKFLOW FIX: Move load to awaiting_payment when invoice is printed (matching email behavior)
+      if (invoice.loadId) {
+        const load = await storage.getLoad(invoice.loadId);
+        if (load && load.status === "awaiting_invoicing") {
+          await storage.updateLoadStatus(load.id, "awaiting_payment");
+          console.log(`🖨️ Invoice printed - Load ${load.number109} moved from AWAITING_INVOICING to AWAITING_PAYMENT`);
+        }
+      }
+      
       res.json(invoice);
     } catch (error) {
       console.error("Error marking invoice as printed:", error);
