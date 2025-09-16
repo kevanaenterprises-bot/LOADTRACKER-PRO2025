@@ -401,7 +401,25 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         variant="outline" 
         size={size} 
         disabled={isPrinting}
-        onClick={invoice && load ? handlePrintRateConAndInvoice : handlePrintInvoice}
+        onClick={() => {
+          console.log("🚀 PRINT BUTTON CLICK DEBUG:", {
+            hasInvoice: !!invoice,
+            hasLoad: !!load,
+            invoiceId,
+            loadId,
+            invoiceNumber: invoice?.invoiceNumber,
+            loadNumber: load?.number109,
+            willCallRateConAndInvoice: !!(invoice && load)
+          });
+          
+          if (invoice && load) {
+            console.log("🚀 CALLING: handlePrintRateConAndInvoice (with POD)");
+            handlePrintRateConAndInvoice();
+          } else {
+            console.log("🚀 CALLING: handlePrintInvoice (invoice only)");
+            handlePrintInvoice();
+          }
+        }}
         data-testid="button-print"
         aria-label={invoice && load ? "Print Invoice and POD" : "Print Invoice"}
         className="shrink-0"
