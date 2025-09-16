@@ -4353,8 +4353,26 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Flexible auth middleware for chat routes
+  const flexibleAuth: RequestHandler = async (req, res, next) => {
+    // Check bypass token first
+    const bypassToken = req.headers['x-bypass-token'];
+    if (bypassToken === BYPASS_SECRET) {
+      console.log("✅ BYPASS TOKEN: Chat route accessed with bypass token");
+      // Simulate a user object for bypass token
+      (req as any).user = { 
+        claims: { sub: "bypass-user" },
+        authType: "bypass"
+      };
+      return next();
+    }
+    
+    // Fall back to regular authentication
+    return isAuthenticated(req, res, next);
+  };
+
   // Chat AI Assistant routes
-  app.post("/api/chat", isAuthenticated, async (req, res) => {
+  app.post("/api/chat", flexibleAuth, async (req, res) => {
     try {
       // Validate input using Zod
       const chatInputSchema = insertChatMessageSchema.extend({
@@ -4413,7 +4431,7 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  app.get("/api/chat/:sessionId", isAuthenticated, async (req, res) => {
+  app.get("/api/chat/:sessionId", flexibleAuth, async (req, res) => {
     try {
       const userId = req.user?.claims?.sub || 'anonymous';
       const userBoundSessionId = `${userId}-${req.params.sessionId}`;
@@ -4425,7 +4443,7 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  app.delete("/api/chat/:sessionId", isAuthenticated, async (req, res) => {
+  app.delete("/api/chat/:sessionId", flexibleAuth, async (req, res) => {
     try {
       const userId = req.user?.claims?.sub || 'anonymous';
       const userBoundSessionId = `${userId}-${req.params.sessionId}`;
