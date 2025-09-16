@@ -43,6 +43,7 @@ const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
   locationId: z.string().min(1, "Delivery location is required"),
   estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
+  truckNumber: z.string().optional(), // Optional truck number for load
 }).omit({ driverId: true });
 
 type FormData = z.infer<typeof formSchema>;
@@ -64,6 +65,7 @@ export default function LoadForm() {
   
   // Simplified state for the new workflow
   const [loadNumber, setLoadNumber] = useState("109-");
+  const [truckNumber, setTruckNumber] = useState("");
   const [currentLocationId, setCurrentLocationId] = useState("");
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
   const [stops, setStops] = useState<LoadStop[]>([]);
@@ -77,7 +79,7 @@ export default function LoadForm() {
   });
 
   const createLoadMutation = useMutation({
-    mutationFn: async (data: { number109: string; stops: LoadStop[]; overridePassword?: string }) => {
+    mutationFn: async (data: { number109: string; truckNumber?: string; stops: LoadStop[]; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
       if (data.stops.length === 0) {
         throw new Error("Please add at least one stop");
@@ -90,6 +92,7 @@ export default function LoadForm() {
         description: "Load created successfully! You can now assign a driver from the loads table.",
       });
       setLoadNumber("109-");
+      setTruckNumber("");
       setCurrentLocationId("");
       setCurrentStopType("pickup");
       setStops([]);
@@ -187,6 +190,7 @@ export default function LoadForm() {
 
     const submitData = {
       number109: loadNumber,
+      truckNumber: truckNumber || undefined, // Include truck number if provided
       stops,
       ...(showOverride && overridePassword ? { overridePassword } : {}),
     };
@@ -227,6 +231,18 @@ export default function LoadForm() {
             onChange={(e) => setLoadNumber(e.target.value)}
             placeholder="109-2024-001"
             className="text-lg"
+          />
+        </div>
+
+        {/* Truck Number Field */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Truck Number (Optional)</Label>
+          <Input
+            value={truckNumber}
+            onChange={(e) => setTruckNumber(e.target.value)}
+            placeholder="TR-101, 1234, etc."
+            className="text-lg"
+            data-testid="input-truck-number"
           />
         </div>
 
