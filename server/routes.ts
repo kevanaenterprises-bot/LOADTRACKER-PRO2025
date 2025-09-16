@@ -8,6 +8,7 @@ import { sendSMSToDriver } from "./smsService";
 import { sendTestNotification, notificationService } from "./notificationService";
 import { processRateConfirmationImage } from "./ocrService";
 import { GPSService } from "./gpsService";
+import { aiService } from "./aiService";
 import multer from 'multer';
 import {
   insertLoadSchema,
@@ -16,6 +17,7 @@ import {
   insertRateSchema,
   insertUserSchema,
   insertCustomerSchema,
+  insertChatMessageSchema,
   type Load,
   type User,
   type Location,
@@ -4348,6 +4350,90 @@ Reply YES to confirm acceptance or NO to decline.`
     } catch (error) {
       console.error("Error completing load:", error);
       res.status(500).json({ message: "Failed to complete load" });
+    }
+  });
+
+  // Chat AI Assistant routes
+  app.post("/api/chat", isAuthenticated, async (req, res) => {
+    try {
+      // Validate input using Zod
+      const chatInputSchema = insertChatMessageSchema.extend({
+        message: insertChatMessageSchema.shape.content.min(1).max(4000),
+        sessionId: insertChatMessageSchema.shape.sessionId.optional()
+          .refine(val => !val || /^[a-zA-Z0-9._-]{3,100}$/.test(val), "Invalid sessionId format")
+      }).pick({ message: true, sessionId: true });
+      
+      const { message, sessionId: clientSessionId } = chatInputSchema.parse(req.body);
+      
+      // Create user-bound session ID
+      const userId = req.user?.claims?.sub || 'anonymous';
+      const sessionId = clientSessionId || `user-${userId}-${Date.now()}`;
+      const userBoundSessionId = `${userId}-${sessionId}`;
+
+      // Get conversation history
+      const chatHistory = await storage.getChatMessages(userBoundSessionId, 20);
+      
+      // Convert to format expected by AI service
+      const conversationHistory = chatHistory.map(msg => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content
+      }));
+
+      // Get AI response
+      const aiResponse = await aiService.generateResponse(message, conversationHistory);
+
+      // Save user message
+      await storage.createChatMessage({
+        userId: req.user?.claims?.sub,
+        sessionId: userBoundSessionId,
+        role: 'user',
+        content: message
+      });
+
+      // Save AI response
+      await storage.createChatMessage({
+        userId: req.user?.claims?.sub,
+        sessionId: userBoundSessionId,
+        role: 'assistant',
+        content: aiResponse
+      });
+
+      res.json({ 
+        message: aiResponse,
+        sessionId: sessionId // Return the raw sessionId, not the userBoundSessionId
+      });
+    } catch (error) {
+      console.error("Chat AI error:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('AI assistant unavailable')) {
+        res.status(503).json({ message: "AI assistant is currently unavailable" });
+      } else {
+        res.status(500).json({ message: "Failed to get AI response" });
+      }
+    }
+  });
+
+  app.get("/api/chat/:sessionId", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub || 'anonymous';
+      const userBoundSessionId = `${userId}-${req.params.sessionId}`;
+      const messages = await storage.getChatMessages(userBoundSessionId);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+      res.status(500).json({ message: "Failed to fetch chat messages" });
+    }
+  });
+
+  app.delete("/api/chat/:sessionId", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.user?.claims?.sub || 'anonymous';
+      const userBoundSessionId = `${userId}-${req.params.sessionId}`;
+      await storage.deleteChatSession(userBoundSessionId);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting chat session:", error);
+      res.status(500).json({ message: "Failed to delete chat session" });
     }
   });
 

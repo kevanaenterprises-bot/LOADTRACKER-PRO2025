@@ -33,6 +33,9 @@ import {
   type InsertNotificationPreferences,
   type NotificationLog,
   type InsertNotificationLog,
+  chatMessages,
+  type ChatMessage,
+  type InsertChatMessage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, not } from "drizzle-orm";
@@ -126,6 +129,11 @@ export interface IStorage {
 
   // Status history
   addStatusHistory(loadId: string, status: string, notes?: string): Promise<void>;
+
+  // Chat message operations
+  createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
+  getChatMessages(sessionId: string, limit?: number): Promise<ChatMessage[]>;
+  deleteChatSession(sessionId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1086,6 +1094,30 @@ export class DatabaseStorage implements IStorage {
       .where(eq(notificationLog.driverId, driverId))
       .orderBy(desc(notificationLog.sentAt))
       .limit(limit);
+  }
+
+  // Chat message operations
+  async createChatMessage(message: InsertChatMessage): Promise<ChatMessage> {
+    const [created] = await db
+      .insert(chatMessages)
+      .values(message)
+      .returning();
+    return created;
+  }
+
+  async getChatMessages(sessionId: string, limit = 50): Promise<ChatMessage[]> {
+    return db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.sessionId, sessionId))
+      .orderBy(chatMessages.timestamp)
+      .limit(limit);
+  }
+
+  async deleteChatSession(sessionId: string): Promise<void> {
+    await db
+      .delete(chatMessages)
+      .where(eq(chatMessages.sessionId, sessionId));
   }
 }
 
