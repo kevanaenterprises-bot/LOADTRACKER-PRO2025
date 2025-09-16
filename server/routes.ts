@@ -5411,6 +5411,151 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   return podImagesHTML;
 }
 
+  // POD Debug Endpoint - PRODUCTION DIAGNOSTICS
+  app.get("/api/debug/pod", (req, res, next) => {
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasTokenBypass = isBypassActive(req);
+    
+    if (hasAdminAuth || hasReplitAuth || hasTokenBypass) {
+      next();
+    } else {
+      res.status(401).json({ message: "Admin authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { loadId, podPath } = req.query;
+      
+      if (!loadId && !podPath) {
+        return res.status(400).json({ message: "Either loadId or podPath parameter required" });
+      }
+      
+      let targetPodPath = podPath as string;
+      
+      // If loadId provided, get POD path from load
+      if (loadId && !podPath) {
+        const load = await storage.getLoad(loadId as string);
+        if (!load?.podDocumentPath) {
+          return res.status(404).json({ message: "No POD found for this load" });
+        }
+        targetPodPath = load.podDocumentPath;
+      }
+      
+      console.log(`🔍 POD DEBUG: Testing access to path: ${targetPodPath}`);
+      
+      const diagnostics: any = {
+        podPath: targetPodPath,
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV,
+        tests: {}
+      };
+      
+      // Test 1: Object Storage Direct Access
+      try {
+        console.log(`🔍 POD DEBUG: Testing direct object storage access...`);
+        const { ObjectStorageService } = await import('./objectStorage');
+        const objectStorageService = new ObjectStorageService();
+        
+        const objectFile = await objectStorageService.getObjectEntityFile(targetPodPath);
+        const [metadata] = await objectFile.getMetadata();
+        const [exists] = await objectFile.exists();
+        
+        diagnostics.tests.objectStorageDirect = {
+          success: true,
+          exists: exists,
+          metadata: {
+            size: metadata.size,
+            contentType: metadata.contentType,
+            timeCreated: metadata.timeCreated,
+            updated: metadata.updated
+          }
+        };
+        
+        // Try to download first 1KB to test access
+        const [partialBuffer] = await objectFile.download({ start: 0, end: 1023 });
+        diagnostics.tests.objectStorageDirect.partialDownloadSize = partialBuffer.length;
+        diagnostics.tests.objectStorageDirect.firstBytes = partialBuffer.subarray(0, 16).toString('hex');
+        
+        console.log(`✅ POD DEBUG: Direct object storage access successful`);
+        
+      } catch (storageError: any) {
+        console.error(`❌ POD DEBUG: Direct object storage failed:`, storageError);
+        diagnostics.tests.objectStorageDirect = {
+          success: false,
+          error: storageError.message,
+          stack: storageError.stack
+        };
+      }
+      
+      // Test 2: HTTP Fetch Fallback
+      try {
+        console.log(`🔍 POD DEBUG: Testing HTTP fetch fallback...`);
+        const baseUrl = process.env.NODE_ENV === 'production' ? 
+          `${req.protocol}://${req.get('host')}` : 
+          'http://localhost:5000';
+        const fullUrl = `${baseUrl}${targetPodPath}`;
+        
+        console.log(`🔍 POD DEBUG: Fetching URL: ${fullUrl}`);
+        
+        const response = await fetch(fullUrl, {
+          headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
+        });
+        
+        diagnostics.tests.httpFetch = {
+          success: response.ok,
+          status: response.status,
+          statusText: response.statusText,
+          contentType: response.headers.get('content-type'),
+          contentLength: response.headers.get('content-length'),
+          url: fullUrl
+        };
+        
+        if (response.ok) {
+          const buffer = Buffer.from(await response.arrayBuffer());
+          diagnostics.tests.httpFetch.downloadSize = buffer.length;
+          diagnostics.tests.httpFetch.firstBytes = buffer.subarray(0, 16).toString('hex');
+          console.log(`✅ POD DEBUG: HTTP fetch successful: ${buffer.length} bytes`);
+        } else {
+          const errorText = await response.text();
+          diagnostics.tests.httpFetch.errorBody = errorText;
+          console.error(`❌ POD DEBUG: HTTP fetch failed: ${response.status} - ${errorText}`);
+        }
+        
+      } catch (fetchError: any) {
+        console.error(`❌ POD DEBUG: HTTP fetch error:`, fetchError);
+        diagnostics.tests.httpFetch = {
+          success: false,
+          error: fetchError.message,
+          stack: fetchError.stack
+        };
+      }
+      
+      // Test 3: Environment Check
+      diagnostics.environment = {
+        nodeEnv: process.env.NODE_ENV,
+        hasObjectStorage: !!(process.env.PRIVATE_OBJECT_DIR && process.env.PUBLIC_OBJECT_SEARCH_PATHS),
+        objectStorageVars: {
+          privateDir: !!process.env.PRIVATE_OBJECT_DIR,
+          publicPaths: !!process.env.PUBLIC_OBJECT_SEARCH_PATHS
+        },
+        requestHost: req.get('host'),
+        requestProtocol: req.protocol
+      };
+      
+      console.log(`🔍 POD DEBUG: Complete diagnostics:`, JSON.stringify(diagnostics, null, 2));
+      
+      res.json(diagnostics);
+      
+    } catch (error: any) {
+      console.error("POD debug endpoint error:", error);
+      res.status(500).json({ 
+        message: "POD debug failed", 
+        error: error.message,
+        stack: error.stack 
+      });
+    }
+  });
+
   // Create and return HTTP server
   const server = createServer(app);
   return server;
