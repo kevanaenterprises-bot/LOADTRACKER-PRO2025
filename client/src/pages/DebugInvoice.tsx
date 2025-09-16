@@ -72,7 +72,10 @@ export default function DebugInvoice() {
       const loginResponse = await fetch("/api/driver/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: "john_doe", password: "1234567890" }),
+        body: JSON.stringify({ 
+          username: import.meta.env.VITE_DEBUG_USERNAME || "test_user", 
+          password: import.meta.env.VITE_DEBUG_PASSWORD || "test_password" 
+        }),
         credentials: "include",
       });
       
