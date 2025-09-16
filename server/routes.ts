@@ -4256,25 +4256,44 @@ Reply YES to confirm acceptance or NO to decline.`
           const existingInvoices = await storage.getInvoices();
           let existingInvoice = existingInvoices.find((inv: any) => inv.loadId === loadForInvoice.id);
           
-          // Fetch and convert POD to base64 for embedding
+          // PRODUCTION FIX: Try to fetch and convert POD to base64, but don't fail the entire operation
           let podDataBase64 = null;
           try {
             console.log(`📄 Fetching POD content for embedding: ${podDocumentURL}`);
-            const response = await fetch(podDocumentURL);
+            
+            // Add timeout and better error handling for production
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            
+            const response = await fetch(podDocumentURL, {
+              signal: controller.signal,
+              headers: {
+                'User-Agent': 'LoadTracker-Server/1.0'
+              }
+            });
+            clearTimeout(timeoutId);
+            
             if (response.ok) {
               const buffer = await response.arrayBuffer();
-              const bytes = new Uint8Array(buffer);
-              const base64String = Buffer.from(bytes).toString('base64');
               
-              // Determine MIME type from file extension or response headers
-              const contentType = response.headers.get('content-type') || 'image/jpeg';
-              podDataBase64 = `data:${contentType};base64,${base64String}`;
-              console.log(`✅ POD converted to base64 (${Math.round(base64String.length / 1024)}KB)`);
+              // Check file size (limit to 10MB)
+              if (buffer.byteLength > 10 * 1024 * 1024) {
+                console.warn(`⚠️ POD file too large for embedding: ${Math.round(buffer.byteLength / 1024 / 1024)}MB`);
+              } else {
+                const bytes = new Uint8Array(buffer);
+                const base64String = Buffer.from(bytes).toString('base64');
+                
+                // Determine MIME type from file extension or response headers
+                const contentType = response.headers.get('content-type') || 'image/jpeg';
+                podDataBase64 = `data:${contentType};base64,${base64String}`;
+                console.log(`✅ POD converted to base64 (${Math.round(base64String.length / 1024)}KB)`);
+              }
             } else {
-              console.warn(`⚠️ Could not fetch POD for embedding: ${response.status}`);
+              console.warn(`⚠️ Could not fetch POD for embedding: ${response.status} - ${response.statusText}`);
             }
           } catch (fetchError) {
-            console.warn(`⚠️ Failed to fetch POD for embedding:`, fetchError);
+            console.warn(`⚠️ Failed to fetch POD for embedding (non-critical):`, fetchError instanceof Error ? fetchError.message : fetchError);
+            // Continue processing even if POD embedding fails
           }
           
           if (!existingInvoice) {

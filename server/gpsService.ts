@@ -70,7 +70,7 @@ export class GPSService {
         );
 
         if (distanceToShipper <= this.LOCATION_THRESHOLD) {
-          if (load.status === 'confirmed' || load.status === 'en_route_pickup') {
+          if (load.status === 'confirmed' || load.status === 'in_progress' || load.status === 'en_route_pickup') {
             newStatus = 'at_shipper';
           }
         } else {
@@ -97,12 +97,29 @@ export class GPSService {
         }
       }
 
+      // PRODUCTION FIX: Handle in_progress and in_transit status transitions
       // Determine en route status based on previous status and location
-      if (load.status === 'confirmed' && newStatus === 'confirmed') {
+      if ((load.status === 'confirmed' || load.status === 'in_progress') && newStatus === load.status) {
         // Driver is moving but not at locations yet
         newStatus = 'en_route_pickup';
       } else if (load.status === 'left_shipper' && newStatus !== 'at_receiver') {
         newStatus = 'en_route_receiver';
+      } else if (load.status === 'in_transit' && newStatus === 'in_transit') {
+        // If load is marked as in_transit but we have location data, determine more specific status
+        if (load.shipperLatitude && load.shipperLongitude) {
+          const distanceToShipper = this.calculateDistance(
+            currentLat,
+            currentLon,
+            parseFloat(load.shipperLatitude.toString()),
+            parseFloat(load.shipperLongitude.toString())
+          );
+          
+          if (distanceToShipper <= this.LOCATION_THRESHOLD) {
+            newStatus = 'at_shipper';
+          } else {
+            newStatus = 'en_route_pickup';
+          }
+        }
       }
 
       // Update database if status changed
