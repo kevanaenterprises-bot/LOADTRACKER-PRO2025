@@ -20,7 +20,10 @@ export default function DriverTestDebug() {
       const loginResponse = await fetch("/api/auth/admin-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: "admin", password: "go4fc2024" }),
+        body: JSON.stringify({ 
+          username: import.meta.env.VITE_DEBUG_ADMIN_USERNAME || "admin", 
+          password: import.meta.env.VITE_DEBUG_ADMIN_PASSWORD || "defaultPassword" 
+        }),
         credentials: "include",
       });
       
