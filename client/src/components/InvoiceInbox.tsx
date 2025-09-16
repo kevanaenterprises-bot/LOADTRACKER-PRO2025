@@ -119,79 +119,117 @@ export default function InvoiceInbox() {
     setIsPreviewing(false);
   };
 
-  const handlePrint = (invoice: Invoice) => {
-    // Create a printable invoice format
-    const printWindow = window.open("", "_blank");
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Invoice ${invoice.invoiceNumber}</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              .header { text-align: center; margin-bottom: 30px; }
-              .invoice-details { margin-bottom: 20px; }
-              .line-item { display: flex; justify-content: space-between; margin: 5px 0; }
-              .total { font-weight: bold; font-size: 18px; border-top: 2px solid #000; padding-top: 10px; }
-              .footer { margin-top: 30px; text-align: center; color: #666; }
-            </style>
-          </head>
-          <body>
-            <div class="header">
-              <h1>GO 4 Farms & Cattle</h1>
-              <p style="margin: 5px 0;">1510 Crystal Valley Way<br>
-                 Melissa, TX 75454<br>
-                 Phone: 214-878-1230<br>
-                 Email: accounting@go4fc.com</p>
-              <h2 style="margin-top: 20px;">Invoice ${invoice.invoiceNumber}</h2>
-            </div>
-            
-            <div class="invoice-details">
-              <p><strong>Load #:</strong> ${invoice.load?.number109 || 'N/A'}</p>
-              <p><strong>Driver:</strong> ${invoice.load?.driver ? `${invoice.load.driver.firstName} ${invoice.load.driver.lastName}` : 'N/A'}</p>
-              <p><strong>Destination:</strong> ${invoice.load?.location ? `${invoice.load.location.name}, ${invoice.load.location.city}, ${invoice.load.location.state}` : 'N/A'}</p>
-              <p><strong>Invoice Date:</strong> ${format(new Date(invoice.generatedAt), 'MMM d, yyyy')}</p>
-            </div>
+  const handlePrint = async (invoice: Invoice) => {
+    console.log("🖨️ INBOX PRINT: Using server endpoint for Invoice + POD");
+    
+    if (!invoice.loadId) {
+      toast({
+        title: "Error",
+        description: "No load associated with this invoice",
+        variant: "destructive",
+      });
+      return;
+    }
 
-            <div class="line-items">
-              <div class="line-item">
-                <span>Base Rate (${invoice.load?.location?.city}, ${invoice.load?.location?.state}):</span>
-                <span>$${parseFloat(invoice.flatRate).toFixed(2)}</span>
-              </div>
-              ${parseFloat(invoice.lumperCharge) > 0 ? `
-              <div class="line-item">
-                <span>Lumper Charge:</span>
-                <span>$${parseFloat(invoice.lumperCharge).toFixed(2)}</span>
-              </div>
-              ` : ''}
-              ${invoice.extraStopsCount > 0 ? `
-              <div class="line-item">
-                <span>Extra Stops (${invoice.extraStopsCount} × $50.00):</span>
-                <span>$${parseFloat(invoice.extraStopsCharge).toFixed(2)}</span>
-              </div>
-              ` : ''}
-              <div class="line-item total">
-                <span>Total Amount:</span>
-                <span>$${parseFloat(invoice.totalAmount).toFixed(2)}</span>
-              </div>
-            </div>
+    try {
+      // Use same server endpoint as handlePrintPreview to get Invoice + POD
+      const response = await apiRequest(`/api/invoices/${invoice.invoiceNumber}/print-preview`, "POST", {
+        loadId: invoice.loadId
+      });
 
-            <div class="footer">
-              <p>Generated automatically upon POD upload</p>
-              <p>GO 4 Farms & Cattle - Professional Logistics Services</p>
-            </div>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      
-      // Wait for content to load before printing
-      setTimeout(() => {
-        printWindow.print();
-      }, 500);
-      
-      // Mark as printed after successful print dialog
-      markPrintedMutation.mutate(invoice.id);
+      if (response.success) {
+        // Open print preview in new window
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+          const previewHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <title>Print Preview - Invoice & POD</title>
+              <style>
+                body { margin: 0; font-family: Arial, sans-serif; }
+                .preview-header { 
+                  background: #f8f9fa; 
+                  padding: 15px; 
+                  border-bottom: 1px solid #dee2e6;
+                  position: sticky;
+                  top: 0;
+                  z-index: 1000;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                }
+                .preview-title { 
+                  font-size: 18px; 
+                  font-weight: bold; 
+                  color: #333;
+                }
+                .preview-buttons { 
+                  display: flex; 
+                  gap: 10px; 
+                }
+                .btn { 
+                  padding: 8px 16px; 
+                  border: none; 
+                  border-radius: 4px; 
+                  cursor: pointer; 
+                  font-size: 14px;
+                  font-weight: 500;
+                }
+                .btn-primary { 
+                  background: #007bff; 
+                  color: white; 
+                }
+                .btn-secondary { 
+                  background: #6c757d; 
+                  color: white; 
+                }
+                .btn:hover { 
+                  opacity: 0.9; 
+                }
+                .document-content { 
+                  padding: 20px; 
+                }
+                @media print {
+                  .preview-header { display: none; }
+                  .document-content { padding: 0; }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="preview-header">
+                <div class="preview-title">📄 Print Preview - Invoice & POD</div>
+                <div class="preview-buttons">
+                  <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+                  <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
+                </div>
+              </div>
+              <div class="document-content">
+                ${response.previewHTML}
+              </div>
+            </body>
+            </html>
+          `;
+          
+          printWindow.document.write(previewHTML);
+          printWindow.document.close();
+          
+          toast({
+            title: "Preview Opened",
+            description: `Invoice and ${response.podAttachments?.length || 0} POD attachment(s) loaded`,
+          });
+          
+          // Mark as printed after successful preview generation
+          markPrintedMutation.mutate(invoice.id);
+        }
+      }
+    } catch (error: any) {
+      console.error("INBOX Print error:", error);
+      toast({
+        title: "Print Failed",
+        description: error.message || "Failed to generate print preview",
+        variant: "destructive",
+      });
     }
   };
 
