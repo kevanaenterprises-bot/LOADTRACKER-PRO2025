@@ -2659,12 +2659,27 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(404).json({ message: "No invoice found for this load" });
       }
       
-      // Get rate for recalculation
-      if (!load.location?.city || !load.location?.state) {
-        return res.status(400).json({ message: "Load location not found for rate calculation" });
+      // Get rate for recalculation - use LAST delivery stop (same logic as load creation)
+      const loadStops = await storage.getLoadStops(loadId);
+      const deliveryStops = loadStops.filter(stop => stop.stopType === "dropoff");
+      const lastDeliveryStop = deliveryStops[deliveryStops.length - 1];
+      
+      let rateCity, rateState;
+      // TypeScript-safe access to location data
+      const stopLocation = (lastDeliveryStop as any)?.location;
+      if (stopLocation?.city && stopLocation?.state) {
+        // Use last delivery stop for rate calculation
+        rateCity = stopLocation.city;
+        rateState = stopLocation.state;
+      } else if (load.location?.city && load.location?.state) {
+        // Fallback to main load location if stops don't have location data
+        rateCity = load.location.city;
+        rateState = load.location.state;
+      } else {
+        return res.status(400).json({ message: "No location found for rate calculation" });
       }
       
-      const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+      const rate = await storage.getRateByLocation(rateCity, rateState);
       if (!rate) {
         return res.status(400).json({ message: "Rate not found for this location" });
       }
