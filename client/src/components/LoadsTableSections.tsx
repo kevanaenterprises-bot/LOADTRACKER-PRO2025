@@ -217,20 +217,26 @@ export function LoadSection({
                 <TableCell>
                   <div className="text-sm">
                     {load.stops && load.stops.length > 0 ? (
-                      // Show delivery destinations from stops
-                      load.stops
-                        .filter((stop: any) => stop.stopType === 'dropoff')
-                        .slice(0, 2)
-                        .map((stop: any, index: number, filteredStops: any[]) => (
-                          <div key={stop.id} className="mb-1">
-                            <div className="font-medium">{stop.companyName}</div>
-                            {index === 0 && filteredStops.length > 1 && (
-                              <div className="text-xs text-gray-500">
-                                +{filteredStops.length - 1} more destination{filteredStops.length > 2 ? 's' : ''}
-                              </div>
-                            )}
+                      // Show delivery destinations from stops - prioritize FINAL destination
+                      (() => {
+                        const dropoffStops = load.stops.filter((stop: any) => stop.stopType === 'dropoff');
+                        const finalStop = dropoffStops[dropoffStops.length - 1]; // Get LAST stop
+                        const totalStops = dropoffStops.length;
+                        
+                        if (totalStops === 0) return <span className="text-gray-500">No deliveries</span>;
+                        
+                        return (
+                          <div className="mb-1">
+                            <div className="font-medium">{finalStop.companyName}</div>
+                            <div className="text-xs text-gray-500">
+                              {totalStops === 1 
+                                ? 'Final destination' 
+                                : `Last stop ${totalStops} of ${totalStops}`
+                              }
+                            </div>
                           </div>
-                        ))
+                        );
+                      })())
                     ) : (
                       // Fallback to primary location if no stops
                       <>

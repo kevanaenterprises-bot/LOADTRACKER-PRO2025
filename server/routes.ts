@@ -4251,12 +4251,31 @@ Reply YES to confirm acceptance or NO to decline.`
             const extraStopsCharge = (loadForInvoice.extraStops?.length || 0) * 100;
             const totalAmount = flatRate + lumperCharge + extraStopsCharge;
             
+            // Try to embed POD data in the invoice for print preview
+            let podDataBase64 = null;
+            try {
+              console.log(`📄 Fetching POD for embedding: ${podDocumentURL}`);
+              const response = await fetch(podDocumentURL);
+              if (response.ok) {
+                const buffer = await response.arrayBuffer();
+                const bytes = new Uint8Array(buffer);
+                const base64String = Buffer.from(bytes).toString('base64');
+                const contentType = response.headers.get('content-type') || 'image/jpeg';
+                podDataBase64 = `data:${contentType};base64,${base64String}`;
+                console.log(`✅ POD embedded for print preview (${Math.round(base64String.length / 1024)}KB)`);
+              }
+            } catch (embedError) {
+              console.warn(`⚠️ POD embedding failed (non-critical):`, embedError);
+            }
+
             const invoiceData = {
               loadId: loadForInvoice.id,
               invoiceNumber: `INV-${Date.now()}`,
               amount: totalAmount.toString(),
               generatedAt: new Date(),
               status: "generated" as const,
+              podData: podDataBase64, // Embed POD for print preview
+              podUrl: podDocumentURL,  // Keep URL for reference
             };
             
             await storage.createInvoice(invoiceData);
