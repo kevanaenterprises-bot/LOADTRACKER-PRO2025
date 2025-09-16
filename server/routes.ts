@@ -5059,7 +5059,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       if (!Buffer.isBuffer(pod.content) || pod.content.length === 0) {
         console.error(`❌ Invalid POD buffer for image ${index + 1}`);
         return `
-          <div style="page-break-before: always; padding: 20px;">
+          <div style="margin-top: 40px; padding: 20px; border-top: 3px solid #2d5aa0;">
             <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
               <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
               <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
@@ -5101,7 +5101,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       } catch (encodingError: any) {
         console.error(`❌ Base64 encoding failed for POD ${index + 1}:`, encodingError);
         return `
-          <div style="page-break-before: always; padding: 20px;">
+          <div style="margin-top: 40px; padding: 20px; border-top: 3px solid #2d5aa0;">
             <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
               <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
               <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
@@ -5116,7 +5116,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       
       // Generate the HTML with the image
       return `
-        <div style="page-break-before: always; padding: 20px;">
+        <div style="margin-top: 40px; padding: 20px; border-top: 3px solid #2d5aa0;">
           <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
             <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
             <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
@@ -5137,7 +5137,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     } catch (error: any) {
       console.error(`❌ Error generating POD HTML for image ${index + 1}:`, error);
       return `
-        <div style="page-break-before: always; padding: 20px;">
+        <div style="margin-top: 40px; padding: 20px; border-top: 3px solid #2d5aa0;">
           <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
             <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
             <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>

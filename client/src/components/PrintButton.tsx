@@ -143,11 +143,6 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const handlePrintRateConAndInvoice = async () => {
     setIsPrinting(true);
     try {
-      console.log("🖨️ PRINT DEBUG: Starting handlePrintRateConAndInvoice");
-      console.log("🖨️ PRINT DEBUG: invoice object:", invoice);
-      console.log("🖨️ PRINT DEBUG: invoiceId:", invoiceId);
-      console.log("🖨️ PRINT DEBUG: load object:", load);
-
       // Create a new window for preview
       const previewWindow = window.open('', '_blank');
       if (!previewWindow) {
@@ -156,11 +151,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 
       // Get the correct invoice number - use invoice.invoiceNumber if available, fallback to invoiceId
       const invoiceIdentifier = invoice?.invoiceNumber || invoiceId;
-      console.log(`🖨️ PRINT DEBUG: Using invoice identifier: ${invoiceIdentifier}`);
-      console.log(`🖨️ PRINT DEBUG: Load ID for request: ${load?.id}`);
       
       // Fetch invoice + POD preview from server (same logic as email system)
-      console.log(`🖨️ PRINT DEBUG: About to fetch /api/invoices/${invoiceIdentifier}/print-preview`);
       const response = await fetch(`/api/invoices/${invoiceIdentifier}/print-preview`, {
         method: 'POST',
         headers: {
@@ -170,9 +162,6 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         credentials: 'include',
         body: JSON.stringify({ loadId: load?.id })
       });
-      
-      console.log(`🖨️ PRINT DEBUG: Fetch response status: ${response.status}`);
-      console.log(`🖨️ PRINT DEBUG: Fetch response ok: ${response.ok}`);
 
       if (!response.ok) {
         const errorText = await response.text();
