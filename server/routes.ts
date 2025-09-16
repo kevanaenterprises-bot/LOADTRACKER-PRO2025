@@ -4689,10 +4689,20 @@ Reply YES to confirm acceptance or NO to decline.`
 
   // Print preview with POD attachments - FIXED IMPLEMENTATION
   app.post("/api/invoices/:id/print-preview", (req, res, next) => {
+    console.log("🔥 PRINT-PREVIEW ENDPOINT HIT! Invoice ID:", req.params.id);
+    console.log("🔥 Request body:", req.body);
+    console.log("🔥 Headers:", { 
+      auth: req.headers['x-bypass-token'] ? 'BYPASS_PROVIDED' : 'NO_BYPASS',
+      contentType: req.headers['content-type']
+    });
+    
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    console.log("🔥 Auth check result:", { hasAuth });
+    
     if (hasAuth) {
       next();
     } else {
+      console.log("❌ PRINT-PREVIEW: Authentication failed");
       res.status(401).json({ message: "Authentication required" });
     }
   }, async (req, res) => {
