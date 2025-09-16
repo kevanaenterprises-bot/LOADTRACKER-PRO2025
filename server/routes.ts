@@ -4220,141 +4220,61 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(400).json({ message: "POD document URL is required" });
       }
 
-      // SIMPLIFIED: Just save the POD URL directly
-      console.log(`📄 POD upload for load ${req.params.id}: ${podDocumentURL}`);
+      console.log(`📄 PRODUCTION FIX: POD upload for load ${req.params.id}: ${podDocumentURL}`);
       
-      // Update load with POD document path
+      // STEP 1: Save the POD URL to the load (keeps driver assignment intact)
       const load = await storage.updateLoadPOD(req.params.id, podDocumentURL);
-      console.log(`✅ POD saved for load: ${load.number109}`);
+      console.log(`✅ POD saved for load: ${load.number109} - Driver: ${load.driverId}`);
       
-      // First set status to delivered when POD is uploaded
-      if (load.status !== "delivered" && load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {
+      // STEP 2: Set status to delivered (if not already in final states)
+      if (!["delivered", "awaiting_invoicing", "awaiting_payment", "paid", "completed"].includes(load.status)) {
         await storage.updateLoadStatus(req.params.id, "delivered");
-        // Set delivered timestamp using direct database update
-        await db.update(loads).set({ 
-          deliveredAt: new Date(),
-          updatedAt: new Date() 
-        }).where(eq(loads.id, req.params.id));
-        console.log(`✅ Load ${req.params.id} marked as DELIVERED - POD uploaded successfully`);
+        console.log(`✅ Load ${req.params.id} marked as DELIVERED`);
       }
 
-      // FIXED WORKFLOW: Set to awaiting_invoicing first, then auto-generate
-      const loadWithDetails = await storage.getLoad(req.params.id);
-      if (loadWithDetails && loadWithDetails.status === "delivered") {
-        await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
-        console.log(`📋 Load ${req.params.id} moved to AWAITING_INVOICING - ready for invoice generation`);
-      }
-
-      // Automatically generate invoice when POD is uploaded WITH EMBEDDED POD DATA
-      try {
-        const loadForInvoice = await storage.getLoad(req.params.id);
-        const validStatusesForInvoice = ['awaiting_invoicing'];
+      // STEP 3: Generate invoice if needed (simple check)
+      const loadForInvoice = await storage.getLoad(req.params.id);
+      if (loadForInvoice?.location?.city && loadForInvoice?.location?.state) {
         
-        if (loadForInvoice && loadForInvoice.location?.city && loadForInvoice.location?.state && validStatusesForInvoice.includes(loadForInvoice.status)) {
+        // Check if invoice already exists
+        const existingInvoices = await storage.getInvoices();
+        const hasInvoice = existingInvoices.some((inv: any) => inv.loadId === loadForInvoice.id);
+        
+        if (!hasInvoice) {
+          console.log(`📄 Generating invoice for load ${loadForInvoice.number109}`);
           
-          // Check if invoice already exists for this load (PREVENT DUPLICATES)
-          const existingInvoices = await storage.getInvoices();
-          let existingInvoice = existingInvoices.find((inv: any) => inv.loadId === loadForInvoice.id);
-          
-          // PRODUCTION FIX: Try to fetch and convert POD to base64, but don't fail the entire operation
-          let podDataBase64 = null;
-          try {
-            console.log(`📄 Fetching POD content for embedding: ${podDocumentURL}`);
+          // Get rate for calculation
+          const rate = await storage.getRate(loadForInvoice.location.city, loadForInvoice.location.state);
+          if (rate) {
+            const flatRate = parseFloat(rate.flatRate);
+            const lumperCharge = parseFloat(rate.lumperCharge || "0");
+            const extraStopsCharge = (loadForInvoice.extraStops?.length || 0) * 100;
+            const totalAmount = flatRate + lumperCharge + extraStopsCharge;
             
-            // Add timeout and better error handling for production
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+            const invoiceData = {
+              loadId: loadForInvoice.id,
+              invoiceNumber: `INV-${Date.now()}`,
+              amount: totalAmount.toString(),
+              generatedAt: new Date(),
+              status: "generated" as const,
+            };
             
-            const response = await fetch(podDocumentURL, {
-              signal: controller.signal,
-              headers: {
-                'User-Agent': 'LoadTracker-Server/1.0'
-              }
-            });
-            clearTimeout(timeoutId);
-            
-            if (response.ok) {
-              const buffer = await response.arrayBuffer();
-              
-              // Check file size (limit to 10MB)
-              if (buffer.byteLength > 10 * 1024 * 1024) {
-                console.warn(`⚠️ POD file too large for embedding: ${Math.round(buffer.byteLength / 1024 / 1024)}MB`);
-              } else {
-                const bytes = new Uint8Array(buffer);
-                const base64String = Buffer.from(bytes).toString('base64');
-                
-                // Determine MIME type from file extension or response headers
-                const contentType = response.headers.get('content-type') || 'image/jpeg';
-                podDataBase64 = `data:${contentType};base64,${base64String}`;
-                console.log(`✅ POD converted to base64 (${Math.round(base64String.length / 1024)}KB)`);
-              }
-            } else {
-              console.warn(`⚠️ Could not fetch POD for embedding: ${response.status} - ${response.statusText}`);
-            }
-          } catch (fetchError) {
-            console.warn(`⚠️ Failed to fetch POD for embedding (non-critical):`, fetchError instanceof Error ? fetchError.message : fetchError);
-            // Continue processing even if POD embedding fails
-          }
-          
-          if (!existingInvoice) {
-            console.log(`📄 No existing invoice found - generating new invoice with embedded POD for load ${loadForInvoice.number109}`);
-            
-            // Get rate for the location
-            const rate = await storage.getRateByLocation(
-              loadForInvoice.location.city, 
-              loadForInvoice.location.state
-            );
-            
-            if (rate) {
-              // Calculate invoice amount based on flat rate system
-              const flatRate = parseFloat(rate.flatRate.toString());
-              const lumperCharge = parseFloat(loadForInvoice.lumperCharge?.toString() || "0");
-              const extraStops = parseFloat(loadForInvoice.extraStops?.toString() || "0");
-              const extraStopsCharge = extraStops; // Use raw dollar amount entered, not multiplied by $50
-              const totalAmount = flatRate + lumperCharge + extraStopsCharge;
-
-              // Auto-generate invoice with sequential GO6000 series AND embedded POD
-              const invoiceNumber = await storage.getNextInvoiceNumber();
-              await storage.createInvoice({
-                loadId: loadForInvoice.id,
-                invoiceNumber,
-                flatRate: rate.flatRate,
-                lumperCharge: loadForInvoice.lumperCharge || "0.00",
-                extraStopsCharge: extraStopsCharge.toString(),
-                extraStopsCount: parseFloat(loadForInvoice.extraStops?.toString() || "0"),
-                totalAmount: totalAmount.toString(),
-                status: "pending",
-                podUrl: podDocumentURL, // Keep original URL for reference
-                podData: podDataBase64, // NEW: Embed POD data directly
-                podAttachedAt: new Date()
-              });
-
-              console.log(`✅ Auto-generated invoice ${invoiceNumber} with embedded POD for load ${loadForInvoice.number109}`);
-              console.log(`📋 Load ${req.params.id} stays in AWAITING_INVOICING - invoice ready with embedded POD`);
-            }
-          } else if (podDataBase64) {
-            // Update existing invoice with POD data
-            console.log(`📄 Updating existing invoice ${existingInvoice.invoiceNumber} with embedded POD data`);
-            await db.update(invoices).set({
-              podUrl: podDocumentURL,
-              podData: podDataBase64,
-              podAttachedAt: new Date(),
-              status: "finalized" // Mark as finalized since POD is now embedded
-            }).where(eq(invoices.id, existingInvoice.id));
-            console.log(`✅ Invoice ${existingInvoice.invoiceNumber} updated with embedded POD`);
-          } else {
-            console.log(`📄 Invoice already exists for load ${loadForInvoice.number109} - skipping invoice generation`);
+            await storage.createInvoice(invoiceData);
+            await storage.updateLoadStatus(req.params.id, "awaiting_payment");
+            console.log(`✅ Invoice generated: ${invoiceData.invoiceNumber} for $${totalAmount}`);
           }
         }
-      } catch (invoiceError) {
-        console.error("Failed to auto-generate invoice with embedded POD:", invoiceError);
-        // Don't fail the POD upload if invoice generation fails
       }
-
-      res.json(load);
+      
+      // Return success response
+      res.json({ 
+        message: "POD uploaded successfully", 
+        load: await storage.getLoad(req.params.id)
+      });
+      
     } catch (error) {
-      console.error("Error updating POD:", error);
-      res.status(500).json({ message: "Failed to update POD document" });
+      console.error("❌ POD upload error:", error);
+      res.status(500).json({ message: "Failed to upload POD document" });
     }
   });
 
