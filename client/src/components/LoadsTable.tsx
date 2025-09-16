@@ -375,6 +375,43 @@ export default function LoadsTable() {
     }
   };
 
+  // Update existing invoice with new lumper/stop charges
+  const updateInvoiceMutation = useMutation({
+    mutationFn: async (loadId: string) => {
+      const response = await fetch(`/api/loads/${loadId}/update-invoice`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update invoice: ${errorText}`);
+      }
+      
+      return await response.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Invoice Updated",
+        description: `Invoice ${data.invoiceNumber || 'N/A'} updated with new charges.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update invoice",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const updateInvoiceWithNewCharges = (loadId: string) => {
+    updateInvoiceMutation.mutate(loadId);
+  };
+
   // Check if a load already has an invoice
   const hasInvoice = (loadId: string) => {
     return Array.isArray(invoices) && invoices.some((invoice: any) => invoice.loadId === loadId);
@@ -1204,6 +1241,33 @@ export default function LoadsTable() {
                     />
                   </div>
                 </div>
+                
+                {/* Update Invoice Button - Only show if invoice exists */}
+                {hasInvoice(selectedLoad.id) && (
+                  <div className="mt-3 text-center">
+                    <Button 
+                      onClick={() => updateInvoiceWithNewCharges(selectedLoad.id)}
+                      disabled={updateInvoiceMutation.isPending}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      size="sm"
+                    >
+                      {updateInvoiceMutation.isPending ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Updating...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-sync mr-2"></i>
+                          Update Invoice
+                        </>
+                      )}
+                    </Button>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Recalculate invoice with current lumper/stop fees
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Action Buttons */}

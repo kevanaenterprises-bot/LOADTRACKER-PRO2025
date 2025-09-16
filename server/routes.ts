@@ -2622,6 +2622,81 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Update existing invoice with new lumper/stop charges
+  app.patch("/api/loads/:id/update-invoice", (req, res, next) => {
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasTokenBypass = isBypassActive(req);
+    const hasAuth = hasAdminAuth || hasReplitAuth || hasTokenBypass;
+    
+    console.log("Invoice update auth check:", {
+      hasAdminAuth,
+      hasReplitAuth,
+      hasTokenBypass,
+      hasAuth
+    });
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      
+      // Get the load with current lumper/stop charges
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // Find the existing invoice for this load
+      const invoices = await storage.getInvoices();
+      const existingInvoice = invoices.find((inv: any) => inv.loadId === loadId);
+      
+      if (!existingInvoice) {
+        return res.status(404).json({ message: "No invoice found for this load" });
+      }
+      
+      // Get rate for recalculation
+      if (!load.location?.city || !load.location?.state) {
+        return res.status(400).json({ message: "Load location not found for rate calculation" });
+      }
+      
+      const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+      if (!rate) {
+        return res.status(400).json({ message: "Rate not found for this location" });
+      }
+      
+      // Recalculate invoice amounts with current load charges
+      const flatRate = parseFloat(rate.flatRate.toString());
+      const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
+      const extraStopsCharge = parseFloat(load.extraStops?.toString() || "0");
+      const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+      
+      // Update the existing invoice
+      const updatedInvoice = await storage.updateInvoice(existingInvoice.id, {
+        flatRate: flatRate.toFixed(2),
+        lumperCharge: lumperCharge.toFixed(2), 
+        extraStopsCharge: extraStopsCharge.toFixed(2),
+        totalAmount: totalAmount.toFixed(2)
+      });
+      
+      console.log(`✅ Invoice ${existingInvoice.invoiceNumber} updated with new charges:`, {
+        flatRate: flatRate.toFixed(2),
+        lumperCharge: lumperCharge.toFixed(2),
+        extraStopsCharge: extraStopsCharge.toFixed(2),
+        totalAmount: totalAmount.toFixed(2)
+      });
+      
+      res.json(updatedInvoice);
+    } catch (error) {
+      console.error("Error updating invoice:", error);
+      res.status(500).json({ message: "Failed to update invoice" });
+    }
+  });
+
   // Driver unassign endpoint  
   app.post("/api/loads/:id/unassign", (req, res, next) => {
     // Flexible authentication for driver unassignment
