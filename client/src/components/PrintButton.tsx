@@ -409,9 +409,17 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       </Dialog>
 
       {/* Print Button */}
-      <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
+      <Dialog open={printDialogOpen} onOpenChange={(open) => {
+        console.log("🖨️ DIALOG DEBUG: Print dialog open state changing to:", open);
+        setPrintDialogOpen(open);
+      }}>
         <DialogTrigger asChild>
-          <Button variant="outline" size={size} disabled={isPrinting}>
+          <Button 
+            variant="outline" 
+            size={size} 
+            disabled={isPrinting}
+            onClick={() => console.log("🖨️ DIALOG DEBUG: Print button clicked, opening dialog")}
+          >
             <Printer className="h-4 w-4 mr-2" />
             {isPrinting ? "Printing..." : "Print"}
           </Button>
