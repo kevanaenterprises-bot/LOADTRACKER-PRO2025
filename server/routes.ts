@@ -2283,11 +2283,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedStops = stops;
         console.log("Load creation - stops validated:", validatedStops.length);
 
-        // DESTINATION FIX: Set main load's locationId to first delivery stop for display purposes
-        const firstDeliveryStop = stops.find(stop => stop.stopType === "dropoff");
-        if (firstDeliveryStop && firstDeliveryStop.locationId) {
-          validatedData.locationId = firstDeliveryStop.locationId;
-          console.log("Load creation - setting main locationId to first delivery stop:", firstDeliveryStop.locationId);
+        // DESTINATION FIX: Set main load's locationId to LAST delivery stop for rate lookup purposes
+        const deliveryStops = stops.filter(stop => stop.stopType === "dropoff");
+        const lastDeliveryStop = deliveryStops[deliveryStops.length - 1];
+        if (lastDeliveryStop && lastDeliveryStop.locationId) {
+          validatedData.locationId = lastDeliveryStop.locationId;
+          console.log("Load creation - setting main locationId to LAST delivery stop for rate lookup:", lastDeliveryStop.locationId);
         }
       }
 
