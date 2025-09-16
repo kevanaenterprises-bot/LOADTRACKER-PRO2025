@@ -4745,6 +4745,39 @@ Reply YES to confirm acceptance or NO to decline.`
         updatedAt: load.updatedAt
       });
 
+      // 🔍 CRITICAL DATABASE DEBUG - CHECK WHAT DATABASE WE'RE ACTUALLY QUERYING
+      console.log(`🔍 DATABASE DEBUG: Current DATABASE_URL environment:`, {
+        hasDbUrl: !!process.env.DATABASE_URL,
+        dbUrlPrefix: process.env.DATABASE_URL?.substring(0, 50) || 'NOT_SET',
+        nodeEnv: process.env.NODE_ENV
+      });
+
+      // 🔍 QUERY ALL LOADS TO SEE WHAT'S IN DATABASE
+      console.log(`🔍 DATABASE DEBUG: Checking all loads in current database...`);
+      try {
+        const allLoads = await storage.getLoads();
+        console.log(`🔍 DATABASE DEBUG: Found ${allLoads.length} total loads in database`);
+        
+        // Look specifically for load 109-41936
+        const targetLoad = allLoads.find(l => l.number109 === '109-41936');
+        if (targetLoad) {
+          console.log(`🎯 FOUND TARGET LOAD 109-41936:`, {
+            id: targetLoad.id,
+            number109: targetLoad.number109,
+            podDocumentPath: targetLoad.podDocumentPath,
+            status: targetLoad.status,
+            driverId: targetLoad.driverId,
+            createdAt: targetLoad.createdAt
+          });
+        } else {
+          console.log(`❌ LOAD 109-41936 NOT FOUND IN DATABASE! Available loads:`, 
+            allLoads.map(l => ({ id: l.id, number109: l.number109, podPath: l.podDocumentPath }))
+          );
+        }
+      } catch (dbError) {
+        console.error(`❌ DATABASE QUERY ERROR:`, dbError);
+      }
+
       // Check if this load has any POD but the path is broken/orphaned
       if (!load.podDocumentPath) {
         console.log(`⚠️ NO POD DOCUMENTS - Load ${load.number109} (ID: ${load.id}) has no POD attachments`);
