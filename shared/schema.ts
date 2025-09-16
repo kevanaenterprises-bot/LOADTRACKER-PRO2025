@@ -250,6 +250,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   phoneNumber: true,
   username: true,
   password: true,
+  truckNumber: true, // Added truck number support for driver creation
 });
 
 export const insertLocationSchema = createInsertSchema(locations).omit({
