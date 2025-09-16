@@ -4749,50 +4749,88 @@ Reply YES to confirm acceptance or NO to decline.`
       
       if (load.podDocumentPath) {
         console.log(`🖨️ Processing POD for print preview: ${load.podDocumentPath}`);
+        console.log(`🖨️ POD path details:`, {
+          fullPath: load.podDocumentPath,
+          type: typeof load.podDocumentPath,
+          length: load.podDocumentPath.length,
+          startsWithObjects: load.podDocumentPath.startsWith('/objects/'),
+          startsWithSlash: load.podDocumentPath.startsWith('/')
+        });
+
         try {
-          // Check if it's an object storage path (SAME AS EMAIL)
-          if (load.podDocumentPath.startsWith('/objects/')) {
-            console.log(`🖨️ Fetching POD from object storage...`);
-            const objectStorageService = new (await import('./objectStorage')).ObjectStorageService();
-            const objectFile = await objectStorageService.getObjectEntityFile(load.podDocumentPath);
-            const [fileBuffer] = await objectFile.download();
-            const contentType = load.podDocumentPath.toLowerCase().includes('.pdf') ? 'application/pdf' : 'image/jpeg';
+          // Try direct HTTP fetch first - this is more reliable for our setup
+          let podUrl = load.podDocumentPath;
+          
+          // Normalize the URL path
+          if (!podUrl.startsWith('/objects/') && !podUrl.startsWith('/')) {
+            podUrl = `/objects/${podUrl}`;
+          }
+          
+          console.log(`🖨️ Attempting direct fetch of POD: ${podUrl}`);
+          
+          // Use proper host resolution for production environments
+          const baseUrl = process.env.NODE_ENV === 'production' ? 
+            `${req.protocol}://${req.get('host')}` : 
+            'http://localhost:5000';
+          
+          const response = await fetch(`${baseUrl}${podUrl}`, {
+            headers: { 
+              'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025',
+              'Accept': 'image/*,application/pdf,*/*'
+            }
+          });
+          
+          console.log(`🖨️ POD fetch response:`, {
+            status: response.status,
+            statusText: response.statusText,
+            contentType: response.headers.get('content-type'),
+            contentLength: response.headers.get('content-length'),
+            ok: response.ok
+          });
+          
+          if (response.ok) {
+            // Get response as array buffer for binary data
+            const arrayBuffer = await response.arrayBuffer();
+            const fileBuffer = Buffer.from(arrayBuffer);
+            const contentType = response.headers.get('content-type') || 'image/jpeg';
             
-            // Add to podImages array (SAME AS EMAIL)
-            podImages.push({
-              content: fileBuffer,
-              type: contentType
+            console.log(`🖨️ POD buffer details:`, {
+              bufferLength: fileBuffer.length,
+              isBuffer: Buffer.isBuffer(fileBuffer),
+              contentType: contentType,
+              firstFewBytes: fileBuffer.subarray(0, 10).toString('hex')
             });
-            console.log(`✅ POD prepared for print preview embedding: ${fileBuffer.length} bytes`);
             
-          } else {
-            // For test data or non-object storage paths, use fallback (SAME AS EMAIL)
-            console.log(`🖨️ Using fallback fetch for POD: ${load.podDocumentPath}`);
-            try {
-              const podUrl = load.podDocumentPath.startsWith('/') ? load.podDocumentPath : `/${load.podDocumentPath}`;
-              // Use proper host resolution for production environments
-              const baseUrl = process.env.NODE_ENV === 'production' ? 
-                `${req.protocol}://${req.get('host')}` : 
-                'http://localhost:5000';
-              const response = await fetch(`${baseUrl}${podUrl}`, {
-                headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
+            // Validate that we have a valid image buffer
+            if (fileBuffer.length > 0) {
+              // Check for valid image file signatures
+              const firstBytes = fileBuffer.subarray(0, 4);
+              const isJPEG = firstBytes[0] === 0xFF && firstBytes[1] === 0xD8;
+              const isPNG = firstBytes.toString('hex') === '89504e47';
+              const isPDF = fileBuffer.subarray(0, 5).toString() === '%PDF-';
+              
+              console.log(`🖨️ File signature validation:`, {
+                isJPEG,
+                isPNG, 
+                isPDF,
+                firstBytesHex: firstBytes.toString('hex')
               });
               
-              if (response.ok) {
-                const fileBuffer = Buffer.from(await response.arrayBuffer());
-                const contentType = response.headers.get('content-type') || 'image/jpeg';
-                
+              if (isJPEG || isPNG || isPDF) {
                 podImages.push({
                   content: fileBuffer,
                   type: contentType
                 });
-                console.log(`✅ POD prepared for embedding via fallback: ${fileBuffer.length} bytes`);
+                console.log(`✅ Valid POD image prepared for embedding: ${fileBuffer.length} bytes`);
               } else {
-                console.error(`❌ Fallback HTTP fetch failed: ${response.status} - ${await response.text()}`);
+                console.error(`❌ Invalid image file signature - not a valid image file`);
               }
-            } catch (fetchError) {
-              console.error(`❌ Fallback fetch error:`, fetchError);
+            } else {
+              console.error(`❌ Empty POD buffer received`);
             }
+          } else {
+            const errorText = await response.text();
+            console.error(`❌ POD fetch failed: HTTP ${response.status} - ${errorText}`);
           }
         } catch (error) {
           console.error(`❌ Error processing POD for preview:`, error);
