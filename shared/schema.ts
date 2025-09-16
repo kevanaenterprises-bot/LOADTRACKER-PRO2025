@@ -227,6 +227,16 @@ export const notificationLog = pgTable("notification_log", {
   errorMessage: text("error_message"),
 });
 
+// AI Chat Messages table
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id), // Optional: link to user if authenticated
+  sessionId: varchar("session_id").notNull(), // For grouping conversation
+  role: varchar("role").notNull(), // "user" or "assistant" 
+  content: text("content").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -290,6 +300,11 @@ export const insertNotificationLogSchema = createInsertSchema(notificationLog).o
   sentAt: true,
 });
 
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  timestamp: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -312,6 +327,8 @@ export type InsertNotificationPreferences = z.infer<typeof insertNotificationPre
 export type NotificationPreferences = typeof notificationPreferences.$inferSelect;
 export type InsertNotificationLog = z.infer<typeof insertNotificationLogSchema>;
 export type NotificationLog = typeof notificationLog.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {
