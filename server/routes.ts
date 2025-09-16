@@ -2579,7 +2579,7 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   }, async (req, res) => {
     try {
-      const { driverId } = req.body;
+      const { driverId, truckNumber } = req.body;
       const loadId = req.params.id;
       
       if (!driverId) {
@@ -2592,8 +2592,12 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(404).json({ message: "Load not found" });
       }
 
-      // Update the load with driver assignment
-      await storage.updateLoad(loadId, { driverId });
+      // Update the load with driver assignment and optional truck number
+      const updateData: any = { driverId };
+      if (truckNumber) {
+        updateData.truckNumber = truckNumber;
+      }
+      await storage.updateLoad(loadId, updateData);
 
       // Get complete load data with driver, location, and invoice details for UI
       const completeLoad = await storage.getLoad(loadId);

@@ -37,6 +37,7 @@ const driverSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   username: z.string().min(1, "Username is required"),
+  truckNumber: z.string().optional(), // Optional truck number for driver
 });
 
 const locationSchema = z.object({
@@ -116,6 +117,7 @@ export default function Dashboard() {
       lastName: "",
       phoneNumber: "",
       username: "",
+      truckNumber: "",
     },
   });
 
@@ -587,6 +589,19 @@ export default function Dashboard() {
                                 <FormLabel>Username (for driver login)</FormLabel>
                                 <FormControl>
                                   <Input placeholder="john_smith" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={driverForm.control}
+                            name="truckNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Truck Number (Optional)</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="TR-101, 1234, etc." {...field} data-testid="input-driver-truck-number" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>

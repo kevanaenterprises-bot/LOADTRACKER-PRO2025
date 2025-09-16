@@ -50,6 +50,7 @@ export function LoadSection({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [assigningDriverFor, setAssigningDriverFor] = useState<string | null>(null);
+  const [assignmentTruckNumber, setAssignmentTruckNumber] = useState("");
   const [podUploadDialogOpen, setPodUploadDialogOpen] = useState(false);
   const [selectedLoadForPOD, setSelectedLoadForPOD] = useState<any>(null);
 
@@ -76,8 +77,12 @@ export function LoadSection({
   });
 
   const assignDriverMutation = useMutation({
-    mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
-      return apiRequest(`/api/loads/${loadId}/assign`, "PATCH", { driverId });
+    mutationFn: async ({ loadId, driverId, truckNumber }: { loadId: string; driverId: string; truckNumber?: string }) => {
+      const payload: any = { driverId };
+      if (truckNumber) {
+        payload.truckNumber = truckNumber;
+      }
+      return apiRequest(`/api/loads/${loadId}/assign`, "PATCH", payload);
     },
     onSuccess: (data, variables) => {
       toast({
@@ -86,6 +91,7 @@ export function LoadSection({
       });
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       setAssigningDriverFor(null);
+      setAssignmentTruckNumber(""); // Clear truck number after assignment
       // Update load status to assigned
       apiRequest(`/api/loads/${variables.loadId}/status`, "PATCH", { status: "assigned" });
     },
@@ -100,7 +106,11 @@ export function LoadSection({
 
   const handleAssignDriver = (loadId: string, driverId: string) => {
     if (driverId) {
-      assignDriverMutation.mutate({ loadId, driverId });
+      assignDriverMutation.mutate({ 
+        loadId, 
+        driverId, 
+        truckNumber: assignmentTruckNumber || undefined 
+      });
     }
   };
 
@@ -171,26 +181,41 @@ export function LoadSection({
                 {showDriverAssign ? (
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     {assigningDriverFor === load.id ? (
-                      <div className="flex items-center gap-2">
-                        <Select onValueChange={(value) => handleAssignDriver(load.id, value)}>
-                          <SelectTrigger className="w-40">
-                            <SelectValue placeholder="Select driver..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableDrivers.map((driver: any) => (
-                              <SelectItem key={driver.id} value={driver.id}>
-                                {driver.firstName} {driver.lastName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setAssigningDriverFor(null)}
-                        >
-                          Cancel
-                        </Button>
+                      <div className="flex flex-col gap-2 p-2 bg-gray-50 rounded border">
+                        <div className="flex items-center gap-2">
+                          <Select onValueChange={(value) => handleAssignDriver(load.id, value)}>
+                            <SelectTrigger className="w-40">
+                              <SelectValue placeholder="Select driver..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {availableDrivers.map((driver: any) => (
+                                <SelectItem key={driver.id} value={driver.id}>
+                                  {driver.firstName} {driver.lastName}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setAssigningDriverFor(null);
+                              setAssignmentTruckNumber("");
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            placeholder="Truck # (optional)"
+                            value={assignmentTruckNumber}
+                            onChange={(e) => setAssignmentTruckNumber(e.target.value)}
+                            className="w-40 text-sm"
+                            data-testid="input-assignment-truck-number"
+                          />
+                          <span className="text-xs text-gray-500">Optional truck number</span>
+                        </div>
                       </div>
                     ) : (
                       <Button
