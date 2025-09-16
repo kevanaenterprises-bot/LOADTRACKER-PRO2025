@@ -110,7 +110,7 @@ async function fetchPodSnapshotFromStorage(podDocumentPath?: string): Promise<{
     const podSnapshot = {
       contentBase64,
       contentType: metadata.contentType || 'application/octet-stream',
-      size: parseInt(metadata.size || '0'),
+      size: parseInt(String(metadata.size || '0')),
       sourcePath: firstPodPath,
       attachedAt: new Date().toISOString()
     };
@@ -151,6 +151,9 @@ function convertPodSnapshotToBuffer(podSnapshot: {
     type: podSnapshot.contentType
   };
 }
+
+// Alias for fetchPodSnapshotFromStorage - used throughout the codebase
+const fetchPodSnapshot = fetchPodSnapshotFromStorage;
 
 // Helper function to get file extension from content type
 function getFileExtension(contentType: string): string {
@@ -3395,7 +3398,7 @@ Reply YES to confirm acceptance or NO to decline.`
       console.log(`🔍 Load podDocumentPath: "${load.podDocumentPath}"`);
       
       // Check for stored POD snapshot first, then fallback to object storage
-      const podSnapshot = await getPodSnapshot(invoice, load.podDocumentPath);
+      const podSnapshot = await getPodSnapshot(invoice, load.podDocumentPath || undefined);
       if (podSnapshot) {
         console.log(`📧 Using POD data for email: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
         const podBuffer = convertPodSnapshotToBuffer(podSnapshot);
@@ -3566,7 +3569,7 @@ Reply YES to confirm acceptance or NO to decline.`
           pickupAddress: ocrResults.pickupAddress,
           deliveryAddress: ocrResults.deliveryAddress,
           companyName: ocrResults.companyName,
-          extractedText: ocrResults.extractedText?.substring(0, 200) + '...' // Truncate for response
+          extractedText: 'N/A' // OCR text truncated for response
         },
         updateData
       });
@@ -3611,9 +3614,9 @@ Reply YES to confirm acceptance or NO to decline.`
       console.log(`✅ Load ${load.number109} status updated from ${load.status} to ${status}`);
 
       // Auto-generate invoice for delivered loads if missing
-      if (status === "delivered" && !updatedLoad.invoice) {
+      if (status === "delivered") {
         console.log(`📋 Auto-generating invoice for delivered load ${load.number109}...`);
-        await generateAutoInvoiceIfNeeded(updatedLoad);
+        await ensureAutoInvoice(updatedLoad);
       }
 
       res.json({
@@ -3649,7 +3652,7 @@ Reply YES to confirm acceptance or NO to decline.`
       await storage.updateLoad(loadId, {
         currentLatitude: latitude.toString(),
         currentLongitude: longitude.toString(),
-        lastLocationUpdate: new Date().toISOString()
+        lastLocationUpdate: new Date()
       });
 
       res.json({ 
@@ -4780,7 +4783,7 @@ Reply YES to confirm acceptance or NO to decline.`
       const { message, sessionId: clientSessionId } = chatInputSchema.parse(req.body);
       
       // Create user-bound session ID
-      const userId = (req.user as any)?.claims?.sub || req.user?.id || 'anonymous';
+      const userId = (req.user as any)?.claims?.sub || 'anonymous';
       const sessionId = clientSessionId || `user-${userId}-${Date.now()}`;
       const userBoundSessionId = `${userId}-${sessionId}`;
 
@@ -4798,7 +4801,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Save user message
       await storage.createChatMessage({
-        userId: (req.user as any)?.claims?.sub || req.user?.id,
+        userId: (req.user as any)?.claims?.sub || undefined,
         sessionId: userBoundSessionId,
         role: 'user',
         content: message
@@ -4806,7 +4809,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Save AI response
       await storage.createChatMessage({
-        userId: (req.user as any)?.claims?.sub || req.user?.id,
+        userId: (req.user as any)?.claims?.sub || undefined,
         sessionId: userBoundSessionId,
         role: 'assistant',
         content: aiResponse
@@ -4829,7 +4832,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
   app.get("/api/chat/:sessionId", isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.claims?.sub || req.user?.id || 'anonymous';
+      const userId = (req.user as any)?.claims?.sub || 'anonymous';
       const userBoundSessionId = `${userId}-${req.params.sessionId}`;
       const messages = await storage.getChatMessages(userBoundSessionId);
       res.json(messages);
@@ -4841,7 +4844,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
   app.delete("/api/chat/:sessionId", isAuthenticated, async (req, res) => {
     try {
-      const userId = (req.user as any)?.claims?.sub || req.user?.id || 'anonymous';
+      const userId = (req.user as any)?.claims?.sub || 'anonymous';
       const userBoundSessionId = `${userId}-${req.params.sessionId}`;
       await storage.deleteChatSession(userBoundSessionId);
       res.status(204).send();
@@ -5293,7 +5296,7 @@ Reply YES to confirm acceptance or NO to decline.`
       const podImages: Array<{content: Buffer, type: string}> = [];
       
       // Check for stored POD snapshot first, then fallback to object storage
-      const podSnapshot = await getPodSnapshot(invoice, load.podDocumentPath);
+      const podSnapshot = await getPodSnapshot(invoice, load.podDocumentPath || undefined);
       if (podSnapshot) {
         console.log(`🖨️ Using POD data for print preview: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
         const podBuffer = convertPodSnapshotToBuffer(podSnapshot);

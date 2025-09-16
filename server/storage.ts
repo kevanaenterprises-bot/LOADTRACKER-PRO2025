@@ -1031,13 +1031,13 @@ export class DatabaseStorage implements IStorage {
     
     const newInvoice: InsertInvoice = {
       loadId,
-      customerId: load.customerId || undefined,
+      customerId: undefined, // Loads don't have customerId - this gets set later
       invoiceNumber,
-      flatRate: load.flatRate ? parseFloat(load.flatRate.toString()) : 0,
-      lumperCharge: load.lumperCharge ? parseFloat(load.lumperCharge.toString()) : 0,
-      extraStopsCharge: load.extraStopsCharge ? parseFloat(load.extraStopsCharge.toString()) : 0,
-      extraStopsCount: load.extraStopsCount || 0,
-      totalAmount: load.totalAmount ? parseFloat(load.totalAmount.toString()) : 0,
+      flatRate: load.flatRate ? load.flatRate.toString() : "0.00",
+      lumperCharge: load.lumperCharge ? load.lumperCharge.toString() : "0.00", 
+      extraStopsCharge: load.extraStops ? load.extraStops.toString() : "0.00", // extraStops is the charge amount
+      extraStopsCount: 0, // Default to 0 since loads don't track count separately
+      totalAmount: "0.00", // Calculate this later based on other amounts
       status: "draft"
     };
 
