@@ -4933,12 +4933,54 @@ Reply YES to confirm acceptance or NO to decline.`
       const invoiceContext = await computeInvoiceContext(load);
       const baseHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       
-      // Embed POD images if available - USE SAME FUNCTION AS EMAIL
+      // Embed POD images if available - PRIORITIZE EMBEDDED POD DATA FROM INVOICE
       let previewHTML = baseHTML;
       const podImages: Array<{content: Buffer, type: string}> = [];
       
-      if (load.podDocumentPath) {
-        console.log(`🖨️ Processing POD for print preview: ${load.podDocumentPath}`);
+      console.log(`🖨️ POD Status Check:`, {
+        invoiceId: invoice.id,
+        invoiceNumber: invoice.invoiceNumber,
+        hasEmbeddedPOD: !!invoice.podData,
+        hasLoadPODPath: !!load.podDocumentPath,
+        podDataLength: invoice.podData ? Math.round(invoice.podData.length / 1024) + 'KB' : 'none'
+      });
+      
+      // PRIORITIZE EMBEDDED POD DATA FROM INVOICE
+      if (invoice.podData) {
+        console.log(`✅ Using embedded POD data from invoice ${invoice.invoiceNumber}`);
+        try {
+          // Parse the data URL (format: "data:image/jpeg;base64,...")
+          const dataUrlMatch = invoice.podData.match(/^data:([^;]+);base64,(.+)$/);
+          if (dataUrlMatch) {
+            const contentType = dataUrlMatch[1];
+            const base64Data = dataUrlMatch[2];
+            const fileBuffer = Buffer.from(base64Data, 'base64');
+            
+            console.log(`🖨️ Embedded POD details:`, {
+              contentType,
+              bufferSize: fileBuffer.length,
+              base64Length: base64Data.length
+            });
+            
+            if (fileBuffer.length > 0) {
+              podImages.push({
+                content: fileBuffer,
+                type: contentType
+              });
+              console.log(`✅ Embedded POD data loaded successfully: ${fileBuffer.length} bytes`);
+            } else {
+              console.error(`❌ Empty buffer from embedded POD data`);
+            }
+          } else {
+            console.error(`❌ Invalid embedded POD data format - not a valid data URL`);
+          }
+        } catch (error) {
+          console.error(`❌ Error processing embedded POD data:`, error);
+        }
+      }
+      // FALLBACK: Try object storage if no embedded data
+      else if (load.podDocumentPath) {
+        console.log(`⚠️ No embedded POD data found, falling back to object storage: ${load.podDocumentPath}`);
         console.log(`🖨️ POD path details:`, {
           fullPath: load.podDocumentPath,
           type: typeof load.podDocumentPath,
@@ -5026,11 +5068,8 @@ Reply YES to confirm acceptance or NO to decline.`
           console.error(`❌ Error processing POD for preview:`, error);
         }
       } else {
-        console.log(`⚠️ No POD document uploaded for load ${load.number109} (ID: ${load.id}) - preview will show invoice only`);
-        console.log(`🔍 DIAGNOSIS: If POD was recently uploaded but not showing:`);
-        console.log(`   - Check if load was deleted and recreated (new ID breaks POD links)`);
-        console.log(`   - Verify POD upload completed successfully`);
-        console.log(`   - Check object storage for orphaned files`);
+        console.log(`⚠️ No POD data available (neither embedded nor in object storage) for load ${load.number109} (ID: ${load.id})`);
+        console.log(`💡 NEW WORKFLOW: POD data should now be embedded directly in invoices when uploaded`);
       }
       
       // Embed POD images into the preview HTML if available - USE SAME FUNCTION AS EMAIL
