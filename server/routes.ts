@@ -4928,6 +4928,46 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // MANUAL FIX: Move load from awaiting_invoicing to awaiting_payment 
+  app.patch("/api/loads/:id/move-to-payment", isAdminAuthenticated, async (req, res) => {
+    try {
+      const load = await storage.getLoad(req.params.id);
+      
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      if (load.status !== "awaiting_invoicing") {
+        return res.status(400).json({ 
+          message: `Load ${load.number109} is ${load.status}, can only move from awaiting_invoicing to awaiting_payment` 
+        });
+      }
+      
+      // Verify invoice exists
+      const invoices = await storage.getInvoices();
+      const hasInvoice = invoices.some((inv: any) => inv.loadId === load.id);
+      
+      if (!hasInvoice) {
+        return res.status(400).json({ 
+          message: `Load ${load.number109} has no invoice - cannot move to awaiting_payment` 
+        });
+      }
+      
+      await storage.updateLoadStatus(load.id, "awaiting_payment");
+      console.log(`✅ MANUAL FIX: Load ${load.number109} moved from AWAITING_INVOICING to AWAITING_PAYMENT`);
+      
+      res.json({ 
+        message: `Load ${load.number109} successfully moved to awaiting payment`,
+        previousStatus: "awaiting_invoicing",
+        newStatus: "awaiting_payment"
+      });
+      
+    } catch (error) {
+      console.error("Error moving load to payment:", error);
+      res.status(500).json({ message: "Failed to move load to payment status" });
+    }
+  });
+
   // Test data endpoint (development only)
   if (false && process.env.NODE_ENV === "development") {
     app.post("/api/test/create-sample-loads", isAdminAuthenticated, async (req, res) => {
