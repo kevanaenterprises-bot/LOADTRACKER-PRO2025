@@ -3624,8 +3624,10 @@ Reply YES to confirm acceptance or NO to decline.`
     try {
       // Generate sequential invoice number
       const invoiceNumber = await storage.getNextInvoiceNumber();
+      const now = new Date();
       
-      const invoice = await storage.createInvoice({
+      // Prepare invoice data
+      const invoiceData: any = {
         loadId: load.id,
         invoiceNumber,
         status: 'pending',
@@ -3636,7 +3638,18 @@ Reply YES to confirm acceptance or NO to decline.`
         extraStopsCount: 0, // Default value
         totalAmount: load.flatRate || '0.00', // Use flat rate as default
         printedAt: null
-      });
+      };
+      
+      // Embed POD if available on the load
+      if (load.podDocumentPath) {
+        invoiceData.podUrl = load.podDocumentPath;
+        invoiceData.podAttachedAt = now;
+        invoiceData.finalizedAt = now;
+        invoiceData.status = "finalized"; // Set to finalized since POD is embedded
+        console.log(`📄 POD found and embedded into auto invoice for load ${load.number109}`);
+      }
+      
+      const invoice = await storage.createInvoice(invoiceData);
       
       // Update load status to awaiting_payment
       await storage.updateLoadStatus(load.id, 'awaiting_payment');
@@ -3959,7 +3972,10 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Generate sequential invoice number starting with GO6000
       const invoiceNumber = await storage.getNextInvoiceNumber();
-      const invoice = await storage.createInvoice({
+      const now = new Date();
+      
+      // Check if load has POD document and embed it if available
+      const invoiceData: any = {
         loadId: load.id,
         customerId: customerId || undefined,
         invoiceNumber,
@@ -3969,7 +3985,18 @@ Reply YES to confirm acceptance or NO to decline.`
         extraStopsCount: parseFloat(load.extraStops?.toString() || "0"),
         totalAmount: totalAmount.toString(),
         status: "pending",
-      });
+      };
+      
+      // Embed POD if available on the load
+      if (load.podDocumentPath) {
+        invoiceData.podUrl = load.podDocumentPath;
+        invoiceData.podAttachedAt = now;
+        invoiceData.finalizedAt = now;
+        invoiceData.status = "finalized"; // Set to finalized since POD is embedded
+        console.log(`📄 POD found and embedded into manual invoice for load ${load.number109}`);
+      }
+      
+      const invoice = await storage.createInvoice(invoiceData);
 
       console.log(`Manual invoice ${invoiceNumber} generated for load ${load.number109} by admin`);
       
@@ -4275,6 +4302,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
               // Auto-generate invoice with sequential GO6000 series
               const invoiceNumber = await storage.getNextInvoiceNumber();
+              const now = new Date();
               await storage.createInvoice({
                 loadId: loadForInvoice.id,
                 invoiceNumber,
@@ -4283,7 +4311,10 @@ Reply YES to confirm acceptance or NO to decline.`
                 extraStopsCharge: extraStopsCharge.toString(),
                 extraStopsCount: parseFloat(loadForInvoice.extraStops?.toString() || "0"),
                 totalAmount: totalAmount.toString(),
-                status: "pending",
+                status: "finalized", // Set to finalized since POD is already embedded
+                podUrl: podDocumentURL, // Embed POD directly into invoice
+                podAttachedAt: now, // Mark when POD was attached
+                finalizedAt: now, // Mark as finalized immediately since POD is embedded
               });
 
               console.log(`Auto-generated invoice ${invoiceNumber} for load ${loadForInvoice.number109}`);
