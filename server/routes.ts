@@ -4193,6 +4193,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
               // Auto-generate invoice with sequential GO6000 series
               const invoiceNumber = await storage.getNextInvoiceNumber();
+              const now = new Date();
               const invoice = await storage.createInvoice({
                 loadId: loadWithDetails.id,
                 invoiceNumber,
@@ -4201,7 +4202,10 @@ Reply YES to confirm acceptance or NO to decline.`
                 extraStopsCharge: extraStopsCharge.toString(),
                 extraStopsCount: parseFloat(loadWithDetails.extraStops?.toString() || "0"),
                 totalAmount: totalAmount.toString(),
-                status: "pending",
+                status: "finalized", // Set to finalized since BOL/POD is already embedded
+                podUrl: bolDocumentURL, // Embed BOL/POD directly into invoice
+                podAttachedAt: now, // Mark when BOL/POD was attached
+                finalizedAt: now, // Mark as finalized immediately since BOL/POD is embedded
               });
 
               console.log(`🧾 ✅ Auto-generated invoice ${invoiceNumber} for load ${loadWithDetails.number109} - ready for admin inbox!`);
