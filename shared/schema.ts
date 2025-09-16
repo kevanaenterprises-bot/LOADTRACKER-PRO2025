@@ -173,13 +173,13 @@ export const invoices = pgTable("invoices", {
   podUrl: varchar("pod_url"), // POD document path attached to this invoice
   podChecksum: varchar("pod_checksum"), // SHA256 checksum for data integrity
   podAttachedAt: timestamp("pod_attached_at"), // When POD was attached to invoice
-  podSnapshot: jsonb("pod_snapshot").$type<{
+  podSnapshot: jsonb("pod_snapshot").$type<Array<{
     contentBase64: string;
     contentType: string;
     size: number;
     sourcePath: string;
     attachedAt: string;
-  }>(), // POD content stored as base64 for reliable embedding
+  }>>(), // POD content stored as base64 array for multi-POD support
   finalizedAt: timestamp("finalized_at"), // When invoice was finalized with POD
   generatedAt: timestamp("generated_at").defaultNow(),
   printedAt: timestamp("printed_at"),
