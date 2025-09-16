@@ -5181,7 +5181,7 @@ Reply YES to confirm acceptance or NO to decline.`
     try {
       const extractedData = req.body;
       
-      if (!extractedData || extractedData.confidence < 0.3) {
+      if (!extractedData || extractedData.confidence < 0.1) {
         return res.status(400).json({ 
           message: 'Insufficient data or low confidence to generate load' 
         });

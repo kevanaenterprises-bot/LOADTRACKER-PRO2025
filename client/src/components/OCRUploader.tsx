@@ -90,9 +90,11 @@ export function OCRUploader() {
     },
     onError: (error) => {
       console.error("OCR extraction failed:", error);
+      // Show specific error instead of generic "cleaner image" message
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       toast({
-        title: "Extraction Failed",
-        description: "Could not read the image. Please try a clearer image.",
+        title: "Extraction Failed", 
+        description: `${errorMessage}. The system handles low-quality images - try uploading anyway or check file format.`,
         variant: "destructive",
       });
     },
