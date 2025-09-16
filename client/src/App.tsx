@@ -8,6 +8,7 @@ import Dashboard from "@/pages/Dashboard";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
+import Chat from "@/pages/Chat";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
+      <Route path="/chat" component={Chat} />
       
       {/* Landing page */}
       <Route path="/" component={Landing} />

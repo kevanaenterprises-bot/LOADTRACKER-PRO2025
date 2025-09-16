@@ -41,3 +41,7 @@ integrations = ["javascript_object_storage:1.0.0", "javascript_openai:1.0.0", "j
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 44945
+externalPort = 3000
