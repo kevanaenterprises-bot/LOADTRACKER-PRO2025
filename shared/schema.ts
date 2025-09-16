@@ -36,6 +36,7 @@ export const users = pgTable("users", {
   phoneNumber: varchar("phone_number"),
   username: varchar("username").unique(), // For driver login
   password: varchar("password"), // For driver login (phone number)
+  truckNumber: varchar("truck_number"), // Truck number for drivers
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -57,6 +58,7 @@ export const loads = pgTable("loads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   number109: varchar("number_109").notNull().unique(),
   driverId: varchar("driver_id").references(() => users.id),
+  truckNumber: varchar("truck_number"), // Truck number assigned to this load
   locationId: varchar("location_id").references(() => locations.id),
   pickupLocationId: varchar("pickup_location_id").references(() => locations.id),
   estimatedMiles: integer("estimated_miles"),
