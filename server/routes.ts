@@ -4354,21 +4354,28 @@ Reply YES to confirm acceptance or NO to decline.`
   });
 
   // Flexible auth middleware for chat routes
-  const flexibleAuth: RequestHandler = async (req, res, next) => {
+  const flexibleAuth = async (req: any, res: any, next: any) => {
     // Check bypass token first
     const bypassToken = req.headers['x-bypass-token'];
     if (bypassToken === BYPASS_SECRET) {
       console.log("✅ BYPASS TOKEN: Chat route accessed with bypass token");
-      // Simulate a user object for bypass token
-      (req as any).user = { 
-        claims: { sub: "bypass-user" },
+      // Set consistent user object for bypass token
+      req.user = { 
+        id: "bypass-user",
         authType: "bypass"
       };
       return next();
     }
     
-    // Fall back to regular authentication
-    return isAuthenticated(req, res, next);
+    // Check if user is already authenticated via Replit
+    if (req.isAuthenticated() && req.user) {
+      console.log("✅ REPLIT AUTH: Chat route accessed with Replit authentication");
+      return next();
+    }
+    
+    // No valid authentication found
+    console.log("❌ CHAT AUTH: No valid authentication (bypass token or Replit auth)");
+    return res.status(401).json({ message: "Unauthorized" });
   };
 
   // Chat AI Assistant routes
@@ -4383,8 +4390,8 @@ Reply YES to confirm acceptance or NO to decline.`
       
       const { message, sessionId: clientSessionId } = chatInputSchema.parse(req.body);
       
-      // Create user-bound session ID
-      const userId = req.user?.claims?.sub || 'anonymous';
+      // Create user-bound session ID - handle both Replit auth and bypass token
+      const userId = req.user?.id || req.user?.claims?.sub || req.user?.username || 'anonymous';
       const sessionId = clientSessionId || `user-${userId}-${Date.now()}`;
       const userBoundSessionId = `${userId}-${sessionId}`;
 
@@ -4402,7 +4409,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Save user message
       await storage.createChatMessage({
-        userId: req.user?.claims?.sub,
+        userId: req.user?.id || req.user?.claims?.sub || req.user?.username,
         sessionId: userBoundSessionId,
         role: 'user',
         content: message
@@ -4410,7 +4417,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Save AI response
       await storage.createChatMessage({
-        userId: req.user?.claims?.sub,
+        userId: req.user?.id || req.user?.claims?.sub || req.user?.username,
         sessionId: userBoundSessionId,
         role: 'assistant',
         content: aiResponse
@@ -4433,7 +4440,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
   app.get("/api/chat/:sessionId", flexibleAuth, async (req, res) => {
     try {
-      const userId = req.user?.claims?.sub || 'anonymous';
+      const userId = req.user?.id || req.user?.claims?.sub || req.user?.username || 'anonymous';
       const userBoundSessionId = `${userId}-${req.params.sessionId}`;
       const messages = await storage.getChatMessages(userBoundSessionId);
       res.json(messages);
@@ -4445,7 +4452,7 @@ Reply YES to confirm acceptance or NO to decline.`
 
   app.delete("/api/chat/:sessionId", flexibleAuth, async (req, res) => {
     try {
-      const userId = req.user?.claims?.sub || 'anonymous';
+      const userId = req.user?.id || req.user?.claims?.sub || req.user?.username || 'anonymous';
       const userBoundSessionId = `${userId}-${req.params.sessionId}`;
       await storage.deleteChatSession(userBoundSessionId);
       res.status(204).send();
