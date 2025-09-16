@@ -153,14 +153,31 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       const invoiceIdentifier = invoice?.invoiceNumber || invoiceId;
       
       // Fetch invoice + POD preview from server (same logic as email system)
-      const response = await fetch(`/api/invoices/${invoiceIdentifier}/print-preview`, {
+      const fetchURL = `/api/invoices/${invoiceIdentifier}/print-preview`;
+      const fetchBody = { loadId: load?.id };
+      
+      console.log("🚀 FETCH DEBUG: About to make API call", {
+        url: fetchURL,
+        body: fetchBody,
+        invoiceIdentifier,
+        loadId: load?.id
+      });
+      
+      const response = await fetch(fetchURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
         },
         credentials: 'include',
-        body: JSON.stringify({ loadId: load?.id })
+        body: JSON.stringify(fetchBody)
+      });
+      
+      console.log("🚀 FETCH DEBUG: API response received", {
+        status: response.status,
+        ok: response.ok,
+        statusText: response.statusText,
+        url: response.url
       });
 
       if (!response.ok) {
