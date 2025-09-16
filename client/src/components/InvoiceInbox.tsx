@@ -120,7 +120,8 @@ export default function InvoiceInbox() {
   };
 
   const handlePrint = async (invoice: Invoice) => {
-    console.log("🖨️ INBOX PRINT: Using server endpoint for Invoice + POD");
+    console.log("🚀 INBOX PRINT: handlePrint called for invoice:", invoice.invoiceNumber);
+    console.log("🚀 INBOX PRINT: invoice data:", { loadId: invoice.loadId, invoiceNumber: invoice.invoiceNumber });
     
     if (!invoice.loadId) {
       toast({

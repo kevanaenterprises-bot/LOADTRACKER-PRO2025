@@ -4700,7 +4700,9 @@ Reply YES to confirm acceptance or NO to decline.`
       const invoiceIdOrNumber = req.params.id;
       const { loadId } = req.body;
 
-      console.log(`🖨️ Print preview requested for invoice: ${invoiceIdOrNumber}`);
+      console.log(`🚀 SERVER: Print preview API called for invoice: ${invoiceIdOrNumber}`);
+      console.log(`🚀 SERVER: Request body:`, { loadId });
+      console.log(`🚀 SERVER: Request headers:`, { auth: req.headers['x-bypass-token'] ? 'BYPASS' : 'OTHER' });
 
       // Get invoice data - simplified lookup
       console.log(`🔍 Looking up invoice: ${invoiceIdOrNumber}`);
