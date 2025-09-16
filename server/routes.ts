@@ -3438,20 +3438,26 @@ Reply YES to confirm acceptance or NO to decline.`
       console.log(`🔍 Invoice podSnapshot available: ${!!invoice.podSnapshot}`);
       console.log(`🔍 Load podDocumentPath: "${load.podDocumentPath}"`);
       
-      // Check for stored POD snapshot first, then fallback to object storage
-      const podSnapshot = await getPodSnapshot(invoice, load.podDocumentPath || undefined);
-      if (podSnapshot) {
-        console.log(`📧 Using POD data for email: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
-        const podBuffer = convertPodSnapshotToBuffer(podSnapshot);
-        podImages.push(podBuffer);
-        
-        // Add as attachment too
-        attachments.push({
-          filename: `POD-${primaryLoadNumber}.${getFileExtension(podSnapshot.contentType)}`,
-          content: podBuffer.content,
-          contentType: podSnapshot.contentType
+      // FIXED: Get ALL POD snapshots for multi-POD loads (email complete package)
+      const allPodSnapshots = await getAllPodSnapshots(invoice, load.podDocumentPath || undefined);
+      if (allPodSnapshots.length > 0) {
+        console.log(`📧 Using ${allPodSnapshots.length} POD(s) for email: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
+        allPodSnapshots.forEach((snapshot, index) => {
+          const podBuffer = convertPodSnapshotToBuffer(snapshot);
+          podImages.push(podBuffer);
+          console.log(`📧 POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes)`);
         });
-        console.log(`✅ POD prepared for email: ${podBuffer.content.length} bytes`);
+        
+        // Add all PODs as separate attachments
+        allPodSnapshots.forEach((snapshot, index) => {
+          const podBuffer = convertPodSnapshotToBuffer(snapshot);
+          attachments.push({
+            filename: `POD-${primaryLoadNumber}-${index + 1}.${getFileExtension(snapshot.contentType)}`,
+            content: podBuffer.content,
+            contentType: snapshot.contentType
+          });
+          console.log(`✅ POD ${index + 1} prepared for email: ${podBuffer.content.length} bytes`);
+        });
       } else {
         console.log(`⚠️ No POD available for load ${primaryLoadNumber} - email will contain invoice only`);
       }
@@ -5379,13 +5385,16 @@ Reply YES to confirm acceptance or NO to decline.`
       let previewHTML = baseHTML;
       const podImages: Array<{content: Buffer, type: string}> = [];
       
-      // Check for stored POD snapshot first, then fallback to object storage
-      const podSnapshot = await getPodSnapshot(invoice, load.podDocumentPath || undefined);
-      if (podSnapshot) {
-        console.log(`🖨️ Using POD data for print preview: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
-        const podBuffer = convertPodSnapshotToBuffer(podSnapshot);
-        podImages.push(podBuffer);
-        console.log(`✅ POD prepared for print preview: ${podBuffer.content.length} bytes`);
+      // FIXED: Get ALL POD snapshots for multi-POD loads (print preview)
+      const allPodSnapshots = await getAllPodSnapshots(invoice, load.podDocumentPath || undefined);
+      if (allPodSnapshots.length > 0) {
+        console.log(`🖨️ Using ${allPodSnapshots.length} POD(s) for print preview: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
+        allPodSnapshots.forEach((snapshot, index) => {
+          const podBuffer = convertPodSnapshotToBuffer(snapshot);
+          podImages.push(podBuffer);
+          console.log(`🖨️ POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes)`);
+        });
+        console.log(`✅ ${allPodSnapshots.length} POD(s) prepared for print preview`);
       } else {
         console.log(`⚠️ No POD document uploaded for load ${load.number109} (ID: ${load.id}) - preview will show invoice only`);
         console.log(`🔍 DIAGNOSIS: If POD was recently uploaded but not showing:`);
