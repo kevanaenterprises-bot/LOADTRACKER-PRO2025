@@ -59,21 +59,21 @@ async function getPodSnapshot(invoice: any, podDocumentPath?: string): Promise<{
   return await fetchPodSnapshotFromStorage(podDocumentPath);
 }
 
-// Legacy helper function to fetch POD data from object storage and convert to base64
-async function fetchPodSnapshotFromStorage(podDocumentPath?: string): Promise<{
+// FIXED: Process ALL POD documents, not just the first one (was causing multi-POD issues)
+async function fetchAllPodSnapshotsFromStorage(podDocumentPath?: string): Promise<Array<{
   contentBase64: string;
   contentType: string;
   size: number;
   sourcePath: string;
   attachedAt: string;
-} | null> {
+}>> {
   if (!podDocumentPath || podDocumentPath === 'test-pod-document.pdf') {
     console.log('📄 No valid POD document path provided');
-    return null;
+    return [];
   }
 
   try {
-    console.log('📄 Fetching POD from object storage:', podDocumentPath);
+    console.log('📄 Fetching ALL PODs from object storage:', podDocumentPath);
     
     // Initialize object storage service
     const objectStorageService = new ObjectStorageService();
@@ -83,46 +83,74 @@ async function fetchPodSnapshotFromStorage(podDocumentPath?: string): Promise<{
       ? podDocumentPath.split(',').map(path => path.trim())
       : [podDocumentPath];
     
-    // Use the first POD document for the snapshot
-    const firstPodPath = podPaths[0];
+    console.log(`📄 Processing ${podPaths.length} POD document(s):`);
+    podPaths.forEach((path, index) => console.log(`  ${index + 1}. ${path}`));
     
-    // Normalize the path if it's a full URL
-    const normalizedPath = objectStorageService.normalizeObjectEntityPath(firstPodPath);
-    console.log('📄 Normalized POD path:', normalizedPath);
+    const podSnapshots = [];
     
-    // Get the file object from object storage
-    const podFile = await objectStorageService.getObjectEntityFile(normalizedPath);
-    const [metadata] = await podFile.getMetadata();
+    // Process ALL PODs, not just the first one
+    for (let i = 0; i < podPaths.length; i++) {
+      const podPath = podPaths[i];
+      console.log(`📄 Processing POD ${i + 1}/${podPaths.length}: ${podPath}`);
+      
+      try {
+        // Normalize the path if it's a full URL
+        const normalizedPath = objectStorageService.normalizeObjectEntityPath(podPath);
+        console.log(`📄 Normalized POD path ${i + 1}: ${normalizedPath}`);
+        
+        // Get the file object from object storage
+        const podFile = await objectStorageService.getObjectEntityFile(normalizedPath);
+        const [metadata] = await podFile.getMetadata();
+        
+        // Read the file content into a buffer
+        const chunks: Buffer[] = [];
+        const stream = podFile.createReadStream();
+        
+        await new Promise<void>((resolve, reject) => {
+          stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+          stream.on('error', reject);
+          stream.on('end', resolve);
+        });
+        
+        const buffer = Buffer.concat(chunks);
+        const contentBase64 = buffer.toString('base64');
+        
+        const podSnapshot = {
+          contentBase64,
+          contentType: metadata.contentType || 'application/octet-stream',
+          size: parseInt(String(metadata.size || '0')),
+          sourcePath: podPath,
+          attachedAt: new Date().toISOString()
+        };
+        
+        podSnapshots.push(podSnapshot);
+        console.log(`✅ POD ${i + 1} snapshot created: ${podSnapshot.size} bytes, type: ${podSnapshot.contentType}`);
+        
+      } catch (podError) {
+        console.error(`❌ Failed to process POD ${i + 1} (${podPath}):`, podError);
+        // Continue processing other PODs even if one fails
+      }
+    }
     
-    // Read the file content into a buffer
-    const chunks: Buffer[] = [];
-    const stream = podFile.createReadStream();
-    
-    await new Promise<void>((resolve, reject) => {
-      stream.on('data', (chunk: Buffer) => chunks.push(chunk));
-      stream.on('error', reject);
-      stream.on('end', resolve);
-    });
-    
-    const buffer = Buffer.concat(chunks);
-    const contentBase64 = buffer.toString('base64');
-    
-    const podSnapshot = {
-      contentBase64,
-      contentType: metadata.contentType || 'application/octet-stream',
-      size: parseInt(String(metadata.size || '0')),
-      sourcePath: firstPodPath,
-      attachedAt: new Date().toISOString()
-    };
-    
-    console.log(`✅ POD snapshot created from storage: ${podSnapshot.size} bytes, type: ${podSnapshot.contentType}`);
-    return podSnapshot;
+    console.log(`✅ Successfully processed ${podSnapshots.length}/${podPaths.length} POD documents`);
+    return podSnapshots;
     
   } catch (error) {
-    console.error('❌ Failed to fetch POD snapshot from storage:', error);
-    // Return null rather than throwing to allow invoice creation to continue
-    return null;
+    console.error('❌ Failed to fetch POD snapshots from storage:', error);
+    return [];
   }
+}
+
+// Legacy function for backward compatibility - now returns first POD only
+async function fetchPodSnapshotFromStorage(podDocumentPath?: string): Promise<{
+  contentBase64: string;
+  contentType: string;
+  size: number;
+  sourcePath: string;
+  attachedAt: string;
+} | null> {
+  const allSnapshots = await fetchAllPodSnapshotsFromStorage(podDocumentPath);
+  return allSnapshots.length > 0 ? allSnapshots[0] : null;
 }
 
 // Utility function to convert base64 POD snapshot to buffer for PDF embedding
