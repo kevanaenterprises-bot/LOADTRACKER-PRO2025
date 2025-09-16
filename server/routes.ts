@@ -3352,30 +3352,75 @@ Reply YES to confirm acceptance or NO to decline.`
                 
               } catch (storageError) {
                 console.error(`❌ Failed to download POD document ${load.podDocumentPath} from object storage:`, storageError);
-                console.log(`📄 Trying fallback HTTP fetch for POD embedding...`);
+                console.log(`📄 Trying enhanced fallback for production POD access...`);
                 try {
-                  // Use proper host resolution for production environments  
-                  const baseUrl = process.env.NODE_ENV === 'production' ? 
-                    `${req.protocol}://${req.get('host')}` : 
-                    'http://localhost:5000';
-                  const response = await fetch(`${baseUrl}${podUrl}`, {
-                    headers: { 'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025' }
-                  });
+                  // Enhanced production POD access with multiple fallback methods
+                  let fileBuffer, contentType;
                   
-                  if (response.ok) {
-                    const fileBuffer = Buffer.from(await response.arrayBuffer());
-                    const contentType = response.headers.get('content-type') || 'application/pdf';
+                  // Method 1: Try direct object storage with signed URL approach
+                  try {
+                    console.log(`🔐 Attempting signed URL access for production...`);
+                    const { ObjectStorageService } = await import('./objectStorage');
+                    const objectStorageService = new ObjectStorageService();
+                    const objectFile = await objectStorageService.getObjectEntityFile(podUrl);
                     
+                    // Generate signed URL for temporary access
+                    const [signedUrl] = await objectFile.getSignedUrl({
+                      action: 'read',
+                      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+                    });
+                    
+                    console.log(`🔐 Generated signed URL for POD access`);
+                    const signedResponse = await fetch(signedUrl);
+                    
+                    if (signedResponse.ok) {
+                      fileBuffer = Buffer.from(await signedResponse.arrayBuffer());
+                      contentType = signedResponse.headers.get('content-type') || 'application/pdf';
+                      console.log(`✅ POD accessed via signed URL: ${fileBuffer.length} bytes`);
+                    } else {
+                      throw new Error(`Signed URL fetch failed: ${signedResponse.status}`);
+                    }
+                    
+                  } catch (signedUrlError) {
+                    console.log(`⚠️ Signed URL method failed: ${signedUrlError.message}`);
+                    
+                    // Method 2: Direct HTTP with enhanced headers
+                    const baseUrl = process.env.NODE_ENV === 'production' ? 
+                      `${req.protocol}://${req.get('host')}` : 
+                      'http://localhost:5000';
+                    
+                    console.log(`🔄 Trying direct HTTP fetch with enhanced auth...`);
+                    const response = await fetch(`${baseUrl}${podUrl}`, {
+                      headers: { 
+                        'x-bypass-token': process.env.BYPASS_SECRET || 'LOADTRACKER_BYPASS_2025',
+                        'User-Agent': 'LoadTracker-POD-Fetcher/1.0'
+                      }
+                    });
+                    
+                    if (response.ok) {
+                      fileBuffer = Buffer.from(await response.arrayBuffer());
+                      contentType = response.headers.get('content-type') || 'application/pdf';
+                      console.log(`✅ POD accessed via direct HTTP: ${fileBuffer.length} bytes`);
+                    } else {
+                      const errorText = await response.text();
+                      console.error(`❌ Direct HTTP failed: ${response.status} - ${errorText}`);
+                      throw new Error(`HTTP ${response.status}: ${errorText}`);
+                    }
+                  }
+                  
+                  if (fileBuffer && fileBuffer.length > 0) {
                     podImages.push({
                       content: fileBuffer,
                       type: contentType
                     });
-                    console.log(`✅ POD prepared for embedding via fallback: ${fileBuffer.length} bytes`);
+                    console.log(`✅ POD successfully prepared for embedding: ${fileBuffer.length} bytes`);
                   } else {
-                    console.error(`❌ Fallback HTTP fetch failed: ${response.status} - ${await response.text()}`);
+                    console.error(`❌ No valid POD data retrieved`);
                   }
+                  
                 } catch (fetchError) {
-                  console.error(`❌ Fallback fetch error:`, fetchError);
+                  console.error(`❌ All POD fetch methods failed:`, fetchError);
+                  console.log(`📄 POD will be omitted from PDF due to access issues`);
                 }
               }
             } catch (error) {
