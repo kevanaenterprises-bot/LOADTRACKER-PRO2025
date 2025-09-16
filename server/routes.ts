@@ -32,7 +32,35 @@ import { loads } from "@shared/schema";
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
 
-// Helper function to get POD data prioritizing stored snapshots over object storage
+// FIXED: Multi-POD version - gets ALL POD snapshots prioritizing stored snapshots
+async function getAllPodSnapshots(invoice: any, podDocumentPath?: string): Promise<Array<{
+  contentBase64: string;
+  contentType: string;
+  size: number;
+  sourcePath: string;
+  attachedAt: string;
+}>> {
+  console.log('📄 Getting ALL POD snapshots - checking stored snapshots first...');
+  
+  // First priority: Use stored podSnapshot array if available
+  if (invoice.podSnapshot && Array.isArray(invoice.podSnapshot) && invoice.podSnapshot.length > 0) {
+    console.log(`✅ Using ${invoice.podSnapshot.length} stored POD snapshots from invoice`);
+    return invoice.podSnapshot;
+  }
+  
+  // Handle legacy single POD snapshot (convert to array)
+  if (invoice.podSnapshot && invoice.podSnapshot.contentBase64) {
+    console.log('✅ Converting legacy single POD snapshot to array format');
+    return [invoice.podSnapshot];
+  }
+  
+  console.log('⚠️ No stored POD snapshots found, falling back to object storage...');
+  
+  // Fallback: Fetch from object storage (gets ALL PODs)
+  return await fetchAllPodSnapshotsFromStorage(podDocumentPath);
+}
+
+// Legacy function for backward compatibility - returns first POD only  
 async function getPodSnapshot(invoice: any, podDocumentPath?: string): Promise<{
   contentBase64: string;
   contentType: string;
@@ -40,23 +68,8 @@ async function getPodSnapshot(invoice: any, podDocumentPath?: string): Promise<{
   sourcePath: string;
   attachedAt: string;
 } | null> {
-  console.log('📄 Getting POD snapshot - checking stored snapshot first...');
-  
-  // First priority: Use stored podSnapshot if available
-  if (invoice.podSnapshot && invoice.podSnapshot.contentBase64) {
-    console.log('✅ Using stored POD snapshot from invoice:', {
-      size: invoice.podSnapshot.size,
-      contentType: invoice.podSnapshot.contentType,
-      sourcePath: invoice.podSnapshot.sourcePath,
-      attachedAt: invoice.podSnapshot.attachedAt
-    });
-    return invoice.podSnapshot;
-  }
-  
-  console.log('⚠️ No stored POD snapshot found, falling back to object storage...');
-  
-  // Fallback: Fetch from object storage (legacy behavior)
-  return await fetchPodSnapshotFromStorage(podDocumentPath);
+  const allSnapshots = await getAllPodSnapshots(invoice, podDocumentPath);
+  return allSnapshots.length > 0 ? allSnapshots[0] : null;
 }
 
 // FIXED: Process ALL POD documents, not just the first one (was causing multi-POD issues)
@@ -3948,23 +3961,26 @@ Reply YES to confirm acceptance or NO to decline.`
         printedAt: null
       };
       
-      // Embed POD if available on the load
+      // FIXED: Embed ALL PODs if available on the load (not just first one)
       if (load.podDocumentPath) {
         invoiceData.podUrl = load.podDocumentPath;
         invoiceData.podAttachedAt = now;
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized"; // Set to finalized since POD is embedded
         
-        // Fetch POD snapshot data for embedding
-        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
-        if (podSnapshot) {
-          invoiceData.podSnapshot = podSnapshot;
-          console.log(`📄 POD snapshot embedded into auto invoice for load ${load.number109}`);
+        // CRITICAL FIX: Fetch ALL POD snapshots for multi-POD loads
+        const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
+        if (allPodSnapshots.length > 0) {
+          invoiceData.podSnapshot = allPodSnapshots;
+          console.log(`📄 ${allPodSnapshots.length} POD snapshot(s) embedded into auto invoice for load ${load.number109}`);
+          allPodSnapshots.forEach((pod, index) => {
+            console.log(`  📄 POD ${index + 1}: ${pod.sourcePath} (${pod.size} bytes, ${pod.contentType})`);
+          });
         } else {
-          console.log(`⚠️ POD snapshot fetch failed for auto invoice of load ${load.number109}`);
+          console.log(`⚠️ No POD snapshots found for auto invoice of load ${load.number109}`);
         }
         
-        console.log(`📄 POD found and embedded into auto invoice for load ${load.number109}`);
+        console.log(`📄 ${allPodSnapshots.length} POD(s) found and embedded into auto invoice for load ${load.number109}`);
       }
       
       const invoice = await storage.createInvoice(invoiceData);
