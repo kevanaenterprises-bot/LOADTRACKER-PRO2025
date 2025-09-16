@@ -141,9 +141,6 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 
 
   const handlePrintRateConAndInvoice = async () => {
-    console.log("🚀 PrintButton: handlePrintRateConAndInvoice called");
-    console.log("🚀 PrintButton data:", { invoice: !!invoice, load: !!load, invoiceId, loadId });
-    
     setIsPrinting(true);
     try {
       // Create a new window for preview
@@ -154,11 +151,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
 
       // Get the correct invoice number - use invoice.invoiceNumber if available, fallback to invoiceId
       const invoiceIdentifier = invoice?.invoiceNumber || invoiceId;
-      console.log("🚀 PrintButton: Using invoiceIdentifier:", invoiceIdentifier);
-      console.log("🚀 PrintButton: Using loadId:", load?.id);
       
       // Fetch invoice + POD preview from server (same logic as email system)
-      console.log("🚀 PrintButton: Making API call to /api/invoices/" + invoiceIdentifier + "/print-preview");
       const response = await fetch(`/api/invoices/${invoiceIdentifier}/print-preview`, {
         method: 'POST',
         headers: {
@@ -168,12 +162,9 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         credentials: 'include',
         body: JSON.stringify({ loadId: load?.id })
       });
-      
-      console.log("🚀 PrintButton: API response status:", response.status, response.ok);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`❌ Print preview API error: ${response.status} - ${errorText}`);
         throw new Error(`Failed to generate preview: ${response.status} - ${errorText}`);
       }
 

@@ -1210,28 +1210,14 @@ export default function LoadsTable() {
               <div className="pt-4 border-t space-y-4">
                 {/* Print Button - Always prominently available */}
                 <div className="text-center">
-                  {(() => {
-                    const foundInvoice = Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id) : undefined;
-                    console.log("🚀 LOAD DIALOG: PrintButton data debug:", {
-                      loadId: selectedLoad.id,
-                      load: !!selectedLoad,
-                      invoiceId: foundInvoice?.id,
-                      invoice: !!foundInvoice,
-                      invoicesArray: Array.isArray(invoices),
-                      invoicesLength: Array.isArray(invoices) ? invoices.length : 0,
-                      selectedLoadId: selectedLoad.id
-                    });
-                    return (
-                      <PrintButton 
-                        invoiceId={foundInvoice?.id}
-                        loadId={selectedLoad.id}
-                        load={selectedLoad}
-                        invoice={foundInvoice}
-                        variant="default"
-                        size="lg"
-                      />
-                    );
-                  })()}
+                  <PrintButton 
+                    invoiceId={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id)?.id : undefined}
+                    loadId={selectedLoad.id}
+                    load={selectedLoad}
+                    invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id) : undefined}
+                    variant="default"
+                    size="lg"
+                  />
                   <p className="text-xs text-gray-600 mt-2">
                     Print rate confirmation & invoice together • Can be printed multiple times
                   </p>
