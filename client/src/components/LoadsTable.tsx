@@ -796,20 +796,18 @@ export default function LoadsTable() {
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle className="text-sm sm:text-base">Load Details - {selectedLoad?.number109}</DialogTitle>
-              <div className="flex items-center gap-2">
-                {/* Mobile-Accessible Print Button */}
-                {hasInvoice(selectedLoad?.id) && (
-                  <div className="md:hidden">
-                    <PrintButton 
-                      invoiceId={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad?.id)?.id : undefined}
-                      loadId={selectedLoad?.id}
-                      load={selectedLoad}
-                      invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad?.id) : undefined}
-                      variant="outline"
-                      size="sm"
-                    />
-                  </div>
-                )}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Print Button - Visible on All Devices */}
+                <div className="shrink-0">
+                  <PrintButton 
+                    invoiceId={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad?.id)?.id : undefined}
+                    loadId={selectedLoad?.id}
+                    load={selectedLoad}
+                    invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad?.id) : undefined}
+                    variant="outline"
+                    size="sm"
+                  />
+                </div>
                 <Button 
                   variant={editMode ? "secondary" : "outline"}
                   size="sm"
@@ -1211,21 +1209,19 @@ export default function LoadsTable() {
               {/* Action Buttons */}
               <div className="pt-4 border-t space-y-4">
                 {/* Print Button - Always prominently available */}
-                {hasInvoice(selectedLoad.id) && (
-                  <div className="text-center">
-                    <PrintButton 
-                      invoiceId={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id)?.id : undefined}
-                      loadId={selectedLoad.id}
-                      load={selectedLoad}
-                      invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id) : undefined}
-                      variant="default"
-                      size="lg"
-                    />
-                    <p className="text-xs text-gray-600 mt-2">
-                      Print rate confirmation & invoice together • Can be printed multiple times
-                    </p>
-                  </div>
-                )}
+                <div className="text-center">
+                  <PrintButton 
+                    invoiceId={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id)?.id : undefined}
+                    loadId={selectedLoad.id}
+                    load={selectedLoad}
+                    invoice={Array.isArray(invoices) ? invoices.find((inv: any) => inv.loadId === selectedLoad.id) : undefined}
+                    variant="default"
+                    size="lg"
+                  />
+                  <p className="text-xs text-gray-600 mt-2">
+                    Print rate confirmation & invoice together • Can be printed multiple times
+                  </p>
+                </div>
                 
                 <div className="flex justify-between">
                   <div className="text-sm text-gray-600">

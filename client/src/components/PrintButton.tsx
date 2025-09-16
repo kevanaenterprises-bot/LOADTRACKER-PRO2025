@@ -408,50 +408,19 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         </DialogContent>
       </Dialog>
 
-      {/* Print Button */}
-      <Dialog open={printDialogOpen} onOpenChange={(open) => {
-        console.log("🖨️ DIALOG DEBUG: Print dialog open state changing to:", open);
-        setPrintDialogOpen(open);
-      }}>
-        <DialogTrigger asChild>
-          <Button 
-            variant="outline" 
-            size={size} 
-            disabled={isPrinting}
-            onClick={() => console.log("🖨️ DIALOG DEBUG: Print button clicked, opening dialog")}
-          >
-            <Printer className="h-4 w-4 mr-2" />
-            {isPrinting ? "Printing..." : "Print"}
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Print Documents</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {invoice && load && (
-              <div className="space-y-3">
-                <Card className="cursor-pointer hover:bg-gray-50 border-2 border-blue-200 bg-blue-50" onClick={handlePrintRateConAndInvoice}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center">
-                      <FileText className="h-4 w-4 mr-2 text-blue-700" />
-                      Print Invoice & POD
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-xs text-gray-600">
-                      Invoice: {invoice.invoiceNumber} • Load: {load.number_109 || load.number109} • ${invoice.totalAmount}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Includes: Invoice{load.podDocumentPath ? ' and POD Images' : ' only'}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Print Button - Direct Action */}
+      <Button 
+        variant="outline" 
+        size={size} 
+        disabled={isPrinting}
+        onClick={invoice && load ? handlePrintRateConAndInvoice : handlePrintInvoice}
+        data-testid="button-print"
+        aria-label={invoice && load ? "Print Invoice and POD" : "Print Invoice"}
+        className="shrink-0"
+      >
+        <Printer className="h-4 w-4 mr-2" />
+        {isPrinting ? "Printing..." : "Print"}
+      </Button>
     </div>
   );
 }
