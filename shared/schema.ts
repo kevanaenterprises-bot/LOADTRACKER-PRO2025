@@ -171,6 +171,7 @@ export const invoices = pgTable("invoices", {
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
   status: varchar("status").default("draft"), // draft, awaiting_pod, finalized, printed, emailed
   podUrl: varchar("pod_url"), // POD document path attached to this invoice
+  podData: text("pod_data"), // Base64 encoded POD content embedded directly in invoice
   podChecksum: varchar("pod_checksum"), // SHA256 checksum for data integrity
   podAttachedAt: timestamp("pod_attached_at"), // When POD was attached to invoice
   finalizedAt: timestamp("finalized_at"), // When invoice was finalized with POD
