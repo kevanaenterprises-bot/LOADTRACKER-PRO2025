@@ -8,7 +8,6 @@ import Dashboard from "@/pages/Dashboard";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
-import EmergencyAdmin from "@/pages/EmergencyAdmin";
 import Chat from "@/pages/Chat";
 import NotFound from "@/pages/not-found";
 
@@ -17,7 +16,6 @@ function Router() {
     <Switch>
       {/* Authentication Pages */}
       <Route path="/admin-login" component={AdminLogin} />
-      <Route path="/emergency-admin" component={EmergencyAdmin} /> {/* Emergency access */}
       <Route path="/driver-login" component={DriverLogin} />
       <Route path="/login" component={DriverLogin} /> {/* Backward compatibility */}
       
