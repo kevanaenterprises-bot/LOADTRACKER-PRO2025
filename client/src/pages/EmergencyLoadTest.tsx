@@ -17,10 +17,18 @@ export default function EmergencyLoadTest() {
     try {
       // Step 1: Admin login
       setResult(prev => prev + "Step 1: Admin login...\n");
+      const adminUsername = import.meta.env.VITE_EMERGENCY_ADMIN_USERNAME;
+      const adminPassword = import.meta.env.VITE_EMERGENCY_ADMIN_PASSWORD;
+      
+      if (!adminUsername || !adminPassword) {
+        setResult(prev => prev + "✗ Admin credentials not configured in environment\n");
+        return;
+      }
+      
       const loginResponse = await fetch("/api/auth/admin-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: "admin", password: "go4fc2024" }),
+        body: JSON.stringify({ username: adminUsername, password: adminPassword }),
         credentials: "include",
       });
       
