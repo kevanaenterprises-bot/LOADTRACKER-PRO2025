@@ -4031,6 +4031,47 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // AUTO-EMAIL FUNCTION - Sends invoice email programmatically
+  async function sendInvoiceEmail(invoiceNumber: string, emailAddress: string, loadId: string): Promise<{success: boolean, error?: string}> {
+    try {
+      console.log(`📧 Starting auto-email for invoice ${invoiceNumber} to ${emailAddress}`);
+      
+      // Get invoice and load data
+      const invoice = await storage.getInvoice(invoiceNumber);
+      if (!invoice) {
+        return { success: false, error: `Invoice ${invoiceNumber} not found` };
+      }
+      
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return { success: false, error: `Load ${loadId} not found` };
+      }
+      
+      // Generate email HTML using existing function
+      const emailHTML = await generateInvoiceHTML(invoice, load);
+      const subject = `Invoice ${invoice.invoiceNumber} - GO 4 Farms & Cattle`;
+      
+      // Send email using existing email service
+      const { sendEmail } = await import('./emailService');
+      const emailResult = await sendEmail({
+        to: emailAddress,
+        subject,
+        html: emailHTML
+      });
+      
+      if (emailResult.messageId) {
+        console.log(`✅ Auto-email sent successfully: ${emailResult.messageId}`);
+        return { success: true };
+      } else {
+        return { success: false, error: 'Email send failed - no message ID returned' };
+      }
+      
+    } catch (error) {
+      console.error(`❌ Auto-email error:`, error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  }
+
   // CENTRALIZED AUTO-INVOICE FUNCTION - Used by both POD upload routes
   async function ensureAutoInvoice(load: any): Promise<void> {
     if (!['delivered', 'completed', 'awaiting_invoicing'].includes(load.status)) {
@@ -4092,12 +4133,43 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`📄 ${allPodSnapshots.length} POD(s) found and embedded into auto invoice for load ${load.number109}`);
       }
       
+      // Set customer ID on invoice if load has customer
+      if (load.customerId) {
+        invoiceData.customerId = load.customerId;
+      }
+      
       const invoice = await storage.createInvoice(invoiceData);
       
       // Update load status to awaiting_payment
       await storage.updateLoadStatus(load.id, 'awaiting_payment');
       
       console.log(`✅ Auto-invoice created: ${invoice.invoiceNumber} for ${load.number109}`);
+      
+      // 🚀 AUTO-EMAIL LOGIC: If load has customer with email, send invoice automatically
+      if (load.customerId) {
+        try {
+          const customer = await storage.getCustomer(load.customerId);
+          if (customer && customer.email) {
+            console.log(`📧 Auto-emailing invoice ${invoice.invoiceNumber} to customer ${customer.name} (${customer.email})`);
+            
+            // Call the existing email API endpoint internally
+            const emailResult = await sendInvoiceEmail(invoice.invoiceNumber, customer.email, load.id);
+            
+            if (emailResult.success) {
+              console.log(`✅ Auto-email successful: Invoice ${invoice.invoiceNumber} sent to ${customer.email}`);
+            } else {
+              console.error(`❌ Auto-email failed: ${emailResult.error}`);
+            }
+          } else {
+            console.log(`⚠️ Customer ${load.customerId} has no email address - skipping auto-email`);
+          }
+        } catch (emailError) {
+          console.error(`❌ Auto-email error for invoice ${invoice.invoiceNumber}:`, emailError);
+          // Don't throw - let the invoice creation succeed even if email fails
+        }
+      } else {
+        console.log(`⚠️ Load ${load.number109} has no customer assigned - skipping auto-email`);
+      }
     } catch (invoiceError) {
       console.error(`❌ Failed to create auto-invoice for ${load.number109}:`, invoiceError);
       throw invoiceError;
