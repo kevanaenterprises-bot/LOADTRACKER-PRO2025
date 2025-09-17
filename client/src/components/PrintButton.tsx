@@ -265,37 +265,130 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
             ${combinedHTML}
           </div>
           <script>
-            function handleEmailInvoice() {
-              const email = prompt('Enter recipient email address:');
-              if (email && email.includes('@')) {
-                // Call email API
-                fetch('/api/invoices/${invoiceIdentifier}/email', {
-                  method: 'POST',
+            let customers = [];
+            
+            // Load customers when page loads
+            window.addEventListener('load', async function() {
+              try {
+                const response = await fetch('/api/customers', {
+                  method: 'GET',
                   headers: {
-                    'Content-Type': 'application/json',
                     'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
                   },
-                  credentials: 'include',
-                  body: JSON.stringify({ 
-                    email: email,
-                    loadId: '${load?.id || ''}'
-                  })
-                })
-                .then(response => response.json())
-                .then(data => {
+                  credentials: 'include'
+                });
+                if (response.ok) {
+                  customers = await response.json();
+                  console.log('✅ Loaded', customers.length, 'customers for email dropdown');
+                }
+              } catch (error) {
+                console.error('Failed to load customers:', error);
+              }
+            });
+            
+            function handleEmailInvoice() {
+              // Create modal dialog with customer dropdown
+              const modal = document.createElement('div');
+              modal.style.cssText = \`
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                background: rgba(0,0,0,0.5); z-index: 10000; 
+                display: flex; align-items: center; justify-content: center;
+              \`;
+              
+              const dialog = document.createElement('div');
+              dialog.style.cssText = \`
+                background: white; padding: 30px; border-radius: 8px; 
+                max-width: 500px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+              \`;
+              
+              dialog.innerHTML = \`
+                <h3 style="margin-top: 0; color: #333;">📧 Email Invoice</h3>
+                <div style="margin: 20px 0;">
+                  <label style="display: block; margin-bottom: 8px; font-weight: bold;">Select Customer:</label>
+                  <select id="customerSelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <option value="">-- Select Customer --</option>
+                    \${customers.map(customer => 
+                      \`<option value="\${customer.email || ''}" data-name="\${customer.name || 'Unknown'}">\${customer.name || 'Unnamed Customer'} \${customer.email ? '(' + customer.email + ')' : '(No Email)'}</option>\`
+                    ).join('')}
+                  </select>
+                </div>
+                <div style="margin: 20px 0;">
+                  <label style="display: block; margin-bottom: 8px; font-weight: bold;">Email Address:</label>
+                  <input type="email" id="emailInput" placeholder="customer@company.com" 
+                         style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 25px;">
+                  <button id="sendBtn" style="flex: 1; padding: 10px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">📧 Send Email</button>
+                  <button id="cancelBtn" style="flex: 1; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Cancel</button>
+                </div>
+              \`;
+              
+              modal.appendChild(dialog);
+              document.body.appendChild(modal);
+              
+              // Customer selection handler
+              const customerSelect = dialog.querySelector('#customerSelect');
+              const emailInput = dialog.querySelector('#emailInput');
+              
+              customerSelect.addEventListener('change', function() {
+                emailInput.value = this.value;
+              });
+              
+              // Send button handler
+              dialog.querySelector('#sendBtn').addEventListener('click', async function() {
+                const email = emailInput.value.trim();
+                const selectedCustomer = customerSelect.options[customerSelect.selectedIndex];
+                const customerName = selectedCustomer ? selectedCustomer.getAttribute('data-name') : '';
+                
+                if (!email || !email.includes('@')) {
+                  alert('Please enter a valid email address.');
+                  return;
+                }
+                
+                // Call email API
+                try {
+                  const response = await fetch('/api/invoices/${invoiceIdentifier}/email', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ 
+                      email: email,
+                      loadId: '${load?.id || ''}'
+                    })
+                  });
+                  
+                  const data = await response.json();
+                  document.body.removeChild(modal);
+                  
                   if (data.success) {
-                    alert('✅ Email sent successfully to ' + email);
+                    alert('✅ Email sent successfully to ' + (customerName ? customerName + ' (' + email + ')' : email));
                   } else {
                     alert('❌ Failed to send email: ' + (data.message || 'Unknown error'));
                   }
-                })
-                .catch(error => {
+                } catch (error) {
+                  document.body.removeChild(modal);
                   console.error('Email error:', error);
                   alert('❌ Failed to send email: ' + error.message);
-                });
-              } else if (email !== null) {
-                alert('Please enter a valid email address.');
-              }
+                }
+              });
+              
+              // Cancel button handler
+              dialog.querySelector('#cancelBtn').addEventListener('click', function() {
+                document.body.removeChild(modal);
+              });
+              
+              // Close on background click
+              modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                  document.body.removeChild(modal);
+                }
+              });
+              
+              // Focus the customer dropdown
+              customerSelect.focus();
             }
           </script>
         </body>
