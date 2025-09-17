@@ -64,7 +64,7 @@ export interface IStorage {
   updateLoad(id: string, updates: Partial<Load>): Promise<Load>;
   updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load>;
   forceUpdateLoadStatus(id: string, status: string, timestamp?: Date, userId?: string): Promise<Load>;
-  updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load>;
+  updateLoadBOL(id: string, bolNumber: string, tripNumber: string, lumperFee?: number, extraStopsFee?: number): Promise<Load>;
   updateLoadBOLDocument(id: string, bolDocumentPath: string): Promise<Load>;
   updateLoadPOD(id: string, podDocumentPath: string): Promise<Load>;
   getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]>;
@@ -525,10 +525,24 @@ export class DatabaseStorage implements IStorage {
     return updatedLoad;
   }
 
-  async updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load> {
+  async updateLoadBOL(id: string, bolNumber: string, tripNumber: string, lumperFee?: number, extraStopsFee?: number): Promise<Load> {
+    const updateData: any = { 
+      bolNumber, 
+      tripNumber, 
+      updatedAt: new Date() 
+    };
+    
+    // Add fee data if provided
+    if (lumperFee !== undefined && lumperFee > 0) {
+      updateData.lumperCharge = lumperFee.toString();
+    }
+    if (extraStopsFee !== undefined && extraStopsFee > 0) {
+      updateData.extraStops = extraStopsFee.toString();
+    }
+    
     const [updatedLoad] = await db
       .update(loads)
-      .set({ bolNumber, tripNumber, updatedAt: new Date() })
+      .set(updateData)
       .where(eq(loads.id, id))
       .returning();
 

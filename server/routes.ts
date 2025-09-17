@@ -4548,7 +4548,7 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   }, async (req, res) => {
     try {
-      const { bolNumber, tripNumber, override } = req.body;
+      const { bolNumber, tripNumber, lumperFee, extraStopsFee, override } = req.body;
       
       // Validate trip number format (4 digits)
       if (!/^\d{4}$/.test(tripNumber)) {
@@ -4565,7 +4565,7 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log("🔐 Override flag detected - skipping duplicate BOL check for", bolNumber);
       }
 
-      const load = await storage.updateLoadBOL(req.params.id, bolNumber, tripNumber);
+      const load = await storage.updateLoadBOL(req.params.id, bolNumber, tripNumber, lumperFee, extraStopsFee);
       res.json(load);
     } catch (error) {
       console.error("Error updating load BOL:", error);
