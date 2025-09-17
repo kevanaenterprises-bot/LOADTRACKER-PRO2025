@@ -1216,10 +1216,21 @@ export default function LoadsTable() {
                 </div>
               </div>
 
-              {/* Invoice Fields - Lumper Fees and Extra Stops */}
+              {/* Invoice Fields - Trip Rate, Lumper Fees and Extra Stops */}
               <div>
-                <h4 className="font-semibold mb-2">Additional Charges for Invoice</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
+                <h4 className="font-semibold mb-2">Invoice Amounts</h4>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <label className="text-xs text-gray-600 block">Trip Rate ($)</label>
+                    <input 
+                      type="number" 
+                      step="0.01"
+                      defaultValue={selectedLoad.tripRate || '0.00'}
+                      className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'tripRate', e.target.value)}
+                      data-testid={`input-trip-rate-${selectedLoad.id}`}
+                    />
+                  </div>
                   <div>
                     <label className="text-xs text-gray-600 block">Lumper Fees ($)</label>
                     <input 
@@ -1228,6 +1239,7 @@ export default function LoadsTable() {
                       defaultValue={selectedLoad.lumperCharge || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'lumperCharge', e.target.value)}
+                      data-testid={`input-lumper-charge-${selectedLoad.id}`}
                     />
                   </div>
                   <div>
@@ -1238,6 +1250,7 @@ export default function LoadsTable() {
                       defaultValue={selectedLoad.extraStops || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
+                      data-testid={`input-extra-stops-${selectedLoad.id}`}
                     />
                   </div>
                 </div>

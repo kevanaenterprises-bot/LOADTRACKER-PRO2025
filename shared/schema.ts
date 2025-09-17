@@ -70,6 +70,7 @@ export const loads = pgTable("loads", {
   signedAt: timestamp("signed_at"),
   extraStops: decimal("extra_stops", { precision: 10, scale: 2 }).default("0.00"), // Extra stops charge amount
   lumperCharge: decimal("lumper_charge", { precision: 10, scale: 2 }).default("0.00"), // Lumper charge amount
+  tripRate: decimal("trip_rate", { precision: 10, scale: 2 }).default("0.00"), // Manual trip rate override
   flatRate: decimal("flat_rate", { precision: 10, scale: 2 }).default("0.00"), // Flat rate for this specific load
   // OCR-extracted fields from Rate Con
   poNumber: varchar("po_number"),

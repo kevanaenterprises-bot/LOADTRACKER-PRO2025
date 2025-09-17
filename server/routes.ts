@@ -2968,7 +2968,9 @@ Reply YES to confirm acceptance or NO to decline.`
       }
       
       // Recalculate invoice amounts with current load charges
-      const flatRate = parseFloat(rate.flatRate.toString());
+      // Use tripRate if specified, otherwise fall back to database flat rate
+      const tripRate = parseFloat(load.tripRate?.toString() || "0");
+      const flatRate = tripRate > 0 ? tripRate : parseFloat(rate.flatRate.toString());
       const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
       const extraStopsCharge = parseFloat(load.extraStops?.toString() || "0");
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
@@ -4445,10 +4447,11 @@ Reply YES to confirm acceptance or NO to decline.`
       }
 
       // Calculate invoice amount based on flat rate system
-      const flatRate = parseFloat(rate.flatRate.toString());
+      // Use tripRate if specified, otherwise fall back to database flat rate
+      const tripRate = parseFloat(load.tripRate?.toString() || "0");
+      const flatRate = tripRate > 0 ? tripRate : parseFloat(rate.flatRate.toString());
       const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
-      const extraStops = parseFloat(load.extraStops?.toString() || "0");
-      const extraStopsCharge = extraStops * 50;
+      const extraStopsCharge = parseFloat(load.extraStops?.toString() || "0");
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
 
       // Generate sequential invoice number starting with GO6000
@@ -4460,7 +4463,7 @@ Reply YES to confirm acceptance or NO to decline.`
         loadId: load.id,
         customerId: customerId || undefined,
         invoiceNumber,
-        flatRate: rate.flatRate,
+        flatRate: flatRate.toFixed(2), // Use the actual rate used (including tripRate override)
         lumperCharge: load.lumperCharge || "0.00",
         extraStopsCharge: extraStopsCharge.toString(),
         extraStopsCount: parseFloat(load.extraStops?.toString() || "0"),
