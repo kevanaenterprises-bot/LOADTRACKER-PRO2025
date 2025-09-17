@@ -57,6 +57,7 @@ export const loads = pgTable("loads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   number109: varchar("number_109").notNull().unique(),
   driverId: varchar("driver_id").references(() => users.id),
+  customerId: varchar("customer_id").references(() => customers.id),
   locationId: varchar("location_id").references(() => locations.id),
   pickupLocationId: varchar("pickup_location_id").references(() => locations.id),
   estimatedMiles: integer("estimated_miles"),

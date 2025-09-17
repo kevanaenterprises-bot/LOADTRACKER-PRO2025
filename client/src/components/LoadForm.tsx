@@ -67,6 +67,7 @@ export default function LoadForm() {
   const [currentLocationId, setCurrentLocationId] = useState("");
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
   const [stops, setStops] = useState<LoadStop[]>([]);
+  const [customerId, setCustomerId] = useState("");
   const [showOverride, setShowOverride] = useState(false);
   const [overridePassword, setOverridePassword] = useState("");
 
@@ -76,8 +77,14 @@ export default function LoadForm() {
     refetchOnWindowFocus: false,
   });
 
+  const { data: customers = [] } = useQuery<any[]>({
+    queryKey: ["/api/customers"],
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
   const createLoadMutation = useMutation({
-    mutationFn: async (data: { number109: string; stops: LoadStop[]; overridePassword?: string }) => {
+    mutationFn: async (data: { number109: string; stops: LoadStop[]; customerId?: string; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
       if (data.stops.length === 0) {
         throw new Error("Please add at least one stop");
@@ -93,6 +100,7 @@ export default function LoadForm() {
       setCurrentLocationId("");
       setCurrentStopType("pickup");
       setStops([]);
+      setCustomerId("");
       setShowOverride(false);
       setOverridePassword("");
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
@@ -188,6 +196,7 @@ export default function LoadForm() {
     const submitData = {
       number109: loadNumber,
       stops,
+      ...(customerId ? { customerId } : {}),
       ...(showOverride && overridePassword ? { overridePassword } : {}),
     };
     createLoadMutation.mutate(submitData);
@@ -228,6 +237,33 @@ export default function LoadForm() {
             placeholder="109-2024-001"
             className="text-lg"
           />
+        </div>
+
+        {/* Step 1.5: Customer Selection */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Customer for Invoice</Label>
+          <Select value={customerId} onValueChange={setCustomerId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select customer to invoice (optional)" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">-- No Customer (Manual Invoice) --</SelectItem>
+              {customers.length > 0 ? (
+                customers.map((customer: any) => (
+                  <SelectItem key={customer.id} value={customer.id}>
+                    {customer.name} {customer.email ? `(${customer.email})` : '(No Email)'}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-customers" disabled>
+                  No customers available
+                </SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-gray-500">
+            Select customer for auto-emailing invoices when POD is uploaded
+          </p>
         </div>
 
         {/* Override Password Field - shown when duplicate detected */}
