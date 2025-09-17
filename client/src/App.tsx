@@ -9,7 +9,6 @@ import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
 import Chat from "@/pages/Chat";
-import QuickAuthTest from "@/pages/QuickAuthTest";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -19,7 +18,6 @@ function Router() {
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/driver-login" component={DriverLogin} />
       <Route path="/login" component={DriverLogin} /> {/* Backward compatibility */}
-      <Route path="/auth-test" component={QuickAuthTest} /> {/* Debug auth */}
       
       {/* Main Application Pages */}
       <Route path="/dashboard" component={Dashboard} />

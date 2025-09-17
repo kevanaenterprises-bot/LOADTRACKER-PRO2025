@@ -55,8 +55,10 @@ export default function AdminLogin() {
         await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         await queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
         
-        // Navigate to dashboard
-        setLocation("/dashboard");
+        // Add a small delay to ensure session is saved before redirect
+        setTimeout(() => {
+          setLocation("/dashboard");
+        }, 1000);
       } else {
         const data = await response.json();
         toast({
