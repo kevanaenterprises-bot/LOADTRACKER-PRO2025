@@ -196,6 +196,19 @@ export default function LoadsTable() {
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
     try {
+      // Validate loadId to prevent empty ID causing API errors
+      if (!loadId || loadId.trim() === '') {
+        console.error('❌ Cannot update financials: Load ID is empty or undefined');
+        toast({
+          title: "Update Failed",
+          description: "Load ID is missing. Please refresh the page and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log(`💰 Updating load ${loadId} financial field '${field}' to '${value}'`);
+      
       const response = await fetch(`/api/loads/${loadId}/financials`, {
         method: 'PATCH',
         headers: {
@@ -207,7 +220,8 @@ export default function LoadsTable() {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to update load financials');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to update load financials');
       }
       
       // Update the selected load state immediately for UI feedback
@@ -1227,8 +1241,19 @@ export default function LoadsTable() {
                       step="0.01"
                       defaultValue={selectedLoad.tripRate || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
-                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'tripRate', e.target.value)}
-                      data-testid={`input-trip-rate-${selectedLoad.id}`}
+                      onBlur={(e) => {
+                        if (selectedLoad?.id) {
+                          updateLoadFinancials(selectedLoad.id, 'tripRate', e.target.value);
+                        } else {
+                          console.error('❌ Cannot update trip rate: selectedLoad.id is missing', selectedLoad);
+                          toast({
+                            title: "Update Failed", 
+                            description: "Load information is missing. Please close and reopen this dialog.",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                      data-testid={`input-trip-rate-${selectedLoad.id || 'no-id'}`}
                     />
                   </div>
                   <div>
@@ -1238,8 +1263,19 @@ export default function LoadsTable() {
                       step="0.01"
                       defaultValue={selectedLoad.lumperCharge || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
-                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'lumperCharge', e.target.value)}
-                      data-testid={`input-lumper-charge-${selectedLoad.id}`}
+                      onBlur={(e) => {
+                        if (selectedLoad?.id) {
+                          updateLoadFinancials(selectedLoad.id, 'lumperCharge', e.target.value);
+                        } else {
+                          console.error('❌ Cannot update lumper charge: selectedLoad.id is missing', selectedLoad);
+                          toast({
+                            title: "Update Failed", 
+                            description: "Load information is missing. Please close and reopen this dialog.",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                      data-testid={`input-lumper-charge-${selectedLoad.id || 'no-id'}`}
                     />
                   </div>
                   <div>
@@ -1249,8 +1285,19 @@ export default function LoadsTable() {
                       step="0.01"
                       defaultValue={selectedLoad.extraStops || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
-                      onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
-                      data-testid={`input-extra-stops-${selectedLoad.id}`}
+                      onBlur={(e) => {
+                        if (selectedLoad?.id) {
+                          updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value);
+                        } else {
+                          console.error('❌ Cannot update extra stops: selectedLoad.id is missing', selectedLoad);
+                          toast({
+                            title: "Update Failed", 
+                            description: "Load information is missing. Please close and reopen this dialog.",
+                            variant: "destructive"
+                          });
+                        }
+                      }}
+                      data-testid={`input-extra-stops-${selectedLoad.id || 'no-id'}`}
                     />
                   </div>
                 </div>
