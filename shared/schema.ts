@@ -172,6 +172,9 @@ export const invoices = pgTable("invoices", {
   extraStopsCount: integer("extra_stops_count").default(0),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
   status: varchar("status").default("draft"), // draft, awaiting_pod, finalized, printed, emailed
+  emailStatus: varchar("email_status").default("pending"), // pending, sent, failed
+  emailSentAt: timestamp("email_sent_at"), // When email was successfully sent
+  emailRecipient: varchar("email_recipient"), // Email address invoice was sent to
   podUrl: varchar("pod_url"), // POD document path attached to this invoice
   podChecksum: varchar("pod_checksum"), // SHA256 checksum for data integrity
   podAttachedAt: timestamp("pod_attached_at"), // When POD was attached to invoice

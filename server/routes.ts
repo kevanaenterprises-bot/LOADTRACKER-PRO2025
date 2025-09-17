@@ -4150,21 +4150,50 @@ Reply YES to confirm acceptance or NO to decline.`
         try {
           const customer = await storage.getCustomer(load.customerId);
           if (customer && customer.email) {
-            console.log(`📧 Auto-emailing invoice ${invoice.invoiceNumber} to customer ${customer.name} (${customer.email})`);
-            
-            // Call the existing email API endpoint internally
-            const emailResult = await sendInvoiceEmail(invoice.invoiceNumber, customer.email, load.id);
-            
-            if (emailResult.success) {
-              console.log(`✅ Auto-email successful: Invoice ${invoice.invoiceNumber} sent to ${customer.email}`);
+            // Check if email was already sent to prevent duplicates
+            if (invoice.emailStatus === 'sent') {
+              console.log(`⚠️ Invoice ${invoice.invoiceNumber} already emailed to ${invoice.emailRecipient} - skipping duplicate send`);
             } else {
-              console.error(`❌ Auto-email failed: ${emailResult.error}`);
+              console.log(`📧 Auto-emailing invoice ${invoice.invoiceNumber} to customer ${customer.name} (${customer.email})`);
+              
+              // Update invoice email status to prevent concurrent sends
+              await storage.updateInvoice(invoice.invoiceNumber, { 
+                emailStatus: 'sending',
+                emailRecipient: customer.email 
+              });
+              
+              // Call the existing email API endpoint internally
+              const emailResult = await sendInvoiceEmail(invoice.invoiceNumber, customer.email, load.id);
+              
+              if (emailResult.success) {
+                // Mark email as successfully sent
+                await storage.updateInvoice(invoice.invoiceNumber, { 
+                  emailStatus: 'sent',
+                  emailSentAt: new Date(),
+                  status: 'emailed'
+                });
+                console.log(`✅ Auto-email successful: Invoice ${invoice.invoiceNumber} sent to ${customer.email}`);
+              } else {
+                // Mark email as failed
+                await storage.updateInvoice(invoice.invoiceNumber, { 
+                  emailStatus: 'failed'
+                });
+                console.error(`❌ Auto-email failed: ${emailResult.error}`);
+              }
             }
           } else {
             console.log(`⚠️ Customer ${load.customerId} has no email address - skipping auto-email`);
           }
         } catch (emailError) {
           console.error(`❌ Auto-email error for invoice ${invoice.invoiceNumber}:`, emailError);
+          // Mark email as failed if there was an error
+          try {
+            await storage.updateInvoice(invoice.invoiceNumber, { 
+              emailStatus: 'failed'
+            });
+          } catch (updateError) {
+            console.error(`❌ Failed to update email status after error:`, updateError);
+          }
           // Don't throw - let the invoice creation succeed even if email fails
         }
       } else {

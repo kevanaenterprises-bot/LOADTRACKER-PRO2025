@@ -861,7 +861,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createInvoice(invoice: InsertInvoice): Promise<Invoice> {
-    const [newInvoice] = await db.insert(invoices).values(invoice).returning();
+    const [newInvoice] = await db.insert(invoices).values([invoice]).returning();
     return newInvoice;
   }
 
