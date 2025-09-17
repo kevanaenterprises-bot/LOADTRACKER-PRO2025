@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
+import path from "path";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, getSession } from "./replitAuth";
 import { ObjectStorageService } from "./objectStorage";
@@ -6064,6 +6065,14 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+
+  // SPA FALLBACK: Serve index.html for all non-API, non-static routes (CRITICAL FOR PRODUCTION)
+  // This ensures direct navigation to /admin-login, /driver-login, /, etc. works
+  // Exclude /api/ and /assets/ routes from SPA fallback
+  app.get(/^\/(?!api\/|assets\/).*/, (req, res) => {
+    console.log(`📄 SPA FALLBACK: Serving index.html for ${req.path}`);
+    res.sendFile(path.resolve(process.cwd(), 'server/public/index.html'));
+  });
 
   // Create and return HTTP server
   const server = createServer(app);
