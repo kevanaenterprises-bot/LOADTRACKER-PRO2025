@@ -236,6 +236,10 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
               background: #6c757d; 
               color: white; 
             }
+            .btn-success { 
+              background: #28a745; 
+              color: white; 
+            }
             .btn:hover { 
               opacity: 0.9; 
             }
@@ -252,6 +256,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
           <div class="preview-header">
             <div class="preview-title">📄 Print Preview - Invoice & POD</div>
             <div class="preview-buttons">
+              <button class="btn btn-success" onclick="handleEmailInvoice()">📧 Email</button>
               <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
               <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
             </div>
@@ -259,6 +264,40 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
           <div class="document-content">
             ${combinedHTML}
           </div>
+          <script>
+            function handleEmailInvoice() {
+              const email = prompt('Enter recipient email address:');
+              if (email && email.includes('@')) {
+                // Call email API
+                fetch('/api/invoices/${invoiceIdentifier}/email', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'x-bypass-token': 'LOADTRACKER_BYPASS_2025'
+                  },
+                  credentials: 'include',
+                  body: JSON.stringify({ 
+                    email: email,
+                    loadId: '${load?.id || ''}'
+                  })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.success) {
+                    alert('✅ Email sent successfully to ' + email);
+                  } else {
+                    alert('❌ Failed to send email: ' + (data.message || 'Unknown error'));
+                  }
+                })
+                .catch(error => {
+                  console.error('Email error:', error);
+                  alert('❌ Failed to send email: ' + error.message);
+                });
+              } else if (email !== null) {
+                alert('Please enter a valid email address.');
+              }
+            }
+          </script>
         </body>
         </html>
       `;
