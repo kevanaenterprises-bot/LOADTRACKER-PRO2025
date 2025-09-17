@@ -87,18 +87,24 @@ export default function Dashboard() {
     }
   }, [isAuthenticated, isLoading]);
 
-  // Redirect to login if not authenticated
+  // Redirect to login if not authenticated (with longer timeout to allow admin session to load)
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Please log in...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        setLocation("/");
-      }, 500);
-      return;
+      // Wait a bit longer before redirecting to allow admin session to be recognized
+      const redirectTimer = setTimeout(() => {
+        if (!isAuthenticated && !isLoading) {
+          toast({
+            title: "Unauthorized",
+            description: "You are logged out. Please log in...",
+            variant: "destructive",
+          });
+          setTimeout(() => {
+            setLocation("/");
+          }, 500);
+        }
+      }, 2000); // Wait 2 seconds before redirecting
+
+      return () => clearTimeout(redirectTimer);
     }
   }, [isAuthenticated, isLoading, toast, setLocation]);
 
@@ -258,12 +264,39 @@ export default function Dashboard() {
     }
   };
 
-  if (isLoading || !isAuthenticated) {
+  // Give admin authentication more time to load (up to 5 seconds)
+  const [authTimeout, setAuthTimeout] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAuthTimeout(true);
+    }, 5000);
+    
+    if (isAuthenticated) {
+      clearTimeout(timer);
+    }
+    
+    return () => clearTimeout(timer);
+  }, [isAuthenticated]);
+
+  if ((isLoading || !isAuthenticated) && !authTimeout) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">Loading dashboard... {authType === 'loading' ? '(Checking authentication)' : ''}</p>
+          <p className="text-xs text-gray-400 mt-2">If you just logged in, please wait a moment</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated && authTimeout) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Authentication timed out</p>
+          <Button onClick={() => setLocation("/admin-login")}>Return to Login</Button>
         </div>
       </div>
     );
