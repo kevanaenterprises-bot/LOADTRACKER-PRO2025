@@ -2734,6 +2734,107 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Force status update - bypasses business rules (for admin/driver emergencies)
+  app.patch("/api/loads/:id/force-status", (req, res, next) => {
+    // SECURITY: Restrict authorization - admin only OR driver assigned to this specific load
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasDriverAuth = !!(req.session as any)?.driverAuth;
+    
+    // Only allow bypass token in development environment for authenticated sessions
+    const hasTokenBypass = process.env.NODE_ENV === 'development' && 
+                           req.headers['x-bypass-token'] === BYPASS_SECRET &&
+                           (hasAdminAuth || hasDriverAuth); // Must still have valid session
+    
+    const hasBasicAuth = hasAdminAuth || hasReplitAuth || hasDriverAuth || hasTokenBypass;
+    
+    console.log("🔒 FORCE STATUS AUTH CHECK:", {
+      hasAdminAuth,
+      hasReplitAuth,
+      hasDriverAuth,
+      hasTokenBypass: !!hasTokenBypass,
+      nodeEnv: process.env.NODE_ENV,
+      finalAuth: hasBasicAuth
+    });
+    
+    if (!hasBasicAuth) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    
+    // Store auth context for later authorization check
+    // SECURITY: Only explicit admin role should be treated as admin, not any Replit user
+    const adminSession = (req.session as any)?.adminAuth;
+    const driverSession = (req.session as any)?.driverAuth;
+    const isExplicitAdmin = adminSession?.role === 'admin';
+    
+    (req as any).authContext = {
+      isAdmin: isExplicitAdmin,
+      driverAuth: driverSession,
+      userId: isExplicitAdmin ? adminSession.id : driverSession?.userId || 'unknown'
+    };
+    
+    next();
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      const { status } = req.body;
+      const authContext = (req as any).authContext;
+      
+      console.log("🚨 FORCE STATUS UPDATE REQUEST:", {
+        loadId,
+        requestedStatus: status,
+        authContext,
+        userAgent: req.headers['user-agent']?.substring(0, 50)
+      });
+      
+      // Validate status input
+      const validStatuses = ["pending", "created", "assigned", "in_progress", "in_transit", "en_route_pickup", 
+        "at_shipper", "left_shipper", "en_route_receiver", "at_receiver", "delivered", "empty", 
+        "awaiting_invoicing", "awaiting_payment", "invoiced", "paid", "completed"];
+      
+      if (!status || !validStatuses.includes(status)) {
+        return res.status(400).json({ 
+          message: "Valid status is required", 
+          validStatuses 
+        });
+      }
+      
+      // Get the load to check driver assignment
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // SECURITY: Additional authorization check
+      if (!authContext.isAdmin) {
+        // If not admin, must be the assigned driver
+        if (!load.driverId || load.driverId !== authContext.userId) {
+          console.log(`🔒 AUTHORIZATION DENIED: Driver ${authContext.userId} attempted to force load ${loadId} assigned to ${load.driverId}`);
+          return res.status(403).json({ 
+            message: "Forbidden: You can only force loads assigned to you" 
+          });
+        }
+      }
+      
+      console.log(`🚨 FORCE updating load ${loadId} status to: ${status} (bypassing business rules)`);
+      console.log(`🔒 AUTHORIZED BY: ${authContext.isAdmin ? 'Admin' : `Driver ${authContext.userId}`}`);
+      
+      // Use direct storage method that bypasses business rules
+      const updatedLoad = await storage.forceUpdateLoadStatus(loadId, status, undefined, authContext.userId);
+      
+      console.log(`✅ Load status FORCE updated successfully: ${updatedLoad.status}`);
+      res.json(updatedLoad);
+    } catch (error) {
+      console.error("❌ Error force updating load status:", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : 'No stack trace',
+        loadId: req.params.id,
+        requestBody: req.body
+      });
+      res.status(500).json({ message: "Failed to force update load status" });
+    }
+  });
+
   // Assign driver to load - WITH TOKEN BYPASS (both endpoints for compatibility)
   app.patch("/api/loads/:id/assign", (req, res, next) => {
     // Check multiple auth methods: admin session, Replit auth, driver auth, OR token bypass

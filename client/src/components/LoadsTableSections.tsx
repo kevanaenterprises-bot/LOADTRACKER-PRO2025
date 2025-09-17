@@ -16,7 +16,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BatchPODUpload } from "@/components/BatchPODUpload";
-import { Upload } from "lucide-react";
+import { Upload, Zap } from "lucide-react";
 
 interface LoadSectionProps {
   loads: any[];
@@ -75,6 +75,29 @@ export function LoadSection({
     },
   });
 
+  // Force status update mutation (bypasses business rules)
+  const forceStatusUpdateMutation = useMutation({
+    mutationFn: async ({ loadId, status }: { loadId: string; status: string }) => {
+      return apiRequest(`/api/loads/${loadId}/force-status`, "PATCH", { status });
+    },
+    onSuccess: () => {
+      toast({ 
+        title: "Force Update Successful", 
+        description: "Load status forced to next stage (business rules bypassed)",
+        variant: "default"
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Force Update Failed", 
+        description: error.message || "Failed to force status update",
+        variant: "destructive"
+      });
+    },
+  });
+
   const assignDriverMutation = useMutation({
     mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
       return apiRequest(`/api/loads/${loadId}/assign`, "PATCH", { driverId });
@@ -111,6 +134,37 @@ export function LoadSection({
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
     } catch (error) {
       toast({ title: "Failed to mark as paid", variant: "destructive" });
+    }
+  };
+
+  const getNextStatus = (currentStatus: string): string | null => {
+    const statusProgression = {
+      "created": "assigned",
+      "assigned": "in_progress", 
+      "in_progress": "at_shipper",
+      "at_shipper": "left_shipper",
+      "left_shipper": "at_receiver",
+      "at_receiver": "delivered",
+      "delivered": "awaiting_invoicing",
+      "awaiting_invoicing": "awaiting_payment",
+      "awaiting_payment": "paid",
+      "paid": "completed"
+    };
+    return statusProgression[currentStatus as keyof typeof statusProgression] || null;
+  };
+
+  const forceToNextStage = (loadId: string, currentStatus: string) => {
+    const nextStatus = getNextStatus(currentStatus);
+    if (nextStatus) {
+      if (confirm(`⚠️ Are you sure you want to FORCE this load to "${nextStatus}" status? This will bypass all business rules and validations.`)) {
+        forceStatusUpdateMutation.mutate({ loadId, status: nextStatus });
+      }
+    } else {
+      toast({
+        title: "Cannot Force", 
+        description: "This load is already at the final stage or no next stage available",
+        variant: "destructive"
+      });
     }
   };
 
@@ -311,6 +365,20 @@ export function LoadSection({
                         </DialogContent>
                       </Dialog>
                     )}
+
+                    {/* Force to Next Stage button - Emergency action for stuck loads */}
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => forceToNextStage(load.id, load.status)}
+                      disabled={forceStatusUpdateMutation.isPending || !getNextStatus(load.status)}
+                      className="bg-orange-600 hover:bg-orange-700"
+                      title={`Force load to next stage: ${getNextStatus(load.status) || 'none available'}`}
+                      data-testid={`button-force-next-stage-${load.id}`}
+                    >
+                      <Zap className="h-4 w-4 mr-1" />
+                      Force Next
+                    </Button>
                     
                     <Button
                       size="sm"

@@ -50,6 +50,28 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
     },
   });
 
+  // Force status update mutation (bypasses business rules)
+  const forceStatusUpdateMutation = useMutation({
+    mutationFn: async ({ loadId, status }: { loadId: string; status: string }) => {
+      return await apiRequest(`/api/loads/${loadId}/force-status`, "PATCH", { status });
+    },
+    onSuccess: () => {
+      toast({ 
+        title: "Force Update Successful", 
+        description: "Load status forced to next stage (business rules bypassed)",
+        variant: "default"
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/drivers", driverId, "loads"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Force Update Failed", 
+        description: error.message || "Failed to force status update",
+        variant: "destructive"
+      });
+    },
+  });
+
   // Load return mutation
   const returnLoadMutation = useMutation({
     mutationFn: async (loadId: string) => {
@@ -87,6 +109,37 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
 
   const updateStatus = (loadId: string, newStatus: string) => {
     statusUpdateMutation.mutate({ loadId, status: newStatus });
+  };
+
+  const getNextStatus = (currentStatus: string): string | null => {
+    const statusProgression = {
+      "created": "assigned",
+      "assigned": "in_progress", 
+      "in_progress": "at_shipper",
+      "at_shipper": "left_shipper",
+      "left_shipper": "at_receiver",
+      "at_receiver": "delivered",
+      "delivered": "awaiting_invoicing",
+      "awaiting_invoicing": "awaiting_payment",
+      "awaiting_payment": "paid",
+      "paid": "completed"
+    };
+    return statusProgression[currentStatus as keyof typeof statusProgression] || null;
+  };
+
+  const forceToNextStage = (loadId: string, currentStatus: string) => {
+    const nextStatus = getNextStatus(currentStatus);
+    if (nextStatus) {
+      if (confirm(`⚠️ Are you sure you want to FORCE this load to "${nextStatus}" status? This will bypass all business rules and validations.`)) {
+        forceStatusUpdateMutation.mutate({ loadId, status: nextStatus });
+      }
+    } else {
+      toast({
+        title: "Cannot Force", 
+        description: "This load is already at the final stage or no next stage available",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isLoading) {
@@ -180,6 +233,17 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
                     data-testid={`button-sign-documents-${load.id}`}
                   >
                     Sign Documents
+                  </Button>
+
+                  <Button 
+                    onClick={() => forceToNextStage(load.id, load.status)}
+                    variant="destructive"
+                    size="sm"
+                    disabled={forceStatusUpdateMutation.isPending || !getNextStatus(load.status)}
+                    data-testid={`button-force-next-stage-${load.id}`}
+                    className="bg-orange-600 hover:bg-orange-700"
+                  >
+                    ⚡ Force Next Stage
                   </Button>
                 </>
               )}

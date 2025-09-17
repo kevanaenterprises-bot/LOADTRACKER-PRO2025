@@ -63,6 +63,7 @@ export interface IStorage {
   getLoadByNumber(number: string): Promise<LoadWithDetails | undefined>;
   updateLoad(id: string, updates: Partial<Load>): Promise<Load>;
   updateLoadStatus(id: string, status: string, timestamp?: Date): Promise<Load>;
+  forceUpdateLoadStatus(id: string, status: string, timestamp?: Date, userId?: string): Promise<Load>;
   updateLoadBOL(id: string, bolNumber: string, tripNumber: string): Promise<Load>;
   updateLoadBOLDocument(id: string, bolDocumentPath: string): Promise<Load>;
   updateLoadPOD(id: string, podDocumentPath: string): Promise<Load>;
@@ -433,6 +434,68 @@ export class DatabaseStorage implements IStorage {
     // Add status history
     await this.addStatusHistory(id, status);
 
+    return updatedLoad;
+  }
+
+  async forceUpdateLoadStatus(id: string, status: string, timestamp?: Date, userId?: string): Promise<Load> {
+    console.log(`🚨 FORCE STATUS UPDATE: Bypassing business rules for load ${id} -> ${status} by user ${userId || 'unknown'}`);
+    
+    const updateData: any = { status, updatedAt: new Date() };
+    
+    // Update specific timestamp fields based on status (same as regular update)
+    const now = timestamp || new Date();
+    switch (status) {
+      case "in_progress":
+      case "in_transit":
+        updateData.confirmedAt = now;
+        break;
+      case "en_route_pickup":
+        updateData.enRoutePickupAt = now;
+        break;
+      case "at_shipper":
+        updateData.atShipperAt = now;
+        break;
+      case "left_shipper":
+        updateData.leftShipperAt = now;
+        break;
+      case "en_route_receiver":
+        updateData.enRouteReceiverAt = now;
+        break;
+      case "at_receiver":
+        updateData.atReceiverAt = now;
+        break;
+      case "delivered":
+        updateData.deliveredAt = now;
+        break;
+      case "empty":
+        updateData.emptyAt = now;
+        break;
+      case "awaiting_invoicing":
+        updateData.awaitingInvoicingAt = now;
+        break;
+      case "awaiting_payment":
+        updateData.awaitingPaymentAt = now;
+        console.log(`🚨 FORCE: Moving to awaiting_payment WITHOUT invoice check by user ${userId || 'unknown'}`);
+        break;
+      case "completed":
+        updateData.completedAt = now;
+        break;
+      case "paid":
+        updateData.paidAt = now;
+        break;
+    }
+
+    const [updatedLoad] = await db
+      .update(loads)
+      .set(updateData)
+      .where(eq(loads.id, id))
+      .returning();
+
+    // Add status history with force note and user identification
+    const historyNote = `FORCE STATUS UPDATE by ${userId || 'unknown user'} - Business rules bypassed`;
+    await this.addStatusHistory(id, status, historyNote);
+
+    console.log(`✅ FORCE STATUS UPDATE COMPLETE: Load ${id} -> ${status} by user ${userId || 'unknown'}`);
     return updatedLoad;
   }
 
