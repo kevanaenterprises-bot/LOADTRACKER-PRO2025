@@ -4267,11 +4267,11 @@ Reply YES to confirm acceptance or NO to decline.`
                 invoiceData.finalizedAt = now;
                 invoiceData.status = "finalized";
                 
-                // Fetch POD snapshot data for embedding
-                const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
-                if (podSnapshot) {
-                  invoiceData.podSnapshot = podSnapshot;
-                  console.log(`📄 POD snapshot embedded into backfill invoice for load ${load.number109}`);
+                // Fetch ALL POD snapshot data for embedding (multi-page support)
+                const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
+                if (allPodSnapshots.length > 0) {
+                  invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
+                  console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into backfill invoice for load ${load.number109}`);
                 } else {
                   console.log(`⚠️ POD snapshot fetch failed for backfill invoice of load ${load.number109}`);
                 }
@@ -4377,11 +4377,11 @@ Reply YES to confirm acceptance or NO to decline.`
               invoiceData.finalizedAt = now;
               invoiceData.status = "finalized";
               
-              // Fetch POD snapshot data for embedding
-              const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
-              if (podSnapshot) {
-                invoiceData.podSnapshot = podSnapshot;
-                console.log(`📄 POD snapshot embedded into fix-payment invoice for load ${load.number109}`);
+              // Fetch ALL POD snapshot data for embedding (multi-page support)
+              const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
+              if (allPodSnapshots.length > 0) {
+                invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
+                console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into fix-payment invoice for load ${load.number109}`);
               } else {
                 console.log(`⚠️ POD snapshot fetch failed for fix-payment invoice of load ${load.number109}`);
               }
@@ -4478,11 +4478,11 @@ Reply YES to confirm acceptance or NO to decline.`
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized"; // Set to finalized since POD is embedded
         
-        // Fetch POD snapshot data for embedding
-        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
-        if (podSnapshot) {
-          invoiceData.podSnapshot = podSnapshot;
-          console.log(`📄 POD snapshot embedded into manual invoice for load ${load.number109}`);
+        // Fetch ALL POD snapshot data for embedding (multi-page support)
+        const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
+        if (allPodSnapshots.length > 0) {
+          invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
+          console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into manual invoice for load ${load.number109}`);
         } else {
           console.log(`⚠️ POD snapshot fetch failed for manual invoice of load ${load.number109}`);
         }
@@ -4702,11 +4702,11 @@ Reply YES to confirm acceptance or NO to decline.`
                 finalizedAt: now, // Mark as finalized immediately since BOL/POD is embedded
               };
               
-              // Fetch POD snapshot data for embedding
-              const podSnapshot = await fetchPodSnapshot(bolDocumentURL);
-              if (podSnapshot) {
-                invoiceData.podSnapshot = podSnapshot;
-                console.log(`📄 POD snapshot embedded into BOL-triggered invoice for load ${loadWithDetails.number109}`);
+              // Fetch ALL POD snapshot data for embedding (multi-page support)
+              const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(bolDocumentURL);
+              if (allPodSnapshots.length > 0) {
+                invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
+                console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into BOL-triggered invoice for load ${loadWithDetails.number109}`);
               } else {
                 console.log(`⚠️ POD snapshot fetch failed for BOL-triggered invoice of load ${loadWithDetails.number109}`);
               }
@@ -4826,11 +4826,11 @@ Reply YES to confirm acceptance or NO to decline.`
                 finalizedAt: now, // Mark as finalized immediately since POD is embedded
               };
               
-              // Fetch POD snapshot data for embedding
-              const podSnapshot = await fetchPodSnapshot(podDocumentURL);
-              if (podSnapshot) {
-                invoiceData.podSnapshot = podSnapshot;
-                console.log(`📄 POD snapshot embedded into POD-triggered invoice for load ${loadForInvoice.number109}`);
+              // Fetch ALL POD snapshot data for embedding (multi-page support)
+              const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(podDocumentURL);
+              if (allPodSnapshots.length > 0) {
+                invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
+                console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into POD-triggered invoice for load ${loadForInvoice.number109}`);
               } else {
                 console.log(`⚠️ POD snapshot fetch failed for POD-triggered invoice of load ${loadForInvoice.number109}`);
               }
@@ -4902,11 +4902,11 @@ Reply YES to confirm acceptance or NO to decline.`
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized";
         
-        // Fetch POD snapshot data for embedding
-        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
-        if (podSnapshot) {
-          invoiceData.podSnapshot = podSnapshot;
-          console.log(`📄 POD snapshot embedded into complete-load invoice for load ${load.number109}`);
+        // Fetch ALL POD snapshot data for embedding (multi-page support)
+        const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
+        if (allPodSnapshots.length > 0) {
+          invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
+          console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into complete-load invoice for load ${load.number109}`);
         } else {
           console.log(`⚠️ POD snapshot fetch failed for complete-load invoice of load ${load.number109}`);
         }
