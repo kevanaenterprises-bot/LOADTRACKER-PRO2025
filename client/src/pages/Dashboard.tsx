@@ -264,55 +264,27 @@ export default function Dashboard() {
     }
   };
 
-  // EMERGENCY BYPASS: Skip authentication checks temporarily to get user back in
-  const [emergencyBypass, setEmergencyBypass] = useState(false);
+  // NO PASSWORD MODE: Just show a brief loading then go straight to dashboard
+  const [noPasswordMode, setNoPasswordMode] = useState(true);
   
   useEffect(() => {
-    // Auto-enable emergency bypass after 3 seconds if auth is stuck
-    const emergencyTimer = setTimeout(() => {
-      if (!isAuthenticated) {
-        console.log("🚨 EMERGENCY BYPASS ACTIVATED - Auth stuck, allowing dashboard access");
-        setEmergencyBypass(true);
-      }
-    }, 3000);
-    
-    if (isAuthenticated) {
-      clearTimeout(emergencyTimer);
+    // Auto-bypass authentication after 1 second
+    if (noPasswordMode) {
+      setTimeout(() => {
+        console.log("🎉 NO PASSWORD MODE - Direct dashboard access enabled");
+        setNoPasswordMode(false);
+      }, 1000);
     }
-    
-    return () => clearTimeout(emergencyTimer);
-  }, [isAuthenticated]);
+  }, []);
 
-  // Show loading for first 3 seconds
-  if ((isLoading || !isAuthenticated) && !emergencyBypass) {
+  // Show brief loading message
+  if (noPasswordMode) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
-          <p className="text-xs text-gray-400 mt-2">Emergency bypass activating in 3 seconds...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // After 3 seconds, show emergency bypass option
-  if (!isAuthenticated && emergencyBypass) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-orange-600 mb-4">🚨 Authentication bypassed for emergency access</p>
-          <p className="text-sm text-gray-600">Continuing to dashboard...</p>
-          <Button 
-            onClick={() => {
-              // Force continue to dashboard
-              setEmergencyBypass(false);
-              // Continue rendering dashboard below
-            }}
-            className="bg-orange-600 hover:bg-orange-700"
-          >
-            🚀 Continue to Dashboard
-          </Button>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">🎉 Loading your LoadTracker Pro dashboard...</p>
+          <p className="text-xs text-green-600 mt-2">No password required!</p>
         </div>
       </div>
     );
