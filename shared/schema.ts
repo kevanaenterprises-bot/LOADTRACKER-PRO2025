@@ -57,7 +57,6 @@ export const loads = pgTable("loads", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   number109: varchar("number_109").notNull().unique(),
   driverId: varchar("driver_id").references(() => users.id),
-  customerId: varchar("customer_id").references(() => customers.id),
   locationId: varchar("location_id").references(() => locations.id),
   pickupLocationId: varchar("pickup_location_id").references(() => locations.id),
   estimatedMiles: integer("estimated_miles"),
@@ -172,9 +171,6 @@ export const invoices = pgTable("invoices", {
   extraStopsCount: integer("extra_stops_count").default(0),
   totalAmount: decimal("total_amount", { precision: 10, scale: 2 }),
   status: varchar("status").default("draft"), // draft, awaiting_pod, finalized, printed, emailed
-  emailStatus: varchar("email_status").default("pending"), // pending, sent, failed
-  emailSentAt: timestamp("email_sent_at"), // When email was successfully sent
-  emailRecipient: varchar("email_recipient"), // Email address invoice was sent to
   podUrl: varchar("pod_url"), // POD document path attached to this invoice
   podChecksum: varchar("pod_checksum"), // SHA256 checksum for data integrity
   podAttachedAt: timestamp("pod_attached_at"), // When POD was attached to invoice

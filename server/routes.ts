@@ -4031,47 +4031,6 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  // AUTO-EMAIL FUNCTION - Sends invoice email programmatically
-  async function sendInvoiceEmail(invoiceNumber: string, emailAddress: string, loadId: string): Promise<{success: boolean, error?: string}> {
-    try {
-      console.log(`📧 Starting auto-email for invoice ${invoiceNumber} to ${emailAddress}`);
-      
-      // Get invoice and load data
-      const invoice = await storage.getInvoice(invoiceNumber);
-      if (!invoice) {
-        return { success: false, error: `Invoice ${invoiceNumber} not found` };
-      }
-      
-      const load = await storage.getLoad(loadId);
-      if (!load) {
-        return { success: false, error: `Load ${loadId} not found` };
-      }
-      
-      // Generate email HTML using existing function
-      const emailHTML = await generateInvoiceHTML(invoice, load);
-      const subject = `Invoice ${invoice.invoiceNumber} - GO 4 Farms & Cattle`;
-      
-      // Send email using existing email service
-      const { sendEmail } = await import('./emailService');
-      const emailResult = await sendEmail({
-        to: emailAddress,
-        subject,
-        html: emailHTML
-      });
-      
-      if (emailResult.messageId) {
-        console.log(`✅ Auto-email sent successfully: ${emailResult.messageId}`);
-        return { success: true };
-      } else {
-        return { success: false, error: 'Email send failed - no message ID returned' };
-      }
-      
-    } catch (error) {
-      console.error(`❌ Auto-email error:`, error);
-      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
-    }
-  }
-
   // CENTRALIZED AUTO-INVOICE FUNCTION - Used by both POD upload routes
   async function ensureAutoInvoice(load: any): Promise<void> {
     if (!['delivered', 'completed', 'awaiting_invoicing'].includes(load.status)) {
@@ -4133,72 +4092,12 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`📄 ${allPodSnapshots.length} POD(s) found and embedded into auto invoice for load ${load.number109}`);
       }
       
-      // Set customer ID on invoice if load has customer
-      if (load.customerId) {
-        invoiceData.customerId = load.customerId;
-      }
-      
       const invoice = await storage.createInvoice(invoiceData);
       
       // Update load status to awaiting_payment
       await storage.updateLoadStatus(load.id, 'awaiting_payment');
       
       console.log(`✅ Auto-invoice created: ${invoice.invoiceNumber} for ${load.number109}`);
-      
-      // 🚀 AUTO-EMAIL LOGIC: If load has customer with email, send invoice automatically
-      if (load.customerId) {
-        try {
-          const customer = await storage.getCustomer(load.customerId);
-          if (customer && customer.email) {
-            // Check if email was already sent to prevent duplicates
-            if (invoice.emailStatus === 'sent') {
-              console.log(`⚠️ Invoice ${invoice.invoiceNumber} already emailed to ${invoice.emailRecipient} - skipping duplicate send`);
-            } else {
-              console.log(`📧 Auto-emailing invoice ${invoice.invoiceNumber} to customer ${customer.name} (${customer.email})`);
-              
-              // Update invoice email status to prevent concurrent sends
-              await storage.updateInvoice(invoice.invoiceNumber, { 
-                emailStatus: 'sending',
-                emailRecipient: customer.email 
-              });
-              
-              // Call the existing email API endpoint internally
-              const emailResult = await sendInvoiceEmail(invoice.invoiceNumber, customer.email, load.id);
-              
-              if (emailResult.success) {
-                // Mark email as successfully sent
-                await storage.updateInvoice(invoice.invoiceNumber, { 
-                  emailStatus: 'sent',
-                  emailSentAt: new Date(),
-                  status: 'emailed'
-                });
-                console.log(`✅ Auto-email successful: Invoice ${invoice.invoiceNumber} sent to ${customer.email}`);
-              } else {
-                // Mark email as failed
-                await storage.updateInvoice(invoice.invoiceNumber, { 
-                  emailStatus: 'failed'
-                });
-                console.error(`❌ Auto-email failed: ${emailResult.error}`);
-              }
-            }
-          } else {
-            console.log(`⚠️ Customer ${load.customerId} has no email address - skipping auto-email`);
-          }
-        } catch (emailError) {
-          console.error(`❌ Auto-email error for invoice ${invoice.invoiceNumber}:`, emailError);
-          // Mark email as failed if there was an error
-          try {
-            await storage.updateInvoice(invoice.invoiceNumber, { 
-              emailStatus: 'failed'
-            });
-          } catch (updateError) {
-            console.error(`❌ Failed to update email status after error:`, updateError);
-          }
-          // Don't throw - let the invoice creation succeed even if email fails
-        }
-      } else {
-        console.log(`⚠️ Load ${load.number109} has no customer assigned - skipping auto-email`);
-      }
     } catch (invoiceError) {
       console.error(`❌ Failed to create auto-invoice for ${load.number109}:`, invoiceError);
       throw invoiceError;
@@ -4368,11 +4267,11 @@ Reply YES to confirm acceptance or NO to decline.`
                 invoiceData.finalizedAt = now;
                 invoiceData.status = "finalized";
                 
-                // Fetch ALL POD snapshot data for embedding (multi-page support)
-                const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
-                if (allPodSnapshots.length > 0) {
-                  invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
-                  console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into backfill invoice for load ${load.number109}`);
+                // Fetch POD snapshot data for embedding
+                const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+                if (podSnapshot) {
+                  invoiceData.podSnapshot = podSnapshot;
+                  console.log(`📄 POD snapshot embedded into backfill invoice for load ${load.number109}`);
                 } else {
                   console.log(`⚠️ POD snapshot fetch failed for backfill invoice of load ${load.number109}`);
                 }
@@ -4478,11 +4377,11 @@ Reply YES to confirm acceptance or NO to decline.`
               invoiceData.finalizedAt = now;
               invoiceData.status = "finalized";
               
-              // Fetch ALL POD snapshot data for embedding (multi-page support)
-              const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
-              if (allPodSnapshots.length > 0) {
-                invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
-                console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into fix-payment invoice for load ${load.number109}`);
+              // Fetch POD snapshot data for embedding
+              const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+              if (podSnapshot) {
+                invoiceData.podSnapshot = podSnapshot;
+                console.log(`📄 POD snapshot embedded into fix-payment invoice for load ${load.number109}`);
               } else {
                 console.log(`⚠️ POD snapshot fetch failed for fix-payment invoice of load ${load.number109}`);
               }
@@ -4579,11 +4478,11 @@ Reply YES to confirm acceptance or NO to decline.`
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized"; // Set to finalized since POD is embedded
         
-        // Fetch ALL POD snapshot data for embedding (multi-page support)
-        const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
-        if (allPodSnapshots.length > 0) {
-          invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
-          console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into manual invoice for load ${load.number109}`);
+        // Fetch POD snapshot data for embedding
+        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+        if (podSnapshot) {
+          invoiceData.podSnapshot = podSnapshot;
+          console.log(`📄 POD snapshot embedded into manual invoice for load ${load.number109}`);
         } else {
           console.log(`⚠️ POD snapshot fetch failed for manual invoice of load ${load.number109}`);
         }
@@ -4649,7 +4548,7 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   }, async (req, res) => {
     try {
-      const { bolNumber, tripNumber, lumperFee, extraStopsFee, override } = req.body;
+      const { bolNumber, tripNumber, override } = req.body;
       
       // Validate trip number format (4 digits)
       if (!/^\d{4}$/.test(tripNumber)) {
@@ -4666,7 +4565,7 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log("🔐 Override flag detected - skipping duplicate BOL check for", bolNumber);
       }
 
-      const load = await storage.updateLoadBOL(req.params.id, bolNumber, tripNumber, lumperFee, extraStopsFee);
+      const load = await storage.updateLoadBOL(req.params.id, bolNumber, tripNumber);
       res.json(load);
     } catch (error) {
       console.error("Error updating load BOL:", error);
@@ -4803,11 +4702,11 @@ Reply YES to confirm acceptance or NO to decline.`
                 finalizedAt: now, // Mark as finalized immediately since BOL/POD is embedded
               };
               
-              // Fetch ALL POD snapshot data for embedding (multi-page support)
-              const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(bolDocumentURL);
-              if (allPodSnapshots.length > 0) {
-                invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
-                console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into BOL-triggered invoice for load ${loadWithDetails.number109}`);
+              // Fetch POD snapshot data for embedding
+              const podSnapshot = await fetchPodSnapshot(bolDocumentURL);
+              if (podSnapshot) {
+                invoiceData.podSnapshot = podSnapshot;
+                console.log(`📄 POD snapshot embedded into BOL-triggered invoice for load ${loadWithDetails.number109}`);
               } else {
                 console.log(`⚠️ POD snapshot fetch failed for BOL-triggered invoice of load ${loadWithDetails.number109}`);
               }
@@ -4927,11 +4826,11 @@ Reply YES to confirm acceptance or NO to decline.`
                 finalizedAt: now, // Mark as finalized immediately since POD is embedded
               };
               
-              // Fetch ALL POD snapshot data for embedding (multi-page support)
-              const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(podDocumentURL);
-              if (allPodSnapshots.length > 0) {
-                invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
-                console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into POD-triggered invoice for load ${loadForInvoice.number109}`);
+              // Fetch POD snapshot data for embedding
+              const podSnapshot = await fetchPodSnapshot(podDocumentURL);
+              if (podSnapshot) {
+                invoiceData.podSnapshot = podSnapshot;
+                console.log(`📄 POD snapshot embedded into POD-triggered invoice for load ${loadForInvoice.number109}`);
               } else {
                 console.log(`⚠️ POD snapshot fetch failed for POD-triggered invoice of load ${loadForInvoice.number109}`);
               }
@@ -5003,11 +4902,11 @@ Reply YES to confirm acceptance or NO to decline.`
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized";
         
-        // Fetch ALL POD snapshot data for embedding (multi-page support)
-        const allPodSnapshots = await fetchAllPodSnapshotsFromStorage(load.podDocumentPath);
-        if (allPodSnapshots.length > 0) {
-          invoiceData.podSnapshot = allPodSnapshots; // Store ALL pages, not just first
-          console.log(`📄 ${allPodSnapshots.length} POD page(s) embedded into complete-load invoice for load ${load.number109}`);
+        // Fetch POD snapshot data for embedding
+        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+        if (podSnapshot) {
+          invoiceData.podSnapshot = podSnapshot;
+          console.log(`📄 POD snapshot embedded into complete-load invoice for load ${load.number109}`);
         } else {
           console.log(`⚠️ POD snapshot fetch failed for complete-load invoice of load ${load.number109}`);
         }
@@ -5789,18 +5688,8 @@ function generateInvoiceOnlyHTML(invoice: any, load: any, deliveryLocationText: 
         <tbody>
           <tr>
             <td>Transportation Services - ${deliveryLocationText} - BOL/POD: ${bolPodText}</td>
-            <td>$${(parseFloat(invoice?.flatRate || '0')).toFixed(2)}</td>
+            <td>$${(parseFloat(invoice?.totalAmount || '0')).toFixed(2)}</td>
           </tr>
-          ${parseFloat(invoice?.lumperCharge || '0') > 0 ? `
-          <tr>
-            <td>Lumper Fees</td>
-            <td>$${(parseFloat(invoice?.lumperCharge || '0')).toFixed(2)}</td>
-          </tr>` : ''}
-          ${parseFloat(invoice?.extraStopsCharge || '0') > 0 ? `
-          <tr>
-            <td>Extra Stop Fees</td>
-            <td>$${(parseFloat(invoice?.extraStopsCharge || '0')).toFixed(2)}</td>
-          </tr>` : ''}
         </tbody>
       </table>
 
