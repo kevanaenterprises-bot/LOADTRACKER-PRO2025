@@ -303,13 +303,12 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
       {/* Header with Logo */}
       <Header title="LoadTracker Pro" />
       
       {/* Mobile-Optimized Navigation Bar */}
-      <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sticky top-[72px] z-40">
+      <div className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 flex-shrink-0">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2 sm:space-x-4">
             <nav className="flex space-x-2 sm:space-x-8">
@@ -352,7 +351,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto py-3 sm:py-6 px-2 sm:px-4 lg:px-8">
+      {/* Main scrollable content area */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-7xl mx-auto py-3 sm:py-6 px-2 sm:px-4 lg:px-8">
         {/* Dashboard Stats */}
         <StatsCards 
           stats={stats as any} 
@@ -752,6 +753,7 @@ export default function Dashboard() {
 
         </Tabs>
         
+        </div>
       </div>
     </div>
   );
