@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Printer, FileText, Package, Mail } from "lucide-react";
+import { Printer, FileText, Package, Mail, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useQuery } from "@tanstack/react-query";
 
 interface PrintButtonProps {
   invoiceId?: string;
@@ -24,6 +25,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
   const [isEmailing, setIsEmailing] = useState(false);
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const [selectedEmail, setSelectedEmail] = useState("");
 
   const handlePrintInvoice = async () => {
     setIsPrinting(true);
@@ -192,7 +195,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       
       const combinedHTML = responseData.previewHTML;
       
-      // Create preview HTML with Print and Close buttons
+      // Create preview HTML with Print, Email, and Close buttons
       const previewHTML = `
         <!DOCTYPE html>
         <html>
@@ -232,6 +235,10 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
               background: #007bff; 
               color: white; 
             }
+            .btn-success { 
+              background: #28a745; 
+              color: white; 
+            }
             .btn-secondary { 
               background: #6c757d; 
               color: white; 
@@ -253,12 +260,27 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
             <div class="preview-title">📄 Print Preview - Invoice & POD</div>
             <div class="preview-buttons">
               <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+              <button class="btn btn-success" onclick="openEmailDialog()">✉️ Email</button>
               <button class="btn btn-secondary" onclick="window.close()">✕ Close</button>
             </div>
           </div>
           <div class="document-content">
             ${combinedHTML}
           </div>
+          <script>
+            function openEmailDialog() {
+              // Send a message to the parent window to open email dialog
+              if (window.opener) {
+                window.opener.postMessage({
+                  action: 'openEmailDialog',
+                  invoiceId: '${invoiceIdentifier}',
+                  loadId: '${load?.id}'
+                }, window.location.origin);
+              } else {
+                alert('Please use the Email button in the main application window.');
+              }
+            }
+          </script>
         </body>
         </html>
       `;
@@ -282,11 +304,58 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
     setPrintDialogOpen(false);
   };
 
+  // Add message listener for preview window email button with security validation
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // Security: Validate origin and message structure
+      if (event.origin !== window.location.origin) {
+        console.warn('Ignored message from unauthorized origin:', event.origin);
+        return;
+      }
+      
+      if (event.data?.action === 'openEmailDialog' && 
+          event.data?.invoiceId && 
+          event.data?.loadId) {
+        // Validate that the invoice/load IDs match current context
+        const messageInvoiceId = event.data.invoiceId;
+        const messageLoadId = event.data.loadId;
+        
+        if ((invoice?.invoiceNumber === messageInvoiceId || invoiceId === messageInvoiceId) &&
+            load?.id === messageLoadId) {
+          setEmailDialogOpen(true);
+        } else {
+          console.warn('Message invoice/load IDs do not match current context');
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [invoice, invoiceId, load]);
+
+  // Fetch customers data for email dropdown
+  const { data: customersData, isLoading: customersLoading, error: customersError } = useQuery({
+    queryKey: ["/api/customers"],
+  });
+
   const handleEmailCompletePackage = async () => {
-    if (!emailAddress) {
+    const finalEmailAddress = selectedEmail === 'custom' ? emailAddress : selectedEmail;
+    
+    if (!finalEmailAddress) {
       toast({
         title: "Email Required",
-        description: "Please enter an email address.",
+        description: "Please select a customer or enter an email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(finalEmailAddress)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
         variant: "destructive",
       });
       return;
@@ -311,7 +380,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       // Send complete document package - invoice + POD/BOL + rate confirmation (if available)
       // Backend will prioritize invoice.podSnapshot over object storage fetching
       await apiRequest(`/api/invoices/${invoiceIdentifier}/email-complete-package`, "POST", {
-        emailAddress,
+        emailAddress: finalEmailAddress,
         loadId: loadId,
       });
 
@@ -320,17 +389,15 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
       if (load?.podDocumentPath) {
         documentsIncluded.push("POD Document");
       }
-      if (load?.podDocumentPath) {
-        documentsIncluded.push("POD Document");
-      }
 
       toast({
         title: "Complete Package Sent",
-        description: `All available documents sent to ${emailAddress}: ${documentsIncluded.join(", ")}`,
+        description: `All available documents sent to ${finalEmailAddress}: ${documentsIncluded.join(", ")}`,
       });
       
       setEmailDialogOpen(false);
       setEmailAddress("");
+      setSelectedEmail("");
       
     } catch (error: any) {
       toast({
@@ -359,14 +426,76 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Recipient Email Address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="customer@company.com"
-                value={emailAddress}
-                onChange={(e) => setEmailAddress(e.target.value)}
-                disabled={isEmailing}
-              />
+              <div className="relative">
+                <div
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background cursor-pointer items-center justify-between"
+                  onClick={() => setShowCustomerDropdown(!showCustomerDropdown)}
+                  data-testid="input-customer-email"
+                >
+                  <span className={selectedEmail ? "" : "text-muted-foreground"}>
+                    {selectedEmail === 'custom' ? 'Custom Email Address' : 
+                     selectedEmail ? selectedEmail : 
+                     'Select customer or enter custom email...'}
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </div>
+                
+                {showCustomerDropdown && (
+                  <div className="absolute z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md mt-1 w-full max-h-48 overflow-y-auto">
+                    {customersLoading ? (
+                      <div className="relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm text-muted-foreground">
+                        Loading customers...
+                      </div>
+                    ) : customersError ? (
+                      <div className="relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm text-red-500">
+                        Error loading customers
+                      </div>
+                    ) : Array.isArray(customersData) && customersData.length > 0 ? (
+                      customersData
+                        .filter((customer: any) => customer.email && customer.email.includes('@'))
+                        .map((customer: any) => (
+                          <div
+                            key={customer.id}
+                            className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                            onClick={() => {
+                              setSelectedEmail(customer.email);
+                              setShowCustomerDropdown(false);
+                            }}
+                            data-testid={`customer-option-${customer.id}`}
+                          >
+                            {customer.name} - {customer.email}
+                          </div>
+                        ))
+                    ) : (
+                      <div className="relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm text-muted-foreground">
+                        No customers with email addresses available
+                      </div>
+                    )}
+                    <div
+                      className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground border-t mt-1 pt-2"
+                      onClick={() => {
+                        setSelectedEmail('custom');
+                        setShowCustomerDropdown(false);
+                      }}
+                      data-testid="custom-email-option"
+                    >
+                      ⚙️ Enter custom email address
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {selectedEmail === 'custom' && (
+                <Input
+                  type="email"
+                  placeholder="Enter custom email address"
+                  value={emailAddress}
+                  onChange={(e) => setEmailAddress(e.target.value)}
+                  disabled={isEmailing}
+                  data-testid="input-custom-email"
+                  className="mt-2"
+                />
+              )}
             </div>
             
             {invoice && load && (
@@ -394,6 +523,8 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                 onClick={() => {
                   setEmailDialogOpen(false);
                   setEmailAddress("");
+                  setSelectedEmail("");
+                  setShowCustomerDropdown(false);
                 }}
                 disabled={isEmailing}
               >
@@ -401,8 +532,9 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
               </Button>
               <Button 
                 onClick={handleEmailCompletePackage}
-                disabled={isEmailing || !emailAddress}
+                disabled={isEmailing || (!selectedEmail || (selectedEmail === 'custom' && !emailAddress))}
                 className="bg-green-600 hover:bg-green-700"
+                data-testid="button-send-email"
               >
                 {isEmailing ? (
                   <>
