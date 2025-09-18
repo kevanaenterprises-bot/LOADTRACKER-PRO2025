@@ -17,7 +17,6 @@ function Router() {
       {/* Authentication Pages */}
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/driver-login" component={DriverLogin} />
-      <Route path="/login" component={DriverLogin} /> {/* Backward compatibility */}
       
       {/* Main Application Pages */}
       <Route path="/dashboard" component={Dashboard} />

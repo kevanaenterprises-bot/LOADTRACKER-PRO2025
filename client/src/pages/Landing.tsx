@@ -49,12 +49,12 @@ export default function Landing() {
       {/* Login Buttons */}
       <div className="flex flex-col gap-6 w-full max-w-md">
         <Button 
-          onClick={() => setLocation("/dashboard")} 
+          onClick={handleAdminLogin} 
           size="lg" 
-          className="w-full py-4 text-lg font-semibold bg-green-600 hover:bg-green-700"
+          className="w-full py-4 text-lg font-semibold"
         >
-          <i className="fas fa-rocket mr-3 text-xl"></i>
-          🎉 Enter Dashboard (No Password!)
+          <i className="fas fa-user-shield mr-3 text-xl"></i>
+          Admin Login
         </Button>
         
         <Button 

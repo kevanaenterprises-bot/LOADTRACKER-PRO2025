@@ -63,7 +63,7 @@ export default function Dashboard() {
   const [debugLog, setDebugLog] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
-  // Setup bypass token immediately on mount (don't wait for authentication)
+  // Setup bypass token automatically when authenticated (just like test pages)
   useEffect(() => {
     const setupBypassToken = async () => {
       if (!localStorage.getItem('bypass-token')) {
@@ -75,40 +75,30 @@ export default function Dashboard() {
           if (response.ok) {
             const data = await response.json();
             localStorage.setItem('bypass-token', data.token);
-            console.log('✅ Dashboard: Bypass token set up successfully');
           }
         } catch (error) {
-          console.warn('⚠️ Dashboard: Bypass token setup failed:', error);
+          // Silent fail - will use normal authentication
         }
       }
     };
 
-    // Set up bypass token immediately, don't wait for authentication
-    setupBypassToken();
-  }, []); // Only run once on mount
+    if (isAuthenticated && !isLoading) {
+      setupBypassToken();
+    }
+  }, [isAuthenticated, isLoading]);
 
-  // Redirect to login if not authenticated (but wait longer for auth to stabilize)
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      // Check if we have a bypass token - if so, wait much longer
-      const hasBypassToken = !!localStorage.getItem('bypass-token');
-      const timeoutDelay = hasBypassToken ? 10000 : 5000; // 10s with token, 5s without
-      
-      const redirectTimer = setTimeout(() => {
-        if (!isAuthenticated && !isLoading) {
-          console.log('⚠️ Dashboard: Still not authenticated after timeout, redirecting');
-          toast({
-            title: "Unauthorized",
-            description: "You are logged out. Please log in...",
-            variant: "destructive",
-          });
-          setTimeout(() => {
-            setLocation("/");
-          }, 500);
-        }
-      }, timeoutDelay);
-
-      return () => clearTimeout(redirectTimer);
+      toast({
+        title: "Unauthorized",
+        description: "You are logged out. Please log in...",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        setLocation("/");
+      }, 500);
+      return;
     }
   }, [isAuthenticated, isLoading, toast, setLocation]);
 
@@ -268,27 +258,12 @@ export default function Dashboard() {
     }
   };
 
-  // NO PASSWORD MODE: Just show a brief loading then go straight to dashboard
-  const [noPasswordMode, setNoPasswordMode] = useState(true);
-  
-  useEffect(() => {
-    // Auto-bypass authentication after 1 second
-    if (noPasswordMode) {
-      setTimeout(() => {
-        console.log("🎉 NO PASSWORD MODE - Direct dashboard access enabled");
-        setNoPasswordMode(false);
-      }, 1000);
-    }
-  }, []);
-
-  // Show brief loading message
-  if (noPasswordMode) {
+  if (isLoading || !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">🎉 Loading your LoadTracker Pro dashboard...</p>
-          <p className="text-xs text-green-600 mt-2">No password required!</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
