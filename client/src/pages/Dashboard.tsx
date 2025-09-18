@@ -63,7 +63,7 @@ export default function Dashboard() {
   const [debugLog, setDebugLog] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
-  // Setup bypass token automatically when authenticated (just like test pages)
+  // Setup bypass token immediately on mount (don't wait for authentication)
   useEffect(() => {
     const setupBypassToken = async () => {
       if (!localStorage.getItem('bypass-token')) {
@@ -75,24 +75,28 @@ export default function Dashboard() {
           if (response.ok) {
             const data = await response.json();
             localStorage.setItem('bypass-token', data.token);
+            console.log('✅ Dashboard: Bypass token set up successfully');
           }
         } catch (error) {
-          // Silent fail - will use normal authentication
+          console.warn('⚠️ Dashboard: Bypass token setup failed:', error);
         }
       }
     };
 
-    if (isAuthenticated && !isLoading) {
-      setupBypassToken();
-    }
-  }, [isAuthenticated, isLoading]);
+    // Set up bypass token immediately, don't wait for authentication
+    setupBypassToken();
+  }, []); // Only run once on mount
 
-  // Redirect to login if not authenticated (with longer timeout to allow admin session to load)
+  // Redirect to login if not authenticated (but wait longer for auth to stabilize)
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      // Wait a bit longer before redirecting to allow admin session to be recognized
+      // Check if we have a bypass token - if so, wait much longer
+      const hasBypassToken = !!localStorage.getItem('bypass-token');
+      const timeoutDelay = hasBypassToken ? 10000 : 5000; // 10s with token, 5s without
+      
       const redirectTimer = setTimeout(() => {
         if (!isAuthenticated && !isLoading) {
+          console.log('⚠️ Dashboard: Still not authenticated after timeout, redirecting');
           toast({
             title: "Unauthorized",
             description: "You are logged out. Please log in...",
@@ -102,7 +106,7 @@ export default function Dashboard() {
             setLocation("/");
           }, 500);
         }
-      }, 2000); // Wait 2 seconds before redirecting
+      }, timeoutDelay);
 
       return () => clearTimeout(redirectTimer);
     }
