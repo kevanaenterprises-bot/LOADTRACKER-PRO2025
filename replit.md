@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**September 18, 2025 - Implemented Secure Admin/Driver Portal Separation**
+- ✅ **Perfect Security Solution** - Created separate access portals for admin vs. driver access
+- ✅ **Admin Portal** - Password-protected access (`go4fc2024`) to full dashboard with financials, rates, invoices
+- ✅ **Driver Portal** - Direct access to driver login page with NO financial information visible
+- ✅ **GoDaddy Website Integration** - HTML portal pages designed for embedding in Go4FC.com website
+- ✅ **Single-Click Access** - Clean, professional interface with one-click access for drivers
+- ✅ **Mobile Optimized** - Responsive design for both desktop and mobile access
+- ✅ **Complete Financial Separation** - Drivers cannot access rates, invoices, lumper fees, or any financial data
+- ✅ **Admin Security** - Admin access requires password before accessing full dashboard with financials
+- ✅ **Production Ready** - Ready for deployment on user's business website at https://go4fc.com
+
 **August 21, 2025 - Implemented OCR Wright Con Scanner with Edit Capability**
 - ✅ Added Anthropic Claude 4.0 Sonnet OCR service for reading rate confirmation images
 - ✅ Created Wright Con Scanner tab in Dashboard for image upload and processing
@@ -96,6 +107,24 @@ Preferred communication style: Simple, everyday language.
 - ✅ Successfully tested invoice generation: INV-1755756388476 for $1350.00
 - ✅ Created comprehensive test pages at `/quick-invoice` and `/admin-invoice`
 - ✅ All authentication methods now work: Admin (admin/admin123), Driver (john_doe/1234567890), Replit Auth
+
+## Portal Access Information
+
+### Website Integration Files
+- **admin-portal.html** - Password-protected admin access portal for full dashboard with financials
+- **driver-portal-simple.html** - Simple driver access portal that redirects to driver login (no financials)
+- **loadtracker-portal.html** - Combined portal with both admin and driver buttons (alternative option)
+
+### Access Credentials
+- **Admin Password:** `go4fc2024` (for admin portal access to full financial dashboard)
+- **Driver Access:** Direct link to driver login page (drivers use their username/phone authentication)
+- **LoadTracker URL:** https://gofarmsmobilupload.com
+- **Business Website:** https://go4fc.com (GoDaddy hosted)
+
+### Security Implementation
+- **Admin Portal:** Password protection before accessing financial dashboard
+- **Driver Portal:** Direct access to driver login, no financial data accessible
+- **Complete Separation:** Admin sees all financials, drivers see only their assigned loads and upload functions
 
 ## System Architecture
 
