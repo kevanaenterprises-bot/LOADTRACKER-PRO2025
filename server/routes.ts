@@ -3518,7 +3518,7 @@ Reply YES to confirm acceptance or NO to decline.`
         emailLength: process.env.OUTLOOK_EMAIL?.length || 0
       });
       
-      const { sendEmail, testEmailConnection, generatePDF } = await import('./emailService');
+      const { sendEmail, testEmailConnection, generatePDF, convertImageToPDF } = await import('./emailService');
       
       // Test connection first
       console.log("🔍 Testing email connection...");
@@ -3551,16 +3551,46 @@ Reply YES to confirm acceptance or NO to decline.`
           console.log(`📧 POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes)`);
         });
         
-        // Add all PODs as separate attachments
-        allPodSnapshots.forEach((snapshot, index) => {
+        // Add all PODs as separate attachments - Convert images to PDF for better customer compatibility
+        for (let index = 0; index < allPodSnapshots.length; index++) {
+          const snapshot = allPodSnapshots[index];
           const podBuffer = convertPodSnapshotToBuffer(snapshot);
-          attachments.push({
-            filename: `POD-${primaryLoadNumber}-${index + 1}.${getFileExtension(snapshot.contentType)}`,
-            content: podBuffer.content,
-            contentType: snapshot.contentType
-          });
-          console.log(`✅ POD ${index + 1} prepared for email: ${podBuffer.content.length} bytes`);
-        });
+          
+          // Check if this is an image format that should be converted to PDF
+          const isImageFormat = snapshot.contentType.startsWith('image/');
+          
+          if (isImageFormat) {
+            console.log(`🖼️ Converting POD ${index + 1} from ${snapshot.contentType} to PDF for better customer viewing...`);
+            try {
+              const originalFilename = `POD-${primaryLoadNumber}-${index + 1}`;
+              const pdfBuffer = await convertImageToPDF(podBuffer.content, snapshot.contentType, originalFilename);
+              
+              attachments.push({
+                filename: `${originalFilename}.pdf`,
+                content: pdfBuffer,
+                contentType: 'application/pdf'
+              });
+              console.log(`✅ POD ${index + 1} converted to PDF: ${pdfBuffer.length} bytes (was ${podBuffer.content.length} bytes ${snapshot.contentType})`);
+            } catch (conversionError) {
+              console.error(`❌ Failed to convert POD ${index + 1} to PDF:`, conversionError);
+              // Fallback to original format if conversion fails
+              attachments.push({
+                filename: `POD-${primaryLoadNumber}-${index + 1}.${getFileExtension(snapshot.contentType)}`,
+                content: podBuffer.content,
+                contentType: snapshot.contentType
+              });
+              console.log(`⚠️ POD ${index + 1} kept in original format due to conversion error: ${podBuffer.content.length} bytes`);
+            }
+          } else {
+            // Keep PDFs and other non-image formats as-is
+            attachments.push({
+              filename: `POD-${primaryLoadNumber}-${index + 1}.${getFileExtension(snapshot.contentType)}`,
+              content: podBuffer.content,
+              contentType: snapshot.contentType
+            });
+            console.log(`✅ POD ${index + 1} kept in original PDF format: ${podBuffer.content.length} bytes`);
+          }
+        }
       } else {
         console.log(`⚠️ No POD available for load ${primaryLoadNumber} - email will contain invoice only`);
       }

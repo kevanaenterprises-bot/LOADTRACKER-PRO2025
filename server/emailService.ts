@@ -138,6 +138,96 @@ export async function generatePDF(html: string): Promise<Buffer> {
   }
 }
 
+// Convert image buffer (JPEG/PNG) to PDF for better email compatibility
+export async function convertImageToPDF(imageBuffer: Buffer, contentType: string, filename: string): Promise<Buffer> {
+  console.log(`🖼️ Converting image to PDF: ${filename} (${imageBuffer.length} bytes, ${contentType})`);
+  
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
+    args: [
+      '--no-sandbox', 
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--disable-gpu',
+      '--disable-extensions',
+      '--disable-features=VizDisplayCompositor'
+    ]
+  });
+  
+  try {
+    const page = await browser.newPage();
+    
+    // Convert image buffer to base64 data URL
+    const base64Image = imageBuffer.toString('base64');
+    const dataUrl = `data:${contentType};base64,${base64Image}`;
+    
+    // Create HTML with the image centered and properly sized
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            background: white;
+          }
+          .image-container {
+            text-align: center;
+            max-width: 100%;
+          }
+          .document-title {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+          }
+          .document-image {
+            max-width: 100%;
+            max-height: 90vh;
+            height: auto;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          }
+        </style>
+      </head>
+      <body>
+        <div class="image-container">
+          <div class="document-title">${filename}</div>
+          <img src="${dataUrl}" alt="Document" class="document-image">
+        </div>
+      </body>
+      </html>
+    `;
+    
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    
+    const pdf = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '0.5in',
+        right: '0.5in',
+        bottom: '0.5in',
+        left: '0.5in',
+      },
+    });
+    
+    console.log(`✅ Image converted to PDF: ${filename} -> ${pdf.length} bytes PDF`);
+    return Buffer.from(pdf);
+    
+  } finally {
+    await browser.close();
+  }
+}
+
 export async function testEmailConnection() {
   try {
     console.log('🔍 Testing email connection with config:', {
