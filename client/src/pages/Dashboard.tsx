@@ -56,7 +56,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices" | "cleanup">("loads");
+  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "trucks" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices" | "cleanup">("loads");
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
@@ -383,7 +383,7 @@ export default function Dashboard() {
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-4 sm:mt-8">
           {/* Mobile: Show horizontal scrolling tabs, Desktop: Grid layout */}
           <div className="overflow-x-auto scrollbar-hide">
-            <TabsList className="hidden md:grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 h-auto gap-1">
+            <TabsList className="hidden md:grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-9 h-auto gap-1">
               <TabsTrigger value="loads" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-blue-700 hover:text-blue-900 font-semibold min-h-[60px] touch-target">
                 <i className="fas fa-truck text-lg md:text-base text-blue-600"></i>
                 <span className="text-center leading-tight">Load Management</span>
@@ -399,6 +399,10 @@ export default function Dashboard() {
               <TabsTrigger value="drivers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-orange-700 hover:text-orange-900 font-semibold min-h-[60px] touch-target">
                 <i className="fas fa-users text-lg md:text-base text-orange-600"></i>
                 <span className="text-center leading-tight">Driver Management</span>
+              </TabsTrigger>
+              <TabsTrigger value="trucks" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-amber-700 hover:text-amber-900 font-semibold min-h-[60px] touch-target">
+                <i className="fas fa-truck text-lg md:text-base text-amber-600"></i>
+                <span className="text-center leading-tight">Truck Management</span>
               </TabsTrigger>
               <TabsTrigger value="customers" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-indigo-700 hover:text-indigo-900 font-semibold min-h-[60px] touch-target">
                 <i className="fas fa-building text-lg md:text-base text-indigo-600"></i>
@@ -439,6 +443,10 @@ export default function Dashboard() {
               <TabsTrigger value="drivers" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
                 <i className="fas fa-users text-xl text-orange-600"></i>
                 <span className="text-center leading-tight">Drivers</span>
+              </TabsTrigger>
+              <TabsTrigger value="trucks" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
+                <i className="fas fa-truck text-xl text-amber-600"></i>
+                <span className="text-center leading-tight">Trucks</span>
               </TabsTrigger>
               <TabsTrigger value="customers" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
                 <i className="fas fa-building text-xl text-indigo-600"></i>
@@ -723,6 +731,23 @@ export default function Dashboard() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </TabsContent>
+
+          {/* Truck Management Tab */}
+          <TabsContent value="trucks" className="mt-6">
+            <div className="space-y-6">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-2">Truck Management</h2>
+                <p className="text-gray-600">
+                  Manage your fleet of trucks including make, model, year, VIN numbers, and mileage tracking.
+                </p>
+              </div>
+              <div className="text-center py-8 text-gray-500">
+                <i className="fas fa-truck text-4xl mb-4"></i>
+                <p>Truck management interface coming soon...</p>
+                <p className="text-sm">This will include truck add/edit forms and fleet overview table.</p>
+              </div>
             </div>
           </TabsContent>
 
