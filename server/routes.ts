@@ -17,6 +17,7 @@ import {
   insertRateSchema,
   insertUserSchema,
   insertCustomerSchema,
+  insertTruckSchema,
   insertChatMessageSchema,
   insertInvoiceSchema,
   type Load,
@@ -1927,6 +1928,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting customer:", error);
       res.status(500).json({ message: "Failed to delete customer" });
+    }
+  });
+
+  // Truck management endpoints
+  app.get("/api/trucks", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const trucks = await storage.getTrucks();
+      res.json(trucks);
+    } catch (error) {
+      console.error("Error fetching trucks:", error);
+      res.status(500).json({ message: "Failed to fetch trucks" });
+    }
+  });
+
+  app.post("/api/trucks", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      console.log("Truck creation request body:", req.body);
+      const validatedData = insertTruckSchema.parse(req.body);
+      console.log("Truck validation successful:", validatedData);
+      const truck = await storage.createTruck(validatedData);
+      console.log("Truck created successfully:", truck.id);
+      res.status(201).json(truck);
+    } catch (error: any) {
+      console.error("Error creating truck - full details:", error);
+      if (error?.name === 'ZodError') {
+        console.error("Truck validation errors:", error.errors);
+        res.status(400).json({ message: "Invalid truck data", errors: error.errors });
+      } else {
+        res.status(400).json({ message: error?.message || "Invalid truck data" });
+      }
+    }
+  });
+
+  app.put("/api/trucks/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const truck = await storage.updateTruck(req.params.id, req.body);
+      res.json(truck);
+    } catch (error) {
+      console.error("Error updating truck:", error);
+      res.status(500).json({ message: "Failed to update truck" });
+    }
+  });
+
+  app.delete("/api/trucks/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      await storage.deleteTruck(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting truck:", error);
+      res.status(500).json({ message: "Failed to delete truck" });
     }
   });
 
