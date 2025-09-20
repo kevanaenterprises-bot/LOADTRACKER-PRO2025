@@ -215,6 +215,9 @@ export default function LoadsTable() {
         setSelectedLoad({ ...selectedLoad, [field]: value });
       }
       
+      // Mark that financials have been modified for this load
+      setFinancialsModified(loadId);
+      
       // Refresh the loads data
       queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
       
@@ -410,25 +413,24 @@ export default function LoadsTable() {
 
   const updateInvoiceWithNewCharges = (loadId: string) => {
     updateInvoiceMutation.mutate(loadId);
+    // Clear the modified state after updating
+    setFinancialsModified(null);
+  };
+
+  // Track when financial values have been modified
+  const [financialsModified, setFinancialsModified] = useState<string | null>(null);
+
+  // Handle dialog close and clear modified state
+  const handleDialogClose = (open: boolean) => {
+    setDialogOpen(open);
+    if (!open) {
+      setFinancialsModified(null); // Clear modified state when dialog closes
+    }
   };
 
   // Check if a load already has an invoice
   const hasInvoice = (loadId: string) => {
-    console.log('🔍 DEBUG hasInvoice function called:', {
-      loadId,
-      invoicesIsArray: Array.isArray(invoices),
-      invoicesLength: Array.isArray(invoices) ? invoices.length : 0,
-      invoicesData: Array.isArray(invoices) ? invoices.map((inv: any) => ({
-        id: inv.id,
-        invoiceNumber: inv.invoiceNumber,
-        loadId: inv.loadId,
-        totalAmount: inv.totalAmount
-      })) : 'NOT_ARRAY'
-    });
-    
-    const result = Array.isArray(invoices) && invoices.some((invoice: any) => invoice.loadId === loadId);
-    console.log('🔍 DEBUG hasInvoice result:', { loadId, result });
-    return result;
+    return Array.isArray(invoices) && invoices.some((invoice: any) => invoice.loadId === loadId);
   };
 
   // Driver assignment mutation
@@ -842,7 +844,7 @@ export default function LoadsTable() {
       </CardContent>
 
       {/* Load Details Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={handleDialogClose}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <div className="flex items-center justify-between">
@@ -1269,8 +1271,8 @@ export default function LoadsTable() {
                   </div>
                 </div>
                 
-                {/* Update Invoice Button - Only show if invoice exists */}
-                {hasInvoice(selectedLoad.id) && (
+                {/* Update Invoice Button - Show if invoice exists AND financials have been modified */}
+                {hasInvoice(selectedLoad.id) && financialsModified === selectedLoad.id && (
                   <div className="mt-3 text-center">
                     <Button 
                       onClick={() => updateInvoiceWithNewCharges(selectedLoad.id)}
@@ -1324,7 +1326,7 @@ export default function LoadsTable() {
                   </div>
                   
                   <div className="space-x-2">
-                    <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                    <Button variant="outline" onClick={() => handleDialogClose(false)}>
                       Close
                     </Button>
                   
