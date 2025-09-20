@@ -871,7 +871,9 @@ export default function LoadsTable() {
                     } else {
                       setEditMode(true);
                       setEditFormData({
+                        number109: selectedLoad?.number109 || '',
                         locationId: selectedLoad?.locationId || '',
+                        pickupLocationId: selectedLoad?.pickupLocationId || '',
                         estimatedMiles: selectedLoad?.estimatedMiles || 0,
                         specialInstructions: selectedLoad?.specialInstructions || ''
                       });
@@ -906,22 +908,13 @@ export default function LoadsTable() {
                   {/* Edit Form */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Primary Delivery Location</label>
-                      <Select 
-                        value={editFormData.locationId} 
-                        onValueChange={(value) => setEditFormData({...editFormData, locationId: value})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select destination" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.isArray(locations) && locations.map((location: any) => (
-                            <SelectItem key={location.id} value={location.id}>
-                              {location.name} - {location.city}, {location.state}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <label className="block text-sm font-medium mb-2">109 Load Number</label>
+                      <Input
+                        type="text"
+                        value={editFormData.number109}
+                        onChange={(e) => setEditFormData({...editFormData, number109: e.target.value})}
+                        placeholder="SEPTEMBER 2025 TRAILER RENTAL"
+                      />
                     </div>
                     
                     <div>
@@ -932,6 +925,45 @@ export default function LoadsTable() {
                         onChange={(e) => setEditFormData({...editFormData, estimatedMiles: parseInt(e.target.value) || 0})}
                         placeholder="0"
                       />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Pickup Location</label>
+                      <Select 
+                        value={editFormData.pickupLocationId} 
+                        onValueChange={(value) => setEditFormData({...editFormData, pickupLocationId: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select pickup location" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">No pickup location</SelectItem>
+                          {Array.isArray(locations) && locations.map((location: any) => (
+                            <SelectItem key={location.id} value={location.id}>
+                              {location.name} - {location.city}, {location.state}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Delivery Location</label>
+                      <Select 
+                        value={editFormData.locationId} 
+                        onValueChange={(value) => setEditFormData({...editFormData, locationId: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select delivery location" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.isArray(locations) && locations.map((location: any) => (
+                            <SelectItem key={location.id} value={location.id}>
+                              {location.name} - {location.city}, {location.state}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                   
