@@ -22,6 +22,8 @@ import RateManagement from "@/components/RateManagement";
 import { CacheDebugger } from "@/components/CacheDebugger";
 import { PaidInvoices } from "@/components/PaidInvoices";
 import GhostLoadCleanup from "@/components/GhostLoadCleanup";
+import TruckForm from "@/components/TruckForm";
+import TruckTable from "@/components/TruckTable";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -736,17 +738,15 @@ export default function Dashboard() {
 
           {/* Truck Management Tab */}
           <TabsContent value="trucks" className="mt-6">
-            <div className="space-y-6">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">Truck Management</h2>
-                <p className="text-gray-600">
-                  Manage your fleet of trucks including make, model, year, VIN numbers, and mileage tracking.
-                </p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Add New Truck Form */}
+              <div className="lg:col-span-1">
+                <TruckForm />
               </div>
-              <div className="text-center py-8 text-gray-500">
-                <i className="fas fa-truck text-4xl mb-4"></i>
-                <p>Truck management interface coming soon...</p>
-                <p className="text-sm">This will include truck add/edit forms and fleet overview table.</p>
+
+              {/* Truck Fleet Table */}
+              <div className="lg:col-span-2">
+                <TruckTable />
               </div>
             </div>
           </TabsContent>
