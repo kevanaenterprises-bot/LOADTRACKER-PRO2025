@@ -414,7 +414,21 @@ export default function LoadsTable() {
 
   // Check if a load already has an invoice
   const hasInvoice = (loadId: string) => {
-    return Array.isArray(invoices) && invoices.some((invoice: any) => invoice.loadId === loadId);
+    console.log('🔍 DEBUG hasInvoice function called:', {
+      loadId,
+      invoicesIsArray: Array.isArray(invoices),
+      invoicesLength: Array.isArray(invoices) ? invoices.length : 0,
+      invoicesData: Array.isArray(invoices) ? invoices.map((inv: any) => ({
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        loadId: inv.loadId,
+        totalAmount: inv.totalAmount
+      })) : 'NOT_ARRAY'
+    });
+    
+    const result = Array.isArray(invoices) && invoices.some((invoice: any) => invoice.loadId === loadId);
+    console.log('🔍 DEBUG hasInvoice result:', { loadId, result });
+    return result;
   };
 
   // Driver assignment mutation
