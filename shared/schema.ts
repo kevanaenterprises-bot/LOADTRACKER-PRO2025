@@ -38,6 +38,8 @@ export const users = pgTable("users", {
   password: varchar("password"), // For driver login (phone number)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // DEPRECATED: Legacy truck_number column - DO NOT USE in new code
+  truckNumber: varchar("truck_number"), // Temporarily kept to avoid data loss
 });
 
 // Locations table for receivers
@@ -96,6 +98,8 @@ export const loads = pgTable("loads", {
   receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
   receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
   lastLocationUpdate: timestamp("last_location_update"),
+  // DEPRECATED: Legacy truck_number column - DO NOT USE in new code
+  truckNumber: varchar("truck_number"), // Temporarily kept to avoid data loss
 });
 
 // Load stops table for multiple pickups and deliveries
@@ -245,6 +249,19 @@ export const chatMessages = pgTable("chat_messages", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
+// Trucks table for fleet management
+export const trucks = pgTable("trucks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  truckNumber: varchar("truck_number").notNull().unique(),
+  make: varchar("make").notNull(),
+  model: varchar("model").notNull(),
+  year: integer("year").notNull(),
+  vinNumber: varchar("vin_number").notNull().unique(),
+  mileage: integer("mileage").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -313,6 +330,12 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
   timestamp: true,
 });
 
+export const insertTruckSchema = createInsertSchema(trucks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -337,6 +360,8 @@ export type InsertNotificationLog = z.infer<typeof insertNotificationLogSchema>;
 export type NotificationLog = typeof notificationLog.$inferSelect;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertTruck = z.infer<typeof insertTruckSchema>;
+export type Truck = typeof trucks.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {
