@@ -36,6 +36,9 @@ import {
   chatMessages,
   type ChatMessage,
   type InsertChatMessage,
+  trucks,
+  type Truck,
+  type InsertTruck,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, not } from "drizzle-orm";
@@ -135,6 +138,14 @@ export interface IStorage {
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   getChatMessages(sessionId: string, limit?: number): Promise<ChatMessage[]>;
   deleteChatSession(sessionId: string): Promise<void>;
+
+  // Truck operations
+  getTrucks(): Promise<Truck[]>;
+  getTruck(id: string): Promise<Truck | undefined>;
+  getTruckByNumber(truckNumber: string): Promise<Truck | undefined>;
+  createTruck(truck: InsertTruck): Promise<Truck>;
+  updateTruck(id: string, updates: Partial<InsertTruck>): Promise<Truck>;
+  deleteTruck(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1181,6 +1192,39 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(chatMessages)
       .where(eq(chatMessages.sessionId, sessionId));
+  }
+
+  // Truck operations
+  async getTrucks(): Promise<Truck[]> {
+    return await db.select().from(trucks).orderBy(trucks.truckNumber);
+  }
+
+  async getTruck(id: string): Promise<Truck | undefined> {
+    const [truck] = await db.select().from(trucks).where(eq(trucks.id, id));
+    return truck;
+  }
+
+  async getTruckByNumber(truckNumber: string): Promise<Truck | undefined> {
+    const [truck] = await db.select().from(trucks).where(eq(trucks.truckNumber, truckNumber));
+    return truck;
+  }
+
+  async createTruck(truck: InsertTruck): Promise<Truck> {
+    const [newTruck] = await db.insert(trucks).values(truck).returning();
+    return newTruck;
+  }
+
+  async updateTruck(id: string, updates: Partial<InsertTruck>): Promise<Truck> {
+    const [updatedTruck] = await db
+      .update(trucks)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(trucks.id, id))
+      .returning();
+    return updatedTruck;
+  }
+
+  async deleteTruck(id: string): Promise<void> {
+    await db.delete(trucks).where(eq(trucks.id, id));
   }
 }
 
