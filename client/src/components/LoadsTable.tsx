@@ -943,18 +943,27 @@ export default function LoadsTable() {
             )}
           </DialogHeader>
           
-          {selectedLoad && (
-            <div className="space-y-6">
-              {editMode ? (
-                // Edit Mode
-                <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
-                  <div className="text-xs bg-yellow-100 p-2 rounded">
-                    Debug: editMode={String(editMode)}, selectedLoad exists: {String(!!selectedLoad)}, 
-                    editFormData: {JSON.stringify(editFormData)}, 
-                    locations: {Array.isArray(locations) ? locations.length : 'not array'},
-                    loadLocation: {selectedLoad?.location ? JSON.stringify({city: selectedLoad.location.city, state: selectedLoad.location.state, name: selectedLoad.location.name}) : 'none'}
-                  </div>
+          <div className="space-y-6">
+            <div className="p-4 bg-red-100 border border-red-300 rounded">
+              <h3 className="font-bold">DIALOG DEBUG INFO</h3>
+              <p>dialogOpen: {String(dialogOpen)}</p>
+              <p>selectedLoad exists: {String(!!selectedLoad)}</p>
+              <p>editMode: {String(editMode)}</p>
+              <p>selectedLoad ID: {selectedLoad?.id || 'no ID'}</p>
+            </div>
+            
+            {selectedLoad && (
+              <div className="space-y-6">
+                {editMode ? (
+                  // Edit Mode
+                  <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
+                    <div className="text-xs bg-yellow-100 p-2 rounded">
+                      Debug: editMode={String(editMode)}, selectedLoad exists: {String(!!selectedLoad)}, 
+                      editFormData: {JSON.stringify(editFormData)}, 
+                      locations: {Array.isArray(locations) ? locations.length : 'not array'},
+                      loadLocation: {selectedLoad?.location ? JSON.stringify({city: selectedLoad.location.city, state: selectedLoad.location.state, name: selectedLoad.location.name}) : 'none'}
+                    </div>
                   
                   {/* Edit Form */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1491,6 +1500,7 @@ export default function LoadsTable() {
               )}
             </div>
           )}
+          </div>
         </DialogContent>
       </Dialog>
 
