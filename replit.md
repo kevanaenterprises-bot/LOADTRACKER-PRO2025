@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**September 20, 2025 - Fixed Lumper Charge Validation Error**
+- ✅ **Resolved Pattern Validation Error** - Fixed "The string did not match the expected pattern" error when updating lumper charges
+- ✅ **Enhanced Input Validation** - Added client-side validation for financial fields (trip rate, lumper fees, extra stops)
+- ✅ **Improved Error Handling** - Better error messages and automatic input field reset on validation failure
+- ✅ **Financial Field Improvements** - Added min="0" attribute and Enter/Tab key handling for better user experience
+- ✅ **Value Formatting** - Automatic formatting to 2 decimal places for consistency with currency fields
+
 **August 21, 2025 - Implemented OCR Wright Con Scanner with Edit Capability**
 - ✅ Added Anthropic Claude 4.0 Sonnet OCR service for reading rate confirmation images
 - ✅ Created Wright Con Scanner tab in Dashboard for image upload and processing

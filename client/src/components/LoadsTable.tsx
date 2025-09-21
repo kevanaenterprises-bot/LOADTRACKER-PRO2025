@@ -196,6 +196,15 @@ export default function LoadsTable() {
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
     try {
+      // Validate financial input before sending
+      const numericValue = parseFloat(value);
+      if (isNaN(numericValue) || numericValue < 0) {
+        throw new Error('Please enter a valid positive number');
+      }
+      
+      // Format to 2 decimal places
+      const formattedValue = numericValue.toFixed(2);
+      
       const response = await fetch(`/api/loads/${loadId}/financials`, {
         method: 'PATCH',
         headers: {
@@ -203,16 +212,18 @@ export default function LoadsTable() {
           'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
         },
         credentials: 'include',
-        body: JSON.stringify({ [field]: value })
+        body: JSON.stringify({ [field]: formattedValue })
       });
       
       if (!response.ok) {
-        throw new Error('Failed to update load financials');
+        const errorText = await response.text();
+        console.error('Financial update error:', errorText);
+        throw new Error(`Failed to update ${field}: ${errorText}`);
       }
       
       // Update the selected load state immediately for UI feedback
       if (selectedLoad && selectedLoad.id === loadId) {
-        setSelectedLoad({ ...selectedLoad, [field]: value });
+        setSelectedLoad({ ...selectedLoad, [field]: formattedValue });
       }
       
       // Mark that financials have been modified for this load
@@ -226,11 +237,18 @@ export default function LoadsTable() {
         description: `${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully`,
       });
     } catch (error) {
+      console.error("Error updating load financials:", error);
       toast({
         title: "Error",
-        description: `Failed to update ${field}`,
+        description: error instanceof Error ? error.message : `Failed to update ${field}`,
         variant: "destructive",
       });
+      
+      // Reset the input field to the previous value if update failed
+      const inputElement = document.querySelector(`[data-testid="input-${field}-${loadId}"]`) as HTMLInputElement;
+      if (inputElement && selectedLoad) {
+        inputElement.value = selectedLoad[field as keyof typeof selectedLoad] || '0.00';
+      }
     }
   };
 
@@ -1273,9 +1291,15 @@ export default function LoadsTable() {
                     <input 
                       type="number" 
                       step="0.01"
+                      min="0"
                       defaultValue={selectedLoad.tripRate || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'tripRate', e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === 'Tab') {
+                          e.currentTarget.blur();
+                        }
+                      }}
                       data-testid={`input-trip-rate-${selectedLoad.id}`}
                     />
                   </div>
@@ -1284,9 +1308,15 @@ export default function LoadsTable() {
                     <input 
                       type="number" 
                       step="0.01"
+                      min="0"
                       defaultValue={selectedLoad.lumperCharge || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'lumperCharge', e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === 'Tab') {
+                          e.currentTarget.blur();
+                        }
+                      }}
                       data-testid={`input-lumper-charge-${selectedLoad.id}`}
                     />
                   </div>
@@ -1295,9 +1325,15 @@ export default function LoadsTable() {
                     <input 
                       type="number" 
                       step="0.01"
+                      min="0"
                       defaultValue={selectedLoad.extraStops || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === 'Tab') {
+                          e.currentTarget.blur();
+                        }
+                      }}
                       data-testid={`input-extra-stops-${selectedLoad.id}`}
                     />
                   </div>
