@@ -33,7 +33,7 @@ import { loads } from "@shared/schema";
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
 
-// FIXED: Multi-POD version - gets ALL POD snapshots prioritizing stored snapshots
+// FIXED: Multi-POD version - gets ALL POD snapshots from BOTH stored snapshots AND object storage
 async function getAllPodSnapshots(invoice: any, podDocumentPath?: string): Promise<Array<{
   contentBase64: string;
   contentType: string;
@@ -41,24 +41,48 @@ async function getAllPodSnapshots(invoice: any, podDocumentPath?: string): Promi
   sourcePath: string;
   attachedAt: string;
 }>> {
-  console.log('📄 Getting ALL POD snapshots - checking stored snapshots first...');
+  console.log('📄 Getting ALL POD snapshots - checking BOTH stored snapshots AND object storage...');
   
-  // First priority: Use stored podSnapshot array if available
+  const allPodSnapshots: Array<{
+    contentBase64: string;
+    contentType: string;
+    size: number;
+    sourcePath: string;
+    attachedAt: string;
+  }> = [];
+  
+  // First: Collect any stored POD snapshots from invoice
   if (invoice.podSnapshot && Array.isArray(invoice.podSnapshot) && invoice.podSnapshot.length > 0) {
-    console.log(`✅ Using ${invoice.podSnapshot.length} stored POD snapshots from invoice`);
-    return invoice.podSnapshot;
-  }
-  
-  // Handle legacy single POD snapshot (convert to array)
-  if (invoice.podSnapshot && invoice.podSnapshot.contentBase64) {
+    console.log(`✅ Found ${invoice.podSnapshot.length} stored POD snapshots in invoice`);
+    allPodSnapshots.push(...invoice.podSnapshot);
+  } else if (invoice.podSnapshot && invoice.podSnapshot.contentBase64) {
     console.log('✅ Converting legacy single POD snapshot to array format');
-    return [invoice.podSnapshot];
+    allPodSnapshots.push(invoice.podSnapshot);
   }
   
-  console.log('⚠️ No stored POD snapshots found, falling back to object storage...');
+  // Second: ALSO check object storage for additional PODs
+  if (podDocumentPath && podDocumentPath !== 'test-pod-document.pdf') {
+    console.log('🔍 Also checking object storage for additional PODs...');
+    const storagePods = await fetchAllPodSnapshotsFromStorage(podDocumentPath);
+    
+    if (storagePods.length > 0) {
+      console.log(`📄 Found ${storagePods.length} additional PODs in object storage`);
+      
+      // Add storage PODs that aren't already in stored snapshots (deduplicate by sourcePath)
+      const existingPaths = new Set(allPodSnapshots.map(pod => pod.sourcePath));
+      const newPods = storagePods.filter(pod => !existingPaths.has(pod.sourcePath));
+      allPodSnapshots.push(...newPods);
+      
+      if (newPods.length > 0) {
+        console.log(`✅ Added ${newPods.length} new PODs from object storage`);
+      } else {
+        console.log('📄 No new PODs found in object storage (all already stored)');
+      }
+    }
+  }
   
-  // Fallback: Fetch from object storage (gets ALL PODs)
-  return await fetchAllPodSnapshotsFromStorage(podDocumentPath);
+  console.log(`📋 TOTAL PODs available: ${allPodSnapshots.length}`);
+  return allPodSnapshots;
 }
 
 // Legacy function for backward compatibility - returns first POD only  
