@@ -105,6 +105,12 @@ export const loads = pgTable("loads", {
   receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
   receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
   lastLocationUpdate: timestamp("last_location_update"),
+  // Geofence entry/exit timestamps for automatic tracking
+  shipperEnteredAt: timestamp("shipper_entered_at"), // When driver entered shipper geofence
+  shipperExitedAt: timestamp("shipper_exited_at"), // When driver left shipper geofence
+  receiverEnteredAt: timestamp("receiver_entered_at"), // When driver entered receiver geofence
+  receiverExitedAt: timestamp("receiver_exited_at"), // When driver left receiver geofence
+  trackingStartedAt: timestamp("tracking_started_at"), // When driver accepted load and started tracking
   // Route calculation and mileage fields
   calculatedMiles: decimal("calculated_miles", { precision: 10, scale: 2 }), // Calculated route distance
   routeData: jsonb("route_data"), // Store full route details from API
