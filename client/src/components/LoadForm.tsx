@@ -36,8 +36,10 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, MapPin, Package, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation } from "lucide-react";
 import { HelpButton } from "@/components/HelpTooltip";
+import { HEREMapView } from "@/components/HEREMapView";
+import type { Location, OptimizedRoute } from "@/services/HERERouteOptimizer";
 
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
@@ -69,6 +71,10 @@ export default function LoadForm() {
   const [stops, setStops] = useState<LoadStop[]>([]);
   const [showOverride, setShowOverride] = useState(false);
   const [overridePassword, setOverridePassword] = useState("");
+  
+  // HERE Maps route optimization state
+  const [optimizedRoute, setOptimizedRoute] = useState<OptimizedRoute | null>(null);
+  const [showRouteMap, setShowRouteMap] = useState(false);
 
   const { data: locations = [] } = useQuery<any[]>({
     queryKey: ["/api/locations"],
@@ -201,6 +207,34 @@ export default function LoadForm() {
       stopSequence: i + 1,
     }));
     setStops(resequencedStops);
+    // Clear route optimization when stops change
+    setOptimizedRoute(null);
+  };
+
+  // Convert LoadStops to HERE Maps Location format
+  const convertStopsToLocations = (): Location[] => {
+    return stops.map((stop) => ({
+      address: stop.address || "",
+      name: stop.companyName,
+      type: stop.stopType === "dropoff" ? "dropoff" : "pickup",
+    }));
+  };
+
+  // Handle route optimization callback from HERE Maps
+  const handleRouteOptimized = (route: OptimizedRoute) => {
+    setOptimizedRoute(route);
+    toast({
+      title: "Route Optimized! 🚛",
+      description: `Total distance: ${route.totalMiles} miles • Est. fuel cost: $${route.estimatedFuelCost}`,
+    });
+  };
+
+  // Toggle route map visibility
+  const toggleRouteMap = () => {
+    setShowRouteMap(!showRouteMap);
+    if (!showRouteMap) {
+      setOptimizedRoute(null); // Clear previous route when opening
+    }
   };
 
   return (
@@ -314,7 +348,21 @@ export default function LoadForm() {
         {/* Step 3: Added Stops */}
         {stops.length > 0 && (
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Added Stops ({stops.length})</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Added Stops ({stops.length})</Label>
+              {stops.length >= 2 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleRouteMap}
+                  className="flex items-center gap-2"
+                >
+                  <Navigation className="h-4 w-4" />
+                  {showRouteMap ? "Hide Route" : "View Route & Optimize"}
+                </Button>
+              )}
+            </div>
             <div className="space-y-2">
               {stops.map((stop, index) => (
                 <div 
@@ -347,6 +395,23 @@ export default function LoadForm() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* HERE Maps Route Optimization */}
+        {showRouteMap && stops.length >= 2 && (
+          <div className="space-y-3">
+            <HEREMapView
+              locations={convertStopsToLocations()}
+              onRouteOptimized={handleRouteOptimized}
+              showOptimization={true}
+              height="400px"
+              truckSpecs={{
+                maxWeight: 80000, // Standard truck weight limit
+                maxHeight: 13.6,  // Standard truck height limit  
+                axleCount: 5,     // Typical semi-truck
+              }}
+            />
           </div>
         )}
 
