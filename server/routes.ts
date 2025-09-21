@@ -2641,6 +2641,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedStops = stops;
         console.log("Load creation - stops validated:", validatedStops.length);
 
+        // PICKUP FIX: Set main load's pickupLocationId to FIRST pickup stop for tracking and geofencing
+        const pickupStops = stops.filter(stop => stop.stopType === "pickup");
+        const firstPickupStop = pickupStops[0];
+        if (firstPickupStop && firstPickupStop.locationId) {
+          validatedData.pickupLocationId = firstPickupStop.locationId;
+          console.log("Load creation - setting main pickupLocationId to FIRST pickup stop for geofencing:", firstPickupStop.locationId);
+        }
+
         // DESTINATION FIX: Set main load's locationId to LAST delivery stop for rate lookup purposes
         const deliveryStops = stops.filter(stop => stop.stopType === "dropoff");
         const lastDeliveryStop = deliveryStops[deliveryStops.length - 1];
