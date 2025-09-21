@@ -207,6 +207,7 @@ export function LoadSection({
             <TableRow>
               <TableHead>109 Number</TableHead>
               <TableHead data-testid="th-bol-374">BOL (374)</TableHead>
+              <TableHead>Invoice #</TableHead>
               {showDriverAssign && <TableHead>Assign Driver</TableHead>}
               {!showDriverAssign && <TableHead>Driver</TableHead>}
               <TableHead>Destinations</TableHead>
@@ -232,6 +233,11 @@ export function LoadSection({
                 <TableCell>
                   <div className="text-sm font-medium" data-testid={`text-bol-number-${load.id}`}>
                     {load.bolNumber || <span className="text-gray-400 italic">Not set</span>}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm font-medium" data-testid={`text-invoice-number-${load.id}`}>
+                    {load.invoice?.invoiceNumber || <span className="text-gray-400 italic">Not invoiced</span>}
                   </div>
                 </TableCell>
                 
