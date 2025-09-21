@@ -19,7 +19,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BatchPODUpload } from "@/components/BatchPODUpload";
-import { Upload, Zap, DollarSign } from "lucide-react";
+import { Upload, Zap, DollarSign, Route, Calculator } from "lucide-react";
 
 interface LoadSectionProps {
   loads: any[];
@@ -34,6 +34,91 @@ interface LoadSectionProps {
   onLoadClick?: (load: any) => void;
   onGenerateInvoice?: (load: any) => void;
   onDeleteLoad?: (load: any) => void;
+}
+
+// Mileage Cell Component with Calculate Route functionality
+function MileageCell({ load }: { load: any }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [calculating, setCalculating] = useState(false);
+
+  const calculateRouteMutation = useMutation({
+    mutationFn: async (loadId: string) => {
+      return apiRequest(`/api/loads/${loadId}/calculate-route`, "POST");
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast({
+          title: "Route Calculated",
+          description: `Calculated ${data.mileage} miles for this route`,
+        });
+        queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      } else {
+        toast({
+          title: "Route Calculation Failed",
+          description: data.error || "Could not calculate route",
+          variant: "destructive",
+        });
+      }
+      setCalculating(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Route Calculation Failed",
+        description: error.message || "Failed to calculate route",
+        variant: "destructive",
+      });
+      setCalculating(false);
+    },
+  });
+
+  const handleCalculateRoute = (e: any) => {
+    e.stopPropagation();
+    setCalculating(true);
+    calculateRouteMutation.mutate(load.id);
+  };
+
+  // Check if load has coordinates for route calculation
+  const hasCoordinates = load.shipperLatitude && load.shipperLongitude && 
+                        load.receiverLatitude && load.receiverLongitude;
+
+  return (
+    <div className="text-sm" onClick={(e) => e.stopPropagation()}>
+      {load.calculatedMiles ? (
+        <div className="flex items-center gap-2">
+          <Route className="h-3 w-3 text-blue-500" />
+          <span className="font-medium">{parseFloat(load.calculatedMiles).toFixed(0)} mi</span>
+          {load.lastRouteCalculated && (
+            <div className="text-xs text-gray-500">
+              {new Date(load.lastRouteCalculated).toLocaleDateString()}
+            </div>
+          )}
+        </div>
+      ) : hasCoordinates ? (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleCalculateRoute}
+          disabled={calculating}
+          className="h-6 px-2 text-xs"
+        >
+          {calculating ? (
+            <>
+              <Calculator className="h-3 w-3 mr-1 animate-spin" />
+              Calculating...
+            </>
+          ) : (
+            <>
+              <Calculator className="h-3 w-3 mr-1" />
+              Calculate
+            </>
+          )}
+        </Button>
+      ) : (
+        <span className="text-gray-400 italic text-xs">No coordinates</span>
+      )}
+    </div>
+  );
 }
 
 export function LoadSection({
@@ -211,6 +296,7 @@ export function LoadSection({
               {showDriverAssign && <TableHead>Assign Driver</TableHead>}
               {!showDriverAssign && <TableHead>Driver</TableHead>}
               <TableHead>Destinations</TableHead>
+              <TableHead>Mileage</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -316,6 +402,10 @@ export function LoadSection({
                       </>
                     )}
                   </div>
+                </TableCell>
+                
+                <TableCell>
+                  <MileageCell load={load} />
                 </TableCell>
                 
                 <TableCell>

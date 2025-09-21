@@ -9,6 +9,7 @@ import { sendTestNotification, notificationService } from "./notificationService
 import { processRateConfirmationImage } from "./ocrService";
 import { GPSService } from "./gpsService";
 import { aiService } from "./aiService";
+import { RouteService } from "./routeService";
 import multer from 'multer';
 import {
   insertLoadSchema,
@@ -2522,6 +2523,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating location:", error);
       res.status(500).json({ message: "Failed to update location" });
+    }
+  });
+
+  // Route calculation endpoint
+  app.post('/api/loads/:id/calculate-route', (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const load = await storage.getLoad(id);
+      
+      if (!load) {
+        return res.status(404).json({ error: 'Load not found' });
+      }
+
+      const routeService = new RouteService(storage);
+      const result = await routeService.calculateLoadRoute(load);
+      
+      if (result.success && result.mileage) {
+        // Update load with calculated mileage and route data
+        await storage.updateLoadRoute(id, {
+          calculatedMiles: result.mileage,
+          routeData: result.routeData,
+          lastRouteCalculated: new Date()
+        });
+        
+        res.json({ 
+          success: true, 
+          mileage: result.mileage,
+          routeData: result.routeData 
+        });
+      } else {
+        res.json({ 
+          success: false, 
+          error: result.error || 'Unable to calculate route' 
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error calculating route:', error);
+      res.status(500).json({ error: 'Failed to calculate route' });
     }
   });
 

@@ -261,4 +261,70 @@ export class RouteService {
       return false;
     }
   }
+
+  /**
+   * Calculate route for a specific load and return the result
+   */
+  async calculateLoadRoute(load: any): Promise<{ success: boolean; mileage?: number; routeData?: any; error?: string }> {
+    try {
+      if (!this.apiKey) {
+        return { 
+          success: false, 
+          error: 'HERE API key not configured' 
+        };
+      }
+
+      // Get load stops for multi-stop routing
+      const stops = await this.storage.getLoadStops(load.id);
+      
+      let routeResult: RouteCalculationResult | null = null;
+
+      if (stops && stops.length > 0) {
+        // Multi-stop route calculation
+        console.log('⚠️ Multi-stop routing with coordinate extraction not yet implemented - using basic route');
+        // For now, fall back to basic two-point routing
+      }
+      
+      // Simple two-point route calculation
+      const pickup: RoutePoint | null = load.shipperLatitude && load.shipperLongitude ? {
+        latitude: parseFloat(load.shipperLatitude),
+        longitude: parseFloat(load.shipperLongitude),
+        address: load.pickupAddress || undefined
+      } : null;
+
+      const delivery: RoutePoint | null = load.receiverLatitude && load.receiverLongitude ? {
+        latitude: parseFloat(load.receiverLatitude),
+        longitude: parseFloat(load.receiverLongitude),
+        address: load.deliveryAddress || undefined
+      } : null;
+
+      if (!pickup || !delivery) {
+        return { 
+          success: false, 
+          error: 'Load missing pickup or delivery coordinates' 
+        };
+      }
+
+      routeResult = await this.calculateRoute(pickup, delivery);
+      
+      if (routeResult) {
+        return {
+          success: true,
+          mileage: routeResult.distance,
+          routeData: routeResult.routeData
+        };
+      } else {
+        return { 
+          success: false, 
+          error: 'Route calculation failed' 
+        };
+      }
+    } catch (error) {
+      console.error('❌ Error in calculateLoadRoute:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
+    }
+  }
 }
