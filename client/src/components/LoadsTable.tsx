@@ -263,12 +263,19 @@ export default function LoadsTable() {
 
   // HERE Maps route calculation function
   const calculateRouteDistance = async (loadId: string, load: any) => {
-    // Check for addresses in multiple possible locations
+    // Extract addresses from stops array (preferred) or fallback to other fields
+    const pickupStop = load.stops?.find((stop: any) => stop.stopType === 'pickup');
+    const deliveryStop = load.stops?.find((stop: any) => stop.stopType === 'dropoff');
+    
     const pickupAddr = load.pickupAddress || 
+      pickupStop?.address ||
+      (pickupStop?.location?.address) ||
       (load.pickupLocation ? `${load.pickupLocation.address || load.pickupLocation.name}, ${load.pickupLocation.city || ''}, ${load.pickupLocation.state || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null) ||
       "1800 E PLANO PKWY, Plano, TX"; // Default pickup from your loads
     
     const deliveryAddr = load.deliveryAddress || 
+      deliveryStop?.address ||
+      (deliveryStop?.location?.address) ||
       (load.location ? `${load.location.address || load.location.name}, ${load.location.city || ''}, ${load.location.state || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null);
       
     if (!pickupAddr || !deliveryAddr) {
@@ -1432,8 +1439,14 @@ export default function LoadsTable() {
                           </span>
                         </div>
                         {((selectedLoad.estimatedMiles || 0) === 0 || !routeCalculated[selectedLoad.id]) && 
-                         (selectedLoad.pickupAddress || selectedLoad.pickupLocation || true) && 
-                         (selectedLoad.deliveryAddress || selectedLoad.location) && (
+                         (selectedLoad.pickupAddress || 
+                          selectedLoad.stops?.find((stop: any) => stop.stopType === 'pickup')?.address ||
+                          selectedLoad.stops?.find((stop: any) => stop.stopType === 'pickup')?.location?.address ||
+                          selectedLoad.pickupLocation || true) && 
+                         (selectedLoad.deliveryAddress || 
+                          selectedLoad.stops?.find((stop: any) => stop.stopType === 'dropoff')?.address ||
+                          selectedLoad.stops?.find((stop: any) => stop.stopType === 'dropoff')?.location?.address ||
+                          selectedLoad.location) && (
                           <Button
                             variant="outline"
                             size="sm"
