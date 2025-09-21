@@ -2629,6 +2629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate stops if provided
       let validatedStops = undefined;
       if (stops && Array.isArray(stops) && stops.length > 0) {
+        // NEW STOPS-BASED FORMAT
         // Validate each stop location exists
         for (const stop of stops) {
           if (stop.locationId) {
@@ -2656,6 +2657,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           validatedData.locationId = lastDeliveryStop.locationId;
           console.log("Load creation - setting main locationId to LAST delivery stop for rate lookup:", lastDeliveryStop.locationId);
         }
+      } else if (validatedData.locationId) {
+        // OLD FORMAT COMPATIBILITY FIX: If no stops provided but locationId exists,
+        // treat it as both pickup and delivery location for backward compatibility
+        validatedData.pickupLocationId = validatedData.locationId;
+        console.log("Load creation - OLD FORMAT: setting pickupLocationId to same as locationId for geofencing:", validatedData.locationId);
       }
 
       const load = await storage.createLoad(validatedData, validatedStops);
