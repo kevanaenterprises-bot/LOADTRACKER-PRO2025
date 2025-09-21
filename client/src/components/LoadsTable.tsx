@@ -453,9 +453,9 @@ export default function LoadsTable() {
   };
 
   // Check if a load already has an invoice
-  const hasInvoice = (loadId: string) => {
-    // Check if load has an invoice based on status rather than global invoices query
-    return selectedLoad && ['invoiced', 'awaiting_payment', 'paid'].includes(selectedLoad.status);
+  const hasInvoice = (load: any) => {
+    // Check if load has an invoice based on status
+    return load && ['invoiced', 'awaiting_payment', 'paid'].includes(load.status);
   };
 
   // Driver assignment mutation
@@ -913,7 +913,7 @@ export default function LoadsTable() {
             </div>
             
             {/* Mobile Print Button Alert */}
-            {hasInvoice(selectedLoad?.id) && (
+            {hasInvoice(selectedLoad) && (
               <div className="md:hidden mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center gap-2 text-sm text-blue-800">
                   <i className="fas fa-info-circle"></i>
@@ -1364,7 +1364,7 @@ export default function LoadsTable() {
                 </div>
                 
                 {/* Update Invoice Button - Show if invoice exists AND financials have been modified */}
-                {hasInvoice(selectedLoad.id) && (
+                {hasInvoice(selectedLoad) && (
                   <div className="mt-3 text-center">
                     <Button 
                       onClick={() => updateInvoiceWithNewCharges(selectedLoad.id)}
@@ -1410,7 +1410,7 @@ export default function LoadsTable() {
                 
                 <div className="flex justify-between">
                   <div className="text-sm text-gray-600">
-                    {hasInvoice(selectedLoad.id) ? (
+                    {hasInvoice(selectedLoad) ? (
                       <span className="text-green-600">✅ Invoice generated for this load</span>
                     ) : (
                       <span>No invoice generated yet</span>
@@ -1422,7 +1422,7 @@ export default function LoadsTable() {
                       Close
                     </Button>
                   
-                    {!hasInvoice(selectedLoad.id) && (
+                    {!hasInvoice(selectedLoad) && (
                       <Button 
                         onClick={handleGenerateInvoice}
                         disabled={generateInvoiceMutation.isPending}
