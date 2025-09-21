@@ -3603,13 +3603,14 @@ Reply YES to confirm acceptance or NO to decline.`
       const primaryLoadNumber = load.number109 || 'Unknown';
       const subject = `Complete Package - Load ${primaryLoadNumber} - Invoice ${invoice.invoiceNumber}`;
       
-      // Simple email - no cover page, just attachment notification
+      // Simple email - single complete package attachment
       let emailHTML = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #2d5aa0;">GO 4 Farms & Cattle</h2>
-          <p>Please find attached the invoice and POD for Load ${primaryLoadNumber}.</p>
-          <p>Invoice Number: ${invoice.invoiceNumber}</p>
-          <p>Amount: $${invoice.totalAmount}</p>
+          <p>Please find attached the complete document package for Load ${primaryLoadNumber}.</p>
+          <p><strong>Invoice Number:</strong> ${invoice.invoiceNumber}</p>
+          <p><strong>Amount:</strong> $${invoice.totalAmount}</p>
+          <p>The attached PDF contains the invoice, rate confirmation, and proof of delivery documents.</p>
           <p>Thank you for your business!</p>
         </div>
       `;
@@ -3655,46 +3656,10 @@ Reply YES to confirm acceptance or NO to decline.`
           console.log(`📧 POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes)`);
         });
         
-        // Add all PODs as separate attachments - Convert images to PDF for better customer compatibility
-        for (let index = 0; index < allPodSnapshots.length; index++) {
-          const snapshot = allPodSnapshots[index];
-          const podBuffer = convertPodSnapshotToBuffer(snapshot);
-          
-          // Check if this is an image format that should be converted to PDF
-          const isImageFormat = snapshot.contentType.startsWith('image/');
-          
-          if (isImageFormat) {
-            console.log(`🖼️ Converting POD ${index + 1} from ${snapshot.contentType} to PDF for better customer viewing...`);
-            try {
-              const originalFilename = `POD-${primaryLoadNumber}-${index + 1}`;
-              const pdfBuffer = await convertImageToPDF(podBuffer.content, snapshot.contentType, originalFilename);
-              
-              attachments.push({
-                filename: `${originalFilename}.pdf`,
-                content: pdfBuffer,
-                contentType: 'application/pdf'
-              });
-              console.log(`✅ POD ${index + 1} converted to PDF: ${pdfBuffer.length} bytes (was ${podBuffer.content.length} bytes ${snapshot.contentType})`);
-            } catch (conversionError) {
-              console.error(`❌ Failed to convert POD ${index + 1} to PDF:`, conversionError);
-              // Fallback to original format if conversion fails
-              attachments.push({
-                filename: `POD-${primaryLoadNumber}-${index + 1}.${getFileExtension(snapshot.contentType)}`,
-                content: podBuffer.content,
-                contentType: snapshot.contentType
-              });
-              console.log(`⚠️ POD ${index + 1} kept in original format due to conversion error: ${podBuffer.content.length} bytes`);
-            }
-          } else {
-            // Keep PDFs and other non-image formats as-is
-            attachments.push({
-              filename: `POD-${primaryLoadNumber}-${index + 1}.${getFileExtension(snapshot.contentType)}`,
-              content: podBuffer.content,
-              contentType: snapshot.contentType
-            });
-            console.log(`✅ POD ${index + 1} kept in original PDF format: ${podBuffer.content.length} bytes`);
-          }
-        }
+        // ❌ REMOVED: Don't send separate POD attachments for complete package
+        // The PODs are already embedded in the Combined PDF above
+        console.log(`✅ PODs embedded in Complete Package PDF - no separate attachments needed`);
+        console.log(`📧 Complete Package will be single PDF with ${allPodSnapshots.length} POD(s) embedded`);
       } else {
         console.log(`⚠️ No POD available for load ${primaryLoadNumber} - email will contain invoice only`);
       }
