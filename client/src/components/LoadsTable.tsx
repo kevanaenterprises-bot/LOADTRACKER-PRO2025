@@ -287,6 +287,11 @@ export default function LoadsTable() {
       return;
     }
 
+    console.log('🚛 ROUTE CALCULATION DEBUG:');
+    console.log('📍 Pickup Address:', pickupAddr);
+    console.log('📍 Delivery Address:', deliveryAddr);
+    console.log('🔑 HERE API Key available:', !!import.meta.env.VITE_HERE_MAPS_API_KEY);
+    
     setCalculatingRoute(true);
     try {
       const distance = await HERERouteOptimizer.calculateDistance(
@@ -298,6 +303,8 @@ export default function LoadsTable() {
           axleCount: 5,     // Typical semi-truck
         }
       );
+      
+      console.log('✅ Route calculation successful:', distance);
 
       // Update the load's estimated miles in the database
       const response = await fetch(`/api/loads/${loadId}/financials`, {
