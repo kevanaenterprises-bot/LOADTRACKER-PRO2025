@@ -83,6 +83,7 @@ export const loads = pgTable("loads", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
   // Basic timestamps for manual status tracking
+  deliveryDueAt: timestamp("delivery_due_at"), // When the load is due for delivery
   deliveredAt: timestamp("delivered_at"),
   completedAt: timestamp("completed_at"),
   paidAt: timestamp("paid_at"),
@@ -121,8 +122,33 @@ export const loadStops = pgTable("load_stops", {
   contactName: varchar("contact_name"),
   contactPhone: varchar("contact_phone"),
   notes: text("notes"), // Special instructions for this stop
+  // Geofencing fields
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  geofenceRadiusMeters: integer("geofence_radius_meters").default(200), // 200m default radius
+  arrivedAt: timestamp("arrived_at"),
+  departedAt: timestamp("departed_at"),
+  arrivalSource: varchar("arrival_source"), // "auto" or "manual"
+  departureSource: varchar("departure_source"), // "auto" or "manual"
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// GPS tracking pings table for location history
+export const trackingPings = pgTable("tracking_pings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  loadId: varchar("load_id").references(() => loads.id).notNull(),
+  driverId: varchar("driver_id").references(() => users.id).notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }).notNull(),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
+  speed: decimal("speed", { precision: 6, scale: 2 }), // mph
+  heading: decimal("heading", { precision: 5, scale: 1 }), // degrees 0-360
+  accuracy: decimal("accuracy", { precision: 6, scale: 2 }), // meters
+  battery: integer("battery"), // percentage 0-100
+  capturedAt: timestamp("captured_at").defaultNow(),
+}, (table) => [
+  index("IDX_tracking_load_captured").on(table.loadId, table.capturedAt.desc()),
+  index("IDX_tracking_driver_captured").on(table.driverId, table.capturedAt.desc()),
+]);
 
 // BOL tracking table for duplicate prevention
 export const bolNumbers = pgTable("bol_numbers", {
@@ -299,6 +325,11 @@ export const insertLoadStopSchema = createInsertSchema(loadStops).omit({
   createdAt: true,
 });
 
+export const insertTrackingPingSchema = createInsertSchema(trackingPings).omit({
+  id: true,
+  capturedAt: true,
+});
+
 export const insertBolNumberSchema = createInsertSchema(bolNumbers).omit({
   id: true,
   createdAt: true,
@@ -352,6 +383,8 @@ export type InsertLoad = z.infer<typeof insertLoadSchema>;
 export type Load = typeof loads.$inferSelect;
 export type InsertLoadStop = z.infer<typeof insertLoadStopSchema>;
 export type LoadStop = typeof loadStops.$inferSelect;
+export type InsertTrackingPing = z.infer<typeof insertTrackingPingSchema>;
+export type TrackingPing = typeof trackingPings.$inferSelect;
 export type InsertBolNumber = z.infer<typeof insertBolNumberSchema>;
 export type BolNumber = typeof bolNumbers.$inferSelect;
 export type InsertRate = z.infer<typeof insertRateSchema>;
