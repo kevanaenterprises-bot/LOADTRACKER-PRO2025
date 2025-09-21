@@ -3508,23 +3508,24 @@ Reply YES to confirm acceptance or NO to decline.`
       const origin = originData.items[0].position;
       const destination = destData.items[0].position;
 
-      // Step 2: Calculate truck route
-      const routeUrl = 'https://route.ls.hereapi.com/routing/7.2/calculateroute';
+      // Step 2: Calculate truck route using HERE Maps Routing API v8
+      const routeUrl = 'https://router.hereapi.com/v8/routes';
       const params = new URLSearchParams({
         apikey: apiKey,
         transportMode: 'truck',
         origin: `${origin.lat},${origin.lng}`,
         destination: `${destination.lat},${destination.lng}`,
         return: 'summary',
-        routingMode: 'fast',
       });
 
-      // Add truck specifications if provided
+      // Add truck specifications if provided (HERE Maps v8 API format)
       if (truckSpecs?.maxWeight) {
+        // Convert pounds to kilograms for HERE API (integer value)
         params.append('truck[grossWeight]', Math.round(truckSpecs.maxWeight * 0.453592).toString());
       }
       if (truckSpecs?.maxHeight) {
-        params.append('truck[height]', Math.round(truckSpecs.maxHeight * 0.3048 * 100).toString()); // feet to cm
+        // Convert feet to centimeters for HERE API (integer value)
+        params.append('truck[height]', Math.round(truckSpecs.maxHeight * 30.48).toString());
       }
 
       const routeRes = await fetch(`${routeUrl}?${params}`);
@@ -3541,10 +3542,11 @@ Reply YES to confirm acceptance or NO to decline.`
       }
       
       const route = routeData.routes[0];
-      const summary = route.sections[0].summary;
+      const summary = route.sections[0].summary || route.summary;
       
+      // Convert meters to miles and seconds to minutes
       const miles = Math.round((summary.length * 0.000621371) * 100) / 100;
-      const duration = Math.round(summary.duration / 60);
+      const duration = Math.round((summary.duration || summary.baseDuration) / 60);
       
       console.log(`✅ Route calculated: ${miles} miles, ${duration} minutes`);
       
