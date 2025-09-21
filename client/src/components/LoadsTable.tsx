@@ -923,7 +923,20 @@ export default function LoadsTable() {
                       setEditMode(false);
                       setEditFormData({});
                     } else {
-                      handleEditLoad(selectedLoad);
+                      console.log("🔥 EDIT BUTTON CLICKED - Setting editMode to true");
+                      // Initialize form data with current load
+                      setEditFormData({
+                        number109: selectedLoad?.number109 || '',
+                        locationId: selectedLoad?.locationId || '',
+                        pickupLocationId: selectedLoad?.pickupLocationId || '',
+                        estimatedMiles: selectedLoad?.estimatedMiles || 0,
+                        specialInstructions: selectedLoad?.specialInstructions || ''
+                      });
+                      setEditMode(true);
+                      // Fetch load stops for editing
+                      if (selectedLoad?.id) {
+                        fetchLoadStops(selectedLoad.id);
+                      }
                     }
                   }}
                 >
