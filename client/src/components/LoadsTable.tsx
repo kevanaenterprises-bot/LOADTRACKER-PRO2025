@@ -223,11 +223,25 @@ export default function LoadsTable() {
       });
       
       console.log(`🔧 Response status:`, response.status);
+      console.log(`🔧 Response ok:`, response.ok);
+      console.log(`🔧 Response headers:`, response.headers);
       
       if (!response.ok) {
         const errorText = await response.text();
         console.error('🔧 Financial update error response:', errorText);
         throw new Error(`Update failed: ${errorText}`);
+      }
+      
+      // Try to parse the response
+      let responseData;
+      try {
+        responseData = await response.json();
+        console.log(`🔧 Response data:`, responseData);
+      } catch (parseError) {
+        console.error('🔧 Failed to parse response JSON:', parseError);
+        const responseText = await response.text();
+        console.log('🔧 Raw response text:', responseText);
+        throw new Error('Failed to parse server response');
       }
       
       // Update the selected load state immediately for UI feedback
