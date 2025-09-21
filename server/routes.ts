@@ -3749,6 +3749,17 @@ Reply YES to confirm acceptance or NO to decline.`
         attachments
       });
       
+      // ✅ WORKFLOW AUTOMATION: Auto-transition from "awaiting_invoicing" to "awaiting_payment" after successful email
+      if (load.status === "awaiting_invoicing") {
+        try {
+          await storage.updateLoadStatus(load.id, "awaiting_payment");
+          console.log(`🔄 WORKFLOW AUTO-TRANSITION: Load ${load.number109} moved from AWAITING_INVOICING → AWAITING_PAYMENT after successful email`);
+        } catch (statusError) {
+          console.error(`❌ Failed to auto-transition load status for ${load.number109}:`, statusError);
+          // Don't fail the email response if status update fails
+        }
+      }
+      
       res.json({
         message: "Complete document package emailed successfully",
         emailAddress,

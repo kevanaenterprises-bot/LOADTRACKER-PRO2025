@@ -86,6 +86,13 @@ export const loads = pgTable("loads", {
   deliveredAt: timestamp("delivered_at"),
   completedAt: timestamp("completed_at"),
   paidAt: timestamp("paid_at"),
+  // Payment tracking fields
+  paymentMethod: varchar("payment_method"), // "check", "wire", "ach", "cash", etc.
+  paymentReference: varchar("payment_reference"), // Check number, wire confirmation, etc.
+  paymentNotes: text("payment_notes"), // Additional payment details
+  // Archive fields for paid load management
+  isArchived: boolean("is_archived").default(false),
+  archivedAt: timestamp("archived_at"),
   // Driver confirmation tracking
   driverConfirmed: boolean("driver_confirmed").default(false),
   driverConfirmedAt: timestamp("driver_confirmed_at"),
