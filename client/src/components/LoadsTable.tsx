@@ -27,10 +27,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Package, MapPin, X, RefreshCw, Search } from "lucide-react";
+import { Plus, Package, MapPin, X, RefreshCw, Search, Route, Navigation } from "lucide-react";
 import { useState, useEffect } from "react";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 import { LoadSection } from "@/components/LoadsTableSections";
+import { HERERouteOptimizer } from "@/services/HERERouteOptimizer";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -125,6 +126,10 @@ export default function LoadsTable() {
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // HERE Maps route calculation state
+  const [calculatingRoute, setCalculatingRoute] = useState(false);
+  const [routeCalculated, setRouteCalculated] = useState<{[key: string]: boolean}>({});
 
   // Function to fetch load stops for editing
   const fetchLoadStops = async (loadId: string) => {
@@ -253,6 +258,79 @@ export default function LoadsTable() {
       if (inputElement && selectedLoad) {
         inputElement.value = selectedLoad[field as keyof typeof selectedLoad] || '0.00';
       }
+    }
+  };
+
+  // HERE Maps route calculation function
+  const calculateRouteDistance = async (loadId: string, load: any) => {
+    if (!load.pickupAddress || !load.deliveryAddress) {
+      toast({
+        title: "Cannot Calculate Route",
+        description: "Both pickup and delivery addresses are required for route calculation",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setCalculatingRoute(true);
+    try {
+      const distance = await HERERouteOptimizer.calculateDistance(
+        load.pickupAddress,
+        load.deliveryAddress,
+        {
+          maxWeight: 80000, // Standard truck weight limit
+          maxHeight: 13.6,  // Standard truck height limit  
+          axleCount: 5,     // Typical semi-truck
+        }
+      );
+
+      // Update the load's estimated miles in the database
+      const response = await fetch(`/api/loads/${loadId}/financials`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ estimatedMiles: distance.miles.toString() })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update mileage: ${response.status}`);
+      }
+      
+      // Update the selected load state for immediate UI feedback
+      if (selectedLoad && selectedLoad.id === loadId) {
+        setSelectedLoad({ ...selectedLoad, estimatedMiles: distance.miles });
+      }
+      
+      // Mark route as calculated
+      setRouteCalculated(prev => ({ ...prev, [loadId]: true }));
+      
+      // Refresh loads data
+      queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
+      
+      toast({
+        title: "Route Calculated! 🚛",
+        description: `Total distance: ${distance.miles} miles • Est. time: ${Math.floor(distance.duration / 60)}h ${distance.duration % 60}m`,
+      });
+      
+      if (distance.warnings && distance.warnings.length > 0) {
+        toast({
+          title: "Truck Route Warnings",
+          description: distance.warnings.join(", "),
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Route calculation failed:", error);
+      toast({
+        title: "Route Calculation Failed",
+        description: error instanceof Error ? error.message : "Unable to calculate route using HERE Maps",
+        variant: "destructive"
+      });
+    } finally {
+      setCalculatingRoute(false);
     }
   };
 
@@ -1335,12 +1413,35 @@ export default function LoadsTable() {
                     </div>
                   </div>
 
-                  {/* Miles Information */}
+                  {/* Miles Information with HERE Maps Route Calculation */}
                   <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <span className="font-semibold text-yellow-800">Total Distance:</span>
-                        <span className="ml-2 text-lg">{selectedLoad.estimatedMiles || 0} miles</span>
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <span className="font-semibold text-yellow-800">Total Distance:</span>
+                          <span className={`ml-2 text-lg ${(selectedLoad.estimatedMiles || 0) === 0 ? 'text-red-600' : 'text-green-600'}`}>
+                            {selectedLoad.estimatedMiles || 0} miles
+                          </span>
+                        </div>
+                        {((selectedLoad.estimatedMiles || 0) === 0 || !routeCalculated[selectedLoad.id]) && 
+                         selectedLoad.pickupAddress && selectedLoad.deliveryAddress && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => calculateRouteDistance(selectedLoad.id, selectedLoad)}
+                            disabled={calculatingRoute}
+                            className="flex items-center gap-2 text-xs"
+                          >
+                            <Navigation className="h-3 w-3" />
+                            {calculatingRoute ? "Calculating..." : "Calculate Route"}
+                          </Button>
+                        )}
+                        {routeCalculated[selectedLoad.id] && (selectedLoad.estimatedMiles || 0) > 0 && (
+                          <div className="flex items-center gap-1 text-xs text-green-600">
+                            <Route className="h-3 w-3" />
+                            <span>✅ Truck Route</span>
+                          </div>
+                        )}
                       </div>
                       {selectedLoad.appointmentTime && (
                         <div className="text-sm text-yellow-700">
@@ -1348,6 +1449,11 @@ export default function LoadsTable() {
                         </div>
                       )}
                     </div>
+                    {((selectedLoad.estimatedMiles || 0) === 0) && (
+                      <div className="mt-2 text-xs text-yellow-700">
+                        <strong>💡 Tip:</strong> Click "Calculate Route" to get accurate truck mileage using HERE Maps commercial routing
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
