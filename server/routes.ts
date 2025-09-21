@@ -2214,15 +2214,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user = { role: "admin" };
       }
       
+      // Extract query parameters for filtering
+      const { status } = req.query;
+      console.log(`🔍 Query parameters:`, { status });
+      
       let loads;
       if (user?.role === "driver" && userId) {
         console.log(`🔥 DRIVER MODE: Getting loads for driver ${userId}`);
         loads = await storage.getLoadsByDriver(userId);
         console.log(`🔒 SECURITY: Driver ${userId} should only see ${loads?.length || 0} assigned loads`);
+        
+        // Apply additional filtering for drivers if needed
+        if (status && typeof status === 'string') {
+          loads = loads.filter(load => load.status === status);
+          console.log(`🔍 DRIVER FILTER: Filtered to ${loads.length} loads with status "${status}"`);
+        }
       } else {
-        console.log("🔥 ADMIN MODE: Getting all loads");
-        loads = await storage.getLoads();
-        console.log(`📋 ADMIN: Returning ${loads?.length || 0} total loads`);
+        console.log("🔥 ADMIN MODE: Getting loads with filters");
+        
+        if (status && typeof status === 'string') {
+          console.log(`🔍 ADMIN FILTER: Using filtered query for status "${status}"`);
+          loads = await storage.getLoadsFiltered({ status });
+        } else {
+          console.log("🔥 ADMIN: Getting all loads (no filters)");
+          loads = await storage.getLoads();
+        }
+        console.log(`📋 ADMIN: Returning ${loads?.length || 0} loads`);
       }
       
       // SECURITY CHECK: Log exactly what's being returned

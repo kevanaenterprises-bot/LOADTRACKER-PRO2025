@@ -62,6 +62,7 @@ export interface IStorage {
   // Load operations
   createLoad(load: InsertLoad, stops?: InsertLoadStop[]): Promise<Load>;
   getLoads(): Promise<LoadWithDetails[]>;
+  getLoadsFiltered(filters: { status?: string }): Promise<LoadWithDetails[]>;
   getLoad(id: string): Promise<LoadWithDetails | undefined>;
   getLoadByNumber(number: string): Promise<LoadWithDetails | undefined>;
   updateLoad(id: string, updates: Partial<Load>): Promise<Load>;
@@ -646,6 +647,36 @@ export class DatabaseStorage implements IStorage {
       location: row.location || undefined,
       invoice: row.invoice || undefined,
     }));
+  }
+
+  async getLoadsFiltered(filters: { status?: string }): Promise<LoadWithDetails[]> {
+    console.log(`🔍 Getting filtered loads with filters:`, filters);
+    
+    const result = await db
+      .select({
+        load: loads,
+        driver: users,
+        location: locations,
+        invoice: invoices,
+      })
+      .from(loads)
+      .leftJoin(users, eq(loads.driverId, users.id))
+      .leftJoin(locations, eq(loads.locationId, locations.id))
+      .leftJoin(invoices, eq(loads.id, invoices.loadId))
+      .where(
+        filters.status ? eq(loads.status, filters.status) : sql`1 = 1`
+      )
+      .orderBy(desc(loads.updatedAt));
+
+    const filteredResults = result.map(row => ({
+      ...row.load,
+      driver: row.driver || undefined,
+      location: row.location || undefined,
+      invoice: row.invoice || undefined,
+    }));
+
+    console.log(`📊 Found ${filteredResults.length} loads matching filters`);
+    return filteredResults;
   }
 
   async markLoadPaid(id: string, paymentDetails: {
