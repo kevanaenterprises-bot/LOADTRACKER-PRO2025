@@ -375,4 +375,5 @@ export type LoadWithDetails = Load & {
   driver?: User;
   location?: Location;
   invoice?: Invoice;
+  stops?: LoadStop[];
 };

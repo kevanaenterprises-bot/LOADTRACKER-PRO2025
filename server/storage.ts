@@ -406,11 +406,15 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
+    // Get stops for this load (SAME AS getLoads method)
+    const stops = await this.getLoadStops(result.load.id);
+
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
       invoice: result.invoice || undefined,
+      stops: stops || [], // ✅ NOW INCLUDES STOPS!
     };
   }
 
@@ -430,11 +434,15 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
+    // Get stops for this load (SAME AS getLoads method)
+    const stops = await this.getLoadStops(result.load.id);
+
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
       invoice: result.invoice || undefined,
+      stops: stops || [], // ✅ NOW INCLUDES STOPS!
     };
   }
 
