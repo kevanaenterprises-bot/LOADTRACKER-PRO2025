@@ -195,15 +195,22 @@ export default function LoadsTable() {
 
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
+    console.log(`🔧 Updating ${field} for load ${loadId} with value:`, value);
+    
     try {
-      // Validate financial input before sending
-      const numericValue = parseFloat(value);
+      // Allow empty values to be set as 0
+      const cleanValue = value.trim();
+      const numericValue = cleanValue === "" ? 0 : parseFloat(cleanValue);
+      
+      console.log(`🔧 Parsed numeric value:`, numericValue);
+      
       if (isNaN(numericValue) || numericValue < 0) {
         throw new Error('Please enter a valid positive number');
       }
       
       // Format to 2 decimal places
       const formattedValue = numericValue.toFixed(2);
+      console.log(`🔧 Formatted value:`, formattedValue);
       
       const response = await fetch(`/api/loads/${loadId}/financials`, {
         method: 'PATCH',
@@ -215,10 +222,12 @@ export default function LoadsTable() {
         body: JSON.stringify({ [field]: formattedValue })
       });
       
+      console.log(`🔧 Response status:`, response.status);
+      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Financial update error:', errorText);
-        throw new Error(`Failed to update ${field}: ${errorText}`);
+        console.error('🔧 Financial update error response:', errorText);
+        throw new Error(`Update failed: ${errorText}`);
       }
       
       // Update the selected load state immediately for UI feedback

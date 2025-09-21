@@ -3333,14 +3333,25 @@ Reply YES to confirm acceptance or NO to decline.`
       const { id } = req.params;
       const updateData = req.body;
       
-      console.log(`Updating load ${id} financials:`, updateData);
+      console.log(`🔧 SERVER: Updating load ${id} financials:`, updateData);
+      console.log(`🔧 SERVER: Update data types:`, Object.keys(updateData).map(key => `${key}: ${typeof updateData[key]} (${updateData[key]})`));
       
       const updatedLoad = await storage.updateLoad(id, updateData);
       
+      console.log(`🔧 SERVER: Successfully updated load financials for ${id}`);
       res.json(updatedLoad);
     } catch (error) {
-      console.error('Error updating load financials:', error);
-      res.status(500).json({ error: 'Failed to update load financials' });
+      console.error('🔧 SERVER: Error updating load financials:', error);
+      console.error('🔧 SERVER: Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        updateData,
+        loadId: id
+      });
+      res.status(500).json({ 
+        error: 'Failed to update load financials',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
