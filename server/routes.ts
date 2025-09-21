@@ -3452,6 +3452,118 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Calculate route distance using HERE Maps (fixes CORS issues)
+  app.post("/api/loads/:id/calculate-route", (req, res, next) => {
+    // Flexible authentication for route calculations
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || hasTokenBypass;
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { pickupAddress, deliveryAddress, truckSpecs } = req.body;
+      
+      if (!pickupAddress || !deliveryAddress) {
+        return res.status(400).json({ 
+          error: 'Both pickup and delivery addresses are required' 
+        });
+      }
+
+      // Get HERE Maps API key from environment
+      const apiKey = process.env.HERE_MAPS_API_KEY || process.env.VITE_HERE_MAPS_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ 
+          error: 'HERE Maps API key not configured on server' 
+        });
+      }
+
+      console.log(`🚛 Backend route calculation: ${pickupAddress} → ${deliveryAddress}`);
+
+      // Step 1: Geocode addresses
+      const geocodeUrl = 'https://geocode.search.hereapi.com/v1/geocode';
+      
+      const [originRes, destRes] = await Promise.all([
+        fetch(`${geocodeUrl}?q=${encodeURIComponent(pickupAddress)}&apikey=${apiKey}&limit=1`),
+        fetch(`${geocodeUrl}?q=${encodeURIComponent(deliveryAddress)}&apikey=${apiKey}&limit=1`)
+      ]);
+
+      if (!originRes.ok || !destRes.ok) {
+        throw new Error('Failed to geocode addresses');
+      }
+
+      const [originData, destData] = await Promise.all([
+        originRes.json(),
+        destRes.json()
+      ]);
+
+      if (!originData.items?.[0] || !destData.items?.[0]) {
+        throw new Error('Could not find coordinates for addresses');
+      }
+
+      const origin = originData.items[0].position;
+      const destination = destData.items[0].position;
+
+      // Step 2: Calculate truck route
+      const routeUrl = 'https://route.ls.hereapi.com/routing/7.2/calculateroute';
+      const params = new URLSearchParams({
+        apikey: apiKey,
+        transportMode: 'truck',
+        origin: `${origin.lat},${origin.lng}`,
+        destination: `${destination.lat},${destination.lng}`,
+        return: 'summary',
+        routingMode: 'fast',
+      });
+
+      // Add truck specifications if provided
+      if (truckSpecs?.maxWeight) {
+        params.append('truck[grossWeight]', Math.round(truckSpecs.maxWeight * 0.453592).toString());
+      }
+      if (truckSpecs?.maxHeight) {
+        params.append('truck[height]', Math.round(truckSpecs.maxHeight * 0.3048 * 100).toString()); // feet to cm
+      }
+
+      const routeRes = await fetch(`${routeUrl}?${params}`);
+      
+      if (!routeRes.ok) {
+        const errorText = await routeRes.text();
+        throw new Error(`HERE routing failed: ${routeRes.status} - ${errorText}`);
+      }
+      
+      const routeData = await routeRes.json();
+      
+      if (!routeData.routes || routeData.routes.length === 0) {
+        throw new Error('No route found');
+      }
+      
+      const route = routeData.routes[0];
+      const summary = route.sections[0].summary;
+      
+      const miles = Math.round((summary.length * 0.000621371) * 100) / 100;
+      const duration = Math.round(summary.duration / 60);
+      
+      console.log(`✅ Route calculated: ${miles} miles, ${duration} minutes`);
+      
+      res.json({ 
+        miles, 
+        duration,
+        pickupAddress,
+        deliveryAddress
+      });
+
+    } catch (error: any) {
+      console.error('❌ Route calculation failed:', error);
+      res.status(500).json({ 
+        error: 'Route calculation failed',
+        message: error.message
+      });
+    }
+  });
+
   // Update load financial details
   app.patch("/api/loads/:id/financials", (req, res, next) => {
     // Flexible authentication for financial updates

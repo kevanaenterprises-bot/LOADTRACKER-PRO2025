@@ -287,30 +287,39 @@ export default function LoadsTable() {
       return;
     }
 
-    console.log('🚛 ROUTE CALCULATION DEBUG:');
-    console.log('📍 Pickup Address:', pickupAddr);
-    console.log('📍 Delivery Address:', deliveryAddr);
-    console.log('🔑 HERE API Key available:', !!import.meta.env.VITE_HERE_MAPS_API_KEY);
-    
-    // Temporary alert for production testing
-    alert(`ROUTE TEST:\nPickup: ${pickupAddr}\nDelivery: ${deliveryAddr}\nAPI Key: ${!!import.meta.env.VITE_HERE_MAPS_API_KEY ? 'YES' : 'NO'}`);
+    console.log('🚛 Route calculation starting via backend API...');
     
     setCalculatingRoute(true);
     try {
-      const distance = await HERERouteOptimizer.calculateDistance(
-        pickupAddr,
-        deliveryAddr,
-        {
-          maxWeight: 80000, // Standard truck weight limit
-          maxHeight: 13.6,  // Standard truck height limit  
-          axleCount: 5,     // Typical semi-truck
-        }
-      );
+      // Call our backend API endpoint instead of HERE Maps directly (fixes CORS)
+      const response = await fetch(`/api/loads/${loadId}/calculate-route`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          pickupAddress: pickupAddr, 
+          deliveryAddress: deliveryAddr,
+          truckSpecs: {
+            maxWeight: 80000,
+            maxHeight: 13.6,
+            axleCount: 5
+          }
+        })
+      });
       
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Route calculation failed: ${response.status}`);
+      }
+      
+      const distance = await response.json();
       console.log('✅ Route calculation successful:', distance);
 
       // Update the load's estimated miles in the database
-      const response = await fetch(`/api/loads/${loadId}/financials`, {
+      const updateResponse = await fetch(`/api/loads/${loadId}/financials`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -320,8 +329,8 @@ export default function LoadsTable() {
         body: JSON.stringify({ estimatedMiles: distance.miles.toString() })
       });
       
-      if (!response.ok) {
-        throw new Error(`Failed to update mileage: ${response.status}`);
+      if (!updateResponse.ok) {
+        throw new Error(`Failed to update mileage: ${updateResponse.status}`);
       }
       
       // Update the selected load state for immediate UI feedback
