@@ -39,11 +39,9 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, X, MapPin, Package, ArrowUp, ArrowDown } from "lucide-react";
 import { HelpButton } from "@/components/HelpTooltip";
 
-const formSchema = insertLoadSchema.extend({
+const formSchema = z.object({
   number109: z.string().min(1, "109 Number is required"),
-  locationId: z.string().min(1, "Delivery location is required"),
-  estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
-}).omit({ driverId: true });
+});
 
 type FormData = z.infer<typeof formSchema>;
 
