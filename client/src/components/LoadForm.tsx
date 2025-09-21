@@ -36,9 +36,10 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation } from "lucide-react";
+import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation, Calendar } from "lucide-react";
 import { HelpButton } from "@/components/HelpTooltip";
 import { HEREMapView } from "@/components/HEREMapView";
+import { DatePicker } from "@/components/ui/date-picker";
 import type { Location, OptimizedRoute } from "@/services/HERERouteOptimizer";
 
 const formSchema = insertLoadSchema.extend({
@@ -68,6 +69,7 @@ export default function LoadForm() {
   const [loadNumber, setLoadNumber] = useState("109-");
   const [currentLocationId, setCurrentLocationId] = useState("");
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
+  const [deliveryDueDate, setDeliveryDueDate] = useState<Date | undefined>(undefined);
   const [stops, setStops] = useState<LoadStop[]>([]);
   const [showOverride, setShowOverride] = useState(false);
   const [overridePassword, setOverridePassword] = useState("");
@@ -83,7 +85,7 @@ export default function LoadForm() {
   });
 
   const createLoadMutation = useMutation({
-    mutationFn: async (data: { number109: string; stops: LoadStop[]; overridePassword?: string }) => {
+    mutationFn: async (data: { number109: string; stops: LoadStop[]; deliveryDueAt?: Date; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
       if (data.stops.length === 0) {
         throw new Error("Please add at least one stop");
@@ -98,6 +100,7 @@ export default function LoadForm() {
       setLoadNumber("109-");
       setCurrentLocationId("");
       setCurrentStopType("pickup");
+      setDeliveryDueDate(undefined);
       setStops([]);
       setShowOverride(false);
       setOverridePassword("");
@@ -194,6 +197,7 @@ export default function LoadForm() {
     const submitData = {
       number109: loadNumber,
       stops,
+      ...(deliveryDueDate ? { deliveryDueAt: deliveryDueDate } : {}),
       ...(showOverride && overridePassword ? { overridePassword } : {}),
     };
     createLoadMutation.mutate(submitData);
@@ -281,9 +285,23 @@ export default function LoadForm() {
           </div>
         )}
 
-        {/* Step 2: Add Stops */}
+        {/* Step 2: Delivery Due Date */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Step 2: Delivery Due Date (Optional)</Label>
+          <DatePicker
+            date={deliveryDueDate}
+            onDateChange={setDeliveryDueDate}
+            placeholder="Select delivery due date"
+            className="w-full"
+          />
+          <p className="text-xs text-gray-500">
+            When this load needs to be delivered (optional)
+          </p>
+        </div>
+
+        {/* Step 3: Add Stops */}
         <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
-          <Label className="text-sm font-medium">Step 2: Add Stops</Label>
+          <Label className="text-sm font-medium">Step 3: Add Stops</Label>
           
           {/* Location Selection */}
           <div className="space-y-2">
