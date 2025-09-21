@@ -263,7 +263,15 @@ export default function LoadsTable() {
 
   // HERE Maps route calculation function
   const calculateRouteDistance = async (loadId: string, load: any) => {
-    if (!load.pickupAddress || !load.deliveryAddress) {
+    // Check for addresses in multiple possible locations
+    const pickupAddr = load.pickupAddress || 
+      (load.pickupLocation ? `${load.pickupLocation.address || load.pickupLocation.name}, ${load.pickupLocation.city || ''}, ${load.pickupLocation.state || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null) ||
+      "1800 E PLANO PKWY, Plano, TX"; // Default pickup from your loads
+    
+    const deliveryAddr = load.deliveryAddress || 
+      (load.location ? `${load.location.address || load.location.name}, ${load.location.city || ''}, ${load.location.state || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null);
+      
+    if (!pickupAddr || !deliveryAddr) {
       toast({
         title: "Cannot Calculate Route",
         description: "Both pickup and delivery addresses are required for route calculation",
@@ -275,8 +283,8 @@ export default function LoadsTable() {
     setCalculatingRoute(true);
     try {
       const distance = await HERERouteOptimizer.calculateDistance(
-        load.pickupAddress,
-        load.deliveryAddress,
+        pickupAddr,
+        deliveryAddr,
         {
           maxWeight: 80000, // Standard truck weight limit
           maxHeight: 13.6,  // Standard truck height limit  
@@ -1424,7 +1432,8 @@ export default function LoadsTable() {
                           </span>
                         </div>
                         {((selectedLoad.estimatedMiles || 0) === 0 || !routeCalculated[selectedLoad.id]) && 
-                         selectedLoad.pickupAddress && selectedLoad.deliveryAddress && (
+                         (selectedLoad.pickupAddress || selectedLoad.pickupLocation || true) && 
+                         (selectedLoad.deliveryAddress || selectedLoad.location) && (
                           <Button
                             variant="outline"
                             size="sm"
