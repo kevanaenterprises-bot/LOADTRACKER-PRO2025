@@ -370,6 +370,9 @@ export default function LoadsTable() {
     console.log("Load clicked:", load);
     setSelectedLoad(load);
     setDialogOpen(true);
+    // Always reset edit mode when opening a new load dialog
+    setEditMode(false);
+    setEditFormData({});
     
     // Fetch existing stops for this load
     try {
@@ -923,7 +926,6 @@ export default function LoadsTable() {
                       setEditMode(false);
                       setEditFormData({});
                     } else {
-                      console.log("🔥 EDIT BUTTON CLICKED - Setting editMode to true");
                       // Initialize form data with current load
                       setEditFormData({
                         number109: selectedLoad?.number109 || '',
@@ -957,13 +959,6 @@ export default function LoadsTable() {
           </DialogHeader>
           
           <div className="space-y-6">
-            <div className="p-4 bg-red-100 border border-red-300 rounded">
-              <h3 className="font-bold">DIALOG DEBUG INFO</h3>
-              <p>dialogOpen: {String(dialogOpen)}</p>
-              <p>selectedLoad exists: {String(!!selectedLoad)}</p>
-              <p>editMode: {String(editMode)}</p>
-              <p>selectedLoad ID: {selectedLoad?.id || 'no ID'}</p>
-            </div>
             
             {selectedLoad && (
               <div className="space-y-6">
