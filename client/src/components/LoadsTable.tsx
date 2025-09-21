@@ -195,14 +195,10 @@ export default function LoadsTable() {
 
   // Function to update load financial details
   const updateLoadFinancials = async (loadId: string, field: string, value: string) => {
-    console.log(`🔧 Updating ${field} for load ${loadId} with value:`, value);
-    
     try {
       // Allow empty values to be set as 0
       const cleanValue = value.trim();
       const numericValue = cleanValue === "" ? 0 : parseFloat(cleanValue);
-      
-      console.log(`🔧 Parsed numeric value:`, numericValue);
       
       if (isNaN(numericValue) || numericValue < 0) {
         throw new Error('Please enter a valid positive number');
@@ -210,7 +206,6 @@ export default function LoadsTable() {
       
       // Format to 2 decimal places
       const formattedValue = numericValue.toFixed(2);
-      console.log(`🔧 Formatted value:`, formattedValue);
       
       const response = await fetch(`/api/loads/${loadId}/financials`, {
         method: 'PATCH',
@@ -222,27 +217,12 @@ export default function LoadsTable() {
         body: JSON.stringify({ [field]: formattedValue })
       });
       
-      console.log(`🔧 Response status:`, response.status);
-      console.log(`🔧 Response ok:`, response.ok);
-      console.log(`🔧 Response headers:`, response.headers);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('🔧 Financial update error response:', errorText);
         throw new Error(`Update failed: ${errorText}`);
       }
       
-      // Try to parse the response
-      let responseData;
-      try {
-        responseData = await response.json();
-        console.log(`🔧 Response data:`, responseData);
-      } catch (parseError) {
-        console.error('🔧 Failed to parse response JSON:', parseError);
-        const responseText = await response.text();
-        console.log('🔧 Raw response text:', responseText);
-        throw new Error('Failed to parse server response');
-      }
+      await response.json(); // Parse response to ensure it's valid
       
       // Update the selected load state immediately for UI feedback
       if (selectedLoad && selectedLoad.id === loadId) {
