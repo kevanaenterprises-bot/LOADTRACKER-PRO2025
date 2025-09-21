@@ -1359,7 +1359,7 @@ export default function LoadsTable() {
                 </div>
                 
                 {/* Update Invoice Button - Show if invoice exists AND financials have been modified */}
-                {hasInvoice(selectedLoad.id) && financialsModified === selectedLoad.id && (
+                {hasInvoice(selectedLoad.id) && (
                   <div className="mt-3 text-center">
                     <Button 
                       onClick={() => updateInvoiceWithNewCharges(selectedLoad.id)}
