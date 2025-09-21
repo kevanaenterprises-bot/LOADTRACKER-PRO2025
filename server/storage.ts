@@ -72,6 +72,12 @@ export interface IStorage {
   updateLoadPOD(id: string, podDocumentPath: string): Promise<Load>;
   getLoadsByDriver(driverId: string): Promise<LoadWithDetails[]>;
   getLoadsWithTracking(): Promise<LoadWithDetails[]>;
+  markLoadPaid(id: string, paymentDetails: {
+    paymentMethod: string;
+    paymentReference?: string;
+    paymentNotes?: string;
+    paidAt?: Date;
+  }): Promise<Load>;
   deleteLoad(id: string): Promise<void>;
   
   // Load stops operations
@@ -640,6 +646,46 @@ export class DatabaseStorage implements IStorage {
       location: row.location || undefined,
       invoice: row.invoice || undefined,
     }));
+  }
+
+  async markLoadPaid(id: string, paymentDetails: {
+    paymentMethod: string;
+    paymentReference?: string;
+    paymentNotes?: string;
+    paidAt?: Date;
+  }): Promise<Load> {
+    const paidAt = paymentDetails.paidAt || new Date();
+    
+    console.log(`💰 MARKING LOAD PAID: ${id} with method "${paymentDetails.paymentMethod}"`);
+    
+    // Update the load with payment details and set status to "paid"
+    const [updatedLoad] = await db
+      .update(loads)
+      .set({
+        status: "paid",
+        paidAt,
+        paymentMethod: paymentDetails.paymentMethod,
+        paymentReference: paymentDetails.paymentReference,
+        paymentNotes: paymentDetails.paymentNotes,
+        updatedAt: new Date()
+      })
+      .where(eq(loads.id, id))
+      .returning();
+
+    if (!updatedLoad) {
+      throw new Error("Load not found");
+    }
+
+    // Add status history entry for audit trail
+    await db.insert(loadStatusHistory).values({
+      loadId: id,
+      status: "paid",
+      timestamp: paidAt,
+      notes: `Payment processed via ${paymentDetails.paymentMethod}${paymentDetails.paymentReference ? ` - Ref: ${paymentDetails.paymentReference}` : ''}`,
+    });
+
+    console.log(`✅ Load ${updatedLoad.number109} marked as PAID via ${paymentDetails.paymentMethod}`);
+    return updatedLoad;
   }
 
   async deleteLoad(id: string): Promise<void> {

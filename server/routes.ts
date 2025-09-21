@@ -2700,6 +2700,61 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Mark load as paid - API endpoint for payment processing
+  app.post("/api/loads/:id/mark-paid", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required - Only office staff can mark loads as paid" });
+    }
+  }, async (req, res) => {
+    try {
+      const loadId = req.params.id;
+      const { paymentMethod, paymentReference, paymentNotes, paidAt } = req.body;
+      
+      console.log(`💰 MARK AS PAID REQUEST: Load ${loadId}`, { paymentMethod, paymentReference });
+      
+      // Validate required fields
+      if (!paymentMethod) {
+        return res.status(400).json({ message: "Payment method is required" });
+      }
+      
+      // Verify load exists and is in correct status
+      const existingLoad = await storage.getLoad(loadId);
+      if (!existingLoad) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      if (existingLoad.status !== "awaiting_payment") {
+        return res.status(400).json({ 
+          message: `Cannot mark as paid: Load status is "${existingLoad.status}", expected "awaiting_payment"` 
+        });
+      }
+      
+      // Mark load as paid using storage method
+      const updatedLoad = await storage.markLoadPaid(loadId, {
+        paymentMethod,
+        paymentReference,
+        paymentNotes,
+        paidAt: paidAt ? new Date(paidAt) : undefined
+      });
+      
+      console.log(`✅ Load ${updatedLoad.number109} successfully marked as PAID`);
+      res.json({
+        message: "Load marked as paid successfully",
+        load: updatedLoad
+      });
+      
+    } catch (error) {
+      console.error("❌ Error marking load as paid:", error);
+      res.status(500).json({ 
+        message: "Failed to mark load as paid",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Add stops to an existing load
   app.post("/api/loads/:id/stops", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
