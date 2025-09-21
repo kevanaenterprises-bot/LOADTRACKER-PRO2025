@@ -27,7 +27,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Package, MapPin, X, RefreshCw } from "lucide-react";
+import { Plus, Package, MapPin, X, RefreshCw, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 import { LoadSection } from "@/components/LoadsTableSections";
@@ -124,6 +124,7 @@ export default function LoadsTable() {
   const [existingStops, setExistingStops] = useState<any[]>([]);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Function to fetch load stops for editing
   const fetchLoadStops = async (loadId: string) => {
@@ -747,19 +748,33 @@ export default function LoadsTable() {
     );
   }
 
-  // Categorize loads by new workflow stages
-  const pendingLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "pending" || load.status === "created") : [];
-  const assignedLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "assigned" && load.driverId) : [];
-  const inTransitLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+  // Filter loads based on search term (Load #, Invoice #, or BOL #)
+  const filteredLoads = Array.isArray(loads) ? loads.filter((load: any) => {
+    if (!searchTerm.trim()) return true; // No search term, show all loads
+    
+    const search = searchTerm.toLowerCase().trim();
+    const loadNumber = load.number109?.toLowerCase() || '';
+    const bolNumber = load.bolNumber?.toLowerCase() || '';
+    const invoiceNumber = load.invoice?.invoiceNumber?.toLowerCase() || '';
+    
+    return loadNumber.includes(search) || 
+           bolNumber.includes(search) || 
+           invoiceNumber.includes(search);
+  }) : [];
+
+  // Categorize filtered loads by new workflow stages
+  const pendingLoads = filteredLoads.filter((load: any) => load.status === "pending" || load.status === "created");
+  const assignedLoads = filteredLoads.filter((load: any) => load.status === "assigned" && load.driverId);
+  const inTransitLoads = filteredLoads.filter((load: any) => 
     ["in_transit", "en_route_pickup", "at_shipper", "left_shipper", "en_route_receiver", "at_receiver", "delivered", "in_progress"].includes(load.status)
-  ) : [];
-  const awaitingInvoicingLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+  );
+  const awaitingInvoicingLoads = filteredLoads.filter((load: any) => 
     load.status === "awaiting_invoicing" || load.status === "empty"
-  ) : [];
-  const awaitingPaymentLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+  );
+  const awaitingPaymentLoads = filteredLoads.filter((load: any) => 
     load.status === "awaiting_payment" || load.status === "invoiced" || load.status === "waiting_for_invoice"
-  ) : [];
-  const paidLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "paid") : [];
+  );
+  const paidLoads = filteredLoads.filter((load: any) => load.status === "paid");
 
   return (
     <Card className="material-card">
@@ -811,6 +826,25 @@ export default function LoadsTable() {
         </div>
       </CardHeader>
       <CardContent>
+        {/* Search Field */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by Load #, Invoice #, or BOL #..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+              data-testid="input-search-loads"
+            />
+          </div>
+          {searchTerm.trim() && (
+            <div className="mt-2 text-sm text-gray-600">
+              Showing {filteredLoads.length} load{filteredLoads.length !== 1 ? 's' : ''} matching "{searchTerm}"
+            </div>
+          )}
+        </div>
+
         {/* Trucker Tip for first-time users */}
         {pendingLoads.length === 0 && assignedLoads.length === 0 && inTransitLoads.length === 0 && (
           <TruckerTip 
