@@ -44,7 +44,7 @@ export class GPSService {
     }
   }
 
-  // Enhanced geofencing with entry/exit timestamp tracking
+  // Update load status based on GPS location
   static async updateLoadStatus(
     loadId: string, 
     currentLat: number, 
@@ -59,14 +59,8 @@ export class GPSService {
 
       let newStatus = load.status;
       const now = new Date();
-      const updateData: any = {
-        currentLatitude: currentLat.toString(),
-        currentLongitude: currentLon.toString(),
-        lastLocationUpdate: now,
-        updatedAt: now,
-      };
 
-      // ENHANCED GEOFENCING: Track entry/exit for shipper location
+      // Check proximity to shipper location
       if (load.shipperLatitude && load.shipperLongitude) {
         const distanceToShipper = this.calculateDistance(
           currentLat,
@@ -75,25 +69,19 @@ export class GPSService {
           parseFloat(load.shipperLongitude.toString())
         );
 
-        const isInShipperGeofence = distanceToShipper <= this.LOCATION_THRESHOLD;
-        const wasInShipperGeofence = load.status === 'at_shipper';
-
-        if (isInShipperGeofence && !wasInShipperGeofence) {
-          // ENTERING shipper geofence
-          if (load.status === 'confirmed' || load.status === 'en_route_pickup' || load.status === 'in_progress') {
+        if (distanceToShipper <= this.LOCATION_THRESHOLD) {
+          if (load.status === 'confirmed' || load.status === 'en_route_pickup') {
             newStatus = 'at_shipper';
-            updateData.shipperEnteredAt = now;
-            console.log(`🏭 Driver entered shipper geofence for load ${loadId}`);
           }
-        } else if (!isInShipperGeofence && wasInShipperGeofence) {
-          // EXITING shipper geofence
-          newStatus = 'left_shipper';
-          updateData.shipperExitedAt = now;
-          console.log(`🚛 Driver left shipper geofence for load ${loadId}`);
+        } else {
+          // If driver was at shipper but is now away, they've left
+          if (load.status === 'at_shipper') {
+            newStatus = 'left_shipper';
+          }
         }
       }
 
-      // ENHANCED GEOFENCING: Track entry/exit for receiver location
+      // Check proximity to receiver location
       if (load.receiverLatitude && load.receiverLongitude) {
         const distanceToReceiver = this.calculateDistance(
           currentLat,
@@ -102,45 +90,64 @@ export class GPSService {
           parseFloat(load.receiverLongitude.toString())
         );
 
-        const isInReceiverGeofence = distanceToReceiver <= this.LOCATION_THRESHOLD;
-        const wasInReceiverGeofence = load.status === 'at_receiver';
-
-        if (isInReceiverGeofence && !wasInReceiverGeofence) {
-          // ENTERING receiver geofence
+        if (distanceToReceiver <= this.LOCATION_THRESHOLD) {
           if (load.status === 'left_shipper' || load.status === 'en_route_receiver') {
             newStatus = 'at_receiver';
-            updateData.receiverEnteredAt = now;
-            console.log(`🏪 Driver entered receiver geofence for load ${loadId}`);
           }
-        } else if (!isInReceiverGeofence && wasInReceiverGeofence) {
-          // EXITING receiver geofence (after delivery)
-          updateData.receiverExitedAt = now;
-          console.log(`📦 Driver left receiver geofence for load ${loadId}`);
         }
       }
 
-      // Determine en route status when not in any geofence
-      if (newStatus === load.status) {
-        if (load.status === 'confirmed' || load.status === 'in_progress') {
-          // Driver started tracking but not at any location yet
-          newStatus = 'en_route_pickup';
-        } else if (load.status === 'left_shipper') {
-          // Driver left shipper but not at receiver yet
-          newStatus = 'en_route_receiver';
-        }
+      // Determine en route status based on previous status and location
+      if (load.status === 'confirmed' && newStatus === 'confirmed') {
+        // Driver is moving but not at locations yet
+        newStatus = 'en_route_pickup';
+      } else if (load.status === 'left_shipper' && newStatus !== 'at_receiver') {
+        newStatus = 'en_route_receiver';
       }
 
-      // Update status in the update data if it changed
+      // Update database if status changed
       if (newStatus !== load.status) {
-        updateData.status = newStatus;
-        console.log(`📍 Load ${loadId} status: ${load.status} → ${newStatus} (GPS: ${currentLat.toFixed(6)}, ${currentLon.toFixed(6)})`);
+        const updateData: any = {
+          status: newStatus,
+          currentLatitude: currentLat.toString(),
+          currentLongitude: currentLon.toString(),
+          updatedAt: now,
+        };
+
+        // Add timestamp for specific status
+        switch (newStatus) {
+          case 'en_route_pickup':
+            updateData.enRoutePickupAt = now;
+            break;
+          case 'at_shipper':
+            updateData.atShipperAt = now;
+            break;
+          case 'left_shipper':
+            updateData.leftShipperAt = now;
+            break;
+          case 'en_route_receiver':
+            updateData.enRouteReceiverAt = now;
+            break;
+          case 'at_receiver':
+            updateData.atReceiverAt = now;
+            break;
+        }
+
+        await db.update(loads)
+          .set(updateData)
+          .where(eq(loads.id, loadId));
+
+        console.log(`Load ${loadId} status updated from ${load.status} to ${newStatus}`);
+      } else {
+        // Just update the current location
+        await db.update(loads)
+          .set({
+            currentLatitude: currentLat.toString(),
+            currentLongitude: currentLon.toString(),
+            updatedAt: now,
+          })
+          .where(eq(loads.id, loadId));
       }
-
-      // Always update location and timestamps
-      await db.update(loads)
-        .set(updateData)
-        .where(eq(loads.id, loadId));
-
     } catch (error) {
       console.error('Error updating load status:', error);
     }

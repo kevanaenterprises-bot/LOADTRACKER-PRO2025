@@ -21,8 +21,6 @@ import {
   insertTruckSchema,
   insertChatMessageSchema,
   insertInvoiceSchema,
-  simpleLoadSchema,
-  simpleLoadStopSchema,
   type Load,
   type User,
   type Location,
@@ -2604,92 +2602,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Location validated:", location.name);
       }
       
-      // Handle both simplified (number109 + stops) and legacy (full load data) formats
-      let validatedData;
-      let validatedStops;
-      let overridePassword;
-
-      if (req.body.stops && Array.isArray(req.body.stops)) {
-        // NEW SIMPLIFIED FORMAT: Just number109 + stops
-        console.log("Load creation - using simplified format (number109 + stops)");
-        const simpleData = simpleLoadSchema.parse(req.body);
-        overridePassword = simpleData.overridePassword;
-        
-        // Validate each stop location exists
-        for (const stop of simpleData.stops) {
-          if (stop.locationId) {
-            const location = await storage.getLocation(stop.locationId);
-            if (!location) {
-              return res.status(400).json({ message: `Stop location not found: ${stop.locationId}` });
-            }
-          }
-        }
-        
-        // Derive pickup and delivery locations from stops
-        const pickupStops = simpleData.stops.filter(s => s.stopType === "pickup");
-        const dropoffStops = simpleData.stops.filter(s => s.stopType === "dropoff");
-        
-        const pickupLocationId = pickupStops.length > 0 ? pickupStops[0].locationId : simpleData.stops[0].locationId;
-        const deliveryLocationId = dropoffStops.length > 0 ? dropoffStops[dropoffStops.length - 1].locationId : simpleData.stops[simpleData.stops.length - 1].locationId;
-        
-        // Get location details for addresses
-        const pickupLocation = await storage.getLocation(pickupLocationId);
-        const deliveryLocation = await storage.getLocation(deliveryLocationId);
-        
-        // Create full load object with defaults
-        validatedData = {
-          number109: simpleData.number109,
-          pickupLocationId,
-          locationId: deliveryLocationId,
-          pickupAddress: pickupLocation?.address || "",
-          deliveryAddress: deliveryLocation?.address || "",
-          companyName: deliveryLocation?.name || "",
-          status: "available",
-          tripRate: "0.00",
-          extraStops: "0.00",
-          lumperCharge: "0.00",
-          flatRate: "0.00"
-        };
-        
-        // Convert stops to load stops format
-        validatedStops = simpleData.stops.map(stop => ({
-          ...stop,
-          stopType: stop.stopType as "pickup" | "dropoff"
-        }));
-        
-        console.log("Load creation - derived data from stops:", { pickupLocationId, deliveryLocationId, stopsCount: validatedStops.length });
-        
-      } else {
-        // LEGACY FORMAT: Full load data
-        console.log("Load creation - using legacy format (full load data)");
-        const { stops, overridePassword: override, ...loadData } = req.body;
-        overridePassword = override;
-        
-        // Convert decimal fields from numbers to strings for Drizzle validation
-        const fieldsToConvert = ['tripRate', 'lumperFee', 'fuelAdvance', 'extraStops', 'lumperCharge'];
-        for (const field of fieldsToConvert) {
-          if (loadData[field] !== undefined && typeof loadData[field] === 'number') {
-            loadData[field] = loadData[field].toFixed(2);
-          }
-        }
-        
-        validatedData = insertLoadSchema.parse(loadData);
-        
-        // Validate stops if provided
-        if (stops && Array.isArray(stops) && stops.length > 0) {
-          // Validate each stop location exists
-          for (const stop of stops) {
-            if (stop.locationId) {
-              const location = await storage.getLocation(stop.locationId);
-              if (!location) {
-                return res.status(400).json({ message: `Stop location not found: ${stop.locationId}` });
-              }
-            }
-          }
-          validatedStops = stops;
-          console.log("Load creation - legacy stops validated:", validatedStops.length);
-        }
-      }
+      // Extract stops and override password from the request body
+      const { stops, overridePassword, ...loadData } = req.body;
+      
+      const validatedData = insertLoadSchema.parse(loadData);
       console.log("Load creation - validation successful, creating load:", validatedData);
       
       // Check if 109 number already exists
@@ -2710,12 +2626,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Existing load deleted, proceeding with new load creation");
       }
 
-      // Additional compatibility handling for old format loads
-      if (!req.body.stops && validatedData.locationId && !validatedData.pickupLocationId) {
-        // OLD FORMAT COMPATIBILITY: If no stops provided but locationId exists,
-        // treat it as both pickup and delivery location for backward compatibility
-        validatedData.pickupLocationId = validatedData.locationId;
-        console.log("Load creation - OLD FORMAT: setting pickupLocationId to same as locationId for geofencing:", validatedData.locationId);
+      // Validate stops if provided
+      let validatedStops = undefined;
+      if (stops && Array.isArray(stops) && stops.length > 0) {
+        // Validate each stop location exists
+        for (const stop of stops) {
+          if (stop.locationId) {
+            const location = await storage.getLocation(stop.locationId);
+            if (!location) {
+              return res.status(400).json({ message: `Stop location not found: ${stop.locationId}` });
+            }
+          }
+        }
+        validatedStops = stops;
+        console.log("Load creation - stops validated:", validatedStops.length);
+
+        // DESTINATION FIX: Set main load's locationId to LAST delivery stop for rate lookup purposes
+        const deliveryStops = stops.filter(stop => stop.stopType === "dropoff");
+        const lastDeliveryStop = deliveryStops[deliveryStops.length - 1];
+        if (lastDeliveryStop && lastDeliveryStop.locationId) {
+          validatedData.locationId = lastDeliveryStop.locationId;
+          console.log("Load creation - setting main locationId to LAST delivery stop for rate lookup:", lastDeliveryStop.locationId);
+        }
       }
 
       const load = await storage.createLoad(validatedData, validatedStops);

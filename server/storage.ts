@@ -325,26 +325,14 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .orderBy(desc(loads.createdAt));
 
-    // Get stops and pickup locations for each load
+    // Get stops for each load
     const loadsWithStops = await Promise.all(
       result.map(async (row) => {
         const stops = await this.getLoadStops(row.load.id);
-        
-        // Fetch pickup location separately if pickupLocationId exists
-        let pickupLocation = undefined;
-        if (row.load.pickupLocationId) {
-          const [pickup] = await db
-            .select()
-            .from(locations)
-            .where(eq(locations.id, row.load.pickupLocationId));
-          pickupLocation = pickup || undefined;
-        }
-        
         return {
           ...row.load,
           driver: row.driver || undefined,
           location: row.location || undefined,
-          pickupLocation: pickupLocation,
           invoice: row.invoice || undefined,
           stops: stops || [],
         };
@@ -370,21 +358,10 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
-    // Fetch pickup location separately if pickupLocationId exists
-    let pickupLocation = undefined;
-    if (result.load.pickupLocationId) {
-      const [pickup] = await db
-        .select()
-        .from(locations)
-        .where(eq(locations.id, result.load.pickupLocationId));
-      pickupLocation = pickup || undefined;
-    }
-
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
-      pickupLocation: pickupLocation,
       invoice: result.invoice || undefined,
     };
   }
@@ -405,21 +382,10 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
-    // Fetch pickup location separately if pickupLocationId exists
-    let pickupLocation = undefined;
-    if (result.load.pickupLocationId) {
-      const [pickup] = await db
-        .select()
-        .from(locations)
-        .where(eq(locations.id, result.load.pickupLocationId));
-      pickupLocation = pickup || undefined;
-    }
-
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
-      pickupLocation: pickupLocation,
       invoice: result.invoice || undefined,
     };
   }
@@ -567,24 +533,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async confirmLoad(id: string, driverId: string): Promise<Load> {
-    const now = new Date();
     const [updatedLoad] = await db
       .update(loads)
       .set({ 
         status: 'in_progress',
-        trackingEnabled: true,
-        trackingStartedAt: now,
-        driverConfirmed: true,
-        driverConfirmedAt: now,
-        updatedAt: now,
+        updatedAt: new Date(),
       })
       .where(and(eq(loads.id, id), eq(loads.driverId, driverId)))
       .returning();
 
     // Add status history
-    await this.addStatusHistory(id, 'in_progress', 'Driver accepted load and started GPS tracking');
+    await this.addStatusHistory(id, 'in_progress', 'Driver started trip');
 
-    console.log(`✅ Load ${id} confirmed by driver ${driverId} - GPS tracking enabled`);
     return updatedLoad;
   }
 

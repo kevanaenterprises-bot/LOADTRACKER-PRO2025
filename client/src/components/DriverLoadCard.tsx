@@ -45,12 +45,26 @@ const getStatusText = (status: string) => {
 const getNextAction = (status: string) => {
   switch (status) {
     case "assigned":
+      return { status: "in_progress", text: "Start Trip", icon: "fa-play" };
     case "created":
-      return { status: "confirm_and_track", text: "Accept Load & Start Tracking", icon: "fa-play" };
+      return { status: "en_route_pickup", text: "En Route to Pickup", icon: "fa-route" };
+    case "in_progress":
+    case "in_transit":
+      return { status: "en_route_pickup", text: "En Route to Pickup", icon: "fa-route" };
+    case "en_route_pickup":
+      return { status: "at_shipper", text: "Arrived at Shipper", icon: "fa-map-marker-alt" };
+    case "at_shipper":
+      return { status: "left_shipper", text: "Left Shipper", icon: "fa-truck" };
+    case "left_shipper":
+      return { status: "en_route_receiver", text: "En Route to Receiver", icon: "fa-route" };
+    case "en_route_receiver":
+      return { status: "at_receiver", text: "Arrived at Receiver", icon: "fa-map-marker-alt" };
+    case "at_receiver":
+      return { status: "delivered", text: "Mark as Delivered", icon: "fa-check-circle" };
     case "delivered":
       return { status: "awaiting_invoicing", text: "Complete Load", icon: "fa-file-invoice" };
     default:
-      return null; // All other statuses are handled automatically by geofencing
+      return null;
   }
 };
 
@@ -118,53 +132,10 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
     }
   });
 
-  // Accept load and start tracking mutation
-  const acceptLoadMutation = useMutation({
-    mutationFn: async () => {
-      console.log("🚀 Accepting load and starting tracking:", { loadId: load.id });
-      
-      try {
-        const result = await apiRequest(`/api/loads/${load.id}/confirm`, "POST");
-        console.log("✅ Load accepted and tracking started:", result);
-        return result;
-      } catch (error) {
-        console.error("💥 Accept load failed:", error);
-        throw error;
-      }
-    },
-    onSuccess: (result) => {
-      console.log("🎉 Load accepted successfully:", result);
-      toast({
-        title: "Load Accepted",
-        description: "GPS tracking started! Status updates will now be automatic based on your location.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
-    },
-    onError: (error: Error) => {
-      console.error("🚨 Accept load error:", error);
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Accept Load Error",
-        description: `Failed to accept load: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
   const updateStatusMutation = useMutation({
     mutationFn: async (status: string) => {
       console.log("🚀 Status update starting:", { loadId: load.id, status });
+      console.log("🔑 Bypass token available:", !!localStorage.getItem('bypass-token'));
       
       try {
         const result = await apiRequest(`/api/loads/${load.id}/status`, "PATCH", { status });
@@ -181,6 +152,7 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
         title: "Status Updated",
         description: "Load status has been updated successfully!",
       });
+      // Invalidate both driver loads and general loads to ensure UI refresh
       queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
     },
@@ -208,13 +180,7 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
   const handleStatusUpdate = () => {
     const nextAction = getNextAction(load.status);
     if (nextAction) {
-      if (nextAction.status === "confirm_and_track") {
-        // Accept load and start tracking
-        acceptLoadMutation.mutate();
-      } else {
-        // Regular status update (like completing load)
-        updateStatusMutation.mutate(nextAction.status);
-      }
+      updateStatusMutation.mutate(nextAction.status);
     }
   };
 
@@ -297,17 +263,17 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
               <Button 
                 className="flex-1 bg-green-600 hover:bg-green-700"
                 onClick={handleStatusUpdate}
-                disabled={acceptLoadMutation.isPending || updateStatusMutation.isPending}
+                disabled={updateStatusMutation.isPending}
               >
-                {(acceptLoadMutation.isPending || updateStatusMutation.isPending) ? (
+                {updateStatusMutation.isPending ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    {nextAction.status === "confirm_and_track" ? "Starting Tracking..." : "Updating..."}
+                    Updating...
                   </>
                 ) : (
                   <>
-                    <i className={`fas ${nextAction.status === "confirm_and_track" ? "fa-map-marked-alt" : "fa-check"} mr-2`}></i>
-                    {nextAction.text}
+                    <i className="fas fa-play mr-2"></i>
+                    Update Status
                   </>
                 )}
               </Button>

@@ -39,9 +39,11 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, X, MapPin, Package, ArrowUp, ArrowDown } from "lucide-react";
 import { HelpButton } from "@/components/HelpTooltip";
 
-const formSchema = z.object({
+const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
-});
+  locationId: z.string().min(1, "Delivery location is required"),
+  estimatedMiles: z.coerce.number().min(0, "Miles must be non-negative"),
+}).omit({ driverId: true });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -94,7 +96,6 @@ export default function LoadForm() {
       setShowOverride(false);
       setOverridePassword("");
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/loads", { excludePaid: true }] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
     },
     onError: (error: any) => {

@@ -105,12 +105,6 @@ export const loads = pgTable("loads", {
   receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
   receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
   lastLocationUpdate: timestamp("last_location_update"),
-  // Geofence entry/exit timestamps for automatic tracking
-  shipperEnteredAt: timestamp("shipper_entered_at"), // When driver entered shipper geofence
-  shipperExitedAt: timestamp("shipper_exited_at"), // When driver left shipper geofence
-  receiverEnteredAt: timestamp("receiver_entered_at"), // When driver entered receiver geofence
-  receiverExitedAt: timestamp("receiver_exited_at"), // When driver left receiver geofence
-  trackingStartedAt: timestamp("tracking_started_at"), // When driver accepted load and started tracking
   // Route calculation and mileage fields
   calculatedMiles: decimal("calculated_miles", { precision: 10, scale: 2 }), // Calculated route distance
   routeData: jsonb("route_data"), // Store full route details from API
@@ -309,25 +303,6 @@ export const insertLoadStopSchema = createInsertSchema(loadStops).omit({
   createdAt: true,
 });
 
-// Simplified LoadStop schema for frontend form submission
-export const simpleLoadStopSchema = z.object({
-  stopType: z.enum(["pickup", "dropoff"]),
-  stopSequence: z.number(),
-  locationId: z.string().min(1, "Location is required"),
-  companyName: z.string().optional(),
-  address: z.string().optional(),
-  contactName: z.string().optional(),
-  contactPhone: z.string().optional(),
-  notes: z.string().optional(),
-});
-
-// Simplified load creation schema for frontend
-export const simpleLoadSchema = z.object({
-  number109: z.string().min(1, "109 Number is required"),
-  stops: z.array(simpleLoadStopSchema).min(1, "At least one stop is required"),
-  overridePassword: z.string().optional(),
-});
-
 export const insertBolNumberSchema = createInsertSchema(bolNumbers).omit({
   id: true,
   createdAt: true,
@@ -403,6 +378,5 @@ export type Truck = typeof trucks.$inferSelect;
 export type LoadWithDetails = Load & {
   driver?: User;
   location?: Location;
-  pickupLocation?: Location;
   invoice?: Invoice;
 };
