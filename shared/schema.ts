@@ -105,6 +105,10 @@ export const loads = pgTable("loads", {
   receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
   receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
   lastLocationUpdate: timestamp("last_location_update"),
+  // Route calculation and mileage fields
+  calculatedMiles: decimal("calculated_miles", { precision: 10, scale: 2 }), // Calculated route distance
+  routeData: jsonb("route_data"), // Store full route details from API
+  lastRouteCalculated: timestamp("last_route_calculated"), // When route was last calculated
   // DEPRECATED: Legacy truck_number column - DO NOT USE in new code
   truckNumber: varchar("truck_number"), // Temporarily kept to avoid data loss
 });
