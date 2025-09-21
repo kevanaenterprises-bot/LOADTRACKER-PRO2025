@@ -27,8 +27,8 @@ import {
   invoices
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
-import { loads } from "@shared/schema";
+import { eq, desc, sql } from "drizzle-orm";
+import { loads, locations, loadStops } from "@shared/schema";
 
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
@@ -6179,9 +6179,9 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       console.log("🔧 LOCATION REPAIR: Starting database repair for missing locations");
       
       const repairResults = {
-        missingLocationIds: [],
-        restoredLocations: [],
-        errors: []
+        missingLocationIds: [] as string[],
+        restoredLocations: [] as any[],
+        errors: [] as any[]
       };
 
       // Step 1: Find all location IDs referenced by loads but missing from locations table
@@ -6202,15 +6202,15 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       // Step 2: Find missing location IDs from load_stops
       const missingFromStops = await db
         .select({
-          locationId: load_stops.locationId,
-          companyName: load_stops.companyName,
-          address: load_stops.address,
-          contactName: load_stops.contactName,
-          contactPhone: load_stops.contactPhone
+          locationId: loadStops.locationId,
+          companyName: loadStops.companyName,
+          address: loadStops.address,
+          contactName: loadStops.contactName,
+          contactPhone: loadStops.contactPhone
         })
-        .from(load_stops)
+        .from(loadStops)
         .where(
-          sql`${load_stops.locationId} IS NOT NULL AND ${load_stops.locationId} NOT IN (SELECT id FROM locations)`
+          sql`${loadStops.locationId} IS NOT NULL AND ${loadStops.locationId} NOT IN (SELECT id FROM locations)`
         );
 
       console.log(`🔍 REPAIR: Found ${missingFromLoads.length} missing location IDs from loads`);
@@ -6262,7 +6262,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       }
 
       // Step 4: Restore missing locations
-      for (const [locationId, locationInfo] of locationData.entries()) {
+      for (const [locationId, locationInfo] of Array.from(locationData.entries())) {
         try {
           // Try to parse city/state from address if not provided
           if (locationInfo.address && !locationInfo.city) {
@@ -6275,7 +6275,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
 
           console.log(`🔧 REPAIR: Restoring location ${locationId}: ${locationInfo.name}`);
 
-          // Insert the missing location with its original ID
+          // Insert the missing location with its original ID (using raw values to allow ID specification)
           await db
             .insert(locations)
             .values({
@@ -6286,8 +6286,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
               state: locationInfo.state,
               contactName: locationInfo.contactName,
               contactPhone: locationInfo.contactPhone,
-              createdAt: new Date(),
-              updatedAt: new Date()
+              createdAt: new Date()
             })
             .onConflictDoNothing(); // Safe in case location already exists
 
