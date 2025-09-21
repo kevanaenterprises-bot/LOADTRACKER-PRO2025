@@ -963,164 +963,61 @@ export default function LoadsTable() {
             {selectedLoad && (
               <div className="space-y-6">
                 {editMode ? (
-                  // Edit Mode
-                  <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
-                    <div className="text-xs bg-yellow-100 p-2 rounded">
-                      Debug: editMode={String(editMode)}, selectedLoad exists: {String(!!selectedLoad)}, 
-                      editFormData: {JSON.stringify(editFormData)}, 
-                      locations: {Array.isArray(locations) ? locations.length : 'not array'},
-                      loadLocation: {selectedLoad?.location ? JSON.stringify({city: selectedLoad.location.city, state: selectedLoad.location.state, name: selectedLoad.location.name}) : 'none'}
-                    </div>
-                  
-                  {/* Edit Form */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">109 Load Number</label>
-                      <Input
-                        type="text"
-                        value={editFormData.number109 || ''}
-                        onChange={(e) => setEditFormData({...editFormData, number109: e.target.value})}
-                        placeholder="SEPTEMBER 2025 TRAILER RENTAL"
-                      />
-                    </div>
+                  // Edit Mode - SIMPLIFIED FOR DEBUGGING
+                  <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
+                    <h3 className="text-lg font-semibold text-green-800">✅ EDIT MODE WORKING!</h3>
                     
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Estimated Miles</label>
-                      <Input
-                        type="number"
-                        value={editFormData.estimatedMiles || 0}
-                        onChange={(e) => setEditFormData({...editFormData, estimatedMiles: parseInt(e.target.value) || 0})}
-                        placeholder="0"
-                      />
+                    <div className="text-sm bg-blue-100 p-3 rounded">
+                      <p><strong>Load ID:</strong> {selectedLoad?.id}</p>
+                      <p><strong>Load Number:</strong> {selectedLoad?.number109}</p>
+                      <p><strong>Edit Mode:</strong> {String(editMode)}</p>
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Pickup Location</label>
-                      <Select 
-                        value={editFormData.pickupLocationId || ''} 
-                        onValueChange={(value) => setEditFormData({...editFormData, pickupLocationId: value})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select pickup location" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="">No pickup location</SelectItem>
-                          {Array.isArray(locations) && locations.map((location: any) => (
-                            <SelectItem key={location.id} value={location.id}>
-                              {location.name} - {location.city}, {location.state}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Delivery Location</label>
-                      <Select 
-                        value={editFormData.locationId || ''} 
-                        onValueChange={(value) => setEditFormData({...editFormData, locationId: value})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select delivery location" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.isArray(locations) && locations.map((location: any) => (
-                            <SelectItem key={location.id} value={location.id}>
-                              {location.name} - {location.city}, {location.state}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Special Instructions</label>
-                    <Textarea
-                      value={editFormData.specialInstructions || ''}
-                      onChange={(e) => setEditFormData({...editFormData, specialInstructions: e.target.value})}
-                      placeholder="Any special delivery instructions..."
-                      rows={3}
-                    />
-                  </div>
-                  
-                  {/* Stops Management */}
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <label className="block text-sm font-medium">Additional Stops</label>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowStopDialog(true)}
-                        className="flex items-center gap-2"
-                      >
-                        <Plus className="h-4 w-4" />
-                        Add Stop
-                      </Button>
-                    </div>
-                    
-                    {loadStops.length > 0 && (
-                      <div className="space-y-2 max-h-40 overflow-y-auto">
-                        {loadStops.map((stop: any, index: number) => (
-                          <div 
-                            key={stop.id} 
-                            className="flex items-center justify-between p-3 bg-white rounded border"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs font-medium px-2 py-1 bg-gray-100 rounded">
-                                #{index + 1}
-                              </span>
-                              {stop.stopType === 'pickup' ? (
-                                <Package className="h-4 w-4 text-blue-500" />
-                              ) : (
-                                <MapPin className="h-4 w-4 text-green-500" />
-                              )}
-                              <div className="text-sm">
-                                <div className="font-medium">{stop.location?.name || stop.companyName || 'Custom Location'}</div>
-                                <div className="text-gray-600">{stop.stopType}</div>
-                              </div>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeStopMutation.mutate(stop.id)}
-                              className="text-red-600 hover:text-red-800"
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        ))}
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">109 Load Number</label>
+                        <input
+                          type="text"
+                          className="w-full p-2 border rounded"
+                          value={editFormData.number109 || ''}
+                          onChange={(e) => setEditFormData({...editFormData, number109: e.target.value})}
+                          placeholder="Enter load number"
+                        />
                       </div>
-                    )}
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Special Instructions</label>
+                        <textarea
+                          className="w-full p-2 border rounded"
+                          rows={3}
+                          value={editFormData.specialInstructions || ''}
+                          onChange={(e) => setEditFormData({...editFormData, specialInstructions: e.target.value})}
+                          placeholder="Enter special instructions"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end gap-3 pt-4 border-t">
+                      <button 
+                        className="px-4 py-2 border rounded bg-white hover:bg-gray-50"
+                        onClick={() => {
+                          setEditMode(false);
+                          setEditFormData({});
+                        }}
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        onClick={() => {
+                          console.log('Save clicked with data:', editFormData);
+                          alert('Save functionality - check console');
+                        }}
+                      >
+                        Save Changes
+                      </button>
+                    </div>
                   </div>
-                  
-                  {/* Save/Cancel buttons */}
-                  <div className="flex justify-end gap-3 pt-4 border-t">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        setEditMode(false);
-                        setEditFormData({});
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      onClick={() => updateLoadMutation.mutate(editFormData)}
-                      disabled={updateLoadMutation.isPending}
-                    >
-                      {updateLoadMutation.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Saving...
-                        </>
-                      ) : (
-                        'Save Changes'
-                      )}
-                    </Button>
-                  </div>
-                </div>
               ) : (
                 // View Mode
                 <>
