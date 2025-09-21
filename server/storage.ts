@@ -533,18 +533,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async confirmLoad(id: string, driverId: string): Promise<Load> {
+    const now = new Date();
     const [updatedLoad] = await db
       .update(loads)
       .set({ 
         status: 'in_progress',
-        updatedAt: new Date(),
+        trackingEnabled: true,
+        trackingStartedAt: now,
+        driverConfirmed: true,
+        driverConfirmedAt: now,
+        updatedAt: now,
       })
       .where(and(eq(loads.id, id), eq(loads.driverId, driverId)))
       .returning();
 
     // Add status history
-    await this.addStatusHistory(id, 'in_progress', 'Driver started trip');
+    await this.addStatusHistory(id, 'in_progress', 'Driver accepted load and started GPS tracking');
 
+    console.log(`✅ Load ${id} confirmed by driver ${driverId} - GPS tracking enabled`);
     return updatedLoad;
   }
 
