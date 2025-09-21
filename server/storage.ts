@@ -79,6 +79,11 @@ export interface IStorage {
     paymentNotes?: string;
     paidAt?: Date;
   }): Promise<Load>;
+  updateLoadRoute(id: string, routeData: {
+    calculatedMiles?: number;
+    routeData?: any;
+    lastRouteCalculated?: Date;
+  }): Promise<Load>;
   deleteLoad(id: string): Promise<void>;
   
   // Load stops operations
@@ -580,6 +585,25 @@ export class DatabaseStorage implements IStorage {
     const [updatedLoad] = await db
       .update(loads)
       .set({ podDocumentPath, updatedAt: new Date() })
+      .where(eq(loads.id, id))
+      .returning();
+    
+    return updatedLoad;
+  }
+
+  async updateLoadRoute(id: string, routeData: {
+    calculatedMiles?: number;
+    routeData?: any;
+    lastRouteCalculated?: Date;
+  }): Promise<Load> {
+    const [updatedLoad] = await db
+      .update(loads)
+      .set({ 
+        calculatedMiles: routeData.calculatedMiles?.toString(),
+        routeData: routeData.routeData,
+        lastRouteCalculated: routeData.lastRouteCalculated,
+        updatedAt: new Date() 
+      })
       .where(eq(loads.id, id))
       .returning();
     
