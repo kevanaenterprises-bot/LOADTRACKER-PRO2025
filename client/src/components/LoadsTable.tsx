@@ -524,9 +524,14 @@ export default function LoadsTable() {
           console.error("Error fetching stops:", stopsError);
         }
         
+        console.log("🔍 PRODUCTION DEBUG - Complete load data received:", completeLoadData);
+        console.log("🔍 PRODUCTION DEBUG - Pickup location:", completeLoadData.pickupLocation);
+        console.log("🔍 PRODUCTION DEBUG - Pickup address:", completeLoadData.pickupAddress);
+        console.log("🔍 PRODUCTION DEBUG - Stops:", completeLoadData.stops);
         setSelectedLoad(completeLoadData); // ✅ Now includes pickupLocation AND stops!
       } else {
         // Fallback to list data if individual fetch fails
+        console.log("🔍 PRODUCTION DEBUG - Using fallback load data:", load);
         setSelectedLoad(load);
       }
     } catch (error) {
