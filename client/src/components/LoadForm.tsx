@@ -94,6 +94,7 @@ export default function LoadForm() {
       setShowOverride(false);
       setOverridePassword("");
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads", { excludePaid: true }] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
     },
     onError: (error: any) => {

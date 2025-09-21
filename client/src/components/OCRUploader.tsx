@@ -115,6 +115,7 @@ export function OCRUploader() {
         description: `Load ${data.number109} created successfully`,
       });
       queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads", { excludePaid: true }] });
       // Reset the form and states
       setSelectedFile(null);
       setExtractedData(null);
