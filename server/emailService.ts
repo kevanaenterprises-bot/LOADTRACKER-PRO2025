@@ -195,6 +195,88 @@ export async function generatePDF(html: string): Promise<Buffer> {
   }
 }
 
+// Compress and resize image for efficient PDF embedding
+export async function compressImageForPDF(imageBuffer: Buffer, contentType: string, maxWidth: number = 800): Promise<Buffer> {
+  console.log(`🗜️ Compressing image (${imageBuffer.length} bytes, ${contentType}) to max width ${maxWidth}px`);
+  
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
+    args: [
+      '--no-sandbox', 
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--disable-gpu',
+      '--disable-extensions',
+      '--disable-features=VizDisplayCompositor'
+    ]
+  });
+  
+  try {
+    const page = await browser.newPage();
+    
+    // Convert image buffer to base64 data URL
+    const base64Image = imageBuffer.toString('base64');
+    const dataUrl = `data:${contentType};base64,${base64Image}`;
+    
+    // Create HTML to resize and compress the image
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { margin: 0; padding: 0; }
+          #canvas { border: none; }
+        </style>
+      </head>
+      <body>
+        <canvas id="canvas"></canvas>
+        <script>
+          const canvas = document.getElementById('canvas');
+          const ctx = canvas.getContext('2d');
+          const img = new Image();
+          
+          img.onload = function() {
+            const aspectRatio = img.height / img.width;
+            const newWidth = Math.min(img.width, ${maxWidth});
+            const newHeight = newWidth * aspectRatio;
+            
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            
+            ctx.drawImage(img, 0, 0, newWidth, newHeight);
+            window.imageProcessed = true;
+          };
+          
+          img.src = '${dataUrl}';
+        </script>
+      </body>
+      </html>
+    `;
+    
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    
+    // Wait for image processing
+    await page.waitForFunction('window.imageProcessed', { timeout: 30000 });
+    
+    // Get compressed image as JPEG with quality 0.8
+    const compressedBase64 = await page.evaluate(() => {
+      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+      if (!canvas) throw new Error('Canvas element not found');
+      return canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+    });
+    
+    const compressedBuffer = Buffer.from(compressedBase64, 'base64');
+    console.log(`✅ Image compressed: ${imageBuffer.length} bytes -> ${compressedBuffer.length} bytes (${Math.round((1 - compressedBuffer.length / imageBuffer.length) * 100)}% reduction)`);
+    
+    return compressedBuffer;
+    
+  } finally {
+    await browser.close();
+  }
+}
+
 // Convert image buffer (JPEG/PNG) to PDF for better email compatibility
 export async function convertImageToPDF(imageBuffer: Buffer, contentType: string, filename: string): Promise<Buffer> {
   console.log(`🖼️ Converting image to PDF: ${filename} (${imageBuffer.length} bytes, ${contentType})`);

@@ -3664,13 +3664,34 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`⚠️ No POD available for load ${primaryLoadNumber} - email will contain invoice only`);
       }
       
-      // Embed POD images into the invoice HTML if available
+      // Embed COMPRESSED POD images into the invoice HTML if available
       if (podImages.length > 0) {
-        console.log(`🔗 Embedding ${podImages.length} POD image(s) into invoice...`);
+        console.log(`🔗 Compressing and embedding ${podImages.length} POD image(s) into invoice...`);
         try {
-          const podSectionHTML = generatePODSectionHTML(podImages, primaryLoadNumber);
+          const { compressImageForPDF } = await import('./emailService');
+          
+          // Compress each POD image before embedding
+          const compressedPodImages = [];
+          for (let i = 0; i < podImages.length; i++) {
+            const originalPod = podImages[i];
+            console.log(`🗜️ Compressing POD ${i + 1}/${podImages.length} (${Math.round(originalPod.content.length / 1024)}KB)`);
+            
+            try {
+              const compressedBuffer = await compressImageForPDF(originalPod.content, originalPod.type, 600); // Smaller size for email
+              compressedPodImages.push({
+                content: compressedBuffer,
+                type: 'image/jpeg' // Always convert to JPEG for better compression
+              });
+              console.log(`✅ POD ${i + 1} compressed: ${Math.round(originalPod.content.length / 1024)}KB -> ${Math.round(compressedBuffer.length / 1024)}KB`);
+            } catch (compressionError) {
+              console.error(`❌ Failed to compress POD ${i + 1}, using original:`, compressionError);
+              compressedPodImages.push(originalPod); // Fallback to original
+            }
+          }
+          
+          const podSectionHTML = generatePODSectionHTML(compressedPodImages, primaryLoadNumber);
           combinedHTML = combinedHTML.replace('</body>', `${podSectionHTML}</body>`);
-          console.log(`✅ POD images embedded into combined invoice`);
+          console.log(`✅ ${compressedPodImages.length} compressed POD images embedded into combined invoice`);
         } catch (embedError) {
           console.error(`❌ Failed to embed POD images:`, embedError);
           console.log(`⚠️ Falling back to invoice-only PDF due to POD embedding error`);
