@@ -506,7 +506,25 @@ export default function LoadsTable() {
       if (response.ok) {
         const completeLoadData = await response.json();
         console.log("Complete load data with pickupLocation:", completeLoadData);
-        setSelectedLoad(completeLoadData); // ✅ Now includes pickupLocation!
+        
+        // Fetch and attach stops to the load data for the dialog
+        try {
+          const stopsResponse = await fetch(`/api/loads/${load.id}/stops`, {
+            credentials: 'include',
+            headers: {
+              'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+            }
+          });
+          if (stopsResponse.ok) {
+            const stops = await stopsResponse.json();
+            console.log("Load stops fetched and attached:", stops);
+            completeLoadData.stops = stops; // ✅ Attach stops for dialog rendering
+          }
+        } catch (stopsError) {
+          console.error("Error fetching stops:", stopsError);
+        }
+        
+        setSelectedLoad(completeLoadData); // ✅ Now includes pickupLocation AND stops!
       } else {
         // Fallback to list data if individual fetch fails
         setSelectedLoad(load);
