@@ -1326,6 +1326,92 @@ export default function LoadsTable() {
                       )}
                     </div>
                   </div>
+
+                  {/* Geofence Tracking Timeline */}
+                  {selectedLoad.trackingStartedAt && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <h5 className="font-semibold text-gray-800 mb-3 flex items-center">
+                        <i className="fas fa-map-marker-alt mr-2 text-blue-500"></i>
+                        Automatic Tracking Timeline
+                      </h5>
+                      <div className="space-y-3 text-sm">
+                        {/* Tracking Started */}
+                        <div className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-200">
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                            <span className="font-medium text-blue-800">Tracking Started</span>
+                          </div>
+                          <span className="text-blue-700">
+                            {new Date(selectedLoad.trackingStartedAt).toLocaleString()}
+                          </span>
+                        </div>
+
+                        {/* Shipper Timeline */}
+                        {(selectedLoad.shipperEnteredAt || selectedLoad.shipperExitedAt) && (
+                          <div className="pl-4 border-l-2 border-blue-300 space-y-2">
+                            {selectedLoad.shipperEnteredAt && (
+                              <div className="flex items-center justify-between p-2 bg-green-50 rounded border border-green-200">
+                                <div className="flex items-center">
+                                  <i className="fas fa-sign-in-alt mr-2 text-green-600"></i>
+                                  <span className="font-medium text-green-800">Entered Shipper Geofence</span>
+                                </div>
+                                <span className="text-green-700">
+                                  {new Date(selectedLoad.shipperEnteredAt).toLocaleString()}
+                                </span>
+                              </div>
+                            )}
+                            {selectedLoad.shipperExitedAt && (
+                              <div className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-200">
+                                <div className="flex items-center">
+                                  <i className="fas fa-sign-out-alt mr-2 text-orange-600"></i>
+                                  <span className="font-medium text-orange-800">Left Shipper Geofence</span>
+                                </div>
+                                <span className="text-orange-700">
+                                  {new Date(selectedLoad.shipperExitedAt).toLocaleString()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Receiver Timeline */}
+                        {(selectedLoad.receiverEnteredAt || selectedLoad.receiverExitedAt) && (
+                          <div className="pl-4 border-l-2 border-green-300 space-y-2">
+                            {selectedLoad.receiverEnteredAt && (
+                              <div className="flex items-center justify-between p-2 bg-green-50 rounded border border-green-200">
+                                <div className="flex items-center">
+                                  <i className="fas fa-sign-in-alt mr-2 text-green-600"></i>
+                                  <span className="font-medium text-green-800">Entered Receiver Geofence</span>
+                                </div>
+                                <span className="text-green-700">
+                                  {new Date(selectedLoad.receiverEnteredAt).toLocaleString()}
+                                </span>
+                              </div>
+                            )}
+                            {selectedLoad.receiverExitedAt && (
+                              <div className="flex items-center justify-between p-2 bg-purple-50 rounded border border-purple-200">
+                                <div className="flex items-center">
+                                  <i className="fas fa-sign-out-alt mr-2 text-purple-600"></i>
+                                  <span className="font-medium text-purple-800">Left Receiver Geofence</span>
+                                </div>
+                                <span className="text-purple-700">
+                                  {new Date(selectedLoad.receiverExitedAt).toLocaleString()}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* No tracking data message */}
+                        {!selectedLoad.shipperEnteredAt && !selectedLoad.shipperExitedAt && 
+                         !selectedLoad.receiverEnteredAt && !selectedLoad.receiverExitedAt && (
+                          <div className="text-center py-3 text-gray-500 italic">
+                            Driver is en route - geofence events will appear here automatically
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
