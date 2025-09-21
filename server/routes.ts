@@ -3345,8 +3345,8 @@ Reply YES to confirm acceptance or NO to decline.`
       console.error('🔧 SERVER: Error details:', {
         message: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
-        updateData,
-        loadId: id
+        updateData: req.body,
+        loadId: req.params.id
       });
       res.status(500).json({ 
         error: 'Failed to update load financials',
