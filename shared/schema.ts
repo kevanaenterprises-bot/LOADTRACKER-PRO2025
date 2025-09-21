@@ -61,7 +61,7 @@ export const loads = pgTable("loads", {
   driverId: varchar("driver_id").references(() => users.id),
   locationId: varchar("location_id").references(() => locations.id),
   pickupLocationId: varchar("pickup_location_id").references(() => locations.id),
-  estimatedMiles: integer("estimated_miles"),
+  estimatedMiles: decimal("estimated_miles", { precision: 8, scale: 2 }),
   specialInstructions: text("special_instructions"),
   status: varchar("status").notNull().default("pending"), // pending, assigned, in_transit, awaiting_invoicing, awaiting_payment, paid
   bolNumber: varchar("bol_number"),
