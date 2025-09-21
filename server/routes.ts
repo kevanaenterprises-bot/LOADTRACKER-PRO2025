@@ -2605,6 +2605,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extract stops and override password from the request body
       const { stops, overridePassword, ...loadData } = req.body;
       
+      // Convert decimal fields from numbers to strings for Drizzle validation
+      const fieldsToConvert = ['tripRate', 'lumperFee', 'fuelAdvance', 'extraStops', 'lumperCharge'];
+      for (const field of fieldsToConvert) {
+        if (loadData[field] !== undefined && typeof loadData[field] === 'number') {
+          loadData[field] = loadData[field].toFixed(2);
+        }
+      }
+      
       const validatedData = insertLoadSchema.parse(loadData);
       console.log("Load creation - validation successful, creating load:", validatedData);
       
