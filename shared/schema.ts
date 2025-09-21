@@ -374,6 +374,7 @@ export type Truck = typeof trucks.$inferSelect;
 export type LoadWithDetails = Load & {
   driver?: User;
   location?: Location;
+  pickupLocation?: Location;
   invoice?: Invoice;
   stops?: LoadStop[];
 };

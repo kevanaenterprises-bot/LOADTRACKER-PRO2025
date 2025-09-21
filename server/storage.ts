@@ -406,6 +406,13 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
+    // Get pickup location separately if pickupLocationId exists
+    let pickupLocation: Location | undefined = undefined;
+    if (result.load.pickupLocationId) {
+      const [pickup] = await db.select().from(locations).where(eq(locations.id, result.load.pickupLocationId));
+      pickupLocation = pickup;
+    }
+
     // Get stops for this load (SAME AS getLoads method)
     const stops = await this.getLoadStops(result.load.id);
 
@@ -413,8 +420,9 @@ export class DatabaseStorage implements IStorage {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
+      pickupLocation: pickupLocation, // ✅ NOW INCLUDES PICKUP LOCATION!
       invoice: result.invoice || undefined,
-      stops: stops || [], // ✅ NOW INCLUDES STOPS!
+      stops: stops || [],
     };
   }
 
@@ -434,6 +442,13 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
+    // Get pickup location separately if pickupLocationId exists  
+    let pickupLocation: Location | undefined = undefined;
+    if (result.load.pickupLocationId) {
+      const [pickup] = await db.select().from(locations).where(eq(locations.id, result.load.pickupLocationId));
+      pickupLocation = pickup;
+    }
+
     // Get stops for this load (SAME AS getLoads method)
     const stops = await this.getLoadStops(result.load.id);
 
@@ -441,8 +456,9 @@ export class DatabaseStorage implements IStorage {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
+      pickupLocation: pickupLocation,
       invoice: result.invoice || undefined,
-      stops: stops || [], // ✅ NOW INCLUDES STOPS!
+      stops: stops || [],
     };
   }
 
