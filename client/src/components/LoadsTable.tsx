@@ -963,22 +963,16 @@ export default function LoadsTable() {
             {selectedLoad && (
               <div className="space-y-6">
                 {editMode ? (
-                  // Edit Mode - SIMPLIFIED FOR DEBUGGING
-                  <div className="space-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
-                    <h3 className="text-lg font-semibold text-green-800">✅ EDIT MODE WORKING!</h3>
+                  // Edit Mode
+                  <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
                     
-                    <div className="text-sm bg-blue-100 p-3 rounded">
-                      <p><strong>Load ID:</strong> {selectedLoad?.id}</p>
-                      <p><strong>Load Number:</strong> {selectedLoad?.number109}</p>
-                      <p><strong>Edit Mode:</strong> {String(editMode)}</p>
-                    </div>
-
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium mb-1">109 Load Number</label>
                         <input
                           type="text"
-                          className="w-full p-2 border rounded"
+                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                           value={editFormData.number109 || ''}
                           onChange={(e) => setEditFormData({...editFormData, number109: e.target.value})}
                           placeholder="Enter load number"
@@ -986,20 +980,64 @@ export default function LoadsTable() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium mb-1">Special Instructions</label>
-                        <textarea
-                          className="w-full p-2 border rounded"
-                          rows={3}
-                          value={editFormData.specialInstructions || ''}
-                          onChange={(e) => setEditFormData({...editFormData, specialInstructions: e.target.value})}
-                          placeholder="Enter special instructions"
+                        <label className="block text-sm font-medium mb-1">Estimated Miles</label>
+                        <input
+                          type="number"
+                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={editFormData.estimatedMiles || ''}
+                          onChange={(e) => setEditFormData({...editFormData, estimatedMiles: parseInt(e.target.value) || 0})}
+                          placeholder="0"
+                          min="0"
                         />
                       </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Pickup Location</label>
+                        <select
+                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={editFormData.pickupLocationId || ''}
+                          onChange={(e) => setEditFormData({...editFormData, pickupLocationId: e.target.value})}
+                        >
+                          <option value="">Select pickup location</option>
+                          {Array.isArray(locations) && locations.map((location: any) => (
+                            <option key={location.id} value={location.id}>
+                              {location.name} - {location.city}, {location.state}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Delivery Location</label>
+                        <select
+                          className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={editFormData.locationId || ''}
+                          onChange={(e) => setEditFormData({...editFormData, locationId: e.target.value})}
+                        >
+                          <option value="">Select delivery location</option>
+                          {Array.isArray(locations) && locations.map((location: any) => (
+                            <option key={location.id} value={location.id}>
+                              {location.name} - {location.city}, {location.state}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Special Instructions</label>
+                      <textarea
+                        className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows={3}
+                        value={editFormData.specialInstructions || ''}
+                        onChange={(e) => setEditFormData({...editFormData, specialInstructions: e.target.value})}
+                        placeholder="Enter any special delivery instructions..."
+                      />
                     </div>
                     
                     <div className="flex justify-end gap-3 pt-4 border-t">
                       <button 
-                        className="px-4 py-2 border rounded bg-white hover:bg-gray-50"
+                        className="px-4 py-2 border rounded bg-white hover:bg-gray-50 transition-colors"
                         onClick={() => {
                           setEditMode(false);
                           setEditFormData({});
@@ -1008,13 +1046,18 @@ export default function LoadsTable() {
                         Cancel
                       </button>
                       <button 
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        onClick={() => {
-                          console.log('Save clicked with data:', editFormData);
-                          alert('Save functionality - check console');
-                        }}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50"
+                        onClick={() => updateLoadMutation.mutate(editFormData)}
+                        disabled={updateLoadMutation.isPending}
                       >
-                        Save Changes
+                        {updateLoadMutation.isPending ? (
+                          <>
+                            <span className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                            Saving...
+                          </>
+                        ) : (
+                          'Save Changes'
+                        )}
                       </button>
                     </div>
                   </div>
