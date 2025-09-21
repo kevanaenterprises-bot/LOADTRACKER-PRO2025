@@ -929,6 +929,11 @@ export default function LoadsTable() {
                 // Edit Mode
                 <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
+                  <div className="text-xs text-gray-600">
+                    Debug: EditMode={String(editMode)}, 
+                    EditFormData={JSON.stringify(editFormData)}, 
+                    LocationsCount={Array.isArray(locations) ? locations.length : 0}
+                  </div>
                   
                   {/* Edit Form */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
