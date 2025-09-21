@@ -458,6 +458,30 @@ export default function LoadsTable() {
     return load && ['invoiced', 'awaiting_payment', 'paid'].includes(load.status);
   };
 
+  // Handle edit load - properly manage dialog state
+  const handleEditLoad = async (load: any) => {
+    // Set selected load and open dialog
+    setSelectedLoad(load);
+    setDialogOpen(true);
+    
+    // Initialize edit form data with normalized values
+    setEditFormData({
+      number109: load?.number109 || '',
+      locationId: load?.locationId || '',
+      pickupLocationId: load?.pickupLocationId || '',
+      estimatedMiles: load?.estimatedMiles || 0,
+      specialInstructions: load?.specialInstructions || ''
+    });
+    
+    // Enable edit mode
+    setEditMode(true);
+    
+    // Fetch load stops for editing
+    if (load?.id) {
+      await fetchLoadStops(load.id);
+    }
+  };
+
   // Driver assignment mutation
   const assignDriverMutation = useMutation({
     mutationFn: async ({ loadId, driverId }: { loadId: string; driverId: string }) => {
@@ -894,16 +918,7 @@ export default function LoadsTable() {
                       setEditMode(false);
                       setEditFormData({});
                     } else {
-                      setEditMode(true);
-                      setEditFormData({
-                        number109: selectedLoad?.number109 || '',
-                        locationId: selectedLoad?.locationId || '',
-                        pickupLocationId: selectedLoad?.pickupLocationId || '',
-                        estimatedMiles: selectedLoad?.estimatedMiles || 0,
-                        specialInstructions: selectedLoad?.specialInstructions || ''
-                      });
-                      // Load stops for editing
-                      fetchLoadStops(selectedLoad?.id);
+                      handleEditLoad(selectedLoad);
                     }
                   }}
                 >
@@ -929,11 +944,6 @@ export default function LoadsTable() {
                 // Edit Mode
                 <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
-                  <div className="text-xs text-gray-600">
-                    Debug: EditMode={String(editMode)}, 
-                    EditFormData={JSON.stringify(editFormData)}, 
-                    LocationsCount={Array.isArray(locations) ? locations.length : 0}
-                  </div>
                   
                   {/* Edit Form */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
