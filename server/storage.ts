@@ -3,6 +3,7 @@ import {
   locations,
   loads,
   loadStops,
+  trackingPings,
   bolNumbers,
   rates,
   customers,
@@ -20,6 +21,8 @@ import {
   type LoadWithDetails,
   type LoadStop,
   type InsertLoadStop,
+  type TrackingPing,
+  type InsertTrackingPing,
   type BolNumber,
   type InsertBolNumber,
   type Rate,
@@ -84,6 +87,11 @@ export interface IStorage {
   // Load stops operations
   getLoadStops(loadId: string): Promise<LoadStop[]>;
   createLoadStop(stop: InsertLoadStop): Promise<LoadStop>;
+
+  // GPS Tracking operations
+  createTrackingPing(ping: InsertTrackingPing): Promise<TrackingPing>;
+  getTrackingPings(loadId: string, limit?: number): Promise<TrackingPing[]>;
+  getRecentTrackingPings(driverId: string, limit?: number): Promise<TrackingPing[]>;
 
   // BOL operations
   checkBOLExists(bolNumber: string): Promise<boolean>;
@@ -357,6 +365,32 @@ export class DatabaseStorage implements IStorage {
 
   async removeLoadStop(stopId: string): Promise<void> {
     await db.delete(loadStops).where(eq(loadStops.id, stopId));
+  }
+
+  // GPS Tracking operations
+  async createTrackingPing(ping: InsertTrackingPing): Promise<TrackingPing> {
+    const [newPing] = await db.insert(trackingPings).values(ping).returning();
+    return newPing;
+  }
+
+  async getTrackingPings(loadId: string, limit = 50): Promise<TrackingPing[]> {
+    const result = await db
+      .select()
+      .from(trackingPings)
+      .where(eq(trackingPings.loadId, loadId))
+      .orderBy(desc(trackingPings.capturedAt))
+      .limit(limit);
+    return result;
+  }
+
+  async getRecentTrackingPings(driverId: string, limit = 50): Promise<TrackingPing[]> {
+    const result = await db
+      .select()
+      .from(trackingPings)
+      .where(eq(trackingPings.driverId, driverId))
+      .orderBy(desc(trackingPings.capturedAt))
+      .limit(limit);
+    return result;
   }
 
   async getLoads(): Promise<LoadWithDetails[]> {

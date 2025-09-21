@@ -26,12 +26,13 @@ import {
   type InsertInvoice,
   invoices
 } from "@shared/schema";
+import { z } from "zod";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
 import { loads, locations, loadStops } from "@shared/schema";
 
-// Bypass secret for testing and mobile auth
-const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
+// Bypass secret for development only - DISABLED in production
+const BYPASS_SECRET = process.env.GPS_BYPASS_TOKEN || null;
 
 // FIXED: Multi-POD version - gets ALL POD snapshots from BOTH stored snapshots AND object storage
 async function getAllPodSnapshots(invoice: any, podDocumentPath?: string): Promise<Array<{
@@ -1033,9 +1034,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Use the BYPASS_SECRET already defined above
   
   function isBypassActive(req: any): boolean {
+    // Disable bypass in production
+    if (process.env.NODE_ENV === 'production') {
+      return false;
+    }
+    
+    if (!BYPASS_SECRET) {
+      return false;
+    }
+    
     const token = req.headers['x-bypass-token'];
     const isActive = token === BYPASS_SECRET;
-    console.log("Bypass check:", { token: token ? '[PROVIDED]' : '[MISSING]', expected: BYPASS_SECRET, isActive });
+    console.log("Bypass check:", { token: token ? '[PROVIDED]' : '[MISSING]', isActive });
     return isActive;
   }
 
@@ -1707,6 +1717,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Admin logout error:", error);
       res.status(500).json({ message: "Logout failed" });
+    }
+  });
+
+  // ========== GPS TRACKING ROUTES ==========
+  
+  app.post("/api/gps/ping", (req, res, next) => {
+    // GPS tracking requires driver authentication or bypass token
+    const hasDriverAuth = !!(req.session as any)?.driverAuth;
+    const hasTokenBypass = isBypassActive(req);
+    const hasAuth = hasDriverAuth || hasTokenBypass;
+    
+    console.log("GPS ping auth check:", {
+      hasDriverAuth,
+      hasTokenBypass,
+      hasAuth,
+      loadId: req.body?.loadId || 'missing',
+      hasCoordinates: !!(req.body?.latitude !== undefined && req.body?.longitude !== undefined)
+    });
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Driver authentication required for GPS tracking" });
+    }
+  }, async (req, res) => {
+    try {
+      // Use proper Zod validation to prevent data corruption
+      const gpsSchema = z.object({
+        loadId: z.string().min(1, "Load ID is required"),
+        latitude: z.coerce.number().refine(val => isFinite(val) && val >= -90 && val <= 90, {
+          message: "Latitude must be a valid number between -90 and 90"
+        }),
+        longitude: z.coerce.number().refine(val => isFinite(val) && val >= -180 && val <= 180, {
+          message: "Longitude must be a valid number between -180 and 180"
+        }),
+        accuracy: z.coerce.number().refine(val => val === 0 || (isFinite(val) && val > 0), {
+          message: "Accuracy must be a positive number or 0"
+        }).optional(),
+        speed: z.coerce.number().refine(val => val === 0 || (isFinite(val) && val >= 0), {
+          message: "Speed must be a non-negative number"
+        }).optional(),
+        heading: z.coerce.number().refine(val => val === 0 || (isFinite(val) && val >= 0 && val <= 360), {
+          message: "Heading must be between 0 and 360 degrees"
+        }).optional(),
+        battery: z.coerce.number().int().refine(val => val === 0 || (val >= 1 && val <= 100), {
+          message: "Battery must be an integer between 0 and 100"
+        }).optional(),
+      });
+
+      const validatedData = gpsSchema.parse(req.body);
+      const { loadId, latitude, longitude, accuracy, speed, heading, battery } = validatedData;
+      
+      // Get driver ID from session or use bypass
+      const driverId = (req.session as any)?.driverAuth?.id || "bypass-user";
+      
+      // Verify load exists and is assigned to this driver (bypass users can ping any load)
+      const load = await storage.getLoad(loadId);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      if (driverId !== "bypass-user" && load.driverId !== driverId) {
+        return res.status(403).json({ message: "Load not assigned to this driver" });
+      }
+      
+      console.log(`📍 Processing GPS ping for load (secured) from driver ${driverId}`);
+      
+      // Create GPS ping record with proper type conversion (preserves zero values)
+      const pingData = {
+        loadId,
+        driverId,
+        latitude: latitude.toString(),
+        longitude: longitude.toString(),
+        accuracy: accuracy !== undefined ? accuracy.toString() : null,
+        speed: speed !== undefined ? speed.toString() : null,
+        heading: heading !== undefined ? heading.toString() : null,
+        battery: battery !== undefined ? battery : null,
+      };
+      
+      const ping = await storage.createTrackingPing(pingData);
+      
+      // Update load's current location with validated data
+      await storage.updateLoad(loadId, {
+        currentLatitude: latitude.toString(),
+        currentLongitude: longitude.toString(),
+        lastLocationUpdate: new Date(),
+        trackingEnabled: true,
+      });
+      
+      console.log(`✅ GPS ping recorded for load ${loadId}`);
+      
+      res.json({ 
+        success: true, 
+        message: "GPS ping recorded",
+        pingId: ping.id,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error("Error processing GPS ping:", error);
+      res.status(500).json({ 
+        message: "Failed to process GPS ping",
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
