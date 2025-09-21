@@ -292,6 +292,9 @@ export default function LoadsTable() {
     console.log('📍 Delivery Address:', deliveryAddr);
     console.log('🔑 HERE API Key available:', !!import.meta.env.VITE_HERE_MAPS_API_KEY);
     
+    // Temporary alert for production testing
+    alert(`ROUTE TEST:\nPickup: ${pickupAddr}\nDelivery: ${deliveryAddr}\nAPI Key: ${!!import.meta.env.VITE_HERE_MAPS_API_KEY ? 'YES' : 'NO'}`);
+    
     setCalculatingRoute(true);
     try {
       const distance = await HERERouteOptimizer.calculateDistance(
