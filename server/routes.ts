@@ -2716,14 +2716,44 @@ Reply YES to confirm acceptance or NO to decline.`
         }
       }
       
+      // Check for duplicate number109 if being updated
+      if (updates.number109 && updates.number109 !== existingLoad.number109) {
+        const existingLoads = await storage.getLoads();
+        const duplicateLoad = existingLoads.find(load => 
+          load.number109 === updates.number109 && load.id !== loadId
+        );
+        if (duplicateLoad) {
+          return res.status(400).json({ 
+            message: `Load number ${updates.number109} already exists for another load (ID: ${duplicateLoad.id})` 
+          });
+        }
+      }
+
       // Update the load
       const updatedLoad = await storage.updateLoad(loadId, updates);
       
       console.log(`✅ Load ${loadId} updated successfully`);
       res.json(updatedLoad);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating load:", error);
-      res.status(500).json({ message: "Failed to update load" });
+      
+      // Enhanced error handling for better debugging
+      if (error?.message?.includes('duplicate key') || error?.message?.includes('unique constraint')) {
+        return res.status(400).json({ 
+          message: "Load number already exists. Please use a different number.", 
+          details: error?.message 
+        });
+      } else if (error?.message?.includes('foreign key')) {
+        return res.status(400).json({ 
+          message: "Invalid location or driver reference.", 
+          details: error?.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "Failed to update load", 
+        details: error?.message || "Unknown error" 
+      });
     }
   });
 
