@@ -3709,6 +3709,54 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Toggle GPS tracking for existing loads
+  app.patch("/api/loads/:id/tracking", (req, res, next) => {
+    // Flexible authentication for GPS tracking toggles
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasDriverAuth = !!(req.session as any)?.driverAuth;
+    const hasTokenBypass = isBypassActive(req);
+    const hasAuth = hasAdminAuth || hasReplitAuth || hasDriverAuth || hasTokenBypass;
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required for GPS tracking updates" });
+    }
+  }, async (req, res) => {
+    try {
+      const { trackingEnabled } = req.body;
+      
+      // Validate input
+      if (typeof trackingEnabled !== 'boolean') {
+        return res.status(400).json({ message: "trackingEnabled must be a boolean value" });
+      }
+      
+      const load = await storage.getLoad(req.params.id);
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+      
+      // Update GPS tracking setting
+      const updatedLoad = await storage.updateLoad(req.params.id, {
+        trackingEnabled,
+      });
+      
+      console.log(`📡 GPS tracking ${trackingEnabled ? 'enabled' : 'disabled'} for load ${load.number109}`);
+      
+      res.json({ 
+        message: `GPS tracking ${trackingEnabled ? 'enabled' : 'disabled'} successfully`,
+        load: updatedLoad 
+      });
+    } catch (error) {
+      console.error("Error toggling GPS tracking:", error);
+      res.status(500).json({ 
+        message: "Failed to update GPS tracking setting",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   app.patch("/api/loads/:id/assign-driver", (req, res, next) => {
     // Check multiple auth methods: admin session, Replit auth, driver auth, OR token bypass
     const hasAdminAuth = !!(req.session as any)?.adminAuth;
