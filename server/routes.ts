@@ -2215,8 +2215,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Extract query parameters for filtering
-      const { status } = req.query;
-      console.log(`🔍 Query parameters:`, { status });
+      const { status, excludePaid } = req.query;
+      const excludePaidBool = excludePaid === 'true';
+      console.log(`🔍 Query parameters:`, { status, excludePaid: excludePaidBool });
       
       let loads;
       if (user?.role === "driver" && userId) {
@@ -2232,9 +2233,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         console.log("🔥 ADMIN MODE: Getting loads with filters");
         
+        // Always use filtered query to support excludePaid parameter
+        const filters: { status?: string; excludePaid?: boolean } = {};
         if (status && typeof status === 'string') {
-          console.log(`🔍 ADMIN FILTER: Using filtered query for status "${status}"`);
-          loads = await storage.getLoadsFiltered({ status });
+          filters.status = status;
+        }
+        if (excludePaidBool) {
+          filters.excludePaid = true;
+        }
+        
+        if (Object.keys(filters).length > 0) {
+          console.log(`🔍 ADMIN FILTER: Using filtered query with filters:`, filters);
+          loads = await storage.getLoadsFiltered(filters);
         } else {
           console.log("🔥 ADMIN: Getting all loads (no filters)");
           loads = await storage.getLoads();

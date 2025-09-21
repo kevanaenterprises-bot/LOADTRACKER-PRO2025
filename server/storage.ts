@@ -649,8 +649,25 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async getLoadsFiltered(filters: { status?: string }): Promise<LoadWithDetails[]> {
+  async getLoadsFiltered(filters: { status?: string; excludePaid?: boolean }): Promise<LoadWithDetails[]> {
     console.log(`🔍 Getting filtered loads with filters:`, filters);
+    
+    // Build the where condition based on filters
+    let whereCondition;
+    
+    if (filters.status && filters.excludePaid) {
+      // Both status filter and exclude paid
+      whereCondition = sql`${loads.status} = ${filters.status} AND ${loads.status} != 'paid'`;
+    } else if (filters.status) {
+      // Only status filter
+      whereCondition = eq(loads.status, filters.status);
+    } else if (filters.excludePaid) {
+      // Only exclude paid
+      whereCondition = sql`${loads.status} != 'paid'`;
+    } else {
+      // No filters
+      whereCondition = sql`1 = 1`;
+    }
     
     const result = await db
       .select({
@@ -663,9 +680,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(users, eq(loads.driverId, users.id))
       .leftJoin(locations, eq(loads.locationId, locations.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
-      .where(
-        filters.status ? eq(loads.status, filters.status) : sql`1 = 1`
-      )
+      .where(whereCondition)
       .orderBy(desc(loads.updatedAt));
 
     const filteredResults = result.map(row => ({

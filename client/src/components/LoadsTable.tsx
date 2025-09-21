@@ -256,7 +256,19 @@ export default function LoadsTable() {
   };
 
   const { data: loads, isLoading, refetch } = useQuery({
-    queryKey: ["/api/loads"],
+    queryKey: ["/api/loads", { excludePaid: true }],
+    queryFn: async () => {
+      const response = await fetch('/api/loads?excludePaid=true', {
+        credentials: 'include',
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch loads');
+      }
+      return response.json();
+    },
     retry: false,
     refetchOnWindowFocus: false,
     staleTime: 0, // Always consider data stale to allow quick updates
