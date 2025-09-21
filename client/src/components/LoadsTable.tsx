@@ -381,7 +381,30 @@ export default function LoadsTable() {
 
   const handleLoadClick = async (load: any) => {
     console.log("Load clicked:", load);
-    setSelectedLoad(load);
+    
+    // 🔥 CRITICAL FIX: Fetch complete load details including pickupLocation
+    try {
+      const response = await fetch(`/api/loads/${load.id}`, {
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const completeLoadData = await response.json();
+        console.log("Complete load data with pickupLocation:", completeLoadData);
+        setSelectedLoad(completeLoadData); // ✅ Now includes pickupLocation!
+      } else {
+        // Fallback to list data if individual fetch fails
+        setSelectedLoad(load);
+      }
+    } catch (error) {
+      console.error("Failed to fetch complete load details:", error);
+      // Fallback to list data if individual fetch fails
+      setSelectedLoad(load);
+    }
+    
     setDialogOpen(true);
     // Always reset edit mode when opening a new load dialog
     setEditMode(false);
