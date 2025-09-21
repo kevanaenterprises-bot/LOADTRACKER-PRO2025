@@ -454,7 +454,8 @@ export default function LoadsTable() {
 
   // Check if a load already has an invoice
   const hasInvoice = (loadId: string) => {
-    return Array.isArray(invoices) && invoices.some((invoice: any) => invoice.loadId === loadId);
+    // Check if load has an invoice based on status rather than global invoices query
+    return selectedLoad && ['invoiced', 'awaiting_payment', 'paid'].includes(selectedLoad.status);
   };
 
   // Driver assignment mutation
