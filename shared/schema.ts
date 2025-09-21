@@ -309,6 +309,25 @@ export const insertLoadStopSchema = createInsertSchema(loadStops).omit({
   createdAt: true,
 });
 
+// Simplified LoadStop schema for frontend form submission
+export const simpleLoadStopSchema = z.object({
+  stopType: z.enum(["pickup", "dropoff"]),
+  stopSequence: z.number(),
+  locationId: z.string().min(1, "Location is required"),
+  companyName: z.string().optional(),
+  address: z.string().optional(),
+  contactName: z.string().optional(),
+  contactPhone: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+// Simplified load creation schema for frontend
+export const simpleLoadSchema = z.object({
+  number109: z.string().min(1, "109 Number is required"),
+  stops: z.array(simpleLoadStopSchema).min(1, "At least one stop is required"),
+  overridePassword: z.string().optional(),
+});
+
 export const insertBolNumberSchema = createInsertSchema(bolNumbers).omit({
   id: true,
   createdAt: true,
