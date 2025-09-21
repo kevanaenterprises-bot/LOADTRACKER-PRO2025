@@ -11,12 +11,15 @@ import {
 } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { HelpButton } from "@/components/HelpTooltip";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BatchPODUpload } from "@/components/BatchPODUpload";
-import { Upload, Zap } from "lucide-react";
+import { Upload, Zap, DollarSign } from "lucide-react";
 
 interface LoadSectionProps {
   loads: any[];
@@ -52,19 +55,29 @@ export function LoadSection({
   const [assigningDriverFor, setAssigningDriverFor] = useState<string | null>(null);
   const [podUploadDialogOpen, setPodUploadDialogOpen] = useState(false);
   const [selectedLoadForPOD, setSelectedLoadForPOD] = useState<any>(null);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [selectedLoadForPayment, setSelectedLoadForPayment] = useState<any>(null);
+  const [paymentDetails, setPaymentDetails] = useState({
+    paymentMethod: "",
+    paymentReference: "",
+    paymentNotes: ""
+  });
 
-  // FIXED: Missing markAsPaid function - this was causing the cash button to do nothing
+  // Updated markAsPaid function to use the new mark-paid endpoint with payment details
   const markAsPaidMutation = useMutation({
-    mutationFn: async (loadId: string) => {
-      return apiRequest(`/api/loads/${loadId}/status`, "PATCH", { status: "paid" });
+    mutationFn: async (payload: { loadId: string; paymentDetails: any }) => {
+      return apiRequest(`/api/loads/${payload.loadId}/mark-paid`, "POST", payload.paymentDetails);
     },
     onSuccess: () => {
       toast({
         title: "Load Marked as Paid",
-        description: "Load has been marked as paid successfully",
+        description: "Load has been marked as paid successfully with payment details",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
+      setPaymentDialogOpen(false);
+      setSelectedLoadForPayment(null);
+      setPaymentDetails({ paymentMethod: "", paymentReference: "", paymentNotes: "" });
     },
     onError: (error: any) => {
       toast({
@@ -319,15 +332,111 @@ export function LoadSection({
                     )}
                     
                     {showPaymentButton && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => markAsPaidMutation.mutate(load.id)}
-                        className="text-green-600 hover:text-green-700"
-                      >
-                        <i className="fas fa-check-circle mr-1"></i>
-                        Mark as Paid
-                      </Button>
+                      <Dialog open={paymentDialogOpen && selectedLoadForPayment?.id === load.id} onOpenChange={(open) => {
+                        if (!open) {
+                          setPaymentDialogOpen(false);
+                          setSelectedLoadForPayment(null);
+                          setPaymentDetails({ paymentMethod: "", paymentReference: "", paymentNotes: "" });
+                        }
+                      }}>
+                        <DialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedLoadForPayment(load);
+                              setPaymentDialogOpen(true);
+                            }}
+                            className="text-green-600 hover:text-green-700"
+                            data-testid={`button-mark-paid-${load.id}`}
+                          >
+                            <DollarSign className="h-4 w-4 mr-1" />
+                            Mark as Paid
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Mark Load as Paid - {load.number109}</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="paymentMethod">Payment Method *</Label>
+                              <Select 
+                                value={paymentDetails.paymentMethod} 
+                                onValueChange={(value) => setPaymentDetails(prev => ({ ...prev, paymentMethod: value }))}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select payment method..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="check">Check</SelectItem>
+                                  <SelectItem value="wire">Wire Transfer</SelectItem>
+                                  <SelectItem value="ach">ACH Transfer</SelectItem>
+                                  <SelectItem value="cash">Cash</SelectItem>
+                                  <SelectItem value="credit_card">Credit Card</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            <div>
+                              <Label htmlFor="paymentReference">Payment Reference</Label>
+                              <Input
+                                id="paymentReference"
+                                placeholder="Check number, wire confirmation, etc."
+                                value={paymentDetails.paymentReference}
+                                onChange={(e) => setPaymentDetails(prev => ({ ...prev, paymentReference: e.target.value }))}
+                                data-testid="input-payment-reference"
+                              />
+                            </div>
+                            
+                            <div>
+                              <Label htmlFor="paymentNotes">Payment Notes</Label>
+                              <Textarea
+                                id="paymentNotes"
+                                placeholder="Additional payment details..."
+                                value={paymentDetails.paymentNotes}
+                                onChange={(e) => setPaymentDetails(prev => ({ ...prev, paymentNotes: e.target.value }))}
+                                data-testid="textarea-payment-notes"
+                              />
+                            </div>
+                            
+                            <div className="flex justify-end space-x-3 pt-4">
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setPaymentDialogOpen(false);
+                                  setSelectedLoadForPayment(null);
+                                  setPaymentDetails({ paymentMethod: "", paymentReference: "", paymentNotes: "" });
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  if (!paymentDetails.paymentMethod) {
+                                    toast({
+                                      title: "Payment Method Required",
+                                      description: "Please select a payment method before marking as paid",
+                                      variant: "destructive"
+                                    });
+                                    return;
+                                  }
+                                  markAsPaidMutation.mutate({
+                                    loadId: load.id,
+                                    paymentDetails: paymentDetails
+                                  });
+                                }}
+                                disabled={markAsPaidMutation.isPending}
+                                className="bg-green-600 hover:bg-green-700"
+                                data-testid="button-confirm-payment"
+                              >
+                                {markAsPaidMutation.isPending ? "Processing..." : "Mark as Paid"}
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     )}
 
                     {showPODUpload && (
