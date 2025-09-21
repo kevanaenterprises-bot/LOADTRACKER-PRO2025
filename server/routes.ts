@@ -6166,6 +6166,178 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+  // DATABASE REPAIR: One-time endpoint to rebuild missing locations
+  app.post("/api/admin/repair-locations", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Admin authentication required for database repair" });
+    }
+  }, async (req, res) => {
+    try {
+      console.log("🔧 LOCATION REPAIR: Starting database repair for missing locations");
+      
+      const repairResults = {
+        missingLocationIds: [],
+        restoredLocations: [],
+        errors: []
+      };
+
+      // Step 1: Find all location IDs referenced by loads but missing from locations table
+      const missingFromLoads = await db
+        .select({
+          locationId: loads.locationId,
+          pickupLocationId: loads.pickupLocationId,
+          companyName: loads.companyName,
+          pickupAddress: loads.pickupAddress,
+          deliveryAddress: loads.deliveryAddress,
+          loadNumber: loads.number109
+        })
+        .from(loads)
+        .where(
+          sql`${loads.locationId} IS NOT NULL AND ${loads.locationId} NOT IN (SELECT id FROM locations)`
+        );
+
+      // Step 2: Find missing location IDs from load_stops
+      const missingFromStops = await db
+        .select({
+          locationId: load_stops.locationId,
+          companyName: load_stops.companyName,
+          address: load_stops.address,
+          contactName: load_stops.contactName,
+          contactPhone: load_stops.contactPhone
+        })
+        .from(load_stops)
+        .where(
+          sql`${load_stops.locationId} IS NOT NULL AND ${load_stops.locationId} NOT IN (SELECT id FROM locations)`
+        );
+
+      console.log(`🔍 REPAIR: Found ${missingFromLoads.length} missing location IDs from loads`);
+      console.log(`🔍 REPAIR: Found ${missingFromStops.length} missing location IDs from load_stops`);
+
+      // Step 3: Build a map of missing location IDs and their data
+      const locationData = new Map();
+
+      // Process data from loads
+      for (const load of missingFromLoads) {
+        if (load.locationId && !locationData.has(load.locationId)) {
+          locationData.set(load.locationId, {
+            id: load.locationId,
+            name: load.companyName || `Location for ${load.loadNumber}`,
+            address: load.pickupAddress || load.deliveryAddress || '',
+            city: '', // Will try to extract from address
+            state: '', // Will try to extract from address
+            source: `Load ${load.loadNumber}`
+          });
+        }
+        if (load.pickupLocationId && !locationData.has(load.pickupLocationId)) {
+          locationData.set(load.pickupLocationId, {
+            id: load.pickupLocationId,
+            name: load.companyName || `Pickup Location for ${load.loadNumber}`,
+            address: load.pickupAddress || '',
+            city: '', 
+            state: '',
+            source: `Load ${load.loadNumber} (pickup)`
+          });
+        }
+      }
+
+      // Process data from load_stops (more detailed info)
+      for (const stop of missingFromStops) {
+        if (stop.locationId) {
+          const existing = locationData.get(stop.locationId) || { id: stop.locationId };
+          locationData.set(stop.locationId, {
+            ...existing,
+            id: stop.locationId,
+            name: stop.companyName || existing.name || 'Unknown Location',
+            address: stop.address || existing.address || '',
+            city: existing.city || '', 
+            state: existing.state || '',
+            contactName: stop.contactName,
+            contactPhone: stop.contactPhone,
+            source: existing.source || 'Load Stop'
+          });
+        }
+      }
+
+      // Step 4: Restore missing locations
+      for (const [locationId, locationInfo] of locationData.entries()) {
+        try {
+          // Try to parse city/state from address if not provided
+          if (locationInfo.address && !locationInfo.city) {
+            const addressParts = locationInfo.address.split(',');
+            if (addressParts.length >= 2) {
+              locationInfo.city = addressParts[addressParts.length - 2]?.trim() || '';
+              locationInfo.state = addressParts[addressParts.length - 1]?.trim() || '';
+            }
+          }
+
+          console.log(`🔧 REPAIR: Restoring location ${locationId}: ${locationInfo.name}`);
+
+          // Insert the missing location with its original ID
+          await db
+            .insert(locations)
+            .values({
+              id: locationId,
+              name: locationInfo.name,
+              address: locationInfo.address,
+              city: locationInfo.city,
+              state: locationInfo.state,
+              contactName: locationInfo.contactName,
+              contactPhone: locationInfo.contactPhone,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            })
+            .onConflictDoNothing(); // Safe in case location already exists
+
+          repairResults.restoredLocations.push({
+            id: locationId,
+            name: locationInfo.name,
+            address: locationInfo.address,
+            source: locationInfo.source
+          });
+
+        } catch (error) {
+          console.error(`❌ REPAIR: Failed to restore location ${locationId}:`, error);
+          repairResults.errors.push({
+            locationId,
+            error: error instanceof Error ? error.message : String(error)
+          });
+        }
+      }
+
+      // Step 5: Verify repair success
+      const verifyMissingAfter = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(loads)
+        .where(
+          sql`${loads.locationId} IS NOT NULL AND ${loads.locationId} NOT IN (SELECT id FROM locations)`
+        );
+
+      console.log(`✅ REPAIR: Restored ${repairResults.restoredLocations.length} locations`);
+      console.log(`✅ REPAIR: ${verifyMissingAfter[0].count} loads still have missing location references`);
+
+      res.json({
+        message: "Location repair completed",
+        summary: {
+          locationsRestored: repairResults.restoredLocations.length,
+          remainingMissing: verifyMissingAfter[0].count,
+          errors: repairResults.errors.length
+        },
+        details: repairResults
+      });
+
+    } catch (error: any) {
+      console.error("❌ LOCATION REPAIR FAILED:", error);
+      res.status(500).json({ 
+        message: "Location repair failed", 
+        error: error.message,
+        stack: error.stack 
+      });
+    }
+  });
+
 
   // Create and return HTTP server
   const server = createServer(app);
