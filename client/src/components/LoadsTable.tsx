@@ -454,8 +454,8 @@ export default function LoadsTable() {
 
   // Check if a load already has an invoice
   const hasInvoice = (load: any) => {
-    // Check if load has an invoice based on status
-    return load && ['invoiced', 'awaiting_payment', 'paid'].includes(load.status);
+    // Check if load has an invoice based on status - include awaiting_invoicing for updates
+    return load && ['awaiting_invoicing', 'invoiced', 'awaiting_payment', 'paid'].includes(load.status);
   };
 
   // Handle edit load - properly manage dialog state
@@ -944,6 +944,11 @@ export default function LoadsTable() {
                 // Edit Mode
                 <div className="space-y-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h3 className="text-lg font-semibold text-blue-800">Edit Load Details</h3>
+                  <div className="text-xs bg-yellow-100 p-2 rounded">
+                    Debug: editMode={String(editMode)}, selectedLoad exists: {String(!!selectedLoad)}, 
+                    editFormData: {JSON.stringify(editFormData)}, 
+                    locations: {Array.isArray(locations) ? locations.length : 'not array'}
+                  </div>
                   
                   {/* Edit Form */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1239,7 +1244,19 @@ export default function LoadsTable() {
                             </div>
                           );
                         } else {
-                          return <div className="text-gray-500 italic">No pickup location specified</div>;
+                          return (
+                            <div className="space-y-2">
+                              <div className="text-gray-500 italic">No pickup location specified</div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditLoad(selectedLoad)}
+                                className="text-xs"
+                              >
+                                Add Pickup Location
+                              </Button>
+                            </div>
+                          );
                         }
                       })()}
                     </div>
@@ -1271,7 +1288,17 @@ export default function LoadsTable() {
                           <div><strong>Address:</strong> {selectedLoad.deliveryAddress}</div>
                         </div>
                       ) : (
-                        <div className="text-gray-500 italic">No delivery location specified</div>
+                        <div className="space-y-2">
+                          <div className="text-gray-500 italic">No delivery location specified</div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditLoad(selectedLoad)}
+                            className="text-xs"
+                          >
+                            Add Delivery Location
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>
