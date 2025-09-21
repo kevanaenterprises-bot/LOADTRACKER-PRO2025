@@ -3054,12 +3054,12 @@ Reply YES to confirm acceptance or NO to decline.`
       const extraStopsCharge = parseFloat(load.extraStops?.toString() || "0");
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
       
-      // Update the existing invoice
-      const updatedInvoice = await storage.updateInvoice(existingInvoice.id, {
-        flatRate: flatRate.toFixed(2),
-        lumperCharge: lumperCharge.toFixed(2), 
-        extraStopsCharge: extraStopsCharge.toFixed(2),
-        totalAmount: totalAmount.toFixed(2)
+      // Update the existing invoice with proper decimal values
+      const updatedInvoice = await storage.updateInvoice(existingInvoice.invoiceNumber, {
+        flatRate: flatRate.toString(),
+        lumperCharge: lumperCharge.toString(), 
+        extraStopsCharge: extraStopsCharge.toString(),
+        totalAmount: totalAmount.toString()
       });
       
       console.log(`✅ Invoice ${existingInvoice.invoiceNumber} updated with new charges:`, {
