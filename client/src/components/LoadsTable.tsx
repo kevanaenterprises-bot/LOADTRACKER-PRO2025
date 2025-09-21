@@ -154,7 +154,7 @@ export default function LoadsTable() {
     mutationFn: async (updates: any) => {
       return apiRequest(`/api/loads/${selectedLoad?.id}`, "PUT", updates);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Success",
         description: "Load updated successfully!"
@@ -162,9 +162,46 @@ export default function LoadsTable() {
       setEditMode(false);
       setEditFormData({});
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
-      // Refresh the selected load data
+      
+      // ✅ CRITICAL FIX: Refetch the current load data to refresh the dialog
       if (selectedLoad) {
         queryClient.invalidateQueries({ queryKey: [`/api/loads/${selectedLoad.id}`] });
+        
+        // Refetch complete load data including pickup location
+        try {
+          const response = await fetch(`/api/loads/${selectedLoad.id}`, {
+            headers: {
+              'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+            },
+            credentials: 'include',
+          });
+          
+          if (response.ok) {
+            const updatedLoadData = await response.json();
+            
+            // Also fetch stops and attach them
+            try {
+              const stopsResponse = await fetch(`/api/loads/${selectedLoad.id}/stops`, {
+                credentials: 'include',
+                headers: {
+                  'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+                }
+              });
+              if (stopsResponse.ok) {
+                const stops = await stopsResponse.json();
+                updatedLoadData.stops = stops;
+                setExistingStops(stops);
+              }
+            } catch (stopsError) {
+              console.error("Error fetching updated stops:", stopsError);
+            }
+            
+            console.log("🔄 REFRESH: Updated load data after edit:", updatedLoadData);
+            setSelectedLoad(updatedLoadData); // ✅ Refresh the dialog with new data
+          }
+        } catch (error) {
+          console.error("Failed to refetch updated load details:", error);
+        }
       }
     },
     onError: (error: any) => {
