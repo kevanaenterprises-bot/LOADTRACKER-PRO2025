@@ -31,7 +31,7 @@ export function HEREMapView({
 
   // Get HERE API key from environment
   useEffect(() => {
-    const key = import.meta.env.VITE_HERE_API_KEY || import.meta.env.HERE_API_KEY;
+    const key = import.meta.env.VITE_HERE_MAPS_API_KEY || import.meta.env.HERE_MAPS_API_KEY || import.meta.env.VITE_HERE_API_KEY || import.meta.env.HERE_API_KEY;
     if (key) {
       setHereApiKey(key);
     } else {

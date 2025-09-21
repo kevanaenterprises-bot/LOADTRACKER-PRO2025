@@ -52,11 +52,13 @@ class HERERouteOptimizerService {
 
     try {
       // Get API key from environment
-      this.apiKey = import.meta.env.VITE_HERE_API_KEY || 
+      this.apiKey = import.meta.env.VITE_HERE_MAPS_API_KEY || 
+                    import.meta.env.HERE_MAPS_API_KEY || 
+                    import.meta.env.VITE_HERE_API_KEY || 
                     import.meta.env.HERE_API_KEY;
       
       if (!this.apiKey) {
-        throw new Error('HERE Maps API key not found. Please add HERE_API_KEY to your environment variables.');
+        throw new Error('HERE Maps API key not found. Please add HERE_MAPS_API_KEY to your environment variables.');
       }
 
       // Test API key with a simple request
