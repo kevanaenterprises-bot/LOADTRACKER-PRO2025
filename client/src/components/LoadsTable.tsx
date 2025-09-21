@@ -935,7 +935,7 @@ export default function LoadsTable() {
                       <label className="block text-sm font-medium mb-2">109 Load Number</label>
                       <Input
                         type="text"
-                        value={editFormData.number109}
+                        value={editFormData.number109 || ''}
                         onChange={(e) => setEditFormData({...editFormData, number109: e.target.value})}
                         placeholder="SEPTEMBER 2025 TRAILER RENTAL"
                       />
@@ -945,7 +945,7 @@ export default function LoadsTable() {
                       <label className="block text-sm font-medium mb-2">Estimated Miles</label>
                       <Input
                         type="number"
-                        value={editFormData.estimatedMiles}
+                        value={editFormData.estimatedMiles || 0}
                         onChange={(e) => setEditFormData({...editFormData, estimatedMiles: parseInt(e.target.value) || 0})}
                         placeholder="0"
                       />
@@ -954,7 +954,7 @@ export default function LoadsTable() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Pickup Location</label>
                       <Select 
-                        value={editFormData.pickupLocationId} 
+                        value={editFormData.pickupLocationId || ''} 
                         onValueChange={(value) => setEditFormData({...editFormData, pickupLocationId: value})}
                       >
                         <SelectTrigger>
@@ -974,7 +974,7 @@ export default function LoadsTable() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Delivery Location</label>
                       <Select 
-                        value={editFormData.locationId} 
+                        value={editFormData.locationId || ''} 
                         onValueChange={(value) => setEditFormData({...editFormData, locationId: value})}
                       >
                         <SelectTrigger>
@@ -994,7 +994,7 @@ export default function LoadsTable() {
                   <div>
                     <label className="block text-sm font-medium mb-2">Special Instructions</label>
                     <Textarea
-                      value={editFormData.specialInstructions}
+                      value={editFormData.specialInstructions || ''}
                       onChange={(e) => setEditFormData({...editFormData, specialInstructions: e.target.value})}
                       placeholder="Any special delivery instructions..."
                       rows={3}
@@ -1300,6 +1300,10 @@ export default function LoadsTable() {
                       min="0"
                       defaultValue={selectedLoad.tripRate || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onChange={(e) => {
+                        // Immediately mark financials as modified when user types
+                        setFinancialsModified(selectedLoad.id);
+                      }}
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'tripRate', e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === 'Tab') {
@@ -1317,6 +1321,10 @@ export default function LoadsTable() {
                       min="0"
                       defaultValue={selectedLoad.lumperCharge || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onChange={(e) => {
+                        // Immediately mark financials as modified when user types
+                        setFinancialsModified(selectedLoad.id);
+                      }}
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'lumperCharge', e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === 'Tab') {
@@ -1334,6 +1342,10 @@ export default function LoadsTable() {
                       min="0"
                       defaultValue={selectedLoad.extraStops || '0.00'}
                       className="w-full px-2 py-1 text-sm border rounded mt-1"
+                      onChange={(e) => {
+                        // Immediately mark financials as modified when user types
+                        setFinancialsModified(selectedLoad.id);
+                      }}
                       onBlur={(e) => updateLoadFinancials(selectedLoad.id, 'extraStops', e.target.value)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === 'Tab') {
