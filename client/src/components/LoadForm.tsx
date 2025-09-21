@@ -34,6 +34,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation, Calendar } from "lucide-react";
@@ -70,6 +71,7 @@ export default function LoadForm() {
   const [currentLocationId, setCurrentLocationId] = useState("");
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
   const [deliveryDueDate, setDeliveryDueDate] = useState<Date | undefined>(undefined);
+  const [trackingEnabled, setTrackingEnabled] = useState(false);
   const [stops, setStops] = useState<LoadStop[]>([]);
   const [showOverride, setShowOverride] = useState(false);
   const [overridePassword, setOverridePassword] = useState("");
@@ -85,7 +87,7 @@ export default function LoadForm() {
   });
 
   const createLoadMutation = useMutation({
-    mutationFn: async (data: { number109: string; stops: LoadStop[]; deliveryDueAt?: Date; overridePassword?: string }) => {
+    mutationFn: async (data: { number109: string; stops: LoadStop[]; deliveryDueAt?: Date; trackingEnabled?: boolean; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
       if (data.stops.length === 0) {
         throw new Error("Please add at least one stop");
@@ -101,6 +103,7 @@ export default function LoadForm() {
       setCurrentLocationId("");
       setCurrentStopType("pickup");
       setDeliveryDueDate(undefined);
+      setTrackingEnabled(false);
       setStops([]);
       setShowOverride(false);
       setOverridePassword("");
@@ -197,6 +200,7 @@ export default function LoadForm() {
     const submitData = {
       number109: loadNumber,
       stops,
+      trackingEnabled,
       ...(deliveryDueDate ? { deliveryDueAt: deliveryDueDate } : {}),
       ...(showOverride && overridePassword ? { overridePassword } : {}),
     };
@@ -296,6 +300,24 @@ export default function LoadForm() {
           />
           <p className="text-xs text-gray-500">
             When this load needs to be delivered (optional)
+          </p>
+        </div>
+
+        {/* Step 2.5: GPS Tracking */}
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="gps-tracking"
+              checked={trackingEnabled}
+              onCheckedChange={(checked) => setTrackingEnabled(checked as boolean)}
+              data-testid="checkbox-gps-tracking"
+            />
+            <Label htmlFor="gps-tracking" className="text-sm font-medium cursor-pointer">
+              🛰️ Enable GPS Tracking
+            </Label>
+          </div>
+          <p className="text-xs text-gray-500 ml-6">
+            Allow real-time location tracking for this load. Driver will be able to confirm receipt and provide live location updates.
           </p>
         </div>
 
