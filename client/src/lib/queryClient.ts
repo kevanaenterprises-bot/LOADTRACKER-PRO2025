@@ -71,7 +71,7 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: 5000, // 5 seconds - allows faster cache updates
-      retry: false,
+      retry: false, // Disable retries to prevent infinite loops
     },
     mutations: {
       retry: false,
