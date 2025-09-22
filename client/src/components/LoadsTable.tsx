@@ -529,14 +529,6 @@ export default function LoadsTable() {
   });
 
   const handleLoadClick = async (load: any) => {
-    console.log("🔍 DIALOG DEBUG - Load clicked:", load);
-    console.log("🔍 DIALOG DEBUG - Full load object keys:", Object.keys(load));
-    console.log("🔍 DIALOG DEBUG - pickupLocation:", load.pickupLocation);
-    console.log("🔍 DIALOG DEBUG - pickupLocationId:", load.pickupLocationId);
-    console.log("🔍 DIALOG DEBUG - pickupAddress:", load.pickupAddress);
-    console.log("🔍 DIALOG DEBUG - Delivery location:", load.location);
-    console.log("🔍 DIALOG DEBUG - Load number:", load.number109);
-    
     // ✅ FIXED: Use loads list data directly (now includes pickup location!)
     setSelectedLoad(load);
     setDialogOpen(true);
@@ -1367,6 +1359,18 @@ export default function LoadsTable() {
                       ) : selectedLoad.pickupAddress ? (
                         <div className="space-y-1">
                           <div><strong>Address:</strong> {selectedLoad.pickupAddress}</div>
+                        </div>
+                      ) : selectedLoad.pickupLocationId ? (
+                        <div className="space-y-2">
+                          <div className="text-amber-600 italic">⚠️ Pickup location data missing (Location ID: {selectedLoad.pickupLocationId.slice(0, 8)}...)</div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEditLoad(selectedLoad)}
+                            className="text-xs"
+                          >
+                            Fix Pickup Location
+                          </Button>
                         </div>
                       ) : (
                         <div className="space-y-2">

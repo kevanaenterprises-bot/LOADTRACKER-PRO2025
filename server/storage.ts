@@ -415,8 +415,15 @@ export class DatabaseStorage implements IStorage {
         // Get pickup location separately if pickupLocationId exists (same as getLoad method)
         let pickupLocation: Location | undefined = undefined;
         if (row.load.pickupLocationId) {
-          const [pickup] = await db.select().from(locations).where(eq(locations.id, row.load.pickupLocationId));
-          pickupLocation = pickup;
+          try {
+            const [pickup] = await db.select().from(locations).where(eq(locations.id, row.load.pickupLocationId));
+            pickupLocation = pickup;
+            if (!pickup) {
+              console.warn(`⚠️ Pickup location not found for ID: ${row.load.pickupLocationId} in load ${row.load.number109}`);
+            }
+          } catch (error) {
+            console.error(`❌ Error fetching pickup location ${row.load.pickupLocationId}:`, error);
+          }
         }
         
         return {
