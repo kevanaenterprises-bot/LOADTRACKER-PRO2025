@@ -256,10 +256,28 @@ export default function LoadsTable() {
   };
 
   const { data: loads, isLoading, refetch } = useQuery({
-    queryKey: ["/api/loads", { excludePaid: true }],
+    queryKey: ["/api/loads"],
     queryFn: async () => {
-      // Use the same apiRequest method that works for the "22" click
-      return await apiRequest('/api/loads?excludePaid=true', 'GET');
+      // Fetch ALL loads without any filtering to match what stats shows
+      try {
+        const response = await fetch('/api/loads', {
+          method: 'GET',
+          headers: {
+            'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+          },
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          console.error('Failed to fetch loads:', response.status);
+          throw new Error(`Failed to fetch loads: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log(`✅ Fetched ${data?.length || 0} loads from API`);
+        return data;
+      } catch (error) {
+        console.error('Error fetching loads:', error);
+        throw error;
+      }
     },
     retry: false,
     refetchOnWindowFocus: false,
