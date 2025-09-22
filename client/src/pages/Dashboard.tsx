@@ -348,7 +348,12 @@ export default function Dashboard() {
         <StatsCards 
           stats={stats as any} 
           isLoading={statsLoading} 
-          onActiveLoadsClick={() => setActiveTab("loads")}
+          onActiveLoadsClick={() => {
+            setActiveTab("loads");
+            // Force refresh the loads when clicking the "22"
+            queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+            queryClient.refetchQueries({ queryKey: ["/api/loads"] });
+          }}
         />
         
         {/* Cache Debugger Component - Hidden on mobile for space */}
