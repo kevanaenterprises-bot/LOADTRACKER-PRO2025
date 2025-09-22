@@ -1054,6 +1054,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint to verify session is working
+  app.get("/api/debug/session", async (req, res) => {
+    try {
+      res.json({
+        sessionId: req.session?.id,
+        isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
+        user: !!req.user,
+        userId: (req.session as any)?.userId,
+        adminAuth: (req.session as any)?.adminAuth,
+        driverAuth: (req.session as any)?.driverAuth,
+        secure: req.secure,
+        origin: req.headers.origin,
+        cookie: req.headers.cookie ? 'present' : 'missing',
+        sessionData: req.session
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // KEVIN LOADS TEST: Direct storage call with simple logging
   app.get("/api/test/kevin-loads-direct", async (req, res) => {
     console.log("🎯 KEVIN DIRECT TEST: Testing storage function directly");

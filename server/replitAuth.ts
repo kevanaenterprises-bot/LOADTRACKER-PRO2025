@@ -51,10 +51,9 @@ export function getSession() {
     rolling: true, // Reset expiration on activity
     cookie: {
       httpOnly: true,
-      // Detect production by checking if we're on replit.app domain (more reliable than NODE_ENV)
-      secure: process.env.REPL_SLUG ? true : (process.env.NODE_ENV === 'production'),
+      secure: true, // Always use secure cookies (required for production HTTPS)
       maxAge: sessionTtl,
-      sameSite: process.env.REPL_SLUG ? "none" : "lax", // Must be "none" for cross-site cookies in production
+      sameSite: "lax", // Use "lax" for same-site requests (not "none" which blocks in many browsers)
       // Don't set domain - let the browser handle it automatically
       // This ensures cookies work with any domain/subdomain
     },

@@ -12,11 +12,8 @@ export async function apiRequest(
   method: string,
   data?: unknown | undefined,
 ): Promise<any> {
-  // Use the working static bypass token for mobile reliability
-  const staticBypassToken = 'LOADTRACKER_BYPASS_2025';
-  
+  // Don't use bypass token - let session authentication work normally
   const headers: any = data ? { "Content-Type": "application/json" } : {};
-  headers['x-bypass-token'] = staticBypassToken; // Must be lowercase for production
   
   console.log(`🔄 API Request: ${method} ${url}`);
 
@@ -24,7 +21,7 @@ export async function apiRequest(
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
+    credentials: "include", // This ensures cookies are sent
   });
 
   if (!res.ok) {
@@ -44,16 +41,9 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    // Always use the static bypass token for production reliability
-    const staticBypassToken = 'LOADTRACKER_BYPASS_2025';
-    
-    const headers: any = {
-      'x-bypass-token': staticBypassToken // Must be lowercase for production
-    };
-
+    // Don't use bypass token - let session authentication work normally
     const res = await fetch(queryKey.join("/") as string, {
-      credentials: "include",
-      headers,
+      credentials: "include", // This ensures cookies are sent
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
