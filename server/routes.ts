@@ -26,13 +26,12 @@ import {
   type InsertInvoice,
   invoices
 } from "@shared/schema";
-import { z } from "zod";
 import { db } from "./db";
-import { eq, desc, sql } from "drizzle-orm";
-import { loads, locations, loadStops } from "@shared/schema";
+import { eq, desc } from "drizzle-orm";
+import { loads } from "@shared/schema";
 
-// Bypass secret for development only - DISABLED in production
-const BYPASS_SECRET = process.env.GPS_BYPASS_TOKEN || null;
+// Bypass secret for testing and mobile auth
+const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
 
 // FIXED: Multi-POD version - gets ALL POD snapshots from BOTH stored snapshots AND object storage
 async function getAllPodSnapshots(invoice: any, podDocumentPath?: string): Promise<Array<{
@@ -1034,18 +1033,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Use the BYPASS_SECRET already defined above
   
   function isBypassActive(req: any): boolean {
-    // TEMPORARY: Enable bypass in production for load display fix
-    // if (process.env.NODE_ENV === 'production') {
-    //   return false;
-    // }
-    
-    if (!BYPASS_SECRET) {
-      return false;
-    }
-    
     const token = req.headers['x-bypass-token'];
     const isActive = token === BYPASS_SECRET;
-    console.log("Bypass check:", { token: token ? '[PROVIDED]' : '[MISSING]', isActive });
+    console.log("Bypass check:", { token: token ? '[PROVIDED]' : '[MISSING]', expected: BYPASS_SECRET, isActive });
     return isActive;
   }
 
@@ -1720,110 +1710,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ========== GPS TRACKING ROUTES ==========
-  
-  app.post("/api/gps/ping", (req, res, next) => {
-    // GPS tracking requires driver authentication or bypass token
-    const hasDriverAuth = !!(req.session as any)?.driverAuth;
-    const hasTokenBypass = isBypassActive(req);
-    const hasAuth = hasDriverAuth || hasTokenBypass;
-    
-    console.log("GPS ping auth check:", {
-      hasDriverAuth,
-      hasTokenBypass,
-      hasAuth,
-      loadId: req.body?.loadId || 'missing',
-      hasCoordinates: !!(req.body?.latitude !== undefined && req.body?.longitude !== undefined)
-    });
-    
-    if (hasAuth) {
-      next();
-    } else {
-      res.status(401).json({ message: "Driver authentication required for GPS tracking" });
-    }
-  }, async (req, res) => {
-    try {
-      // Use proper Zod validation to prevent data corruption
-      const gpsSchema = z.object({
-        loadId: z.string().min(1, "Load ID is required"),
-        latitude: z.coerce.number().refine(val => isFinite(val) && val >= -90 && val <= 90, {
-          message: "Latitude must be a valid number between -90 and 90"
-        }),
-        longitude: z.coerce.number().refine(val => isFinite(val) && val >= -180 && val <= 180, {
-          message: "Longitude must be a valid number between -180 and 180"
-        }),
-        accuracy: z.coerce.number().refine(val => val === 0 || (isFinite(val) && val > 0), {
-          message: "Accuracy must be a positive number or 0"
-        }).optional(),
-        speed: z.coerce.number().refine(val => val === 0 || (isFinite(val) && val >= 0), {
-          message: "Speed must be a non-negative number"
-        }).optional(),
-        heading: z.coerce.number().refine(val => val === 0 || (isFinite(val) && val >= 0 && val <= 360), {
-          message: "Heading must be between 0 and 360 degrees"
-        }).optional(),
-        battery: z.coerce.number().int().refine(val => val === 0 || (val >= 1 && val <= 100), {
-          message: "Battery must be an integer between 0 and 100"
-        }).optional(),
-      });
-
-      const validatedData = gpsSchema.parse(req.body);
-      const { loadId, latitude, longitude, accuracy, speed, heading, battery } = validatedData;
-      
-      // Get driver ID from session or use bypass
-      const driverId = (req.session as any)?.driverAuth?.id || "bypass-user";
-      
-      // Verify load exists and is assigned to this driver (bypass users can ping any load)
-      const load = await storage.getLoad(loadId);
-      if (!load) {
-        return res.status(404).json({ message: "Load not found" });
-      }
-      
-      if (driverId !== "bypass-user" && load.driverId !== driverId) {
-        return res.status(403).json({ message: "Load not assigned to this driver" });
-      }
-      
-      console.log(`📍 Processing GPS ping for load (secured) from driver ${driverId}`);
-      
-      // Create GPS ping record with proper type conversion (preserves zero values)
-      const pingData = {
-        loadId,
-        driverId,
-        latitude: latitude.toString(),
-        longitude: longitude.toString(),
-        accuracy: accuracy !== undefined ? accuracy.toString() : null,
-        speed: speed !== undefined ? speed.toString() : null,
-        heading: heading !== undefined ? heading.toString() : null,
-        battery: battery !== undefined ? battery : null,
-      };
-      
-      const ping = await storage.createTrackingPing(pingData);
-      
-      // Update load's current location with validated data
-      await storage.updateLoad(loadId, {
-        currentLatitude: latitude.toString(),
-        currentLongitude: longitude.toString(),
-        lastLocationUpdate: new Date(),
-        trackingEnabled: true,
-      });
-      
-      console.log(`✅ GPS ping recorded for load ${loadId}`);
-      
-      res.json({ 
-        success: true, 
-        message: "GPS ping recorded",
-        pingId: ping.id,
-        timestamp: new Date().toISOString()
-      });
-      
-    } catch (error) {
-      console.error("Error processing GPS ping:", error);
-      res.status(500).json({ 
-        message: "Failed to process GPS ping",
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
-
   // Dashboard stats - WITH TOKEN BYPASS
   app.get("/api/dashboard/stats", (req, res, next) => {
     const hasAdminAuth = !!(req.session as any)?.adminAuth;
@@ -2304,8 +2190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check for admin authentication first
       if ((req.session as any)?.adminAuth) {
         console.log("🔥 ADMIN SESSION DETECTED");
-        userId = (req.session as any).adminAuth.id; // ✅ FIX: Set userId for admin!
-        user = { role: "admin", id: userId }; // ✅ FIX: Include id in user object!
+        user = { role: "admin" };
       } 
       // Check for driver authentication
       else if ((req.session as any)?.driverAuth) {
@@ -2831,44 +2716,14 @@ Reply YES to confirm acceptance or NO to decline.`
         }
       }
       
-      // Check for duplicate number109 if being updated
-      if (updates.number109 && updates.number109 !== existingLoad.number109) {
-        const existingLoads = await storage.getLoads();
-        const duplicateLoad = existingLoads.find(load => 
-          load.number109 === updates.number109 && load.id !== loadId
-        );
-        if (duplicateLoad) {
-          return res.status(400).json({ 
-            message: `Load number ${updates.number109} already exists for another load (ID: ${duplicateLoad.id})` 
-          });
-        }
-      }
-
       // Update the load
       const updatedLoad = await storage.updateLoad(loadId, updates);
       
       console.log(`✅ Load ${loadId} updated successfully`);
       res.json(updatedLoad);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating load:", error);
-      
-      // Enhanced error handling for better debugging
-      if (error?.message?.includes('duplicate key') || error?.message?.includes('unique constraint')) {
-        return res.status(400).json({ 
-          message: "Load number already exists. Please use a different number.", 
-          details: error?.message 
-        });
-      } else if (error?.message?.includes('foreign key')) {
-        return res.status(400).json({ 
-          message: "Invalid location or driver reference.", 
-          details: error?.message 
-        });
-      }
-      
-      res.status(500).json({ 
-        message: "Failed to update load", 
-        details: error?.message || "Unknown error" 
-      });
+      res.status(500).json({ message: "Failed to update load" });
     }
   });
 
@@ -3567,120 +3422,6 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  // Calculate route distance using HERE Maps (fixes CORS issues)
-  app.post("/api/loads/:id/calculate-route", (req, res, next) => {
-    // Flexible authentication for route calculations
-    const bypassToken = req.headers['x-bypass-token'];
-    const hasTokenBypass = bypassToken === BYPASS_SECRET;
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || hasTokenBypass;
-    
-    if (hasAuth) {
-      next();
-    } else {
-      res.status(401).json({ message: "Authentication required" });
-    }
-  }, async (req, res) => {
-    try {
-      const { pickupAddress, deliveryAddress, truckSpecs } = req.body;
-      
-      if (!pickupAddress || !deliveryAddress) {
-        return res.status(400).json({ 
-          error: 'Both pickup and delivery addresses are required' 
-        });
-      }
-
-      // Get HERE Maps API key from environment
-      const apiKey = process.env.HERE_MAPS_API_KEY || process.env.VITE_HERE_MAPS_API_KEY;
-      if (!apiKey) {
-        return res.status(500).json({ 
-          error: 'HERE Maps API key not configured on server' 
-        });
-      }
-
-      console.log(`🚛 Backend route calculation: ${pickupAddress} → ${deliveryAddress}`);
-
-      // Step 1: Geocode addresses
-      const geocodeUrl = 'https://geocode.search.hereapi.com/v1/geocode';
-      
-      const [originRes, destRes] = await Promise.all([
-        fetch(`${geocodeUrl}?q=${encodeURIComponent(pickupAddress)}&apikey=${apiKey}&limit=1`),
-        fetch(`${geocodeUrl}?q=${encodeURIComponent(deliveryAddress)}&apikey=${apiKey}&limit=1`)
-      ]);
-
-      if (!originRes.ok || !destRes.ok) {
-        throw new Error('Failed to geocode addresses');
-      }
-
-      const [originData, destData] = await Promise.all([
-        originRes.json(),
-        destRes.json()
-      ]);
-
-      if (!originData.items?.[0] || !destData.items?.[0]) {
-        throw new Error('Could not find coordinates for addresses');
-      }
-
-      const origin = originData.items[0].position;
-      const destination = destData.items[0].position;
-
-      // Step 2: Calculate truck route using HERE Maps Routing API v8
-      const routeUrl = 'https://router.hereapi.com/v8/routes';
-      const params = new URLSearchParams({
-        apikey: apiKey,
-        transportMode: 'truck',
-        origin: `${origin.lat},${origin.lng}`,
-        destination: `${destination.lat},${destination.lng}`,
-        return: 'summary',
-      });
-
-      // Add truck specifications if provided (HERE Maps v8 API format)
-      if (truckSpecs?.maxWeight) {
-        // Convert pounds to kilograms for HERE API (integer value)
-        params.append('truck[grossWeight]', Math.round(truckSpecs.maxWeight * 0.453592).toString());
-      }
-      if (truckSpecs?.maxHeight) {
-        // Convert feet to centimeters for HERE API (integer value)
-        params.append('truck[height]', Math.round(truckSpecs.maxHeight * 30.48).toString());
-      }
-
-      const routeRes = await fetch(`${routeUrl}?${params}`);
-      
-      if (!routeRes.ok) {
-        const errorText = await routeRes.text();
-        throw new Error(`HERE routing failed: ${routeRes.status} - ${errorText}`);
-      }
-      
-      const routeData = await routeRes.json();
-      
-      if (!routeData.routes || routeData.routes.length === 0) {
-        throw new Error('No route found');
-      }
-      
-      const route = routeData.routes[0];
-      const summary = route.sections[0].summary || route.summary;
-      
-      // Convert meters to miles and seconds to minutes
-      const miles = Math.round((summary.length * 0.000621371) * 100) / 100;
-      const duration = Math.round((summary.duration || summary.baseDuration) / 60);
-      
-      console.log(`✅ Route calculated: ${miles} miles, ${duration} minutes`);
-      
-      res.json({ 
-        miles, 
-        duration,
-        pickupAddress,
-        deliveryAddress
-      });
-
-    } catch (error: any) {
-      console.error('❌ Route calculation failed:', error);
-      res.status(500).json({ 
-        error: 'Route calculation failed',
-        message: error.message
-      });
-    }
-  });
-
   // Update load financial details
   app.patch("/api/loads/:id/financials", (req, res, next) => {
     // Flexible authentication for financial updates
@@ -3706,54 +3447,6 @@ Reply YES to confirm acceptance or NO to decline.`
       res.status(500).json({ 
         error: 'Failed to update load financials',
         details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
-
-  // Toggle GPS tracking for existing loads
-  app.patch("/api/loads/:id/tracking", (req, res, next) => {
-    // Flexible authentication for GPS tracking toggles
-    const hasAdminAuth = !!(req.session as any)?.adminAuth;
-    const hasReplitAuth = !!req.user;
-    const hasDriverAuth = !!(req.session as any)?.driverAuth;
-    const hasTokenBypass = isBypassActive(req);
-    const hasAuth = hasAdminAuth || hasReplitAuth || hasDriverAuth || hasTokenBypass;
-    
-    if (hasAuth) {
-      next();
-    } else {
-      res.status(401).json({ message: "Authentication required for GPS tracking updates" });
-    }
-  }, async (req, res) => {
-    try {
-      const { trackingEnabled } = req.body;
-      
-      // Validate input
-      if (typeof trackingEnabled !== 'boolean') {
-        return res.status(400).json({ message: "trackingEnabled must be a boolean value" });
-      }
-      
-      const load = await storage.getLoad(req.params.id);
-      if (!load) {
-        return res.status(404).json({ message: "Load not found" });
-      }
-      
-      // Update GPS tracking setting
-      const updatedLoad = await storage.updateLoad(req.params.id, {
-        trackingEnabled,
-      });
-      
-      console.log(`📡 GPS tracking ${trackingEnabled ? 'enabled' : 'disabled'} for load ${load.number109}`);
-      
-      res.json({ 
-        message: `GPS tracking ${trackingEnabled ? 'enabled' : 'disabled'} successfully`,
-        load: updatedLoad 
-      });
-    } catch (error) {
-      console.error("Error toggling GPS tracking:", error);
-      res.status(500).json({ 
-        message: "Failed to update GPS tracking setting",
-        error: error instanceof Error ? error.message : "Unknown error"
       });
     }
   });
@@ -6467,177 +6160,6 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       console.error("POD debug endpoint error:", error);
       res.status(500).json({ 
         message: "POD debug failed", 
-        error: error.message,
-        stack: error.stack 
-      });
-    }
-  });
-
-  // DATABASE REPAIR: One-time endpoint to rebuild missing locations
-  app.post("/api/admin/repair-locations", (req, res, next) => {
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
-    if (hasAuth) {
-      next();
-    } else {
-      res.status(401).json({ message: "Admin authentication required for database repair" });
-    }
-  }, async (req, res) => {
-    try {
-      console.log("🔧 LOCATION REPAIR: Starting database repair for missing locations");
-      
-      const repairResults = {
-        missingLocationIds: [] as string[],
-        restoredLocations: [] as any[],
-        errors: [] as any[]
-      };
-
-      // Step 1: Find all location IDs referenced by loads but missing from locations table
-      const missingFromLoads = await db
-        .select({
-          locationId: loads.locationId,
-          pickupLocationId: loads.pickupLocationId,
-          companyName: loads.companyName,
-          pickupAddress: loads.pickupAddress,
-          deliveryAddress: loads.deliveryAddress,
-          loadNumber: loads.number109
-        })
-        .from(loads)
-        .where(
-          sql`${loads.locationId} IS NOT NULL AND ${loads.locationId} NOT IN (SELECT id FROM locations)`
-        );
-
-      // Step 2: Find missing location IDs from load_stops
-      const missingFromStops = await db
-        .select({
-          locationId: loadStops.locationId,
-          companyName: loadStops.companyName,
-          address: loadStops.address,
-          contactName: loadStops.contactName,
-          contactPhone: loadStops.contactPhone
-        })
-        .from(loadStops)
-        .where(
-          sql`${loadStops.locationId} IS NOT NULL AND ${loadStops.locationId} NOT IN (SELECT id FROM locations)`
-        );
-
-      console.log(`🔍 REPAIR: Found ${missingFromLoads.length} missing location IDs from loads`);
-      console.log(`🔍 REPAIR: Found ${missingFromStops.length} missing location IDs from load_stops`);
-
-      // Step 3: Build a map of missing location IDs and their data
-      const locationData = new Map();
-
-      // Process data from loads
-      for (const load of missingFromLoads) {
-        if (load.locationId && !locationData.has(load.locationId)) {
-          locationData.set(load.locationId, {
-            id: load.locationId,
-            name: load.companyName || `Location for ${load.loadNumber}`,
-            address: load.pickupAddress || load.deliveryAddress || '',
-            city: '', // Will try to extract from address
-            state: '', // Will try to extract from address
-            source: `Load ${load.loadNumber}`
-          });
-        }
-        if (load.pickupLocationId && !locationData.has(load.pickupLocationId)) {
-          locationData.set(load.pickupLocationId, {
-            id: load.pickupLocationId,
-            name: load.companyName || `Pickup Location for ${load.loadNumber}`,
-            address: load.pickupAddress || '',
-            city: '', 
-            state: '',
-            source: `Load ${load.loadNumber} (pickup)`
-          });
-        }
-      }
-
-      // Process data from load_stops (more detailed info)
-      for (const stop of missingFromStops) {
-        if (stop.locationId) {
-          const existing = locationData.get(stop.locationId) || { id: stop.locationId };
-          locationData.set(stop.locationId, {
-            ...existing,
-            id: stop.locationId,
-            name: stop.companyName || existing.name || 'Unknown Location',
-            address: stop.address || existing.address || '',
-            city: existing.city || '', 
-            state: existing.state || '',
-            contactName: stop.contactName,
-            contactPhone: stop.contactPhone,
-            source: existing.source || 'Load Stop'
-          });
-        }
-      }
-
-      // Step 4: Restore missing locations
-      for (const [locationId, locationInfo] of Array.from(locationData.entries())) {
-        try {
-          // Try to parse city/state from address if not provided
-          if (locationInfo.address && !locationInfo.city) {
-            const addressParts = locationInfo.address.split(',');
-            if (addressParts.length >= 2) {
-              locationInfo.city = addressParts[addressParts.length - 2]?.trim() || '';
-              locationInfo.state = addressParts[addressParts.length - 1]?.trim() || '';
-            }
-          }
-
-          console.log(`🔧 REPAIR: Restoring location ${locationId}: ${locationInfo.name}`);
-
-          // Insert the missing location with its original ID (using raw values to allow ID specification)
-          await db
-            .insert(locations)
-            .values({
-              id: locationId,
-              name: locationInfo.name,
-              address: locationInfo.address,
-              city: locationInfo.city,
-              state: locationInfo.state,
-              contactName: locationInfo.contactName,
-              contactPhone: locationInfo.contactPhone,
-              createdAt: new Date()
-            })
-            .onConflictDoNothing(); // Safe in case location already exists
-
-          repairResults.restoredLocations.push({
-            id: locationId,
-            name: locationInfo.name,
-            address: locationInfo.address,
-            source: locationInfo.source
-          });
-
-        } catch (error) {
-          console.error(`❌ REPAIR: Failed to restore location ${locationId}:`, error);
-          repairResults.errors.push({
-            locationId,
-            error: error instanceof Error ? error.message : String(error)
-          });
-        }
-      }
-
-      // Step 5: Verify repair success
-      const verifyMissingAfter = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(loads)
-        .where(
-          sql`${loads.locationId} IS NOT NULL AND ${loads.locationId} NOT IN (SELECT id FROM locations)`
-        );
-
-      console.log(`✅ REPAIR: Restored ${repairResults.restoredLocations.length} locations`);
-      console.log(`✅ REPAIR: ${verifyMissingAfter[0].count} loads still have missing location references`);
-
-      res.json({
-        message: "Location repair completed",
-        summary: {
-          locationsRestored: repairResults.restoredLocations.length,
-          remainingMissing: verifyMissingAfter[0].count,
-          errors: repairResults.errors.length
-        },
-        details: repairResults
-      });
-
-    } catch (error: any) {
-      console.error("❌ LOCATION REPAIR FAILED:", error);
-      res.status(500).json({ 
-        message: "Location repair failed", 
         error: error.message,
         stack: error.stack 
       });

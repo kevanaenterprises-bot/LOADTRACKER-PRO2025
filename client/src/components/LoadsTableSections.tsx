@@ -12,7 +12,6 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { HelpButton } from "@/components/HelpTooltip";
@@ -135,32 +134,6 @@ export function LoadSection({
     },
   });
 
-  // GPS tracking toggle mutation
-  const toggleTrackingMutation = useMutation({
-    mutationFn: async ({ loadId, trackingEnabled }: { loadId: string; trackingEnabled: boolean }) => {
-      return apiRequest(`/api/loads/${loadId}/tracking`, "PATCH", { trackingEnabled });
-    },
-    onSuccess: () => {
-      toast({
-        title: "GPS Tracking Updated",
-        description: "GPS tracking setting has been updated successfully",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/tracking/loads"] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Tracking Update Failed",
-        description: error.message || "Failed to update GPS tracking setting",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleToggleTracking = (loadId: string, trackingEnabled: boolean) => {
-    toggleTrackingMutation.mutate({ loadId, trackingEnabled });
-  };
-
   const handleAssignDriver = (loadId: string, driverId: string) => {
     if (driverId) {
       assignDriverMutation.mutate({ loadId, driverId });
@@ -238,7 +211,6 @@ export function LoadSection({
               {showDriverAssign && <TableHead>Assign Driver</TableHead>}
               {!showDriverAssign && <TableHead>Driver</TableHead>}
               <TableHead>Destinations</TableHead>
-              <TableHead>GPS Tracking</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -343,19 +315,6 @@ export function LoadSection({
                         )}
                       </>
                     )}
-                  </div>
-                </TableCell>
-                
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      checked={load.trackingEnabled || false}
-                      onCheckedChange={(checked) => handleToggleTracking(load.id, checked as boolean)}
-                      data-testid={`checkbox-tracking-${load.id}`}
-                    />
-                    <span className="text-xs text-gray-600">
-                      {load.trackingEnabled ? "Enabled" : "Disabled"}
-                    </span>
                   </div>
                 </TableCell>
                 

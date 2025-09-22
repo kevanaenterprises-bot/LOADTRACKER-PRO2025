@@ -34,14 +34,10 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation, Calendar } from "lucide-react";
+import { Plus, X, MapPin, Package, ArrowUp, ArrowDown } from "lucide-react";
 import { HelpButton } from "@/components/HelpTooltip";
-import { HEREMapView } from "@/components/HEREMapView";
-import { DatePicker } from "@/components/ui/date-picker";
-import type { Location, OptimizedRoute } from "@/services/HERERouteOptimizer";
 
 const formSchema = insertLoadSchema.extend({
   number109: z.string().min(1, "109 Number is required"),
@@ -70,15 +66,9 @@ export default function LoadForm() {
   const [loadNumber, setLoadNumber] = useState("109-");
   const [currentLocationId, setCurrentLocationId] = useState("");
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
-  const [deliveryDueDate, setDeliveryDueDate] = useState<Date | undefined>(undefined);
-  const [trackingEnabled, setTrackingEnabled] = useState(false);
   const [stops, setStops] = useState<LoadStop[]>([]);
   const [showOverride, setShowOverride] = useState(false);
   const [overridePassword, setOverridePassword] = useState("");
-  
-  // HERE Maps route optimization state
-  const [optimizedRoute, setOptimizedRoute] = useState<OptimizedRoute | null>(null);
-  const [showRouteMap, setShowRouteMap] = useState(false);
 
   const { data: locations = [] } = useQuery<any[]>({
     queryKey: ["/api/locations"],
@@ -87,7 +77,7 @@ export default function LoadForm() {
   });
 
   const createLoadMutation = useMutation({
-    mutationFn: async (data: { number109: string; stops: LoadStop[]; deliveryDueAt?: Date; trackingEnabled?: boolean; overridePassword?: string }) => {
+    mutationFn: async (data: { number109: string; stops: LoadStop[]; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
       if (data.stops.length === 0) {
         throw new Error("Please add at least one stop");
@@ -102,8 +92,6 @@ export default function LoadForm() {
       setLoadNumber("109-");
       setCurrentLocationId("");
       setCurrentStopType("pickup");
-      setDeliveryDueDate(undefined);
-      setTrackingEnabled(false);
       setStops([]);
       setShowOverride(false);
       setOverridePassword("");
@@ -200,8 +188,6 @@ export default function LoadForm() {
     const submitData = {
       number109: loadNumber,
       stops,
-      trackingEnabled,
-      ...(deliveryDueDate ? { deliveryDueAt: deliveryDueDate } : {}),
       ...(showOverride && overridePassword ? { overridePassword } : {}),
     };
     createLoadMutation.mutate(submitData);
@@ -215,34 +201,6 @@ export default function LoadForm() {
       stopSequence: i + 1,
     }));
     setStops(resequencedStops);
-    // Clear route optimization when stops change
-    setOptimizedRoute(null);
-  };
-
-  // Convert LoadStops to HERE Maps Location format
-  const convertStopsToLocations = (): Location[] => {
-    return stops.map((stop) => ({
-      address: stop.address || "",
-      name: stop.companyName,
-      type: stop.stopType === "dropoff" ? "dropoff" : "pickup",
-    }));
-  };
-
-  // Handle route optimization callback from HERE Maps
-  const handleRouteOptimized = (route: OptimizedRoute) => {
-    setOptimizedRoute(route);
-    toast({
-      title: "Route Optimized! 🚛",
-      description: `Total distance: ${route.totalMiles} miles • Est. fuel cost: $${route.estimatedFuelCost}`,
-    });
-  };
-
-  // Toggle route map visibility
-  const toggleRouteMap = () => {
-    setShowRouteMap(!showRouteMap);
-    if (!showRouteMap) {
-      setOptimizedRoute(null); // Clear previous route when opening
-    }
   };
 
   return (
@@ -289,41 +247,9 @@ export default function LoadForm() {
           </div>
         )}
 
-        {/* Step 2: Delivery Due Date */}
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Step 2: Delivery Due Date (Optional)</Label>
-          <DatePicker
-            date={deliveryDueDate}
-            onDateChange={setDeliveryDueDate}
-            placeholder="Select delivery due date"
-            className="w-full"
-          />
-          <p className="text-xs text-gray-500">
-            When this load needs to be delivered (optional)
-          </p>
-        </div>
-
-        {/* Step 2.5: GPS Tracking */}
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="gps-tracking"
-              checked={trackingEnabled}
-              onCheckedChange={(checked) => setTrackingEnabled(checked as boolean)}
-              data-testid="checkbox-gps-tracking"
-            />
-            <Label htmlFor="gps-tracking" className="text-sm font-medium cursor-pointer">
-              🛰️ Enable GPS Tracking
-            </Label>
-          </div>
-          <p className="text-xs text-gray-500 ml-6">
-            Allow real-time location tracking for this load. Driver will be able to confirm receipt and provide live location updates.
-          </p>
-        </div>
-
-        {/* Step 3: Add Stops */}
+        {/* Step 2: Add Stops */}
         <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
-          <Label className="text-sm font-medium">Step 3: Add Stops</Label>
+          <Label className="text-sm font-medium">Step 2: Add Stops</Label>
           
           {/* Location Selection */}
           <div className="space-y-2">
@@ -388,21 +314,7 @@ export default function LoadForm() {
         {/* Step 3: Added Stops */}
         {stops.length > 0 && (
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">Added Stops ({stops.length})</Label>
-              {stops.length >= 2 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleRouteMap}
-                  className="flex items-center gap-2"
-                >
-                  <Navigation className="h-4 w-4" />
-                  {showRouteMap ? "Hide Route" : "View Route & Optimize"}
-                </Button>
-              )}
-            </div>
+            <Label className="text-sm font-medium">Added Stops ({stops.length})</Label>
             <div className="space-y-2">
               {stops.map((stop, index) => (
                 <div 
@@ -435,23 +347,6 @@ export default function LoadForm() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* HERE Maps Route Optimization */}
-        {showRouteMap && stops.length >= 2 && (
-          <div className="space-y-3">
-            <HEREMapView
-              locations={convertStopsToLocations()}
-              onRouteOptimized={handleRouteOptimized}
-              showOptimization={true}
-              height="400px"
-              truckSpecs={{
-                maxWeight: 80000, // Standard truck weight limit
-                maxHeight: 13.6,  // Standard truck height limit  
-                axleCount: 5,     // Typical semi-truck
-              }}
-            />
           </div>
         )}
 

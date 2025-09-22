@@ -177,28 +177,6 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
     },
   });
 
-  // Combined function to accept tracking and move to in-transit
-  const handleAcceptTracking = async () => {
-    try {
-      // First, update status to in_transit to show load is active
-      await updateStatusMutation.mutateAsync("in_transit");
-      
-      // Then start GPS tracking
-      // The GPSTracker component will handle the actual GPS initialization
-      toast({
-        title: "Load Accepted & Tracking Started! 🚛",
-        description: "You're now tracking this load. GPS updates will be sent automatically.",
-      });
-    } catch (error) {
-      console.error("Failed to accept tracking:", error);
-      toast({
-        title: "Accept Tracking Failed",
-        description: "Could not start tracking. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
   const handleStatusUpdate = () => {
     const nextAction = getNextAction(load.status);
     if (nextAction) {
@@ -282,47 +260,23 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
           
           <div className="flex gap-2">
             {nextAction && (
-              <>
-                {/* Show Accept Tracking for loads that haven't started tracking yet */}
-                {(load.status === "assigned" || load.status === "created") ? (
-                  <Button 
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                    onClick={handleAcceptTracking}
-                    disabled={updateStatusMutation.isPending}
-                  >
-                    {updateStatusMutation.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Starting Tracking...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-location-arrow mr-2"></i>
-                        Accept Tracking
-                      </>
-                    )}
-                  </Button>
+              <Button 
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                onClick={handleStatusUpdate}
+                disabled={updateStatusMutation.isPending}
+              >
+                {updateStatusMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Updating...
+                  </>
                 ) : (
-                  /* Show Update Status for loads already in transit */
-                  <Button 
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
-                    onClick={handleStatusUpdate}
-                    disabled={updateStatusMutation.isPending}
-                  >
-                    {updateStatusMutation.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Updating...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-play mr-2"></i>
-                        Update Status
-                      </>
-                    )}
-                  </Button>
+                  <>
+                    <i className="fas fa-play mr-2"></i>
+                    Update Status
+                  </>
                 )}
-              </>
+              </Button>
             )}
           </div>
           

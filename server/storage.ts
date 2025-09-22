@@ -3,7 +3,6 @@ import {
   locations,
   loads,
   loadStops,
-  trackingPings,
   bolNumbers,
   rates,
   customers,
@@ -21,8 +20,6 @@ import {
   type LoadWithDetails,
   type LoadStop,
   type InsertLoadStop,
-  type TrackingPing,
-  type InsertTrackingPing,
   type BolNumber,
   type InsertBolNumber,
   type Rate,
@@ -87,11 +84,6 @@ export interface IStorage {
   // Load stops operations
   getLoadStops(loadId: string): Promise<LoadStop[]>;
   createLoadStop(stop: InsertLoadStop): Promise<LoadStop>;
-
-  // GPS Tracking operations
-  createTrackingPing(ping: InsertTrackingPing): Promise<TrackingPing>;
-  getTrackingPings(loadId: string, limit?: number): Promise<TrackingPing[]>;
-  getRecentTrackingPings(driverId: string, limit?: number): Promise<TrackingPing[]>;
 
   // BOL operations
   checkBOLExists(bolNumber: string): Promise<boolean>;
@@ -271,74 +263,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLoad(load: InsertLoad, stops?: InsertLoadStop[]): Promise<Load> {
-    let pickupLocationId: string | null = null;
-    let deliveryLocationId: string | null = null;
+    const [newLoad] = await db.insert(loads).values(load).returning();
     
-    // Process stops first to create locations and get IDs
+    // Add initial status history
+    await this.addStatusHistory(newLoad.id, "created", "Load created by office staff");
+    
+    // Create load stops if provided
     if (stops && stops.length > 0) {
-      const stopsWithLoadId = [];
-      
-      for (const stop of stops) {
-        let locationId = stop.locationId;
-        
-        // If no locationId provided, create a location from the stop data
-        if (!locationId && stop.companyName && stop.address) {
-          console.log(`📍 Creating location for ${stop.stopType} stop: ${stop.companyName}`);
-          
-          const newLocation = await this.createLocation({
-            name: stop.companyName,
-            address: stop.address,
-            contactName: stop.contactName,
-            contactPhone: stop.contactPhone
-          });
-          
-          locationId = newLocation.id;
-          console.log(`✅ Location created: ${locationId} for ${stop.companyName}`);
-        }
-        
-        // Track pickup and delivery location IDs
-        if (stop.stopType === 'pickup' && !pickupLocationId) {
-          pickupLocationId = locationId || null;
-        }
-        if (stop.stopType === 'dropoff') {
-          deliveryLocationId = locationId || null; // Keep updating to get the final delivery
-        }
-        
-        stopsWithLoadId.push({
-          ...stop,
-          loadId: '', // Will be updated after load creation
-          locationId
-        });
-      }
-      
-      // Update load with pickup and delivery location references
-      const updatedLoadData = {
-        ...load,
-        pickupLocationId,
-        locationId: deliveryLocationId // Main locationId points to final delivery
-      };
-      
-      const [newLoad] = await db.insert(loads).values(updatedLoadData).returning();
-      
-      // Now update stops with the actual load ID and insert them
-      const finalStops = stopsWithLoadId.map(stop => ({
+      const stopsWithLoadId = stops.map(stop => ({
         ...stop,
-        loadId: newLoad.id
+        loadId: newLoad.id,
       }));
-      
-      await db.insert(loadStops).values(finalStops);
-      
-      // Add initial status history
-      await this.addStatusHistory(newLoad.id, "created", "Load created by office staff");
-      
-      console.log(`🚛 Load created with pickup location: ${pickupLocationId}, delivery location: ${deliveryLocationId}`);
-      return newLoad;
-    } else {
-      // No stops provided, create load as before
-      const [newLoad] = await db.insert(loads).values(load).returning();
-      await this.addStatusHistory(newLoad.id, "created", "Load created by office staff");
-      return newLoad;
+      await db.insert(loadStops).values(stopsWithLoadId);
     }
+    
+    return newLoad;
   }
   
   async getLoadStops(loadId: string): Promise<LoadStop[]> {
@@ -367,32 +306,6 @@ export class DatabaseStorage implements IStorage {
     await db.delete(loadStops).where(eq(loadStops.id, stopId));
   }
 
-  // GPS Tracking operations
-  async createTrackingPing(ping: InsertTrackingPing): Promise<TrackingPing> {
-    const [newPing] = await db.insert(trackingPings).values(ping).returning();
-    return newPing;
-  }
-
-  async getTrackingPings(loadId: string, limit = 50): Promise<TrackingPing[]> {
-    const result = await db
-      .select()
-      .from(trackingPings)
-      .where(eq(trackingPings.loadId, loadId))
-      .orderBy(desc(trackingPings.capturedAt))
-      .limit(limit);
-    return result;
-  }
-
-  async getRecentTrackingPings(driverId: string, limit = 50): Promise<TrackingPing[]> {
-    const result = await db
-      .select()
-      .from(trackingPings)
-      .where(eq(trackingPings.driverId, driverId))
-      .orderBy(desc(trackingPings.capturedAt))
-      .limit(limit);
-    return result;
-  }
-
   async getLoads(): Promise<LoadWithDetails[]> {
     const result = await db
       .select({
@@ -407,30 +320,14 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .orderBy(desc(loads.createdAt));
 
-    // Get stops AND pickup location for each load
+    // Get stops for each load
     const loadsWithStops = await Promise.all(
       result.map(async (row) => {
         const stops = await this.getLoadStops(row.load.id);
-        
-        // Get pickup location separately if pickupLocationId exists (same as getLoad method)
-        let pickupLocation: Location | undefined = undefined;
-        if (row.load.pickupLocationId) {
-          try {
-            const [pickup] = await db.select().from(locations).where(eq(locations.id, row.load.pickupLocationId));
-            pickupLocation = pickup;
-            if (!pickup) {
-              console.warn(`⚠️ Pickup location not found for ID: ${row.load.pickupLocationId} in load ${row.load.number109}`);
-            }
-          } catch (error) {
-            console.error(`❌ Error fetching pickup location ${row.load.pickupLocationId}:`, error);
-          }
-        }
-        
         return {
           ...row.load,
           driver: row.driver || undefined,
           location: row.location || undefined,
-          pickupLocation: pickupLocation, // ✅ NOW INCLUDES PICKUP LOCATION!
           invoice: row.invoice || undefined,
           stops: stops || [],
         };
@@ -456,23 +353,11 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
-    // Get pickup location separately if pickupLocationId exists
-    let pickupLocation: Location | undefined = undefined;
-    if (result.load.pickupLocationId) {
-      const [pickup] = await db.select().from(locations).where(eq(locations.id, result.load.pickupLocationId));
-      pickupLocation = pickup;
-    }
-
-    // Get stops for this load (SAME AS getLoads method)
-    const stops = await this.getLoadStops(result.load.id);
-
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
-      pickupLocation: pickupLocation, // ✅ NOW INCLUDES PICKUP LOCATION!
       invoice: result.invoice || undefined,
-      stops: stops || [],
     };
   }
 
@@ -492,23 +377,11 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
-    // Get pickup location separately if pickupLocationId exists  
-    let pickupLocation: Location | undefined = undefined;
-    if (result.load.pickupLocationId) {
-      const [pickup] = await db.select().from(locations).where(eq(locations.id, result.load.pickupLocationId));
-      pickupLocation = pickup;
-    }
-
-    // Get stops for this load (SAME AS getLoads method)
-    const stops = await this.getLoadStops(result.load.id);
-
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
-      pickupLocation: pickupLocation,
       invoice: result.invoice || undefined,
-      stops: stops || [],
     };
   }
 
