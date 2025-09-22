@@ -258,16 +258,8 @@ export default function LoadsTable() {
   const { data: loads, isLoading, refetch } = useQuery({
     queryKey: ["/api/loads", { excludePaid: true }],
     queryFn: async () => {
-      const response = await fetch('/api/loads?excludePaid=true', {
-        credentials: 'include',
-        headers: {
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch loads');
-      }
-      return response.json();
+      // Use the same apiRequest method that works for the "22" click
+      return await apiRequest('/api/loads?excludePaid=true', 'GET');
     },
     retry: false,
     refetchOnWindowFocus: false,
