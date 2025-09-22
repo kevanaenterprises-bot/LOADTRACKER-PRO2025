@@ -368,23 +368,31 @@ export default function LoadsTable() {
     }
   };
 
-  const { data: loads, isLoading, refetch } = useQuery({
-    queryKey: ["/api/loads", { excludePaid: true }],
+  const { data: loads, isLoading, refetch, error } = useQuery({
+    queryKey: ["/api/loads"],
     queryFn: async () => {
-      const response = await fetch('/api/loads?excludePaid=true', {
+      console.log('🔄 Fetching loads from /api/loads');
+      const response = await fetch('/api/loads', {
         credentials: 'include',
         headers: {
           'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
         }
       });
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch loads');
+        const errorText = await response.text();
+        console.error('❌ Failed to fetch loads:', response.status, errorText);
+        throw new Error(`Failed to fetch loads: ${response.status}`);
       }
-      return response.json();
+      
+      const data = await response.json();
+      console.log(`✅ Fetched ${Array.isArray(data) ? data.length : 0} loads successfully`);
+      return data;
     },
-    retry: false,
-    refetchOnWindowFocus: false,
-    staleTime: 0, // Always consider data stale to allow quick updates
+    retry: 1,
+    refetchOnWindowFocus: true,
+    staleTime: 5000, // Data stays fresh for 5 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Force clear cache and refresh loads  
@@ -492,9 +500,9 @@ export default function LoadsTable() {
   });
 
   const handleLoadClick = async (load: any) => {
-    console.log("Load clicked:", load);
+    console.log("🔍 Load clicked - fetching complete details:", load);
     
-    // 🔥 CRITICAL FIX: Fetch complete load details including pickupLocation
+    // 🔥 CRITICAL FIX: Fetch complete load details including all location data
     try {
       const response = await fetch(`/api/loads/${load.id}`, {
         headers: {
@@ -505,14 +513,24 @@ export default function LoadsTable() {
       
       if (response.ok) {
         const completeLoadData = await response.json();
-        console.log("Complete load data with pickupLocation:", completeLoadData);
-        setSelectedLoad(completeLoadData); // ✅ Now includes pickupLocation!
+        console.log("✅ Complete load data fetched:", {
+          id: completeLoadData.id,
+          number109: completeLoadData.number109,
+          hasPickupLocation: !!completeLoadData.pickupLocation,
+          hasDeliveryLocation: !!completeLoadData.location,
+          hasStops: !!(completeLoadData.stops && completeLoadData.stops.length > 0),
+          pickupAddress: completeLoadData.pickupAddress,
+          deliveryAddress: completeLoadData.deliveryAddress,
+          fullData: completeLoadData
+        });
+        setSelectedLoad(completeLoadData); // Now includes all location data
       } else {
+        console.warn("⚠️ Failed to fetch complete load details, using list data");
         // Fallback to list data if individual fetch fails
         setSelectedLoad(load);
       }
     } catch (error) {
-      console.error("Failed to fetch complete load details:", error);
+      console.error("❌ Failed to fetch complete load details:", error);
       // Fallback to list data if individual fetch fails
       setSelectedLoad(load);
     }
@@ -524,9 +542,15 @@ export default function LoadsTable() {
     
     // Fetch existing stops for this load
     try {
-      const response = await fetch(`/api/loads/${load.id}/stops`);
+      const response = await fetch(`/api/loads/${load.id}/stops`, {
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
+        credentials: 'include',
+      });
       if (response.ok) {
         const stops = await response.json();
+        console.log(`📍 Fetched ${stops.length} stops for load ${load.id}`);
         setExistingStops(stops);
       }
     } catch (error) {
@@ -882,6 +906,61 @@ export default function LoadsTable() {
       </Card>
     );
   }
+
+  // Handle error state
+  if (error) {
+    console.error('Load fetch error:', error);
+    return (
+      <Card className="material-card">
+        <CardHeader>
+          <CardTitle>Active Loads</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center p-8">
+            <div className="text-red-600 mb-4">
+              <i className="fas fa-exclamation-triangle text-2xl"></i>
+            </div>
+            <p className="text-gray-700 mb-2">Failed to load data</p>
+            <p className="text-sm text-gray-500 mb-4">{error instanceof Error ? error.message : 'Unknown error occurred'}</p>
+            <Button onClick={() => refetch()} variant="outline" size="sm">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Handle empty/null data
+  if (!loads) {
+    console.log('No loads data received from server');
+    return (
+      <Card className="material-card">
+        <CardHeader>
+          <CardTitle>Active Loads</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center p-8">
+            <p className="text-gray-700">No load data available</p>
+            <Button onClick={() => refetch()} variant="outline" size="sm" className="mt-4">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Debug log the loads data
+  console.log('📊 LOADS DEBUG:', {
+    loadsExists: !!loads,
+    isArray: Array.isArray(loads),
+    loadsCount: Array.isArray(loads) ? loads.length : 'Not an array',
+    firstLoad: Array.isArray(loads) && loads.length > 0 ? loads[0] : null,
+    searchTerm: searchTerm
+  });
 
   // Filter loads based on search term (Load #, Invoice #, or BOL #)
   const filteredLoads = Array.isArray(loads) ? loads.filter((load: any) => {
