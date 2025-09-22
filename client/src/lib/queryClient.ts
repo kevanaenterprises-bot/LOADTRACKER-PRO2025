@@ -16,7 +16,7 @@ export async function apiRequest(
   const staticBypassToken = 'LOADTRACKER_BYPASS_2025';
   
   const headers: any = data ? { "Content-Type": "application/json" } : {};
-  headers['X-Bypass-Token'] = staticBypassToken;
+  headers['x-bypass-token'] = staticBypassToken; // Must be lowercase for production
   
   console.log(`🔄 API Request: ${method} ${url}`);
 
@@ -44,30 +44,12 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    // Ensure bypass token is available - retry if needed
-    let bypassToken = localStorage.getItem('bypass-token');
-    if (!bypassToken) {
-      try {
-        console.log("🔄 Query function getting bypass token");
-        const response = await fetch("/api/auth/browser-bypass", {
-          method: "POST",
-          credentials: "include",
-        });
-        if (response.ok) {
-          const tokenData = await response.json();
-          localStorage.setItem('bypass-token', tokenData.token);
-          bypassToken = tokenData.token;
-          console.log("✅ Query function bypass token obtained");
-        }
-      } catch (error) {
-        console.warn("⚠️ Query function bypass token failed:", error);
-      }
-    }
+    // Always use the static bypass token for production reliability
+    const staticBypassToken = 'LOADTRACKER_BYPASS_2025';
     
-    const headers: any = {};
-    if (bypassToken) {
-      headers['X-Bypass-Token'] = bypassToken;
-    }
+    const headers: any = {
+      'x-bypass-token': staticBypassToken // Must be lowercase for production
+    };
 
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",

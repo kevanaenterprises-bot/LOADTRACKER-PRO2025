@@ -506,7 +506,7 @@ export default function LoadsTable() {
     try {
       const response = await fetch(`/api/loads/${load.id}`, {
         headers: {
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025', // Must be lowercase for production
         },
         credentials: 'include',
       });
@@ -544,7 +544,7 @@ export default function LoadsTable() {
     try {
       const response = await fetch(`/api/loads/${load.id}/stops`, {
         headers: {
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025', // Must be lowercase for production
         },
         credentials: 'include',
       });
