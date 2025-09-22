@@ -2304,7 +2304,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check for admin authentication first
       if ((req.session as any)?.adminAuth) {
         console.log("🔥 ADMIN SESSION DETECTED");
-        user = { role: "admin" };
+        userId = (req.session as any).adminAuth.id; // ✅ FIX: Set userId for admin!
+        user = { role: "admin", id: userId }; // ✅ FIX: Include id in user object!
       } 
       // Check for driver authentication
       else if ((req.session as any)?.driverAuth) {
