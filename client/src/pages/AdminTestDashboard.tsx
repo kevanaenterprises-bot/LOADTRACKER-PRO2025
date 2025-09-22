@@ -1,17 +1,19 @@
-import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useMainAuth } from "@/hooks/useMainAuth";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 
 export default function AdminTestDashboard() {
-  const { user, isAuthenticated, isLoading } = useAdminAuth();
+  const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/admin-logout", {
-        method: "POST",
-        credentials: "include"
-      });
+      if (authType === 'admin') {
+        await fetch("/api/auth/admin-logout", {
+          method: "POST",
+          credentials: "include"
+        });
+      }
       setLocation("/");
     } catch (error) {
       setLocation("/");
@@ -50,7 +52,7 @@ export default function AdminTestDashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm font-medium text-gray-700">
-                Welcome, {user?.firstName} {user?.lastName} (admin)
+                Welcome, {user?.firstName} {user?.lastName} ({authType})
               </span>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 Logout
@@ -84,7 +86,7 @@ export default function AdminTestDashboard() {
                 <div><dt className="inline font-medium">ID:</dt> <dd className="inline">{user?.id}</dd></div>
                 <div><dt className="inline font-medium">Username:</dt> <dd className="inline">{user?.username}</dd></div>
                 <div><dt className="inline font-medium">Role:</dt> <dd className="inline">{user?.role}</dd></div>
-                <div><dt className="inline font-medium">Auth Type:</dt> <dd className="inline">admin</dd></div>
+                <div><dt className="inline font-medium">Auth Type:</dt> <dd className="inline">{authType}</dd></div>
               </dl>
             </div>
             

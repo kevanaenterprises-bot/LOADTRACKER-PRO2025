@@ -219,6 +219,12 @@ async function startServer() {
       res.status(status).json({ message });
     });
 
+    // Add API 404 guard before static serving to prevent API calls from falling through to SPA
+    app.use('/api', (_req, res) => {
+      console.log(`❌ API 404: Unmatched API route ${_req.method} ${_req.path}`);
+      res.status(404).json({ error: 'API route not found' });
+    });
+
     // Static serving restored - testing storage fixes
     console.log('📁 Setting up static file serving...');
     serveStatic(app);

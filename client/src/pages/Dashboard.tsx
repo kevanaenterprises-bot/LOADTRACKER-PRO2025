@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
+import { useMainAuth } from "@/hooks/useMainAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -56,7 +56,7 @@ const rateSchema = z.object({
 
 export default function Dashboard() {
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading } = useAdminAuth();
+  const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "trucks" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices" | "cleanup">("loads");
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
@@ -273,14 +273,26 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     try {
-      console.log("Admin logout attempt");
-      const response = await fetch("/api/auth/admin-logout", {
-        method: "POST",
-        credentials: "include"
-      });
-      console.log("Admin logout response:", response.status);
-      // Force hard refresh to clear all state
-      window.location.href = "/";
+      console.log("Logout attempt - authType:", authType);
+      if (authType === 'admin') {
+        const response = await fetch("/api/auth/admin-logout", {
+          method: "POST",
+          credentials: "include"
+        });
+        console.log("Admin logout response:", response.status);
+        // Force hard refresh to clear all state
+        window.location.href = "/";
+      } else if (authType === 'driver') {
+        await fetch("/api/auth/driver-logout", {
+          method: "POST", 
+          credentials: "include"
+        });
+        window.location.href = "/";
+      } else {
+        // Replit logout
+        console.log("Using Replit logout");
+        window.location.href = "/api/logout";
+      }
     } catch (error) {
       console.error("Logout error:", error);
       // Force fallback to Replit logout
@@ -348,12 +360,7 @@ export default function Dashboard() {
         <StatsCards 
           stats={stats as any} 
           isLoading={statsLoading} 
-          onActiveLoadsClick={() => {
-            setActiveTab("loads");
-            // Force refresh the loads when clicking the "22"
-            queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
-            queryClient.refetchQueries({ queryKey: ["/api/loads"] });
-          }}
+          onActiveLoadsClick={() => setActiveTab("loads")}
         />
         
         {/* Cache Debugger Component - Hidden on mobile for space */}

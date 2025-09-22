@@ -263,21 +263,74 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createLoad(load: InsertLoad, stops?: InsertLoadStop[]): Promise<Load> {
-    const [newLoad] = await db.insert(loads).values(load).returning();
+    let pickupLocationId: string | null = null;
+    let deliveryLocationId: string | null = null;
     
-    // Add initial status history
-    await this.addStatusHistory(newLoad.id, "created", "Load created by office staff");
-    
-    // Create load stops if provided
+    // Process stops first to create locations and get IDs
     if (stops && stops.length > 0) {
-      const stopsWithLoadId = stops.map(stop => ({
+      const stopsWithLoadId = [];
+      
+      for (const stop of stops) {
+        let locationId = stop.locationId;
+        
+        // If no locationId provided, create a location from the stop data
+        if (!locationId && stop.companyName && stop.address) {
+          console.log(`📍 Creating location for ${stop.stopType} stop: ${stop.companyName}`);
+          
+          const newLocation = await this.createLocation({
+            name: stop.companyName,
+            address: stop.address,
+            contactName: stop.contactName,
+            contactPhone: stop.contactPhone
+          });
+          
+          locationId = newLocation.id;
+          console.log(`✅ Location created: ${locationId} for ${stop.companyName}`);
+        }
+        
+        // Track pickup and delivery location IDs
+        if (stop.stopType === 'pickup' && !pickupLocationId) {
+          pickupLocationId = locationId || null;
+        }
+        if (stop.stopType === 'dropoff') {
+          deliveryLocationId = locationId || null; // Keep updating to get the final delivery
+        }
+        
+        stopsWithLoadId.push({
+          ...stop,
+          loadId: '', // Will be updated after load creation
+          locationId
+        });
+      }
+      
+      // Update load with pickup and delivery location references
+      const updatedLoadData = {
+        ...load,
+        pickupLocationId,
+        locationId: deliveryLocationId // Main locationId points to final delivery
+      };
+      
+      const [newLoad] = await db.insert(loads).values(updatedLoadData).returning();
+      
+      // Now update stops with the actual load ID and insert them
+      const finalStops = stopsWithLoadId.map(stop => ({
         ...stop,
-        loadId: newLoad.id,
+        loadId: newLoad.id
       }));
-      await db.insert(loadStops).values(stopsWithLoadId);
+      
+      await db.insert(loadStops).values(finalStops);
+      
+      // Add initial status history
+      await this.addStatusHistory(newLoad.id, "created", "Load created by office staff");
+      
+      console.log(`🚛 Load created with pickup location: ${pickupLocationId}, delivery location: ${deliveryLocationId}`);
+      return newLoad;
+    } else {
+      // No stops provided, create load as before
+      const [newLoad] = await db.insert(loads).values(load).returning();
+      await this.addStatusHistory(newLoad.id, "created", "Load created by office staff");
+      return newLoad;
     }
-    
-    return newLoad;
   }
   
   async getLoadStops(loadId: string): Promise<LoadStop[]> {
@@ -353,11 +406,23 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
+    // Get pickup location separately if pickupLocationId exists
+    let pickupLocation: Location | undefined = undefined;
+    if (result.load.pickupLocationId) {
+      const [pickup] = await db.select().from(locations).where(eq(locations.id, result.load.pickupLocationId));
+      pickupLocation = pickup;
+    }
+
+    // Get stops for this load (SAME AS getLoads method)
+    const stops = await this.getLoadStops(result.load.id);
+
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
+      pickupLocation: pickupLocation, // ✅ NOW INCLUDES PICKUP LOCATION!
       invoice: result.invoice || undefined,
+      stops: stops || [],
     };
   }
 
@@ -377,11 +442,23 @@ export class DatabaseStorage implements IStorage {
 
     if (!result) return undefined;
 
+    // Get pickup location separately if pickupLocationId exists  
+    let pickupLocation: Location | undefined = undefined;
+    if (result.load.pickupLocationId) {
+      const [pickup] = await db.select().from(locations).where(eq(locations.id, result.load.pickupLocationId));
+      pickupLocation = pickup;
+    }
+
+    // Get stops for this load (SAME AS getLoads method)
+    const stops = await this.getLoadStops(result.load.id);
+
     return {
       ...result.load,
       driver: result.driver || undefined,
       location: result.location || undefined,
+      pickupLocation: pickupLocation,
       invoice: result.invoice || undefined,
+      stops: stops || [],
     };
   }
 

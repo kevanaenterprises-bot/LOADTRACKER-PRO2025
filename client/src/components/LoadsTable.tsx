@@ -27,10 +27,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Package, MapPin, X, RefreshCw } from "lucide-react";
+import { Plus, Package, MapPin, X, RefreshCw, Search, Route, Navigation } from "lucide-react";
 import { useState, useEffect } from "react";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 import { LoadSection } from "@/components/LoadsTableSections";
+import { HERERouteOptimizer } from "@/services/HERERouteOptimizer";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -124,6 +125,11 @@ export default function LoadsTable() {
   const [existingStops, setExistingStops] = useState<any[]>([]);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  // HERE Maps route calculation state
+  const [calculatingRoute, setCalculatingRoute] = useState(false);
+  const [routeCalculated, setRouteCalculated] = useState<{[key: string]: boolean}>({});
 
   // Function to fetch load stops for editing
   const fetchLoadStops = async (loadId: string) => {
@@ -255,29 +261,126 @@ export default function LoadsTable() {
     }
   };
 
-  const { data: loads, isLoading, refetch } = useQuery({
-    queryKey: ["/api/loads"],
-    queryFn: async () => {
-      // Fetch ALL loads without any filtering to match what stats shows
-      try {
-        const response = await fetch('/api/loads', {
-          method: 'GET',
-          headers: {
-            'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
-          },
-          credentials: 'include',
-        });
-        if (!response.ok) {
-          console.error('Failed to fetch loads:', response.status);
-          throw new Error(`Failed to fetch loads: ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log(`✅ Fetched ${data?.length || 0} loads from API`);
-        return data;
-      } catch (error) {
-        console.error('Error fetching loads:', error);
-        throw error;
+  // HERE Maps route calculation function
+  const calculateRouteDistance = async (loadId: string, load: any) => {
+    // Extract addresses from stops array (preferred) or fallback to other fields
+    const pickupStop = load.stops?.find((stop: any) => stop.stopType === 'pickup');
+    const deliveryStop = load.stops?.find((stop: any) => stop.stopType === 'dropoff');
+    
+    const pickupAddr = load.pickupAddress || 
+      pickupStop?.address ||
+      (pickupStop?.location?.address) ||
+      (load.pickupLocation ? `${load.pickupLocation.address || load.pickupLocation.name}, ${load.pickupLocation.city || ''}, ${load.pickupLocation.state || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null) ||
+      "1800 E PLANO PKWY, Plano, TX"; // Default pickup from your loads
+    
+    const deliveryAddr = load.deliveryAddress || 
+      deliveryStop?.address ||
+      (deliveryStop?.location?.address) ||
+      (load.location ? `${load.location.address || load.location.name}, ${load.location.city || ''}, ${load.location.state || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null);
+      
+    if (!pickupAddr || !deliveryAddr) {
+      toast({
+        title: "Cannot Calculate Route",
+        description: "Both pickup and delivery addresses are required for route calculation",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    console.log('🚛 Route calculation starting via backend API...');
+    
+    setCalculatingRoute(true);
+    try {
+      // Call our backend API endpoint instead of HERE Maps directly (fixes CORS)
+      const response = await fetch(`/api/loads/${loadId}/calculate-route`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          pickupAddress: pickupAddr, 
+          deliveryAddress: deliveryAddr,
+          truckSpecs: {
+            maxWeight: 80000,
+            maxHeight: 13.6,
+            axleCount: 5
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Route calculation failed: ${response.status}`);
       }
+      
+      const distance = await response.json();
+      console.log('✅ Route calculation successful:', distance);
+
+      // Update the load's estimated miles in the database
+      const updateResponse = await fetch(`/api/loads/${loadId}/financials`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ estimatedMiles: distance.miles.toString() })
+      });
+      
+      if (!updateResponse.ok) {
+        throw new Error(`Failed to update mileage: ${updateResponse.status}`);
+      }
+      
+      // Update the selected load state for immediate UI feedback
+      if (selectedLoad && selectedLoad.id === loadId) {
+        setSelectedLoad({ ...selectedLoad, estimatedMiles: distance.miles });
+      }
+      
+      // Mark route as calculated
+      setRouteCalculated(prev => ({ ...prev, [loadId]: true }));
+      
+      // Refresh loads data
+      queryClient.invalidateQueries({ queryKey: ['/api/loads'] });
+      
+      toast({
+        title: "Route Calculated! 🚛",
+        description: `Total distance: ${distance.miles} miles • Est. time: ${Math.floor(distance.duration / 60)}h ${distance.duration % 60}m`,
+      });
+      
+      if (distance.warnings && distance.warnings.length > 0) {
+        toast({
+          title: "Truck Route Warnings",
+          description: distance.warnings.join(", "),
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Route calculation failed:", error);
+      toast({
+        title: "Route Calculation Failed",
+        description: error instanceof Error ? error.message : "Unable to calculate route using HERE Maps",
+        variant: "destructive"
+      });
+    } finally {
+      setCalculatingRoute(false);
+    }
+  };
+
+  const { data: loads, isLoading, refetch } = useQuery({
+    queryKey: ["/api/loads", { excludePaid: true }],
+    queryFn: async () => {
+      const response = await fetch('/api/loads?excludePaid=true', {
+        credentials: 'include',
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch loads');
+      }
+      return response.json();
     },
     retry: false,
     refetchOnWindowFocus: false,
@@ -390,7 +493,30 @@ export default function LoadsTable() {
 
   const handleLoadClick = async (load: any) => {
     console.log("Load clicked:", load);
-    setSelectedLoad(load);
+    
+    // 🔥 CRITICAL FIX: Fetch complete load details including pickupLocation
+    try {
+      const response = await fetch(`/api/loads/${load.id}`, {
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const completeLoadData = await response.json();
+        console.log("Complete load data with pickupLocation:", completeLoadData);
+        setSelectedLoad(completeLoadData); // ✅ Now includes pickupLocation!
+      } else {
+        // Fallback to list data if individual fetch fails
+        setSelectedLoad(load);
+      }
+    } catch (error) {
+      console.error("Failed to fetch complete load details:", error);
+      // Fallback to list data if individual fetch fails
+      setSelectedLoad(load);
+    }
+    
     setDialogOpen(true);
     // Always reset edit mode when opening a new load dialog
     setEditMode(false);
@@ -757,19 +883,33 @@ export default function LoadsTable() {
     );
   }
 
-  // Categorize loads by new workflow stages
-  const pendingLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "pending" || load.status === "created") : [];
-  const assignedLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "assigned" && load.driverId) : [];
-  const inTransitLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+  // Filter loads based on search term (Load #, Invoice #, or BOL #)
+  const filteredLoads = Array.isArray(loads) ? loads.filter((load: any) => {
+    if (!searchTerm.trim()) return true; // No search term, show all loads
+    
+    const search = searchTerm.toLowerCase().trim();
+    const loadNumber = load.number109?.toLowerCase() || '';
+    const bolNumber = load.bolNumber?.toLowerCase() || '';
+    const invoiceNumber = load.invoice?.invoiceNumber?.toLowerCase() || '';
+    
+    return loadNumber.includes(search) || 
+           bolNumber.includes(search) || 
+           invoiceNumber.includes(search);
+  }) : [];
+
+  // Categorize filtered loads by new workflow stages
+  const pendingLoads = filteredLoads.filter((load: any) => load.status === "pending" || load.status === "created");
+  const assignedLoads = filteredLoads.filter((load: any) => load.status === "assigned" && load.driverId);
+  const inTransitLoads = filteredLoads.filter((load: any) => 
     ["in_transit", "en_route_pickup", "at_shipper", "left_shipper", "en_route_receiver", "at_receiver", "delivered", "in_progress"].includes(load.status)
-  ) : [];
-  const awaitingInvoicingLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+  );
+  const awaitingInvoicingLoads = filteredLoads.filter((load: any) => 
     load.status === "awaiting_invoicing" || load.status === "empty"
-  ) : [];
-  const awaitingPaymentLoads = Array.isArray(loads) ? loads.filter((load: any) => 
+  );
+  const awaitingPaymentLoads = filteredLoads.filter((load: any) => 
     load.status === "awaiting_payment" || load.status === "invoiced" || load.status === "waiting_for_invoice"
-  ) : [];
-  const paidLoads = Array.isArray(loads) ? loads.filter((load: any) => load.status === "paid") : [];
+  );
+  const paidLoads = filteredLoads.filter((load: any) => load.status === "paid");
 
   return (
     <Card className="material-card">
@@ -821,6 +961,25 @@ export default function LoadsTable() {
         </div>
       </CardHeader>
       <CardContent>
+        {/* Search Field */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by Load #, Invoice #, or BOL #..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+              data-testid="input-search-loads"
+            />
+          </div>
+          {searchTerm.trim() && (
+            <div className="mt-2 text-sm text-gray-600">
+              Showing {filteredLoads.length} load{filteredLoads.length !== 1 ? 's' : ''} matching "{searchTerm}"
+            </div>
+          )}
+        </div>
+
         {/* Trucker Tip for first-time users */}
         {pendingLoads.length === 0 && assignedLoads.length === 0 && inTransitLoads.length === 0 && (
           <TruckerTip 
@@ -1288,12 +1447,42 @@ export default function LoadsTable() {
                     </div>
                   </div>
 
-                  {/* Miles Information */}
+                  {/* Miles Information with HERE Maps Route Calculation */}
                   <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <span className="font-semibold text-yellow-800">Total Distance:</span>
-                        <span className="ml-2 text-lg">{selectedLoad.estimatedMiles || 0} miles</span>
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <span className="font-semibold text-yellow-800">Total Distance:</span>
+                          <span className={`ml-2 text-lg ${(selectedLoad.estimatedMiles || 0) === 0 ? 'text-red-600' : 'text-green-600'}`}>
+                            {selectedLoad.estimatedMiles || 0} miles
+                          </span>
+                        </div>
+                        {((selectedLoad.estimatedMiles || 0) === 0 || !routeCalculated[selectedLoad.id]) && 
+                         (selectedLoad.pickupAddress || 
+                          selectedLoad.stops?.find((stop: any) => stop.stopType === 'pickup')?.address ||
+                          selectedLoad.stops?.find((stop: any) => stop.stopType === 'pickup')?.location?.address ||
+                          selectedLoad.pickupLocation || true) && 
+                         (selectedLoad.deliveryAddress || 
+                          selectedLoad.stops?.find((stop: any) => stop.stopType === 'dropoff')?.address ||
+                          selectedLoad.stops?.find((stop: any) => stop.stopType === 'dropoff')?.location?.address ||
+                          selectedLoad.location) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => calculateRouteDistance(selectedLoad.id, selectedLoad)}
+                            disabled={calculatingRoute}
+                            className="flex items-center gap-2 text-xs"
+                          >
+                            <Navigation className="h-3 w-3" />
+                            {calculatingRoute ? "Calculating..." : "Calculate Route"}
+                          </Button>
+                        )}
+                        {routeCalculated[selectedLoad.id] && (selectedLoad.estimatedMiles || 0) > 0 && (
+                          <div className="flex items-center gap-1 text-xs text-green-600">
+                            <Route className="h-3 w-3" />
+                            <span>✅ Truck Route</span>
+                          </div>
+                        )}
                       </div>
                       {selectedLoad.appointmentTime && (
                         <div className="text-sm text-yellow-700">
@@ -1301,6 +1490,11 @@ export default function LoadsTable() {
                         </div>
                       )}
                     </div>
+                    {((selectedLoad.estimatedMiles || 0) === 0) && (
+                      <div className="mt-2 text-xs text-yellow-700">
+                        <strong>💡 Tip:</strong> Click "Calculate Route" to get accurate truck mileage using HERE Maps commercial routing
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

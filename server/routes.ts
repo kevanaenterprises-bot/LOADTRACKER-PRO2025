@@ -27,8 +27,8 @@ import {
   invoices
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
-import { loads } from "@shared/schema";
+import { eq, desc, sql } from "drizzle-orm";
+import { loads, locations, loadStops } from "@shared/schema";
 
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
@@ -1038,39 +1038,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("Bypass check:", { token: token ? '[PROVIDED]' : '[MISSING]', expected: BYPASS_SECRET, isActive });
     return isActive;
   }
-
-  // PRODUCTION DEBUG: Diagnostic endpoint to debug auth issues
-  app.get("/api/debug/auth-status", (req, res) => {
-    const adminAuth = !!(req.session as any)?.adminAuth;
-    const replitAuth = !!req.user;
-    const driverAuth = !!(req.session as any)?.driverAuth;
-    const bypassToken = req.headers['x-bypass-token'];
-    const hasValidBypass = bypassToken === BYPASS_SECRET;
-    
-    res.json({
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
-      authentication: {
-        adminAuth,
-        replitAuth,
-        driverAuth,
-        bypassToken: bypassToken ? 'PROVIDED' : 'MISSING',
-        bypassSecret: BYPASS_SECRET,
-        hasValidBypass,
-        finalAuthResult: adminAuth || replitAuth || driverAuth || hasValidBypass
-      },
-      session: {
-        exists: !!req.session,
-        id: (req.session as any)?.id || 'NONE',
-        data: req.session ? Object.keys(req.session) : []
-      },
-      headers: {
-        userAgent: req.headers['user-agent'],
-        cookie: req.headers.cookie ? 'PRESENT' : 'MISSING',
-        bypassToken: req.headers['x-bypass-token'] || 'MISSING'
-      }
-    });
-  });
 
   // Simple browser auth bypass for testing
   app.post("/api/auth/browser-bypass", async (req, res) => {
@@ -2206,7 +2173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Loads for admin/office users - WITH TOKEN BYPASS
   app.get("/api/loads", (req, res, next) => {
-    console.log("🔥 API LOADS ROUTE HIT!");
+    console.log("🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!");
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
     if (hasAuth) {
       next();
@@ -2216,34 +2183,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     console.log("🔥 API LOADS HANDLER CALLED!");
     try {
-      // PRODUCTION FIX: Default to admin mode for main loads endpoint
-      // Only use driver mode if explicitly accessing driver-specific endpoints
-      let user: any = { role: "admin" };
+      // Authentication flow - respect actual logged-in driver
+      let userId: string | undefined;
+      let user: any = null;
       
-      console.log("🔥 PRODUCTION AUTH FIX: Defaulting to admin mode for /api/loads endpoint");
-      
-      // PRIORITY FIX: Admin context takes absolute priority
-      const adminAuth = !!(req.session as any)?.adminAuth;
-      const driverAuth = !!(req.session as any)?.driverAuth;  
-      const replitAuth = !!req.user;
-      const bypassAuth = isBypassActive(req);
-      
-      console.log("🔍 AUTH STATUS:", { adminAuth, driverAuth, replitAuth, bypassAuth });
-      
-      // CRITICAL PRODUCTION FIX: Return ALL 31 loads from your database
-      console.log("🚨 PRODUCTION FIX: Bypassing ALL auth/filters to return your 31 loads");
-      
-      try {
-        // Direct database call - no auth, no filters - just get ALL loads
-        const allLoads = await storage.getLoads();
-        console.log(`✅ PRODUCTION SUCCESS: Returning ${allLoads.length} loads from database`);
-        return res.json(allLoads);
-      } catch (error) {
-        console.error("❌ CRITICAL ERROR fetching loads:", error);
-        return res.json([]); // Return empty array instead of crashing
+      // Check for admin authentication first
+      if ((req.session as any)?.adminAuth) {
+        console.log("🔥 ADMIN SESSION DETECTED");
+        user = { role: "admin" };
+      } 
+      // Check for driver authentication
+      else if ((req.session as any)?.driverAuth) {
+        userId = (req.session as any).driverAuth.id;
+        user = userId ? await storage.getUser(userId) : null;
+        console.log(`🔥 DRIVER SESSION: Using driver ID ${userId}`, { 
+          firstName: user?.firstName, 
+          lastName: user?.lastName,
+          username: user?.username 
+        });
       }
+      // Check Replit authentication
+      else if (req.user) {
+        userId = (req.user as any)?.claims?.sub;
+        user = userId ? await storage.getUser(userId) : null;
+        console.log(`🔥 REPLIT AUTH: ${userId}`);
+      }
+      // Bypass only if no other authentication (for testing only)
+      else if (isBypassActive(req)) {
+        console.log("🔥 BYPASS ACTIVE: No session auth detected, using admin mode");
+        user = { role: "admin" };
+      }
+      
+      // Extract query parameters for filtering
+      const { status, excludePaid } = req.query;
+      const excludePaidBool = excludePaid === 'true';
+      console.log(`🔍 Query parameters:`, { status, excludePaid: excludePaidBool });
+      
+      let loads;
+      if (user?.role === "driver" && userId) {
+        console.log(`🔥 DRIVER MODE: Getting loads for driver ${userId}`);
+        loads = await storage.getLoadsByDriver(userId);
+        console.log(`🔒 SECURITY: Driver ${userId} should only see ${loads?.length || 0} assigned loads`);
+        
+        // Apply additional filtering for drivers if needed
+        if (status && typeof status === 'string') {
+          loads = loads.filter(load => load.status === status);
+          console.log(`🔍 DRIVER FILTER: Filtered to ${loads.length} loads with status "${status}"`);
+        }
+      } else {
+        console.log("🔥 ADMIN MODE: Getting loads with filters");
+        
+        // Always use filtered query to support excludePaid parameter
+        const filters: { status?: string; excludePaid?: boolean } = {};
+        if (status && typeof status === 'string') {
+          filters.status = status;
+        }
+        if (excludePaidBool) {
+          filters.excludePaid = true;
+        }
+        
+        if (Object.keys(filters).length > 0) {
+          console.log(`🔍 ADMIN FILTER: Using filtered query with filters:`, filters);
+          loads = await storage.getLoadsFiltered(filters);
+        } else {
+          console.log("🔥 ADMIN: Getting all loads (no filters)");
+          loads = await storage.getLoads();
+        }
+        console.log(`📋 ADMIN: Returning ${loads?.length || 0} loads`);
+      }
+      
+      // SECURITY CHECK: Log exactly what's being returned
+      console.log(`🔒 FINAL SECURITY CHECK: User role="${user?.role}", userId="${userId}", returning ${loads?.length || 0} loads`);
+      
+      console.log(`🔥 RETURNING: ${loads?.length || 0} loads`);
+      res.json(loads);
     } catch (error) {
-      console.error("Error in /api/loads endpoint:", error);
+      console.error("Error fetching loads:", error);
       res.status(500).json({ message: "Failed to fetch loads" });
     }
   });
@@ -2701,14 +2716,44 @@ Reply YES to confirm acceptance or NO to decline.`
         }
       }
       
+      // Check for duplicate number109 if being updated
+      if (updates.number109 && updates.number109 !== existingLoad.number109) {
+        const existingLoads = await storage.getLoads();
+        const duplicateLoad = existingLoads.find(load => 
+          load.number109 === updates.number109 && load.id !== loadId
+        );
+        if (duplicateLoad) {
+          return res.status(400).json({ 
+            message: `Load number ${updates.number109} already exists for another load (ID: ${duplicateLoad.id})` 
+          });
+        }
+      }
+
       // Update the load
       const updatedLoad = await storage.updateLoad(loadId, updates);
       
       console.log(`✅ Load ${loadId} updated successfully`);
       res.json(updatedLoad);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating load:", error);
-      res.status(500).json({ message: "Failed to update load" });
+      
+      // Enhanced error handling for better debugging
+      if (error?.message?.includes('duplicate key') || error?.message?.includes('unique constraint')) {
+        return res.status(400).json({ 
+          message: "Load number already exists. Please use a different number.", 
+          details: error?.message 
+        });
+      } else if (error?.message?.includes('foreign key')) {
+        return res.status(400).json({ 
+          message: "Invalid location or driver reference.", 
+          details: error?.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "Failed to update load", 
+        details: error?.message || "Unknown error" 
+      });
     }
   });
 
@@ -3403,6 +3448,120 @@ Reply YES to confirm acceptance or NO to decline.`
       res.status(500).json({ 
         message: "Failed to complete bulk deletion", 
         error: error?.message || 'Unknown error'
+      });
+    }
+  });
+
+  // Calculate route distance using HERE Maps (fixes CORS issues)
+  app.post("/api/loads/:id/calculate-route", (req, res, next) => {
+    // Flexible authentication for route calculations
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || hasTokenBypass;
+    
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { pickupAddress, deliveryAddress, truckSpecs } = req.body;
+      
+      if (!pickupAddress || !deliveryAddress) {
+        return res.status(400).json({ 
+          error: 'Both pickup and delivery addresses are required' 
+        });
+      }
+
+      // Get HERE Maps API key from environment
+      const apiKey = process.env.HERE_MAPS_API_KEY || process.env.VITE_HERE_MAPS_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ 
+          error: 'HERE Maps API key not configured on server' 
+        });
+      }
+
+      console.log(`🚛 Backend route calculation: ${pickupAddress} → ${deliveryAddress}`);
+
+      // Step 1: Geocode addresses
+      const geocodeUrl = 'https://geocode.search.hereapi.com/v1/geocode';
+      
+      const [originRes, destRes] = await Promise.all([
+        fetch(`${geocodeUrl}?q=${encodeURIComponent(pickupAddress)}&apikey=${apiKey}&limit=1`),
+        fetch(`${geocodeUrl}?q=${encodeURIComponent(deliveryAddress)}&apikey=${apiKey}&limit=1`)
+      ]);
+
+      if (!originRes.ok || !destRes.ok) {
+        throw new Error('Failed to geocode addresses');
+      }
+
+      const [originData, destData] = await Promise.all([
+        originRes.json(),
+        destRes.json()
+      ]);
+
+      if (!originData.items?.[0] || !destData.items?.[0]) {
+        throw new Error('Could not find coordinates for addresses');
+      }
+
+      const origin = originData.items[0].position;
+      const destination = destData.items[0].position;
+
+      // Step 2: Calculate truck route using HERE Maps Routing API v8
+      const routeUrl = 'https://router.hereapi.com/v8/routes';
+      const params = new URLSearchParams({
+        apikey: apiKey,
+        transportMode: 'truck',
+        origin: `${origin.lat},${origin.lng}`,
+        destination: `${destination.lat},${destination.lng}`,
+        return: 'summary',
+      });
+
+      // Add truck specifications if provided (HERE Maps v8 API format)
+      if (truckSpecs?.maxWeight) {
+        // Convert pounds to kilograms for HERE API (integer value)
+        params.append('truck[grossWeight]', Math.round(truckSpecs.maxWeight * 0.453592).toString());
+      }
+      if (truckSpecs?.maxHeight) {
+        // Convert feet to centimeters for HERE API (integer value)
+        params.append('truck[height]', Math.round(truckSpecs.maxHeight * 30.48).toString());
+      }
+
+      const routeRes = await fetch(`${routeUrl}?${params}`);
+      
+      if (!routeRes.ok) {
+        const errorText = await routeRes.text();
+        throw new Error(`HERE routing failed: ${routeRes.status} - ${errorText}`);
+      }
+      
+      const routeData = await routeRes.json();
+      
+      if (!routeData.routes || routeData.routes.length === 0) {
+        throw new Error('No route found');
+      }
+      
+      const route = routeData.routes[0];
+      const summary = route.sections[0].summary || route.summary;
+      
+      // Convert meters to miles and seconds to minutes
+      const miles = Math.round((summary.length * 0.000621371) * 100) / 100;
+      const duration = Math.round((summary.duration || summary.baseDuration) / 60);
+      
+      console.log(`✅ Route calculated: ${miles} miles, ${duration} minutes`);
+      
+      res.json({ 
+        miles, 
+        duration,
+        pickupAddress,
+        deliveryAddress
+      });
+
+    } catch (error: any) {
+      console.error('❌ Route calculation failed:', error);
+      res.status(500).json({ 
+        error: 'Route calculation failed',
+        message: error.message
       });
     }
   });
@@ -6145,6 +6304,177 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       console.error("POD debug endpoint error:", error);
       res.status(500).json({ 
         message: "POD debug failed", 
+        error: error.message,
+        stack: error.stack 
+      });
+    }
+  });
+
+  // DATABASE REPAIR: One-time endpoint to rebuild missing locations
+  app.post("/api/admin/repair-locations", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Admin authentication required for database repair" });
+    }
+  }, async (req, res) => {
+    try {
+      console.log("🔧 LOCATION REPAIR: Starting database repair for missing locations");
+      
+      const repairResults = {
+        missingLocationIds: [] as string[],
+        restoredLocations: [] as any[],
+        errors: [] as any[]
+      };
+
+      // Step 1: Find all location IDs referenced by loads but missing from locations table
+      const missingFromLoads = await db
+        .select({
+          locationId: loads.locationId,
+          pickupLocationId: loads.pickupLocationId,
+          companyName: loads.companyName,
+          pickupAddress: loads.pickupAddress,
+          deliveryAddress: loads.deliveryAddress,
+          loadNumber: loads.number109
+        })
+        .from(loads)
+        .where(
+          sql`${loads.locationId} IS NOT NULL AND ${loads.locationId} NOT IN (SELECT id FROM locations)`
+        );
+
+      // Step 2: Find missing location IDs from load_stops
+      const missingFromStops = await db
+        .select({
+          locationId: loadStops.locationId,
+          companyName: loadStops.companyName,
+          address: loadStops.address,
+          contactName: loadStops.contactName,
+          contactPhone: loadStops.contactPhone
+        })
+        .from(loadStops)
+        .where(
+          sql`${loadStops.locationId} IS NOT NULL AND ${loadStops.locationId} NOT IN (SELECT id FROM locations)`
+        );
+
+      console.log(`🔍 REPAIR: Found ${missingFromLoads.length} missing location IDs from loads`);
+      console.log(`🔍 REPAIR: Found ${missingFromStops.length} missing location IDs from load_stops`);
+
+      // Step 3: Build a map of missing location IDs and their data
+      const locationData = new Map();
+
+      // Process data from loads
+      for (const load of missingFromLoads) {
+        if (load.locationId && !locationData.has(load.locationId)) {
+          locationData.set(load.locationId, {
+            id: load.locationId,
+            name: load.companyName || `Location for ${load.loadNumber}`,
+            address: load.pickupAddress || load.deliveryAddress || '',
+            city: '', // Will try to extract from address
+            state: '', // Will try to extract from address
+            source: `Load ${load.loadNumber}`
+          });
+        }
+        if (load.pickupLocationId && !locationData.has(load.pickupLocationId)) {
+          locationData.set(load.pickupLocationId, {
+            id: load.pickupLocationId,
+            name: load.companyName || `Pickup Location for ${load.loadNumber}`,
+            address: load.pickupAddress || '',
+            city: '', 
+            state: '',
+            source: `Load ${load.loadNumber} (pickup)`
+          });
+        }
+      }
+
+      // Process data from load_stops (more detailed info)
+      for (const stop of missingFromStops) {
+        if (stop.locationId) {
+          const existing = locationData.get(stop.locationId) || { id: stop.locationId };
+          locationData.set(stop.locationId, {
+            ...existing,
+            id: stop.locationId,
+            name: stop.companyName || existing.name || 'Unknown Location',
+            address: stop.address || existing.address || '',
+            city: existing.city || '', 
+            state: existing.state || '',
+            contactName: stop.contactName,
+            contactPhone: stop.contactPhone,
+            source: existing.source || 'Load Stop'
+          });
+        }
+      }
+
+      // Step 4: Restore missing locations
+      for (const [locationId, locationInfo] of Array.from(locationData.entries())) {
+        try {
+          // Try to parse city/state from address if not provided
+          if (locationInfo.address && !locationInfo.city) {
+            const addressParts = locationInfo.address.split(',');
+            if (addressParts.length >= 2) {
+              locationInfo.city = addressParts[addressParts.length - 2]?.trim() || '';
+              locationInfo.state = addressParts[addressParts.length - 1]?.trim() || '';
+            }
+          }
+
+          console.log(`🔧 REPAIR: Restoring location ${locationId}: ${locationInfo.name}`);
+
+          // Insert the missing location with its original ID (using raw values to allow ID specification)
+          await db
+            .insert(locations)
+            .values({
+              id: locationId,
+              name: locationInfo.name,
+              address: locationInfo.address,
+              city: locationInfo.city,
+              state: locationInfo.state,
+              contactName: locationInfo.contactName,
+              contactPhone: locationInfo.contactPhone,
+              createdAt: new Date()
+            })
+            .onConflictDoNothing(); // Safe in case location already exists
+
+          repairResults.restoredLocations.push({
+            id: locationId,
+            name: locationInfo.name,
+            address: locationInfo.address,
+            source: locationInfo.source
+          });
+
+        } catch (error) {
+          console.error(`❌ REPAIR: Failed to restore location ${locationId}:`, error);
+          repairResults.errors.push({
+            locationId,
+            error: error instanceof Error ? error.message : String(error)
+          });
+        }
+      }
+
+      // Step 5: Verify repair success
+      const verifyMissingAfter = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(loads)
+        .where(
+          sql`${loads.locationId} IS NOT NULL AND ${loads.locationId} NOT IN (SELECT id FROM locations)`
+        );
+
+      console.log(`✅ REPAIR: Restored ${repairResults.restoredLocations.length} locations`);
+      console.log(`✅ REPAIR: ${verifyMissingAfter[0].count} loads still have missing location references`);
+
+      res.json({
+        message: "Location repair completed",
+        summary: {
+          locationsRestored: repairResults.restoredLocations.length,
+          remainingMissing: verifyMissingAfter[0].count,
+          errors: repairResults.errors.length
+        },
+        details: repairResults
+      });
+
+    } catch (error: any) {
+      console.error("❌ LOCATION REPAIR FAILED:", error);
+      res.status(500).json({ 
+        message: "Location repair failed", 
         error: error.message,
         stack: error.stack 
       });
