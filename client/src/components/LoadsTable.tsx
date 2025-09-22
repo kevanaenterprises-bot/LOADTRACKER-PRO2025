@@ -530,8 +530,12 @@ export default function LoadsTable() {
 
   const handleLoadClick = async (load: any) => {
     console.log("🔍 DIALOG DEBUG - Load clicked:", load);
-    console.log("🔍 DIALOG DEBUG - Pickup location in list data:", load.pickupLocation);
-    console.log("🔍 DIALOG DEBUG - Delivery location in list data:", load.location);
+    console.log("🔍 DIALOG DEBUG - Full load object keys:", Object.keys(load));
+    console.log("🔍 DIALOG DEBUG - pickupLocation:", load.pickupLocation);
+    console.log("🔍 DIALOG DEBUG - pickupLocationId:", load.pickupLocationId);
+    console.log("🔍 DIALOG DEBUG - pickupAddress:", load.pickupAddress);
+    console.log("🔍 DIALOG DEBUG - Delivery location:", load.location);
+    console.log("🔍 DIALOG DEBUG - Load number:", load.number109);
     
     // ✅ FIXED: Use loads list data directly (now includes pickup location!)
     setSelectedLoad(load);
