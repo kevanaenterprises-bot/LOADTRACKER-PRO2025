@@ -529,68 +529,50 @@ export default function LoadsTable() {
   });
 
   const handleLoadClick = async (load: any) => {
-    console.log("Load clicked:", load);
+    console.log("🔍 DIALOG DEBUG - Load clicked:", load);
     
-    // 🔥 CRITICAL FIX: Fetch complete load details including pickupLocation
+    // 🔥 CRITICAL FIX: Use apiRequest (same as other working parts of app)
     try {
-      const response = await fetch(`/api/loads/${load.id}`, {
-        headers: {
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
-        },
-        credentials: 'include',
-      });
+      console.log("🔍 DIALOG DEBUG - Fetching complete load data for ID:", load.id);
       
-      if (response.ok) {
-        const completeLoadData = await response.json();
-        console.log("Complete load data with pickupLocation:", completeLoadData);
-        
-        // Fetch and attach stops to the load data for the dialog
-        try {
-          const stopsResponse = await fetch(`/api/loads/${load.id}/stops`, {
-            credentials: 'include',
-            headers: {
-              'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
-            }
-          });
-          if (stopsResponse.ok) {
-            const stops = await stopsResponse.json();
-            console.log("Load stops fetched and attached:", stops);
-            completeLoadData.stops = stops; // ✅ Attach stops for dialog rendering
-          }
-        } catch (stopsError) {
-          console.error("Error fetching stops:", stopsError);
-        }
-        
-        console.log("🔍 PRODUCTION DEBUG - Complete load data received:", completeLoadData);
-        console.log("🔍 PRODUCTION DEBUG - Pickup location:", completeLoadData.pickupLocation);
-        console.log("🔍 PRODUCTION DEBUG - Pickup address:", completeLoadData.pickupAddress);
-        console.log("🔍 PRODUCTION DEBUG - Stops:", completeLoadData.stops);
-        setSelectedLoad(completeLoadData); // ✅ Now includes pickupLocation AND stops!
-      } else {
-        // Fallback to list data if individual fetch fails
-        console.log("🔍 PRODUCTION DEBUG - Using fallback load data:", load);
-        setSelectedLoad(load);
+      // Use the same apiRequest method that works elsewhere in the app
+      const completeLoadData = await apiRequest(`/api/loads/${load.id}`, "GET");
+      console.log("🔍 DIALOG DEBUG - Complete load data received:", completeLoadData);
+      console.log("🔍 DIALOG DEBUG - Pickup location object:", completeLoadData.pickupLocation);
+      console.log("🔍 DIALOG DEBUG - Delivery location object:", completeLoadData.location);
+      
+      // Fetch stops too  
+      try {
+        const stops = await apiRequest(`/api/loads/${load.id}/stops`, "GET");
+        console.log("🔍 DIALOG DEBUG - Stops fetched:", stops);
+        completeLoadData.stops = stops;
+      } catch (stopsError) {
+        console.error("🔍 DIALOG DEBUG - Error fetching stops:", stopsError);
+        completeLoadData.stops = [];
       }
+      
+      // ✅ Use complete data with pickup location
+      setSelectedLoad(completeLoadData);
+      console.log("🔍 DIALOG DEBUG - Set complete load data with pickup location");
+      
     } catch (error) {
-      console.error("Failed to fetch complete load details:", error);
-      // Fallback to list data if individual fetch fails
+      console.error("🔍 DIALOG DEBUG - API request failed:", error);
+      // Fallback to list data if API request fails
+      console.log("🔍 DIALOG DEBUG - Using fallback list data:", load);
       setSelectedLoad(load);
     }
     
     setDialogOpen(true);
-    // Always reset edit mode when opening a new load dialog
     setEditMode(false);
     setEditFormData({});
     
-    // Fetch existing stops for this load
+    // Fetch existing stops for editing (separate from dialog display)
     try {
-      const response = await fetch(`/api/loads/${load.id}/stops`);
-      if (response.ok) {
-        const stops = await response.json();
-        setExistingStops(stops);
-      }
+      const stops = await apiRequest(`/api/loads/${load.id}/stops`, "GET");
+      setExistingStops(stops);
     } catch (error) {
-      console.error("Failed to fetch load stops:", error);
+      console.error("Failed to fetch existing stops:", error);
+      setExistingStops([]);
     }
   };
 
