@@ -2206,7 +2206,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Loads for admin/office users - WITH TOKEN BYPASS
   app.get("/api/loads", (req, res, next) => {
-    console.log("🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!");
+    console.log("🔥 API LOADS ROUTE HIT!");
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
     if (hasAuth) {
       next();
@@ -2216,34 +2216,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     console.log("🔥 API LOADS HANDLER CALLED!");
     try {
-      // Authentication flow - respect actual logged-in driver
-      let userId: string | undefined;
-      let user: any = null;
+      // PRODUCTION FIX: Default to admin mode for main loads endpoint
+      // Only use driver mode if explicitly accessing driver-specific endpoints
+      let user: any = { role: "admin" };
       
-      // Check for admin authentication first
-      if ((req.session as any)?.adminAuth) {
-        console.log("🔥 ADMIN SESSION DETECTED");
-        user = { role: "admin" };
-      } 
-      // Check for driver authentication
-      else if ((req.session as any)?.driverAuth) {
-        userId = (req.session as any).driverAuth.id;
-        user = userId ? await storage.getUser(userId) : null;
-        console.log(`🔥 DRIVER SESSION: Using driver ID ${userId}`, { 
-          firstName: user?.firstName, 
-          lastName: user?.lastName,
-          username: user?.username 
-        });
-      }
-      // Check Replit authentication
-      else if (req.user) {
-        userId = (req.user as any)?.claims?.sub;
-        user = userId ? await storage.getUser(userId) : null;
-        console.log(`🔥 REPLIT AUTH: ${userId}`);
-      }
-      // Bypass only if no other authentication (for testing only)
-      else if (isBypassActive(req)) {
-        console.log("🔥 BYPASS ACTIVE: No session auth detected, using admin mode");
+      console.log("🔥 PRODUCTION AUTH FIX: Defaulting to admin mode for /api/loads endpoint");
+      
+      // Check authentication methods for logging
+      const adminAuth = !!(req.session as any)?.adminAuth;
+      const driverAuth = !!(req.session as any)?.driverAuth;  
+      const replitAuth = !!req.user;
+      const bypassAuth = isBypassActive(req);
+      
+      console.log("🔍 AUTH STATUS:", { adminAuth, driverAuth, replitAuth, bypassAuth });
+      
+      // Always use admin mode for this endpoint unless specific driver parameter is provided
+      if (req.query.driverId) {
+        console.log("🔥 DRIVER MODE: Specific driver ID requested:", req.query.driverId);
+        user = { role: "driver", id: req.query.driverId };
+      } else {
+        console.log("🔥 ADMIN MODE: Default admin access for all loads");
         user = { role: "admin" };
       }
       
@@ -2253,10 +2245,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🔍 Query parameters:`, { status, excludePaid: excludePaidBool });
       
       let loads;
-      if (user?.role === "driver" && userId) {
-        console.log(`🔥 DRIVER MODE: Getting loads for driver ${userId}`);
-        loads = await storage.getLoadsByDriver(userId);
-        console.log(`🔒 SECURITY: Driver ${userId} should only see ${loads?.length || 0} assigned loads`);
+      if (user?.role === "driver" && user?.id) {
+        console.log(`🔥 DRIVER MODE: Getting loads for specific driver ${user.id}`);
+        loads = await storage.getLoadsByDriver(user.id);
+        console.log(`🔒 SECURITY: Driver ${user.id} should only see ${loads?.length || 0} assigned loads`);
         
         // Apply additional filtering for drivers if needed
         if (status && typeof status === 'string') {
@@ -2264,7 +2256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`🔍 DRIVER FILTER: Filtered to ${loads.length} loads with status "${status}"`);
         }
       } else {
-        console.log("🔥 ADMIN MODE: Getting loads with filters");
+        console.log("🔥 ADMIN MODE: Getting all loads with filters (PRODUCTION DEFAULT)");
         
         // Always use filtered query to support excludePaid parameter
         const filters: { status?: string; excludePaid?: boolean } = {};
@@ -2286,7 +2278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // SECURITY CHECK: Log exactly what's being returned
-      console.log(`🔒 FINAL SECURITY CHECK: User role="${user?.role}", userId="${userId}", returning ${loads?.length || 0} loads`);
+      console.log(`🔒 FINAL SECURITY CHECK: User role="${user?.role}", user ID="${user?.id || 'N/A'}", returning ${loads?.length || 0} loads`);
       
       console.log(`🔥 RETURNING: ${loads?.length || 0} loads`);
       res.json(loads);
