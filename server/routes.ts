@@ -1039,6 +1039,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return isActive;
   }
 
+  // PRODUCTION DEBUG: Diagnostic endpoint to debug auth issues
+  app.get("/api/debug/auth-status", (req, res) => {
+    const adminAuth = !!(req.session as any)?.adminAuth;
+    const replitAuth = !!req.user;
+    const driverAuth = !!(req.session as any)?.driverAuth;
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasValidBypass = bypassToken === BYPASS_SECRET;
+    
+    res.json({
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      authentication: {
+        adminAuth,
+        replitAuth,
+        driverAuth,
+        bypassToken: bypassToken ? 'PROVIDED' : 'MISSING',
+        bypassSecret: BYPASS_SECRET,
+        hasValidBypass,
+        finalAuthResult: adminAuth || replitAuth || driverAuth || hasValidBypass
+      },
+      session: {
+        exists: !!req.session,
+        id: (req.session as any)?.id || 'NONE',
+        data: req.session ? Object.keys(req.session) : []
+      },
+      headers: {
+        userAgent: req.headers['user-agent'],
+        cookie: req.headers.cookie ? 'PRESENT' : 'MISSING',
+        bypassToken: req.headers['x-bypass-token'] || 'MISSING'
+      }
+    });
+  });
+
   // Simple browser auth bypass for testing
   app.post("/api/auth/browser-bypass", async (req, res) => {
     try {
