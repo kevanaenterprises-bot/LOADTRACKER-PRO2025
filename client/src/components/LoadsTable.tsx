@@ -530,80 +530,11 @@ export default function LoadsTable() {
 
   const handleLoadClick = async (load: any) => {
     console.log("🔍 DIALOG DEBUG - Load clicked:", load);
+    console.log("🔍 DIALOG DEBUG - Pickup location in list data:", load.pickupLocation);
+    console.log("🔍 DIALOG DEBUG - Delivery location in list data:", load.location);
     
-    // 🔥 CRITICAL FIX: Use the same authentication as successful queries
-    try {
-      console.log("🔍 DIALOG DEBUG - Fetching complete load data for ID:", load.id);
-      
-      // Get bypass token the same way successful queries do
-      let bypassToken = localStorage.getItem('bypass-token');
-      if (!bypassToken) {
-        console.log("🔍 DIALOG DEBUG - Getting new bypass token");
-        try {
-          const response = await fetch("/api/auth/browser-bypass", {
-            method: "POST",
-            credentials: "include",
-          });
-          if (response.ok) {
-            const tokenData = await response.json();
-            localStorage.setItem('bypass-token', tokenData.token);
-            bypassToken = tokenData.token;
-            console.log("🔍 DIALOG DEBUG - New bypass token obtained");
-          }
-        } catch (tokenError) {
-          console.error("🔍 DIALOG DEBUG - Failed to get bypass token:", tokenError);
-        }
-      }
-      
-      // Use the same headers pattern as successful queries
-      const headers: any = {};
-      if (bypassToken) {
-        headers['X-Bypass-Token'] = bypassToken;
-      }
-      
-      // Fetch complete load data
-      const response = await fetch(`/api/loads/${load.id}`, {
-        credentials: "include",
-        headers,
-      });
-      
-      if (response.ok) {
-        const completeLoadData = await response.json();
-        console.log("🔍 DIALOG DEBUG - Complete load data received:", completeLoadData);
-        console.log("🔍 DIALOG DEBUG - Pickup location object:", completeLoadData.pickupLocation);
-        console.log("🔍 DIALOG DEBUG - Delivery location object:", completeLoadData.location);
-        
-        // Fetch stops too  
-        try {
-          const stopsResponse = await fetch(`/api/loads/${load.id}/stops`, {
-            credentials: "include",
-            headers,
-          });
-          if (stopsResponse.ok) {
-            const stops = await stopsResponse.json();
-            console.log("🔍 DIALOG DEBUG - Stops fetched:", stops);
-            completeLoadData.stops = stops;
-          }
-        } catch (stopsError) {
-          console.error("🔍 DIALOG DEBUG - Error fetching stops:", stopsError);
-          completeLoadData.stops = [];
-        }
-        
-        // ✅ Use complete data with pickup location
-        setSelectedLoad(completeLoadData);
-        console.log("🔍 DIALOG DEBUG - Set complete load data with pickup location");
-      } else {
-        console.error("🔍 DIALOG DEBUG - API response not ok:", response.status, response.statusText);
-        setSelectedLoad(load);
-      }
-      
-    } catch (error) {
-      console.error("🔍 DIALOG DEBUG - API request failed:", error);
-      // Fallback to list data if API request fails
-      console.log("🔍 DIALOG DEBUG - Using fallback list data:", load);
-      setSelectedLoad(load);
-    }
-    
+    // ✅ FIXED: Use loads list data directly (now includes pickup location!)
+    setSelectedLoad(load);
     setDialogOpen(true);
     setEditMode(false);
     setEditFormData({});

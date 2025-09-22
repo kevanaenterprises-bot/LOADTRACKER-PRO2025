@@ -407,14 +407,23 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .orderBy(desc(loads.createdAt));
 
-    // Get stops for each load
+    // Get stops AND pickup location for each load
     const loadsWithStops = await Promise.all(
       result.map(async (row) => {
         const stops = await this.getLoadStops(row.load.id);
+        
+        // Get pickup location separately if pickupLocationId exists (same as getLoad method)
+        let pickupLocation: Location | undefined = undefined;
+        if (row.load.pickupLocationId) {
+          const [pickup] = await db.select().from(locations).where(eq(locations.id, row.load.pickupLocationId));
+          pickupLocation = pickup;
+        }
+        
         return {
           ...row.load,
           driver: row.driver || undefined,
           location: row.location || undefined,
+          pickupLocation: pickupLocation, // ✅ NOW INCLUDES PICKUP LOCATION!
           invoice: row.invoice || undefined,
           stops: stops || [],
         };
