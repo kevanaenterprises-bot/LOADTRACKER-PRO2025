@@ -51,8 +51,8 @@ export function getSession() {
     rolling: true, // Reset expiration on activity
     cookie: {
       httpOnly: true,
-      // Allow cookies to work in all environments
-      secure: false, // Must be false to work with HTTP/proxies
+      // Set secure cookies in production (HTTPS), non-secure in development
+      secure: process.env.NODE_ENV === 'production', // Must be true for HTTPS in production
       maxAge: sessionTtl,
       sameSite: "lax",
       // Don't set domain - let the browser handle it automatically

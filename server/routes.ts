@@ -1634,6 +1634,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: "User"
         };
 
+        // Log the Set-Cookie header to debug production issues
+        console.log("🔐 Session before save:", {
+          sessionID: req.sessionID,
+          adminAuth: (req.session as any).adminAuth,
+          cookie: req.session.cookie
+        });
+
         // Force session save with explicit reload to ensure persistence
         req.session.save((err) => {
           if (err) {
@@ -1648,10 +1655,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return res.status(500).json({ message: "Session verification failed" });
             }
             
-            console.log("Session saved and verified, adminAuth:", (req.session as any).adminAuth);
+            console.log("✅ Session saved and verified:", {
+              sessionID: req.sessionID,
+              adminAuth: (req.session as any).adminAuth,
+              cookieSettings: {
+                secure: req.session.cookie.secure,
+                httpOnly: req.session.cookie.httpOnly,
+                sameSite: req.session.cookie.sameSite
+              }
+            });
+            
             res.json({ 
               message: "Login successful", 
-              user: (req.session as any).adminAuth 
+              user: (req.session as any).adminAuth,
+              sessionDebug: {
+                sessionID: req.sessionID,
+                cookieSecure: req.session.cookie.secure
+              }
             });
           });
         });
