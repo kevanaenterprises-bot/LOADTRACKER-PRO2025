@@ -1626,7 +1626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Check for admin credentials (case insensitive, trim whitespace)
-      if (username.toLowerCase().trim() === "admin" && password.trim() === "admin123") {
+      if (username.toLowerCase().trim() === "admin" && password.trim() === "go4fc2024") {
         console.log("Admin credentials matched successfully");
         
         // Ensure session exists
