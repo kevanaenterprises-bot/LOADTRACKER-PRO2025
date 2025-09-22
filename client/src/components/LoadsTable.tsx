@@ -389,10 +389,10 @@ export default function LoadsTable() {
       console.log(`✅ Fetched ${Array.isArray(data) ? data.length : 0} loads successfully`);
       return data;
     },
-    retry: 1,
-    refetchOnWindowFocus: true,
-    staleTime: 5000, // Data stays fresh for 5 seconds
-    refetchInterval: 30000, // Refresh every 30 seconds
+    retry: false, // DISABLE retries to prevent infinite loop on 401 errors
+    refetchOnWindowFocus: false, // DISABLE to stop retrying when tab is focused
+    staleTime: 60000, // Data stays fresh for 60 seconds
+    refetchInterval: false, // DISABLE auto-refresh to prevent continuous failed requests
   });
 
   // Force clear cache and refresh loads  
