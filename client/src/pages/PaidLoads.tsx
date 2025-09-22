@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useMainAuth } from "@/hooks/useMainAuth";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +12,7 @@ import { format } from "date-fns";
 
 export default function PaidLoads() {
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading } = useMainAuth();
+  const { user, isAuthenticated, isLoading } = useAdminAuth();
   const [, setLocation] = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7)); // YYYY-MM format

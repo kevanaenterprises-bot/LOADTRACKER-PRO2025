@@ -2222,7 +2222,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("🔥 PRODUCTION AUTH FIX: Defaulting to admin mode for /api/loads endpoint");
       
-      // Check authentication methods for logging
+      // PRIORITY FIX: Admin context takes absolute priority
       const adminAuth = !!(req.session as any)?.adminAuth;
       const driverAuth = !!(req.session as any)?.driverAuth;  
       const replitAuth = !!req.user;
@@ -2230,12 +2230,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("🔍 AUTH STATUS:", { adminAuth, driverAuth, replitAuth, bypassAuth });
       
-      // Always use admin mode for this endpoint unless specific driver parameter is provided
-      if (req.query.driverId) {
+      // CRITICAL: Always prioritize admin context for /api/loads endpoint
+      if (adminAuth || replitAuth || bypassAuth) {
+        console.log("🔥 ADMIN PRIORITY: Using admin context (ignoring any driver sessions)");
+        user = { role: "admin" };
+      } else if (req.query.driverId) {
         console.log("🔥 DRIVER MODE: Specific driver ID requested:", req.query.driverId);
         user = { role: "driver", id: req.query.driverId };
       } else {
-        console.log("🔥 ADMIN MODE: Default admin access for all loads");
+        console.log("🔥 FALLBACK: Default admin mode");
         user = { role: "admin" };
       }
       
