@@ -531,29 +531,71 @@ export default function LoadsTable() {
   const handleLoadClick = async (load: any) => {
     console.log("🔍 DIALOG DEBUG - Load clicked:", load);
     
-    // 🔥 CRITICAL FIX: Use apiRequest (same as other working parts of app)
+    // 🔥 CRITICAL FIX: Use the same authentication as successful queries
     try {
       console.log("🔍 DIALOG DEBUG - Fetching complete load data for ID:", load.id);
       
-      // Use the same apiRequest method that works elsewhere in the app
-      const completeLoadData = await apiRequest(`/api/loads/${load.id}`, "GET");
-      console.log("🔍 DIALOG DEBUG - Complete load data received:", completeLoadData);
-      console.log("🔍 DIALOG DEBUG - Pickup location object:", completeLoadData.pickupLocation);
-      console.log("🔍 DIALOG DEBUG - Delivery location object:", completeLoadData.location);
-      
-      // Fetch stops too  
-      try {
-        const stops = await apiRequest(`/api/loads/${load.id}/stops`, "GET");
-        console.log("🔍 DIALOG DEBUG - Stops fetched:", stops);
-        completeLoadData.stops = stops;
-      } catch (stopsError) {
-        console.error("🔍 DIALOG DEBUG - Error fetching stops:", stopsError);
-        completeLoadData.stops = [];
+      // Get bypass token the same way successful queries do
+      let bypassToken = localStorage.getItem('bypass-token');
+      if (!bypassToken) {
+        console.log("🔍 DIALOG DEBUG - Getting new bypass token");
+        try {
+          const response = await fetch("/api/auth/browser-bypass", {
+            method: "POST",
+            credentials: "include",
+          });
+          if (response.ok) {
+            const tokenData = await response.json();
+            localStorage.setItem('bypass-token', tokenData.token);
+            bypassToken = tokenData.token;
+            console.log("🔍 DIALOG DEBUG - New bypass token obtained");
+          }
+        } catch (tokenError) {
+          console.error("🔍 DIALOG DEBUG - Failed to get bypass token:", tokenError);
+        }
       }
       
-      // ✅ Use complete data with pickup location
-      setSelectedLoad(completeLoadData);
-      console.log("🔍 DIALOG DEBUG - Set complete load data with pickup location");
+      // Use the same headers pattern as successful queries
+      const headers: any = {};
+      if (bypassToken) {
+        headers['X-Bypass-Token'] = bypassToken;
+      }
+      
+      // Fetch complete load data
+      const response = await fetch(`/api/loads/${load.id}`, {
+        credentials: "include",
+        headers,
+      });
+      
+      if (response.ok) {
+        const completeLoadData = await response.json();
+        console.log("🔍 DIALOG DEBUG - Complete load data received:", completeLoadData);
+        console.log("🔍 DIALOG DEBUG - Pickup location object:", completeLoadData.pickupLocation);
+        console.log("🔍 DIALOG DEBUG - Delivery location object:", completeLoadData.location);
+        
+        // Fetch stops too  
+        try {
+          const stopsResponse = await fetch(`/api/loads/${load.id}/stops`, {
+            credentials: "include",
+            headers,
+          });
+          if (stopsResponse.ok) {
+            const stops = await stopsResponse.json();
+            console.log("🔍 DIALOG DEBUG - Stops fetched:", stops);
+            completeLoadData.stops = stops;
+          }
+        } catch (stopsError) {
+          console.error("🔍 DIALOG DEBUG - Error fetching stops:", stopsError);
+          completeLoadData.stops = [];
+        }
+        
+        // ✅ Use complete data with pickup location
+        setSelectedLoad(completeLoadData);
+        console.log("🔍 DIALOG DEBUG - Set complete load data with pickup location");
+      } else {
+        console.error("🔍 DIALOG DEBUG - API response not ok:", response.status, response.statusText);
+        setSelectedLoad(load);
+      }
       
     } catch (error) {
       console.error("🔍 DIALOG DEBUG - API request failed:", error);
@@ -567,13 +609,7 @@ export default function LoadsTable() {
     setEditFormData({});
     
     // Fetch existing stops for editing (separate from dialog display)
-    try {
-      const stops = await apiRequest(`/api/loads/${load.id}/stops`, "GET");
-      setExistingStops(stops);
-    } catch (error) {
-      console.error("Failed to fetch existing stops:", error);
-      setExistingStops([]);
-    }
+    await fetchLoadStops(load.id);
   };
 
   const handleGenerateInvoice = () => {
