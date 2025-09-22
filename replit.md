@@ -4,9 +4,19 @@
 
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies to handle load dispatch, driver coordination, and automated invoicing. The application provides separate interfaces for office staff to manage loads and drivers to update their progress, with real-time status tracking and document management capabilities.
 
+## CRITICAL: Development vs Production
+
+**NEVER FORGET:** Development and Production are COMPLETELY SEPARATE environments:
+- **Development (replit.dev)**: The workspace environment - separate database, for testing only
+- **Production (replit.app)**: The published app - contains the REAL data (22 loads for invoicing)
+- **DO NOT** confuse development data with production data
+- **DO NOT** make changes to development expecting them to appear in production
+- To update production: Must republish the app after changes
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+CRITICAL: User has real loads in PRODUCTION that need invoicing by 4 PM deadlines.
 
 ## Recent Changes
 
