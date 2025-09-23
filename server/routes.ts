@@ -2214,12 +2214,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loads for admin/office users - WITH TOKEN BYPASS
   app.get("/api/loads", (req, res, next) => {
     console.log("🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!");
-    // CRITICAL FIX: Include driver auth in the authentication check!
-    const hasAuth = !!(req.session as any)?.adminAuth || 
-                     !!(req.session as any)?.driverAuth ||  // ADDED: Driver auth check
-                     !!req.user || 
-                     isBypassActive(req);
-    if (hasAuth) {
+    // MATCH THE WORKING STATS ENDPOINT AUTH PATTERN!
+    const hasAdminAuth = !!(req.session as any)?.adminAuth;
+    const hasReplitAuth = !!req.user;
+    const hasTokenBypass = isBypassActive(req);
+    const hasDriverAuth = !!(req.session as any)?.driverAuth;
+    
+    console.log("🔥 LOADS AUTH CHECK:", {
+      hasAdminAuth,
+      hasReplitAuth, 
+      hasTokenBypass,
+      hasDriverAuth,
+      bypassToken: req.headers['x-bypass-token'] ? '[PROVIDED]' : '[MISSING]'
+    });
+    
+    // Use the SAME auth pattern as the working stats endpoint
+    if (hasAdminAuth || hasReplitAuth || hasTokenBypass || hasDriverAuth) {
       next();
     } else {
       res.status(401).json({ message: "Authentication required" });
