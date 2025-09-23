@@ -6481,6 +6481,14 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+  // Simple health check endpoint for Railway deployment
+  app.get("/api/health", (req, res) => {
+    res.json({ 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  });
 
   // Create and return HTTP server
   const server = createServer(app);
