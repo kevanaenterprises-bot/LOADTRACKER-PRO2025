@@ -9,6 +9,7 @@ import PaidLoads from "@/pages/PaidLoads";
 import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
+import { DriverBypass } from "@/pages/DriverBypass";
 import Chat from "@/pages/Chat";
 import NotFound from "@/pages/not-found";
 
@@ -16,6 +17,8 @@ function Router() {
   return (
     <Switch>
       {/* Authentication Pages */}
+      <Route path="/admin" component={DriverBypass} />
+      <Route path="/driver-bypass" component={DriverBypass} />
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/driver-login" component={DriverLogin} />
       

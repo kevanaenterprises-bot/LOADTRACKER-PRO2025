@@ -12,8 +12,14 @@ export async function apiRequest(
   method: string,
   data?: unknown | undefined,
 ): Promise<any> {
-  // Don't use bypass token - let session authentication work normally
+  // Use bypass token for driver portal access
   const headers: any = data ? { "Content-Type": "application/json" } : {};
+  
+  // TEMPORARY: Add bypass token for driver access until sessions are fixed
+  const useDriverBypass = localStorage.getItem('driver-bypass-mode') === 'true';
+  if (useDriverBypass) {
+    headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+  }
   
   console.log(`🔄 API Request: ${method} ${url}`);
 
@@ -41,9 +47,17 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    // Don't use bypass token - let session authentication work normally
+    // Check if driver bypass mode is enabled
+    const useDriverBypass = localStorage.getItem('driver-bypass-mode') === 'true';
+    const headers: any = {};
+    
+    if (useDriverBypass) {
+      headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+    }
+    
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include", // This ensures cookies are sent
+      headers: useDriverBypass ? headers : undefined,
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {

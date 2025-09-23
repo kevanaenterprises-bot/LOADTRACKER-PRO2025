@@ -44,7 +44,7 @@ export function getSession() {
   });
   
   // CRITICAL PRODUCTION FIX: Detect if we're in production Replit environment
-  const isProduction = process.env.REPL_SLUG || process.env.NODE_ENV === 'production';
+  const isProduction = !!(process.env.REPL_SLUG || process.env.NODE_ENV === 'production');
   
   return session({
     store: sessionStore,
