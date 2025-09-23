@@ -360,7 +360,14 @@ export default function Dashboard() {
         <StatsCards 
           stats={stats as any} 
           isLoading={statsLoading} 
-          onActiveLoadsClick={() => setActiveTab("loads")}
+          onActiveLoadsClick={() => {
+            console.log("🎯 ACTIVE LOADS BUTTON CLICKED! Forcing loads fetch...");
+            setActiveTab("loads");
+            // Force invalidate and refetch the loads query
+            queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
+            queryClient.refetchQueries({ queryKey: ["/api/loads"] });
+            console.log("🎯 Loads query invalidated and refetch triggered");
+          }}
         />
         
         {/* Cache Debugger Component - Hidden on mobile for space */}
