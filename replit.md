@@ -17,6 +17,7 @@ LoadTracker Pro is a comprehensive logistics management system designed for tran
 
 Preferred communication style: Simple, everyday language.
 CRITICAL: User has real loads in PRODUCTION that need invoicing by 4 PM deadlines.
+KEVIN OWEN ACCESS: Special driver portal access with password "go4fc2024" available at /admin or /kevin
 
 ## Recent Changes
 
