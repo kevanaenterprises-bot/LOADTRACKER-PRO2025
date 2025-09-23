@@ -2214,7 +2214,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loads for admin/office users - WITH TOKEN BYPASS
   app.get("/api/loads", (req, res, next) => {
     console.log("🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!");
-    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    // CRITICAL FIX: Include driver auth in the authentication check!
+    const hasAuth = !!(req.session as any)?.adminAuth || 
+                     !!(req.session as any)?.driverAuth ||  // ADDED: Driver auth check
+                     !!req.user || 
+                     isBypassActive(req);
     if (hasAuth) {
       next();
     } else {
