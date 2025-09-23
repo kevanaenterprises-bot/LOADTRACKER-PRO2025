@@ -1,0 +1,16 @@
+[build]
+cmd = "npm run build"
+
+[start]
+cmd = "npm start"
+
+[variables]
+NODE_ENV = "production"
+NIXPACKS_METADATA = "node"
+
+[phases.setup]
+nixPkgs = ["nodejs", "python3"]
+
+[phases.build]
+dependsOn = ["setup"]
+cmds = ["npm ci", "npm run build"]
