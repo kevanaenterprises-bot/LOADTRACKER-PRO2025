@@ -16,7 +16,9 @@ export async function apiRequest(
   const headers: any = data ? { "Content-Type": "application/json" } : {};
   
   // TEMPORARY: Add bypass token for driver access until sessions are fixed
-  const useDriverBypass = localStorage.getItem('driver-bypass-mode') === 'true';
+  // Check both localStorage and sessionStorage (for mobile compatibility)
+  const useDriverBypass = localStorage.getItem('driver-bypass-mode') === 'true' || 
+                          sessionStorage.getItem('driver-bypass-mode') === 'true';
   if (useDriverBypass) {
     headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
   }
@@ -47,8 +49,9 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    // Check if driver bypass mode is enabled
-    const useDriverBypass = localStorage.getItem('driver-bypass-mode') === 'true';
+    // Check if driver bypass mode is enabled (both localStorage and sessionStorage for mobile)
+    const useDriverBypass = localStorage.getItem('driver-bypass-mode') === 'true' || 
+                            sessionStorage.getItem('driver-bypass-mode') === 'true';
     const headers: any = {};
     
     if (useDriverBypass) {

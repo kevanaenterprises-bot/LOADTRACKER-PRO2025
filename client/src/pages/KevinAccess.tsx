@@ -18,13 +18,18 @@ export function KevinAccess() {
       localStorage.setItem('kevin-access', 'true');
       localStorage.setItem('driver-bypass-mode', 'true');
       
+      // Also set it in sessionStorage for mobile browsers
+      sessionStorage.setItem('kevin-access', 'true');
+      sessionStorage.setItem('driver-bypass-mode', 'true');
+      
       toast({
         title: "Welcome Kevin Owen!",
         description: "Access granted. Redirecting to dashboard...",
       });
       
+      // Use replace instead of href to maintain storage
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.replace('/dashboard');
       }, 1500);
     } else {
       toast({
@@ -35,7 +40,8 @@ export function KevinAccess() {
     }
   };
 
-  const isKevinLoggedIn = localStorage.getItem('kevin-access') === 'true';
+  const isKevinLoggedIn = localStorage.getItem('kevin-access') === 'true' || 
+                           sessionStorage.getItem('kevin-access') === 'true';
 
   if (isKevinLoggedIn) {
     return (
@@ -52,7 +58,12 @@ export function KevinAccess() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Button 
-              onClick={() => window.location.href = '/dashboard'} 
+              onClick={() => {
+                // Re-ensure the bypass mode is set before navigating
+                localStorage.setItem('driver-bypass-mode', 'true');
+                sessionStorage.setItem('driver-bypass-mode', 'true');
+                window.location.replace('/dashboard');
+              }} 
               className="w-full"
               size="lg"
               data-testid="button-go-dashboard"
