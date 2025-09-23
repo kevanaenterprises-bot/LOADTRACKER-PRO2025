@@ -43,6 +43,9 @@ export function getSession() {
     console.error('Session store connection error:', error);
   });
   
+  // CRITICAL PRODUCTION FIX: Detect if we're in production Replit environment
+  const isProduction = process.env.REPL_SLUG || process.env.NODE_ENV === 'production';
+  
   return session({
     store: sessionStore,
     secret: process.env.SESSION_SECRET || 'loadtracker-default-secret-change-in-production',
@@ -51,9 +54,9 @@ export function getSession() {
     rolling: true, // Reset expiration on activity
     cookie: {
       httpOnly: true,
-      secure: true, // Always use secure cookies (required for production HTTPS)
+      secure: isProduction, // Only require secure in production
       maxAge: sessionTtl,
-      sameSite: "lax", // Use "lax" for same-site requests (not "none" which blocks in many browsers)
+      sameSite: isProduction ? "none" : "lax", // CRITICAL: Must be "none" for cross-origin in Replit production
       // Don't set domain - let the browser handle it automatically
       // This ensures cookies work with any domain/subdomain
     },
