@@ -52,6 +52,9 @@ console.log('🔧 Memory usage:', JSON.stringify(process.memoryUsage(), null, 2)
 
 const app = express();
 
+// CRITICAL FIX: Disable ETag caching to prevent 304 errors on mobile
+app.set('etag', false);
+
 // Add CORS headers for sessions
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -64,6 +67,15 @@ app.use((req, res, next) => {
     return;
   }
   
+  next();
+});
+
+// CRITICAL FIX: Prevent all API caching to avoid 304 responses breaking mobile
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache'); 
+  res.set('Expires', '0');
+  res.removeHeader('ETag');
   next();
 });
 

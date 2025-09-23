@@ -1,7 +1,8 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 async function throwIfResNotOk(res: Response) {
-  if (!res.ok) {
+  // CRITICAL FIX: Handle 304 (Not Modified) as success to prevent mobile errors
+  if (!res.ok && res.status !== 304) {
     const text = (await res.text()) || res.statusText;
     throw new Error(`${res.status}: ${text}`);
   }
@@ -32,10 +33,17 @@ export async function apiRequest(
     credentials: "include", // This ensures cookies are sent
   });
 
-  if (!res.ok) {
+  // CRITICAL FIX: Handle 304 for mutations (though less common)
+  if (!res.ok && res.status !== 304) {
     const errorText = await res.text();
     console.error(`❌ API Error: ${res.status} ${errorText}`);
     throw new Error(`${res.status}: ${errorText}`);
+  }
+  
+  // Handle 304 or successful response
+  if (res.status === 304) {
+    console.log(`✅ API Success (304 Not Modified): ${method} ${url}`);
+    return {}; // Return empty object for 304
   }
   
   const result = await res.json();
@@ -65,6 +73,12 @@ export const getQueryFn: <T>(options: {
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
       return null;
+    }
+    
+    // CRITICAL FIX: Handle 304 responses properly - return cached data
+    if (res.status === 304) {
+      // For 304, return the cached data or empty array
+      return queryClient.getQueryData(queryKey as any) || [];
     }
 
     await throwIfResNotOk(res);
