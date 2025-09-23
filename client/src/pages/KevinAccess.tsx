@@ -10,7 +10,7 @@ export function KevinAccess() {
   const [password, setPassword] = useState("");
   const { toast } = useToast();
 
-  const handleKevinLogin = (e: React.FormEvent) => {
+  const handleKevinLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password === "go4fc2024") {
@@ -21,6 +21,21 @@ export function KevinAccess() {
       // Also set it in sessionStorage for mobile browsers
       sessionStorage.setItem('kevin-access', 'true');
       sessionStorage.setItem('driver-bypass-mode', 'true');
+      
+      // Get bypass token from server
+      try {
+        const response = await fetch("/api/auth/browser-bypass", {
+          method: "POST",
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('bypass-token', data.token);
+          console.log("✅ Kevin: Bypass token obtained");
+        }
+      } catch (error) {
+        console.error("Failed to get bypass token:", error);
+      }
       
       toast({
         title: "Welcome Kevin Owen!",

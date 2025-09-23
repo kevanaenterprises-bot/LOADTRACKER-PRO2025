@@ -9,12 +9,21 @@ export function useDriverAuth() {
     queryFn: async () => {
       console.log("🔍 Driver auth: Checking authentication...");
 
+      // Get bypass token if available
+      const bypassToken = localStorage.getItem('bypass-token');
+      const headers: HeadersInit = {
+        "Content-Type": "application/json"
+      };
+      
+      if (bypassToken) {
+        headers['x-bypass-token'] = bypassToken;
+        console.log("🔑 Driver auth: Using bypass token");
+      }
+
       // Check session with cookies
       const response = await fetch("/api/auth/driver-user", {
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        }
+        headers
       });
       
       console.log("🔍 Driver auth response:", response.status, response.statusText);

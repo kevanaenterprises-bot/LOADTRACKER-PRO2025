@@ -105,6 +105,7 @@ const getStatusText = (status: string) => {
 };
 
 export default function LoadsTable() {
+  console.log("🚨 LoadsTable COMPONENT MOUNTED!");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedLoad, setSelectedLoad] = useState<any>(null);
@@ -141,8 +142,15 @@ export default function LoadsTable() {
                            sessionStorage.getItem('driver-bypass-mode') === 'true';
       
       const headers: any = {};
-      if (isKevinBypass) {
+      // Use the actual bypass token from localStorage if available
+      const bypassToken = localStorage.getItem('bypass-token');
+      if (bypassToken) {
+        headers['x-bypass-token'] = bypassToken;
+        console.log('🔑 LoadsTable: Using bypass token from localStorage');
+      } else if (isKevinBypass) {
+        // Fallback to hardcoded token if needed (shouldn't happen with new flow)
         headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+        console.log('⚠️ LoadsTable: Using hardcoded bypass token (should get real token instead)');
       }
       
       const response = await fetch(`/api/loads/${loadId}/stops`, {
@@ -397,8 +405,15 @@ export default function LoadsTable() {
                            sessionStorage.getItem('driver-bypass-mode') === 'true';
       
       const headers: any = {};
-      if (isKevinBypass) {
+      // Use the actual bypass token from localStorage if available
+      const bypassToken = localStorage.getItem('bypass-token');
+      if (bypassToken) {
+        headers['x-bypass-token'] = bypassToken;
+        console.log('🔑 LoadsTable: Using bypass token from localStorage');
+      } else if (isKevinBypass) {
+        // Fallback to hardcoded token if needed (shouldn't happen with new flow)
         headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+        console.log('⚠️ LoadsTable: Using hardcoded bypass token (should get real token instead)');
       }
       
       const response = await fetch('/api/loads', {
@@ -549,8 +564,15 @@ export default function LoadsTable() {
                            sessionStorage.getItem('driver-bypass-mode') === 'true';
       
       const headers: any = {};
-      if (isKevinBypass) {
+      // Use the actual bypass token from localStorage if available
+      const bypassToken = localStorage.getItem('bypass-token');
+      if (bypassToken) {
+        headers['x-bypass-token'] = bypassToken;
+        console.log('🔑 LoadsTable: Using bypass token from localStorage');
+      } else if (isKevinBypass) {
+        // Fallback to hardcoded token if needed (shouldn't happen with new flow)
         headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+        console.log('⚠️ LoadsTable: Using hardcoded bypass token (should get real token instead)');
       }
       
       const response = await fetch(`/api/loads/${load.id}`, {
