@@ -134,11 +134,20 @@ export default function LoadsTable() {
   // Function to fetch load stops for editing
   const fetchLoadStops = async (loadId: string) => {
     try {
+      // Check if we're in Kevin's bypass mode
+      const isKevinBypass = localStorage.getItem('kevin-access') === 'true' || 
+                           sessionStorage.getItem('kevin-access') === 'true' ||
+                           localStorage.getItem('driver-bypass-mode') === 'true' || 
+                           sessionStorage.getItem('driver-bypass-mode') === 'true';
+      
+      const headers: any = {};
+      if (isKevinBypass) {
+        headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+      }
+      
       const response = await fetch(`/api/loads/${loadId}/stops`, {
         credentials: 'include',
-        headers: {
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
-        }
+        headers: headers
       });
       if (response.ok) {
         const stops = await response.json();
@@ -213,12 +222,20 @@ export default function LoadsTable() {
       // Format to 2 decimal places
       const formattedValue = numericValue.toFixed(2);
       
+      // Check if we're in Kevin's bypass mode
+      const isKevinBypass = localStorage.getItem('kevin-access') === 'true' || 
+                           sessionStorage.getItem('kevin-access') === 'true' ||
+                           localStorage.getItem('driver-bypass-mode') === 'true' || 
+                           sessionStorage.getItem('driver-bypass-mode') === 'true';
+      
+      const headers: any = { 'Content-Type': 'application/json' };
+      if (isKevinBypass) {
+        headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+      }
+      
       const response = await fetch(`/api/loads/${loadId}/financials`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
-        },
+        headers: headers,
         credentials: 'include',
         body: JSON.stringify({ [field]: formattedValue })
       });
@@ -372,24 +389,45 @@ export default function LoadsTable() {
     queryKey: ["/api/loads"],
     queryFn: async () => {
       console.log('🔄 Fetching loads from /api/loads');
+      
+      // Check if we're in Kevin's bypass mode
+      const isKevinBypass = localStorage.getItem('kevin-access') === 'true' || 
+                           sessionStorage.getItem('kevin-access') === 'true' ||
+                           localStorage.getItem('driver-bypass-mode') === 'true' || 
+                           sessionStorage.getItem('driver-bypass-mode') === 'true';
+      
+      const headers: any = {};
+      if (isKevinBypass) {
+        headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+      }
+      
       const response = await fetch('/api/loads', {
         credentials: 'include',
-        headers: {
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
-        }
+        headers: headers
       });
       
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ Failed to fetch loads:', response.status, errorText);
-        throw new Error(`Failed to fetch loads: ${response.status}`);
+        
+        // Better error handling for different status codes
+        if (response.status === 500) {
+          // Server error - might be database issue
+          throw new Error(`Server error: Unable to fetch loads. Please try again.`);
+        } else if (response.status === 401 || response.status === 403) {
+          // Authentication issue
+          throw new Error(`Authentication required. Please log in again.`);
+        } else {
+          throw new Error(`Failed to fetch loads: ${response.status}`);
+        }
       }
       
       const data = await response.json();
       console.log(`✅ Fetched ${Array.isArray(data) ? data.length : 0} loads successfully`);
       return data;
     },
-    retry: false, // DISABLE retries to prevent infinite loop on 401 errors
+    retry: 1, // Allow ONE retry for temporary network issues
+    retryDelay: 1000, // Wait 1 second before retry
     refetchOnWindowFocus: false, // DISABLE to stop retrying when tab is focused
     staleTime: 60000, // Data stays fresh for 60 seconds
     refetchInterval: false, // DISABLE auto-refresh to prevent continuous failed requests
@@ -504,10 +542,19 @@ export default function LoadsTable() {
     
     // 🔥 CRITICAL FIX: Fetch complete load details including all location data
     try {
+      // Check if we're in Kevin's bypass mode
+      const isKevinBypass = localStorage.getItem('kevin-access') === 'true' || 
+                           sessionStorage.getItem('kevin-access') === 'true' ||
+                           localStorage.getItem('driver-bypass-mode') === 'true' || 
+                           sessionStorage.getItem('driver-bypass-mode') === 'true';
+      
+      const headers: any = {};
+      if (isKevinBypass) {
+        headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
+      }
+      
       const response = await fetch(`/api/loads/${load.id}`, {
-        headers: {
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025', // Must be lowercase for production
-        },
+        headers: headers,
         credentials: 'include',
       });
       
