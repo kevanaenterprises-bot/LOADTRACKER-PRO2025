@@ -1054,26 +1054,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Debug endpoint to verify session is working
-  app.get("/api/debug/session", async (req, res) => {
-    try {
-      res.json({
-        sessionId: req.session?.id,
-        isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
-        user: !!req.user,
-        userId: (req.session as any)?.userId,
-        adminAuth: (req.session as any)?.adminAuth,
-        driverAuth: (req.session as any)?.driverAuth,
-        secure: req.secure,
-        origin: req.headers.origin,
-        cookie: req.headers.cookie ? 'present' : 'missing',
-        sessionData: req.session
-      });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
   // KEVIN LOADS TEST: Direct storage call with simple logging
   app.get("/api/test/kevin-loads-direct", async (req, res) => {
     console.log("🎯 KEVIN DIRECT TEST: Testing storage function directly");
@@ -1654,13 +1634,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: "User"
         };
 
-        // Log the Set-Cookie header to debug production issues
-        console.log("🔐 Session before save:", {
-          sessionID: req.sessionID,
-          adminAuth: (req.session as any).adminAuth,
-          cookie: req.session.cookie
-        });
-
         // Force session save with explicit reload to ensure persistence
         req.session.save((err) => {
           if (err) {
@@ -1675,23 +1648,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return res.status(500).json({ message: "Session verification failed" });
             }
             
-            console.log("✅ Session saved and verified:", {
-              sessionID: req.sessionID,
-              adminAuth: (req.session as any).adminAuth,
-              cookieSettings: {
-                secure: req.session.cookie.secure,
-                httpOnly: req.session.cookie.httpOnly,
-                sameSite: req.session.cookie.sameSite
-              }
-            });
-            
+            console.log("Session saved and verified, adminAuth:", (req.session as any).adminAuth);
             res.json({ 
               message: "Login successful", 
-              user: (req.session as any).adminAuth,
-              sessionDebug: {
-                sessionID: req.sessionID,
-                cookieSecure: req.session.cookie.secure
-              }
+              user: (req.session as any).adminAuth 
             });
           });
         });
@@ -2214,22 +2174,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Loads for admin/office users - WITH TOKEN BYPASS
   app.get("/api/loads", (req, res, next) => {
     console.log("🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!");
-    // MATCH THE WORKING STATS ENDPOINT AUTH PATTERN!
-    const hasAdminAuth = !!(req.session as any)?.adminAuth;
-    const hasReplitAuth = !!req.user;
-    const hasTokenBypass = isBypassActive(req);
-    const hasDriverAuth = !!(req.session as any)?.driverAuth;
-    
-    console.log("🔥 LOADS AUTH CHECK:", {
-      hasAdminAuth,
-      hasReplitAuth, 
-      hasTokenBypass,
-      hasDriverAuth,
-      bypassToken: req.headers['x-bypass-token'] ? '[PROVIDED]' : '[MISSING]'
-    });
-    
-    // Use the SAME auth pattern as the working stats endpoint
-    if (hasAdminAuth || hasReplitAuth || hasTokenBypass || hasDriverAuth) {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
       next();
     } else {
       res.status(401).json({ message: "Authentication required" });

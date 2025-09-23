@@ -105,7 +105,6 @@ const getStatusText = (status: string) => {
 };
 
 export default function LoadsTable() {
-  console.log("🚨 LoadsTable COMPONENT MOUNTED!");
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedLoad, setSelectedLoad] = useState<any>(null);
@@ -135,27 +134,11 @@ export default function LoadsTable() {
   // Function to fetch load stops for editing
   const fetchLoadStops = async (loadId: string) => {
     try {
-      // Check if we're in Kevin's bypass mode
-      const isKevinBypass = localStorage.getItem('kevin-access') === 'true' || 
-                           sessionStorage.getItem('kevin-access') === 'true' ||
-                           localStorage.getItem('driver-bypass-mode') === 'true' || 
-                           sessionStorage.getItem('driver-bypass-mode') === 'true';
-      
-      const headers: any = {};
-      // Use the actual bypass token from localStorage if available
-      const bypassToken = localStorage.getItem('bypass-token');
-      if (bypassToken) {
-        headers['x-bypass-token'] = bypassToken;
-        console.log('🔑 LoadsTable: Using bypass token from localStorage');
-      } else if (isKevinBypass) {
-        // Fallback to hardcoded token if needed (shouldn't happen with new flow)
-        headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
-        console.log('⚠️ LoadsTable: Using hardcoded bypass token (should get real token instead)');
-      }
-      
       const response = await fetch(`/api/loads/${loadId}/stops`, {
         credentials: 'include',
-        headers: headers
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        }
       });
       if (response.ok) {
         const stops = await response.json();
@@ -230,20 +213,12 @@ export default function LoadsTable() {
       // Format to 2 decimal places
       const formattedValue = numericValue.toFixed(2);
       
-      // Check if we're in Kevin's bypass mode
-      const isKevinBypass = localStorage.getItem('kevin-access') === 'true' || 
-                           sessionStorage.getItem('kevin-access') === 'true' ||
-                           localStorage.getItem('driver-bypass-mode') === 'true' || 
-                           sessionStorage.getItem('driver-bypass-mode') === 'true';
-      
-      const headers: any = { 'Content-Type': 'application/json' };
-      if (isKevinBypass) {
-        headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
-      }
-      
       const response = await fetch(`/api/loads/${loadId}/financials`, {
         method: 'PATCH',
-        headers: headers,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
         credentials: 'include',
         body: JSON.stringify({ [field]: formattedValue })
       });
@@ -393,59 +368,23 @@ export default function LoadsTable() {
     }
   };
 
-  const { data: loads, isLoading, refetch, error } = useQuery({
-    queryKey: ["/api/loads"],
+  const { data: loads, isLoading, refetch } = useQuery({
+    queryKey: ["/api/loads", { excludePaid: true }],
     queryFn: async () => {
-      console.log('🔄 Fetching loads from /api/loads');
-      
-      // Check if we're in Kevin's bypass mode
-      const isKevinBypass = localStorage.getItem('kevin-access') === 'true' || 
-                           sessionStorage.getItem('kevin-access') === 'true' ||
-                           localStorage.getItem('driver-bypass-mode') === 'true' || 
-                           sessionStorage.getItem('driver-bypass-mode') === 'true';
-      
-      const headers: any = {};
-      // Use the actual bypass token from localStorage if available
-      const bypassToken = localStorage.getItem('bypass-token');
-      if (bypassToken) {
-        headers['x-bypass-token'] = bypassToken;
-        console.log('🔑 LoadsTable: Using bypass token from localStorage');
-      } else if (isKevinBypass) {
-        // Fallback to hardcoded token if needed (shouldn't happen with new flow)
-        headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
-        console.log('⚠️ LoadsTable: Using hardcoded bypass token (should get real token instead)');
-      }
-      
-      const response = await fetch('/api/loads', {
+      const response = await fetch('/api/loads?excludePaid=true', {
         credentials: 'include',
-        headers: headers
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Failed to fetch loads:', response.status, errorText);
-        
-        // Better error handling for different status codes
-        if (response.status === 500) {
-          // Server error - might be database issue
-          throw new Error(`Server error: Unable to fetch loads. Please try again.`);
-        } else if (response.status === 401 || response.status === 403) {
-          // Authentication issue
-          throw new Error(`Authentication required. Please log in again.`);
-        } else {
-          throw new Error(`Failed to fetch loads: ${response.status}`);
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
         }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch loads');
       }
-      
-      const data = await response.json();
-      console.log(`✅ Fetched ${Array.isArray(data) ? data.length : 0} loads successfully`);
-      return data;
+      return response.json();
     },
-    retry: 1, // Allow ONE retry for temporary network issues
-    retryDelay: 1000, // Wait 1 second before retry
-    refetchOnWindowFocus: false, // DISABLE to stop retrying when tab is focused
-    staleTime: 60000, // Data stays fresh for 60 seconds
-    refetchInterval: false, // DISABLE auto-refresh to prevent continuous failed requests
+    retry: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0, // Always consider data stale to allow quick updates
   });
 
   // Force clear cache and refresh loads  
@@ -553,53 +492,27 @@ export default function LoadsTable() {
   });
 
   const handleLoadClick = async (load: any) => {
-    console.log("🔍 Load clicked - fetching complete details:", load);
+    console.log("Load clicked:", load);
     
-    // 🔥 CRITICAL FIX: Fetch complete load details including all location data
+    // 🔥 CRITICAL FIX: Fetch complete load details including pickupLocation
     try {
-      // Check if we're in Kevin's bypass mode
-      const isKevinBypass = localStorage.getItem('kevin-access') === 'true' || 
-                           sessionStorage.getItem('kevin-access') === 'true' ||
-                           localStorage.getItem('driver-bypass-mode') === 'true' || 
-                           sessionStorage.getItem('driver-bypass-mode') === 'true';
-      
-      const headers: any = {};
-      // Use the actual bypass token from localStorage if available
-      const bypassToken = localStorage.getItem('bypass-token');
-      if (bypassToken) {
-        headers['x-bypass-token'] = bypassToken;
-        console.log('🔑 LoadsTable: Using bypass token from localStorage');
-      } else if (isKevinBypass) {
-        // Fallback to hardcoded token if needed (shouldn't happen with new flow)
-        headers['x-bypass-token'] = 'LOADTRACKER_BYPASS_2025';
-        console.log('⚠️ LoadsTable: Using hardcoded bypass token (should get real token instead)');
-      }
-      
       const response = await fetch(`/api/loads/${load.id}`, {
-        headers: headers,
+        headers: {
+          'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
+        },
         credentials: 'include',
       });
       
       if (response.ok) {
         const completeLoadData = await response.json();
-        console.log("✅ Complete load data fetched:", {
-          id: completeLoadData.id,
-          number109: completeLoadData.number109,
-          hasPickupLocation: !!completeLoadData.pickupLocation,
-          hasDeliveryLocation: !!completeLoadData.location,
-          hasStops: !!(completeLoadData.stops && completeLoadData.stops.length > 0),
-          pickupAddress: completeLoadData.pickupAddress,
-          deliveryAddress: completeLoadData.deliveryAddress,
-          fullData: completeLoadData
-        });
-        setSelectedLoad(completeLoadData); // Now includes all location data
+        console.log("Complete load data with pickupLocation:", completeLoadData);
+        setSelectedLoad(completeLoadData); // ✅ Now includes pickupLocation!
       } else {
-        console.warn("⚠️ Failed to fetch complete load details, using list data");
         // Fallback to list data if individual fetch fails
         setSelectedLoad(load);
       }
     } catch (error) {
-      console.error("❌ Failed to fetch complete load details:", error);
+      console.error("Failed to fetch complete load details:", error);
       // Fallback to list data if individual fetch fails
       setSelectedLoad(load);
     }
@@ -611,15 +524,9 @@ export default function LoadsTable() {
     
     // Fetch existing stops for this load
     try {
-      const response = await fetch(`/api/loads/${load.id}/stops`, {
-        headers: {
-          'x-bypass-token': 'LOADTRACKER_BYPASS_2025', // Must be lowercase for production
-        },
-        credentials: 'include',
-      });
+      const response = await fetch(`/api/loads/${load.id}/stops`);
       if (response.ok) {
         const stops = await response.json();
-        console.log(`📍 Fetched ${stops.length} stops for load ${load.id}`);
         setExistingStops(stops);
       }
     } catch (error) {
@@ -975,61 +882,6 @@ export default function LoadsTable() {
       </Card>
     );
   }
-
-  // Handle error state
-  if (error) {
-    console.error('Load fetch error:', error);
-    return (
-      <Card className="material-card">
-        <CardHeader>
-          <CardTitle>Active Loads</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center p-8">
-            <div className="text-red-600 mb-4">
-              <i className="fas fa-exclamation-triangle text-2xl"></i>
-            </div>
-            <p className="text-gray-700 mb-2">Failed to load data</p>
-            <p className="text-sm text-gray-500 mb-4">{error instanceof Error ? error.message : 'Unknown error occurred'}</p>
-            <Button onClick={() => refetch()} variant="outline" size="sm">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Retry
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Handle empty/null data
-  if (!loads) {
-    console.log('No loads data received from server');
-    return (
-      <Card className="material-card">
-        <CardHeader>
-          <CardTitle>Active Loads</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center p-8">
-            <p className="text-gray-700">No load data available</p>
-            <Button onClick={() => refetch()} variant="outline" size="sm" className="mt-4">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Debug log the loads data
-  console.log('📊 LOADS DEBUG:', {
-    loadsExists: !!loads,
-    isArray: Array.isArray(loads),
-    loadsCount: Array.isArray(loads) ? loads.length : 'Not an array',
-    firstLoad: Array.isArray(loads) && loads.length > 0 ? loads[0] : null,
-    searchTerm: searchTerm
-  });
 
   // Filter loads based on search term (Load #, Invoice #, or BOL #)
   const filteredLoads = Array.isArray(loads) ? loads.filter((load: any) => {
