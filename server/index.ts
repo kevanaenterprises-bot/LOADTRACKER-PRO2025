@@ -192,7 +192,7 @@ async function startServer() {
     console.log(`🔧 Configuration validated: PORT=${port}, HOST=0.0.0.0`);
     console.log(`🔧 Environment: NODE_ENV=${process.env.NODE_ENV || 'development'}`);
     
-    // Test database connection
+    // Test database connection (non-blocking)
     console.log('🔧 Testing database connection...');
     try {
       // Import storage to test database connection
@@ -200,8 +200,8 @@ async function startServer() {
       await storage.getLoads(); // Simple query to test connection
       console.log('✅ Database connection successful');
     } catch (dbError) {
-      console.error('❌ Database connection failed:', dbError);
-      throw new Error(`Database connection failed: ${dbError instanceof Error ? dbError.message : 'Unknown database error'}`);
+      console.error('⚠️ Database connection failed during startup (non-fatal):', dbError);
+      console.log('🔧 Server will continue starting - database will be retried on first request');
     }
     
     // Register routes with enhanced error handling
