@@ -1,6 +1,19 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+// Removed broken Vite import - using simple static serving instead
+import path from "path";
+import fs from "fs";
+
+// Simple log function to replace broken Vite logger
+function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
 
 // DEPLOYMENT DEBUG: Immediate file execution confirmation
 console.log('🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy');
@@ -225,10 +238,24 @@ async function startServer() {
       res.status(404).json({ error: 'API route not found' });
     });
 
-    // Static serving restored - testing storage fixes
+    // Simple static serving without broken Vite dependency
     console.log('📁 Setting up static file serving...');
-    serveStatic(app);
-    console.log('✅ Static file serving configured');
+    const distPath = path.resolve(import.meta.dirname, "public");
+    
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+      // Serve index.html for SPA routes
+      app.use("*", (_req, res) => {
+        res.sendFile(path.resolve(distPath, "index.html"));
+      });
+      console.log('✅ Static file serving configured (production mode)');
+    } else {
+      console.log('⚠️  No build directory found - using development mode');
+      // In development, just serve a simple response for non-API routes
+      app.use("*", (_req, res) => {
+        res.send('LoadTracker Pro - Development Mode');
+      });
+    }
 
     // Start the server with enhanced logging
     console.log(`🌐 Starting HTTP server on 0.0.0.0:${port}...`);
