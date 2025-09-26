@@ -370,6 +370,7 @@ export default function LoadsTable() {
 
   const { data: loads, isLoading, refetch } = useQuery({
     queryKey: ["/api/loads", { excludePaid: false }],
+    queryFn: () => apiRequest("/api/loads?excludePaid=false", "GET"),
     retry: false,
     refetchOnWindowFocus: false,
     staleTime: 0, // Always consider data stale to allow quick updates

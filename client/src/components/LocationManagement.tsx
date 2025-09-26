@@ -72,6 +72,7 @@ export default function LocationManagement() {
 
   const { data: locations = [], isLoading } = useQuery<Location[]>({
     queryKey: ["/api/locations"],
+    queryFn: () => apiRequest("/api/locations", "GET"),
   });
 
   const createMutation = useMutation({
