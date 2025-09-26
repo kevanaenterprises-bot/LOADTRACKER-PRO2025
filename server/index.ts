@@ -3,7 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 // DEPLOYMENT DEBUG: Immediate file execution confirmation
-console.log('🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing');
+console.log('🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy');
 console.log('🚨 DEPLOYMENT DEBUG: Current timestamp:', new Date().toISOString());
 console.log('🚨 DEPLOYMENT DEBUG: Process environment:', {
   nodeEnv: process.env.NODE_ENV,
