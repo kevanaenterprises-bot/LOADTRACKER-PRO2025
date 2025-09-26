@@ -1,9 +1,7 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import pkg from 'pg';
+const { Pool } = pkg;
+import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
-
-neonConfig.webSocketConstructor = ws;
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,5 +9,17 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+// Configure connection for Railway or other PostgreSQL services
+const connectionString = process.env.DATABASE_URL;
+const isRailway = connectionString.includes('yamabiko.proxy.rlwy.net');
+
+export const pool = new Pool({
+  connectionString,
+  // Use standard SSL for Railway external connections
+  ssl: isRailway ? { rejectUnauthorized: false } : undefined,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
+
+export const db = drizzle(pool, { schema });
