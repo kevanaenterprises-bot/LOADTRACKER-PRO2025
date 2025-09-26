@@ -369,9 +369,9 @@ export default function LoadsTable() {
   };
 
   const { data: loads, isLoading, refetch } = useQuery({
-    queryKey: ["/api/loads", { excludePaid: true }],
+    queryKey: ["/api/loads", { excludePaid: false }],
     queryFn: async () => {
-      const response = await fetch('/api/loads?excludePaid=true', {
+      const response = await fetch('/api/loads?excludePaid=false', {
         credentials: 'include',
         headers: {
           'x-bypass-token': 'LOADTRACKER_BYPASS_2025',
