@@ -69,7 +69,29 @@ export const getQueryFn: <T>(options: {
       headers['X-Bypass-Token'] = bypassToken;
     }
 
-    const res = await fetch(queryKey.join("/") as string, {
+    // Build proper URL from queryKey - handle query parameters correctly
+    const [path, params] = queryKey as [string, Record<string, any>?];
+    let url = path;
+    if (params && typeof params === 'object' && !Array.isArray(params)) {
+      const qs = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null) {
+          qs.set(k, String(v));
+        }
+      });
+      const queryString = qs.toString();
+      if (queryString) {
+        url += `?${queryString}`;
+      }
+    }
+
+    // Add fallback to static bypass token if no token available
+    if (!bypassToken) {
+      headers['X-Bypass-Token'] = 'LOADTRACKER_BYPASS_2025';
+    }
+
+    console.log(`🔄 Query: ${url}`);
+    const res = await fetch(url, {
       credentials: "include",
       headers,
     });
