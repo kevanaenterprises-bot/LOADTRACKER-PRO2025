@@ -243,6 +243,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Auth middleware (includes session setup)
   await setupAuth(app);
+  
+  // HTTPS Cookie Persistence Fix for Railway/HTTPS deployments
+  app.set('trust proxy', 1);
+  app.use((req, res, next) => {
+    // Fix cookie persistence in HTTPS deployments
+    if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+      if (req.session && req.session.cookie) {
+        req.session.cookie.secure = true;
+        req.session.cookie.sameSite = 'none';
+      }
+    }
+    next();
+  });
 
   // Direct logo download endpoint for mobile users
   app.get("/download/logo", (req, res) => {
