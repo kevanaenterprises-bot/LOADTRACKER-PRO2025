@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-// Removed broken Vite import - using simple static serving instead
+// Vite import temporarily disabled due to syntax error in vite.ts
+// import { setupVite, log } from "./vite";
 import path from "path";
 import fs from "fs";
 
@@ -238,23 +239,61 @@ async function startServer() {
       res.status(404).json({ error: 'API route not found' });
     });
 
-    // Simple static serving without broken Vite dependency
-    console.log('📁 Setting up static file serving...');
-    const distPath = path.resolve(import.meta.dirname, "public");
+    // Setup frontend serving based on environment
+    const isProduction = process.env.NODE_ENV === "production";
     
-    if (fs.existsSync(distPath)) {
-      app.use(express.static(distPath));
-      // Serve index.html for SPA routes
-      app.use("*", (_req, res) => {
-        res.sendFile(path.resolve(distPath, "index.html"));
-      });
-      console.log('✅ Static file serving configured (production mode)');
+    if (isProduction) {
+      console.log('📁 Setting up static file serving for production...');
+      const distPath = path.resolve(import.meta.dirname, "public");
+      
+      if (fs.existsSync(distPath)) {
+        app.use(express.static(distPath));
+        // Serve index.html for SPA routes
+        app.use("*", (_req, res) => {
+          res.sendFile(path.resolve(distPath, "index.html"));
+        });
+        console.log('✅ Static file serving configured (production mode)');
+      } else {
+        console.error('❌ Production build directory not found!');
+        process.exit(1);
+      }
     } else {
-      console.log('⚠️  No build directory found - using development mode');
-      // In development, just serve a simple response for non-API routes
-      app.use("*", (_req, res) => {
-        res.send('LoadTracker Pro - Development Mode');
-      });
+      console.log('🔧 Development mode - Vite temporarily disabled due to config issues');
+      console.log('⚠️  To see your latest code changes, please:');
+      console.log('   1. Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)');
+      console.log('   2. Fix syntax error in server/vite.ts line 68');
+      console.log('   3. Re-enable Vite development server');
+      
+      // Serve the latest built frontend if available, otherwise show message
+      const devDistPath = path.resolve(import.meta.dirname, "public");
+      if (fs.existsSync(devDistPath)) {
+        console.log('📁 Serving built frontend (may be outdated - clear browser cache!)');
+        app.use(express.static(devDistPath));
+        app.use("*", (_req, res) => {
+          res.sendFile(path.resolve(devDistPath, "index.html"));
+        });
+      } else {
+        app.use("*", (_req, res) => {
+          res.send(`
+            <html>
+              <body style="font-family: Arial, sans-serif; padding: 20px;">
+                <h1>🚛 LoadTracker Pro - Development Mode</h1>
+                <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                  <h3>⚠️ Frontend Not Available</h3>
+                  <p>The development server needs to be configured to serve your latest code changes.</p>
+                  <p><strong>To see your new features:</strong></p>
+                  <ul>
+                    <li>Fix syntax error in server/vite.ts</li>
+                    <li>Clear browser cache completely</li>
+                    <li>Restart the development server</li>
+                  </ul>
+                </div>
+                <p><a href="/api/status" style="color: #007bff;">API Status Check</a></p>
+              </body>
+            </html>
+          `);
+        });
+      }
     }
 
     // Start the server with enhanced logging
