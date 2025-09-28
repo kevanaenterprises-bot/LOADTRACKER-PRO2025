@@ -94,7 +94,10 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
   });
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    // Handle undefined/null status gracefully
+    const safeStatus = status || 'created';
+    
+    switch (safeStatus) {
       case "created": return "bg-blue-100 text-blue-800";
       case "assigned": return "bg-yellow-100 text-yellow-800";
       case "in_progress": return "bg-orange-100 text-orange-800";
@@ -197,8 +200,8 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
                   {load.location?.name} - {load.location?.city}, {load.location?.state}
                 </p>
               </div>
-              <Badge className={getStatusColor(load.status)}>
-                {load.status.replace('_', ' ').toUpperCase()}
+              <Badge className={getStatusColor(load.status || 'created')}>
+                {(load.status || 'UNKNOWN').replace('_', ' ').toUpperCase()}
               </Badge>
             </div>
           </CardHeader>
