@@ -236,42 +236,27 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
               
               {load.status !== "delivered" && load.status !== "completed" && (
                 <>
-                  {/* Show Accept Tracking for loads that haven't started tracking yet */}
-                  {(load.status === "assigned" || load.status === "created") ? (
-                    <Button 
-                      onClick={() => handleAcceptTracking(load.id)}
-                      variant="default"
-                      size="sm"
-                      disabled={statusUpdateMutation.isPending}
-                      data-testid={`button-accept-tracking-${load.id}`}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      {statusUpdateMutation.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
-                          Starting...
-                        </>
-                      ) : (
-                        <>
-                          <i className="fas fa-location-arrow mr-2"></i>
-                          Accept Tracking
-                        </>
-                      )}
-                    </Button>
-                  ) : (
-                    /* Show Update Status for loads already in transit */
-                    <Button 
-                      onClick={() => updateStatus(load.id, "in_progress")}
-                      variant="default"
-                      size="sm"
-                      disabled={statusUpdateMutation.isPending}
-                      data-testid={`button-start-load-${load.id}`}
-                    >
-                      {load.status === "created" ? "Start Load" : 
-                       load.status === "assigned" ? "Confirm Receipt" :
-                       "Next Stage"}
-                    </Button>
-                  )}
+                  {/* Main action button - Always Accept Tracking */}
+                  <Button 
+                    onClick={() => handleAcceptTracking(load.id)}
+                    variant="default"
+                    size="sm"
+                    disabled={statusUpdateMutation.isPending}
+                    data-testid={`button-accept-tracking-${load.id}`}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {statusUpdateMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
+                        Updating...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-location-arrow mr-2"></i>
+                        Accept Load & Start Tracking
+                      </>
+                    )}
+                  </Button>
                   
                   <Button 
                     onClick={() => {
