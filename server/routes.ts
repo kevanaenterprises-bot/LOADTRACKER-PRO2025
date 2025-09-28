@@ -2179,20 +2179,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     try {
       const driverId = req.params.driverId;
-      console.log(`🔍 DRIVER LOADS API: Getting loads for driver: ${driverId}`);
+      console.log(`🔍 DRIVER ID INVESTIGATION: Requested driver ID "${driverId}"`);
       
+      // First, let's see what loads exist with Kevin Owen 
+      const allLoads = await storage.getLoadsFiltered({});
+      const kevinLoads = allLoads.filter(load => 
+        (load.driver?.firstName === 'Kevin' && load.driver?.lastName === 'Owen') ||
+        (load.driver?.username === 'kowen') ||
+        (load.number109 === '109-39498' || load.number109 === '109-39410')
+      );
+      
+      console.log(`🔍 KEVIN OWEN LOADS IN DATABASE:`, kevinLoads.map(load => ({
+        number109: load.number109,
+        actualDriverId: load.driverId,
+        driverName: load.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'No driver',
+        username: load.driver?.username,
+        status: load.status,
+        id: load.id
+      })));
+      
+      // Now get loads for the requested driver ID
       const loads = await storage.getLoadsByDriver(driverId);
+      console.log(`🔍 LOADS FOR REQUESTED ID "${driverId}":`, loads.map(load => ({
+        number109: load.number109,
+        id: load.id?.slice(-8),
+        status: load.status
+      })));
       
-      console.log(`📦 DRIVER LOADS API: Found ${loads.length} loads for driver ${driverId}`);
-      if (loads.length > 0) {
-        console.log(`📦 DRIVER LOADS API: First load sample:`, {
-          id: loads[0].id,
-          number109: loads[0].number109,
-          status: loads[0].status,
-          estimatedMiles: loads[0].estimatedMiles,
-          location: loads[0].location
-        });
-      }
+      console.log(`🔍 SUMMARY: Expected Kevin Owen loads, got ${loads.length} loads for driver ID ${driverId}`);
       
       res.json(loads);
     } catch (error) {
