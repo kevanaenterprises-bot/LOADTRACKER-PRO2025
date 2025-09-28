@@ -27,8 +27,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Package, MapPin, X, RefreshCw, Search, Route, Navigation } from "lucide-react";
+import { Plus, Package, MapPin, X, RefreshCw, Search, Route, Navigation, Truck } from "lucide-react";
 import { useState, useEffect } from "react";
+import { TrackingDashboard } from "@/components/TrackingDashboard";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 import { LoadSection } from "@/components/LoadsTableSections";
 import { HERERouteOptimizer } from "@/services/HERERouteOptimizer";
@@ -123,6 +124,8 @@ export default function LoadsTable() {
   const [pendingStops, setPendingStops] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
   const [existingStops, setExistingStops] = useState<any[]>([]);
+  const [trackingDialogOpen, setTrackingDialogOpen] = useState(false);
+  const [trackingLoad, setTrackingLoad] = useState<any>(null);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -603,6 +606,13 @@ export default function LoadsTable() {
     return load && ['awaiting_invoicing', 'invoiced', 'awaiting_payment', 'paid'].includes(load.status);
   };
 
+  // Handle tracking load
+  const handleTrackLoad = (load: any) => {
+    console.log("📍 Opening tracking dashboard for load:", load.number109 || load.loadNumber);
+    setTrackingLoad(load);
+    setTrackingDialogOpen(true);
+  };
+
   // Handle edit load - properly manage dialog state
   const handleEditLoad = async (load: any) => {
     // Set selected load and open dialog
@@ -995,8 +1005,10 @@ export default function LoadsTable() {
           title="Driver Assigned"
           color="text-blue-700"
           helpText="Loads with assigned drivers waiting to start transit."
+          showTrackingButton={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
+          onTrackLoad={handleTrackLoad}
         />
         
         {/* In Transit Section */}
@@ -1006,8 +1018,10 @@ export default function LoadsTable() {
           color="text-yellow-700"
           helpText="Loads currently being transported. Upload POD documents if available."
           showPODUpload={true}
+          showTrackingButton={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
+          onTrackLoad={handleTrackLoad}
         />
         
         {/* Awaiting Invoicing Section */}
@@ -1746,6 +1760,25 @@ export default function LoadsTable() {
               )}
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Load Tracking Dialog */}
+      <Dialog open={trackingDialogOpen} onOpenChange={setTrackingDialogOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Navigation className="h-5 w-5" />
+              HERE Load Tracking - {trackingLoad?.number109 || trackingLoad?.loadNumber}
+            </DialogTitle>
+          </DialogHeader>
+          {trackingLoad && (
+            <TrackingDashboard
+              loadId={trackingLoad.id}
+              driverId={trackingLoad.driverId || trackingLoad.driver_id}
+              onClose={() => setTrackingDialogOpen(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </Card>

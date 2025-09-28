@@ -9,6 +9,13 @@ import { sendTestNotification, notificationService } from "./notificationService
 import { processRateConfirmationImage } from "./ocrService";
 import { GPSService } from "./gpsService";
 import { aiService } from "./aiService";
+import { 
+  startLoadTracking, 
+  updateDriverLocation, 
+  calculateRoute, 
+  calculateETA, 
+  getLoadTrackingStatus 
+} from "./routes/tracking";
 import multer from 'multer';
 import {
   insertLoadSchema,
@@ -6493,6 +6500,13 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       });
     }
   });
+
+  // HERE Load Tracking API Routes
+  app.post("/api/tracking/start/:driverId/:loadId", isAuthenticated, startLoadTracking);
+  app.post("/api/tracking/location", isAuthenticated, updateDriverLocation);
+  app.post("/api/tracking/route", isAuthenticated, calculateRoute);
+  app.post("/api/tracking/eta", isAuthenticated, calculateETA);
+  app.get("/api/tracking/status/:loadId", isAuthenticated, getLoadTrackingStatus);
 
   // Simple health check endpoint for Railway deployment
   app.get("/api/health", (req, res) => {

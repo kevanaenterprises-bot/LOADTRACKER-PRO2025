@@ -19,7 +19,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { BatchPODUpload } from "@/components/BatchPODUpload";
-import { Upload, Zap, DollarSign } from "lucide-react";
+import { Upload, Zap, DollarSign, Navigation } from "lucide-react";
 
 interface LoadSectionProps {
   loads: any[];
@@ -30,10 +30,12 @@ interface LoadSectionProps {
   showInvoiceButton?: boolean;
   showPaymentButton?: boolean;
   showPODUpload?: boolean;
+  showTrackingButton?: boolean;
   availableDrivers?: any[];
   onLoadClick?: (load: any) => void;
   onGenerateInvoice?: (load: any) => void;
   onDeleteLoad?: (load: any) => void;
+  onTrackLoad?: (load: any) => void;
 }
 
 export function LoadSection({
@@ -45,10 +47,12 @@ export function LoadSection({
   showInvoiceButton = false,
   showPaymentButton = false,
   showPODUpload = false,
+  showTrackingButton = false,
   availableDrivers = [],
   onLoadClick,
   onGenerateInvoice,
-  onDeleteLoad
+  onDeleteLoad,
+  onTrackLoad
 }: LoadSectionProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -479,6 +483,21 @@ export function LoadSection({
                           )}
                         </DialogContent>
                       </Dialog>
+                    )}
+
+                    {/* Track Load Button - For loads with drivers or in transit */}
+                    {showTrackingButton && load.driverId && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onTrackLoad?.(load)}
+                        className="text-blue-600 hover:text-blue-700 border-blue-200"
+                        title="Track this load in real-time"
+                        data-testid={`button-track-load-${load.id}`}
+                      >
+                        <Navigation className="h-4 w-4 mr-1" />
+                        Track Load
+                      </Button>
                     )}
 
                     {/* Force to Next Stage button - Emergency action for stuck loads */}
