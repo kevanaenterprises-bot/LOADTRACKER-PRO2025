@@ -194,10 +194,10 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle className="text-xl font-bold text-blue-700">
-                  {load.number109}
+                  Load #{load.number109 || load.id?.slice(-6) || 'Unknown'}
                 </CardTitle>
                 <p className="text-sm text-gray-600">
-                  {load.location?.name} - {load.location?.city}, {load.location?.state}
+                  {load.location?.name || 'Destination'} - {load.location?.city || 'City'}, {load.location?.state || 'State'}
                 </p>
               </div>
               <Badge className={getStatusColor(load.status || 'created')}>
@@ -210,7 +210,7 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
             <div className="mb-4">
               <div>
                 <p className="text-sm font-medium text-gray-700">Distance</p>
-                <p className="text-lg">{load.estimatedMiles} miles</p>
+                <p className="text-lg">{load.estimatedMiles || 'TBD'} miles</p>
               </div>
             </div>
             
@@ -267,7 +267,9 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
                       disabled={statusUpdateMutation.isPending}
                       data-testid={`button-start-load-${load.id}`}
                     >
-                      {load.status === "created" ? "Start Load" : "Update Status"}
+                      {load.status === "created" ? "Start Load" : 
+                       load.status === "assigned" ? "Confirm Receipt" :
+                       "Next Stage"}
                     </Button>
                   )}
                   
