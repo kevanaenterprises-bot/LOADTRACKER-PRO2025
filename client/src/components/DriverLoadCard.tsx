@@ -13,6 +13,11 @@ interface DriverLoadCardProps {
 }
 
 const getStatusText = (status: string) => {
+  // Handle undefined/null status gracefully
+  if (!status) {
+    return "Unknown Status";
+  }
+  
   switch (status) {
     case "assigned":
       return "Assigned";
@@ -38,11 +43,16 @@ const getStatusText = (status: string) => {
     case "awaiting_invoicing":
       return "Awaiting Invoicing";
     default:
-      return status;
+      return status || "Unknown Status";
   }
 };
 
 const getNextAction = (status: string) => {
+  // Handle undefined/null status gracefully
+  if (!status) {
+    return null;
+  }
+  
   switch (status) {
     case "assigned":
       return { status: "in_progress", text: "Start Trip", icon: "fa-play" };
@@ -69,6 +79,9 @@ const getNextAction = (status: string) => {
 };
 
 const getProgressSteps = (currentStatus: string) => {
+  // Handle undefined/null status gracefully
+  const safeStatus = currentStatus || "assigned";
+  
   const steps = [
     { key: "assigned", label: "Assigned", time: "" },
     { key: "in_progress", label: "In Progress", time: "" },
@@ -83,7 +96,7 @@ const getProgressSteps = (currentStatus: string) => {
   ];
 
   const statusOrder = ["assigned", "in_progress", "in_transit", "created", "en_route_pickup", "at_shipper", "left_shipper", "en_route_receiver", "at_receiver", "delivered", "empty", "awaiting_invoicing"];
-  const currentIndex = statusOrder.indexOf(currentStatus);
+  const currentIndex = statusOrder.indexOf(safeStatus);
 
   return steps.map((step, index) => ({
     ...step,
