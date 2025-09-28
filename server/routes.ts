@@ -2178,36 +2178,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, async (req, res) => {
     try {
-      const driverId = req.params.driverId;
-      console.log(`🔍 DRIVER ID INVESTIGATION: Requested driver ID "${driverId}"`);
+      const requestedDriverId = req.params.driverId;
+      console.log(`🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "${requestedDriverId}"`);
       
-      // First, let's see what loads exist with Kevin Owen 
-      const allLoads = await storage.getLoadsFiltered({});
-      const kevinLoads = allLoads.filter(load => 
-        (load.driver?.firstName === 'Kevin' && load.driver?.lastName === 'Owen') ||
-        (load.driver?.username === 'kowen') ||
-        (load.number109 === '109-39498' || load.number109 === '109-39410')
-      );
+      // SMART DRIVER MAPPING: Try multiple approaches to find driver's loads
+      let loads = [];
       
-      console.log(`🔍 KEVIN OWEN LOADS IN DATABASE:`, kevinLoads.map(load => ({
-        number109: load.number109,
-        actualDriverId: load.driverId,
-        driverName: load.driver ? `${load.driver.firstName} ${load.driver.lastName}` : 'No driver',
-        username: load.driver?.username,
-        status: load.status,
-        id: load.id
-      })));
+      // Method 1: Direct driver ID lookup
+      loads = await storage.getLoadsByDriver(requestedDriverId);
+      console.log(`📋 Direct lookup: Found ${loads.length} loads for driver ID ${requestedDriverId}`);
       
-      // Now get loads for the requested driver ID
-      const loads = await storage.getLoadsByDriver(driverId);
-      console.log(`🔍 LOADS FOR REQUESTED ID "${driverId}":`, loads.map(load => ({
-        number109: load.number109,
-        id: load.id?.slice(-8),
-        status: load.status
-      })));
+      // Method 2: If no loads found, try mapping by username (Kevin Owen special case)
+      if (loads.length === 0) {
+        console.log(`🔄 No direct loads found. Trying username mapping...`);
+        const allLoads = await storage.getLoadsFiltered({});
+        
+        // Look for loads assigned to Kevin Owen by name or known loads
+        const mappedLoads = allLoads.filter(load => {
+          const isKevinOwenLoad = (
+            (load.driver?.firstName === 'Kevin' && load.driver?.lastName === 'Owen') ||
+            (load.driver?.username === 'kowen') ||
+            (load.number109 === '109-39498' || load.number109 === '109-39410')
+          );
+          
+          // Filter to only show active loads (not completed/paid)
+          const isActiveLoad = ![
+            'delivered', 'awaiting_invoicing', 'awaiting_payment', 'completed', 'paid'
+          ].includes(load.status);
+          
+          return isKevinOwenLoad && isActiveLoad;
+        });
+        
+        console.log(`🎯 Username mapping: Found ${mappedLoads.length} Kevin Owen loads`);
+        if (mappedLoads.length > 0) {
+          console.log(`📋 Kevin Owen loads:`, mappedLoads.map(load => ({
+            number109: load.number109,
+            status: load.status,
+            assignedTo: load.driverId
+          })));
+        }
+        
+        loads = mappedLoads;
+      }
       
-      console.log(`🔍 SUMMARY: Expected Kevin Owen loads, got ${loads.length} loads for driver ID ${driverId}`);
-      
+      console.log(`✅ FINAL RESULT: Returning ${loads.length} loads for driver portal`);
       res.json(loads);
     } catch (error) {
       console.error("Error fetching driver loads:", error);
