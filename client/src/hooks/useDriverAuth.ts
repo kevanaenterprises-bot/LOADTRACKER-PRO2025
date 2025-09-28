@@ -34,6 +34,8 @@ export function useDriverAuth() {
       }
       
       console.log("✅ Driver authenticated:", data);
+      console.log("🔍 AUTH DEBUG - User ID being returned:", data.id || data.userId);
+      console.log("🔍 AUTH DEBUG - Full user object:", JSON.stringify(data, null, 2));
       return data;
     },
     retry: false, // Don't retry to avoid confusion

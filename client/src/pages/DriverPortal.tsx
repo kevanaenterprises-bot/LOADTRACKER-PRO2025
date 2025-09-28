@@ -67,6 +67,16 @@ export default function DriverPortal() {
   // REVERT: Keep working version stable
   console.log("🚛 DriverPortal: Authentication successful, showing simple interface");
 
+  // Debug the user object to see what's being returned
+  console.log("🔍 DRIVER PORTAL USER DEBUG:", {
+    userId: user.id,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    role: user.role,
+    fullUserObject: JSON.stringify(user, null, 2)
+  });
+
   // SUCCESS: Show authenticated driver portal - BASIC VERSION
   return (
     <div className="max-w-lg mx-auto min-h-screen bg-gray-50 p-4">
