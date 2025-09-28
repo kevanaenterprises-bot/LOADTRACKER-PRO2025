@@ -485,18 +485,21 @@ export function LoadSection({
                       </Dialog>
                     )}
 
-                    {/* Track Load Button - For loads with drivers or in transit */}
-                    {showTrackingButton && load.driverId && (
+                    {/* Track Load Button - For loads with tracking enabled */}
+                    {showTrackingButton && (load.trackingEnabled || load.driverId) && (
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => onTrackLoad?.(load)}
                         className="text-blue-600 hover:text-blue-700 border-blue-200"
-                        title="Track this load in real-time"
+                        title={load.driverId ? "Track this load in real-time" : "Track this load (assign driver to start GPS tracking)"}
                         data-testid={`button-track-load-${load.id}`}
                       >
                         <Navigation className="h-4 w-4 mr-1" />
                         Track Load
+                        {!load.driverId && (
+                          <span className="ml-1 text-xs text-gray-500">(No Driver)</span>
+                        )}
                       </Button>
                     )}
 

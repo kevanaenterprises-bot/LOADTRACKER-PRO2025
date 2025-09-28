@@ -994,9 +994,11 @@ export default function LoadsTable() {
           color="text-gray-700"
           helpText="Newly created loads waiting for a driver to be assigned."
           showDriverAssign={true}
+          showTrackingButton={true}
           availableDrivers={availableDrivers}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
+          onTrackLoad={handleTrackLoad}
         />
         
         {/* Driver Assigned Section */}
@@ -1032,6 +1034,7 @@ export default function LoadsTable() {
           helpText="Load has been delivered. Upload POD documents if driver missed uploading them, then generate invoice."
           showInvoiceButton={true}
           showPODUpload={true}
+          showTrackingButton={true}
           onLoadClick={handleLoadClick}
           onGenerateInvoice={() => {
             if (awaitingInvoicingLoads.length > 0) {
@@ -1040,6 +1043,7 @@ export default function LoadsTable() {
             }
           }}
           onDeleteLoad={handleDeleteLoad}
+          onTrackLoad={handleTrackLoad}
         />
         
         {/* Awaiting Payment Section */}
@@ -1050,8 +1054,10 @@ export default function LoadsTable() {
           helpText="Invoiced loads waiting for payment. Upload additional POD documents if needed."
           showPaymentButton={true}
           showPODUpload={true}
+          showTrackingButton={true}
           onLoadClick={handleLoadClick}
           onDeleteLoad={handleDeleteLoad}
+          onTrackLoad={handleTrackLoad}
         />
         
         {/* Paid Loads Section - Brief Summary */}

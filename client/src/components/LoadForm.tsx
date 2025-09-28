@@ -36,7 +36,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation, Calendar } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation, Calendar, Truck } from "lucide-react";
 import { HelpButton } from "@/components/HelpTooltip";
 import { HEREMapView } from "@/components/HEREMapView";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -70,6 +71,7 @@ export default function LoadForm() {
   const [currentLocationId, setCurrentLocationId] = useState("");
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
   const [deliveryDueDate, setDeliveryDueDate] = useState<Date | undefined>(undefined);
+  const [trackingEnabled, setTrackingEnabled] = useState(true); // Enable tracking by default
   const [stops, setStops] = useState<LoadStop[]>([]);
   const [showOverride, setShowOverride] = useState(false);
   const [overridePassword, setOverridePassword] = useState("");
@@ -85,7 +87,7 @@ export default function LoadForm() {
   });
 
   const createLoadMutation = useMutation({
-    mutationFn: async (data: { number109: string; stops: LoadStop[]; deliveryDueAt?: Date; overridePassword?: string }) => {
+    mutationFn: async (data: { number109: string; stops: LoadStop[]; deliveryDueAt?: Date; trackingEnabled?: boolean; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
       if (data.stops.length === 0) {
         throw new Error("Please add at least one stop");
@@ -101,6 +103,7 @@ export default function LoadForm() {
       setCurrentLocationId("");
       setCurrentStopType("pickup");
       setDeliveryDueDate(undefined);
+      setTrackingEnabled(true);
       setStops([]);
       setShowOverride(false);
       setOverridePassword("");
@@ -197,6 +200,7 @@ export default function LoadForm() {
     const submitData = {
       number109: loadNumber,
       stops,
+      trackingEnabled,
       ...(deliveryDueDate ? { deliveryDueAt: deliveryDueDate } : {}),
       ...(showOverride && overridePassword ? { overridePassword } : {}),
     };
@@ -297,6 +301,31 @@ export default function LoadForm() {
           <p className="text-xs text-gray-500">
             When this load needs to be delivered (optional)
           </p>
+        </div>
+
+        {/* Step 2.5: Enable HERE Tracking */}
+        <div className="space-y-3 p-4 border rounded-lg bg-blue-50">
+          <div className="flex items-center space-x-3">
+            <Checkbox
+              id="tracking-enabled"
+              checked={trackingEnabled}
+              onCheckedChange={(checked) => setTrackingEnabled(!!checked)}
+              data-testid="checkbox-enable-tracking"
+            />
+            <Label htmlFor="tracking-enabled" className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+              <Truck className="h-4 w-4 text-blue-600" />
+              Enable HERE Load Tracking
+            </Label>
+          </div>
+          <p className="text-xs text-gray-600 ml-7">
+            Enable real-time GPS tracking, route optimization, and automatic status updates for this load. 
+            Recommended for all loads with driver assignments.
+          </p>
+          {trackingEnabled && (
+            <div className="ml-7 p-2 bg-blue-100 rounded text-xs text-blue-800">
+              ✓ Load will support: GPS tracking, geofencing, ETA calculations, and automatic status updates
+            </div>
+          )}
         </div>
 
         {/* Step 3: Add Stops */}
