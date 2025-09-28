@@ -4,6 +4,10 @@ import { registerRoutes } from "./routes";
 // import { setupVite, log } from "./vite";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+
+// Fix for Node.js ESM compatibility - replace import.meta.dirname
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Simple log function to replace broken Vite logger
 function log(message: string, source = "express") {
@@ -245,7 +249,9 @@ async function startServer() {
     
     if (isProduction) {
       console.log('📁 Setting up static file serving for production...');
-      const distPath = path.resolve(import.meta.dirname, "public");
+      const distPath = path.resolve(__dirname, "public");
+      console.log('🔍 DEBUG: Resolved static path:', distPath);
+      console.log('🔍 DEBUG: index.html exists:', fs.existsSync(path.join(distPath, "index.html")));
       
       if (fs.existsSync(distPath)) {
         app.use(express.static(distPath));
@@ -266,7 +272,8 @@ async function startServer() {
       console.log('   3. Re-enable Vite development server');
       
       // Serve the latest built frontend if available, otherwise show message
-      const devDistPath = path.resolve(import.meta.dirname, "public");
+      const devDistPath = path.resolve(__dirname, "public");
+      console.log('🔍 DEBUG: Development static path:', devDistPath);
       if (fs.existsSync(devDistPath)) {
         console.log('📁 Serving built frontend (may be outdated - clear browser cache!)');
         app.use(express.static(devDistPath));
