@@ -2179,11 +2179,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     try {
       const driverId = req.params.driverId;
-      console.log(`🔍 Getting loads for driver: ${driverId}`);
+      console.log(`🔍 DRIVER LOADS API: Getting loads for driver: ${driverId}`);
       
       const loads = await storage.getLoadsByDriver(driverId);
       
-      console.log(`📦 Found ${loads.length} actual loads for driver ${driverId}`);
+      console.log(`📦 DRIVER LOADS API: Found ${loads.length} loads for driver ${driverId}`);
+      if (loads.length > 0) {
+        console.log(`📦 DRIVER LOADS API: First load sample:`, {
+          id: loads[0].id,
+          number109: loads[0].number109,
+          status: loads[0].status,
+          estimatedMiles: loads[0].estimatedMiles,
+          location: loads[0].location
+        });
+      }
+      
       res.json(loads);
     } catch (error) {
       console.error("Error fetching driver loads:", error);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,12 +20,24 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
   const [showLoadDetails, setShowLoadDetails] = useState(false);
 
   // Fetch driver's assigned loads
-  const { data: allLoads = [], isLoading } = useQuery<any[]>({
+  const { data: allLoads = [], isLoading, error } = useQuery<any[]>({
     queryKey: ["/api/drivers", driverId, "loads"],
     retry: false,
     refetchOnWindowFocus: false,
     refetchInterval: 30000, // Refresh every 30 seconds
   });
+
+  // Debug logging for load data
+  useEffect(() => {
+    console.log(`🚛 DRIVER LOADS DEBUG: Driver ID: ${driverId}`);
+    console.log(`🚛 DRIVER LOADS DEBUG: Found ${allLoads.length} loads:`, allLoads);
+    if (allLoads.length > 0) {
+      console.log(`🚛 DRIVER LOADS DEBUG: First load:`, JSON.stringify(allLoads[0], null, 2));
+    }
+    if (error) {
+      console.error(`🚛 DRIVER LOADS ERROR for driver ${driverId}:`, error);
+    }
+  }, [allLoads, driverId, error]);
 
   // Filter out loads that have been completed (POD uploaded)
   const loads = allLoads.filter((load: any) => 
