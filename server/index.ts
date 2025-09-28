@@ -240,7 +240,8 @@ async function startServer() {
     });
 
     // Setup frontend serving based on environment
-    const isProduction = process.env.NODE_ENV === "production";
+    // RAILWAY FIX: Force production mode regardless of NODE_ENV since Railway blocks env var changes
+    const isProduction = true; // process.env.NODE_ENV === "production";
     
     if (isProduction) {
       console.log('📁 Setting up static file serving for production...');
