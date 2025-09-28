@@ -1,0 +1,61 @@
+2025-09-28T01:42:54.000000000Z [inf]  Starting Container
+2025-09-28T01:42:54.880030418Z [inf]  
+2025-09-28T01:42:54.880040337Z [inf]  > rest-express@1.0.0 start
+2025-09-28T01:42:54.880050169Z [inf]  > NODE_ENV=production node dist/index.js
+2025-09-28T01:42:54.880056061Z [inf]  
+2025-09-28T01:42:54.880147868Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-09-28T01:42:55.703660558Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-09-28T01:42:55.710330369Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-09-28T01:42:55.710334927Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-09-28T01:42:55.709Z
+2025-09-28T01:42:55.710338991Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-09-28T01:42:55.713845728Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-09-28T01:42:55.713852810Z [inf]  🔧 Process ID: 15
+2025-09-28T01:42:55.713857347Z [inf]  🔧 Node.js version: v22.11.0
+2025-09-28T01:42:55.713861408Z [inf]  🔧 Platform: linux
+2025-09-28T01:42:55.713865867Z [inf]  🔧 Architecture: x64
+2025-09-28T01:42:55.713870285Z [inf]  🔧 Memory usage: {
+2025-09-28T01:42:55.713875146Z [inf]    "rss": 125083648,
+2025-09-28T01:42:55.713879275Z [inf]    "heapTotal": 62382080,
+2025-09-28T01:42:55.713883303Z [inf]    "heapUsed": 31410432,
+2025-09-28T01:42:55.713887414Z [inf]    "external": 3964627,
+2025-09-28T01:42:55.713891554Z [inf]    "arrayBuffers": 384970
+2025-09-28T01:42:55.713895732Z [inf]  }
+2025-09-28T01:42:55.717952565Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-09-28T01:42:55.717959185Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-09-28T01:42:55.713Z
+2025-09-28T01:42:55.717964959Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-09-28T01:42:55.717970556Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-09-28T01:42:55.713Z
+2025-09-28T01:42:55.717976276Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-09-28T01:42:55.717981640Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-09-28T01:42:55.717987708Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-09-28T01:42:55.717992852Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-09-28T01:42:55.717998037Z [inf]  🔧 Validating environment configuration...
+2025-09-28T01:42:55.718003671Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-09-28T01:42:55.718008879Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-09-28T01:42:55.718014555Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-09-28T01:42:55.718020054Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-09-28T01:42:55.718025414Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-09-28T01:42:55.718032364Z [inf]  ✅ Database URL configured
+2025-09-28T01:42:55.718038240Z [err]  ⚠️  Object storage not fully configured:
+2025-09-28T01:42:55.718066726Z [err]     - PRIVATE_OBJECT_DIR is not set. File uploads will be disabled.
+2025-09-28T01:42:55.718072697Z [err]     - PUBLIC_OBJECT_SEARCH_PATHS is not set. Public file serving will be disabled.
+2025-09-28T01:42:55.718078010Z [err]     Object storage features will be unavailable but the server will continue to start.
+2025-09-28T01:42:55.718084189Z [err]  ⚠️  SMS service (Twilio) not configured. Driver notifications will be disabled.
+2025-09-28T01:42:55.718089941Z [err]  ⚠️  SESSION_SECRET not set. Using default secret (not recommended for production).
+2025-09-28T01:42:55.718096780Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-09-28T01:42:55.718101982Z [inf]  🔧 Environment: NODE_ENV=production
+2025-09-28T01:42:55.718106842Z [inf]  🔧 Testing database connection...
+2025-09-28T01:42:55.733121801Z [err]  (node:15) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-09-28T01:42:55.733126038Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-09-28T01:42:56.130215339Z [inf]  ✅ Database connection successful
+2025-09-28T01:42:56.130235492Z [inf]  📝 Registering application routes...
+2025-09-28T01:42:56.320167376Z [inf]  ✅ Routes registered successfully
+2025-09-28T01:42:56.320172432Z [inf]  📁 Setting up static file serving...
+2025-09-28T01:42:56.320177791Z [inf]  ✅ Static file serving configured (production mode)
+2025-09-28T01:42:56.320182408Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-09-28T01:42:56.324102606Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-09-28T01:42:56.324108482Z [inf]  📍 Health check endpoints available:
+2025-09-28T01:42:56.324113351Z [inf]     - GET /api/status (basic status)
+2025-09-28T01:42:56.324117595Z [inf]     - GET /api/health (health check)
+2025-09-28T01:42:56.324122165Z [inf]     - GET /api/ready (readiness check)
+2025-09-28T01:42:56.337606826Z [inf]  1:42:56 AM [express] serving on port 8080
+2025-09-28T01:42:57.242464250Z [inf]  1:42:57 AM [express] GET /api/health 200 in 4ms :: {"status":"ok","timestamp":"2025-09-28T01:42:57.2…
