@@ -689,12 +689,24 @@ export class DatabaseStorage implements IStorage {
 
       console.log(`🎯 KEVIN RESULT: Found ${result.length} loads for driver ${driverId}`);
       
-      return result.map(row => ({
+      const mappedLoads = result.map(row => ({
         ...row.load,
         driver: row.driver || undefined,
         location: row.location || undefined,
         invoice: row.invoice || undefined,
       }));
+      
+      // DEBUG: Log the first load to verify field names
+      if (mappedLoads.length > 0) {
+        console.log(`🔍 FIRST LOAD DATA:`, {
+          id: mappedLoads[0].id,
+          number109: mappedLoads[0].number109,
+          status: mappedLoads[0].status,
+          allKeys: Object.keys(mappedLoads[0])
+        });
+      }
+      
+      return mappedLoads;
     } catch (error) {
       console.error("🎯 ERROR in getLoadsByDriver:", error);
       return [];
