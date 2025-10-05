@@ -1,0 +1,74 @@
+2025-10-05T23:47:23.000000000Z [inf]  Starting Container
+2025-10-05T23:47:24.247540134Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-05T23:47:24.532283518Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-05T23:47:24.532353093Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-05T23:47:24.999952682Z [inf]  Using 'pg' driver for database querying
+2025-10-05T23:47:25.040681065Z [inf]  [⣷] Pulling schema from database...
+2025-10-05T23:47:25.174501739Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-05T23:47:25.317460356Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-05T23:47:25.422200484Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-05T23:47:25.549674229Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-05T23:47:25.558607837Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-05T23:47:25.594344821Z [inf]  [i] No changes detected
+2025-10-05T23:47:25.728082521Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-05T23:47:25.731859015Z [inf]  
+2025-10-05T23:47:25.731864018Z [inf]  > rest-express@1.0.0 start
+2025-10-05T23:47:25.731868440Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-05T23:47:25.731872607Z [inf]  
+2025-10-05T23:47:26.374406116Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-05T23:47:26.383513229Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-05T23:47:26.383519825Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-05T23:47:26.379Z
+2025-10-05T23:47:26.383524621Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-05T23:47:26.383528808Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-05T23:47:26.383533589Z [inf]  🔧 Process ID: 48
+2025-10-05T23:47:26.383537688Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-05T23:47:26.383542641Z [inf]  🔧 Platform: linux
+2025-10-05T23:47:26.383547007Z [inf]  🔧 Architecture: x64
+2025-10-05T23:47:26.383551006Z [inf]  🔧 Memory usage: {
+2025-10-05T23:47:26.383555037Z [inf]    "rss": 125853696,
+2025-10-05T23:47:26.383558793Z [inf]    "heapTotal": 62431232,
+2025-10-05T23:47:26.383563104Z [inf]    "heapUsed": 30891744,
+2025-10-05T23:47:26.383567039Z [inf]    "external": 3897578,
+2025-10-05T23:47:26.383571219Z [inf]    "arrayBuffers": 315505
+2025-10-05T23:47:26.383575029Z [inf]  }
+2025-10-05T23:47:26.383579741Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-05T23:47:26.383584140Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-05T23:47:26.382Z
+2025-10-05T23:47:26.387215164Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-05T23:47:26.387221523Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-05T23:47:26.383Z
+2025-10-05T23:47:26.387226072Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-05T23:47:26.387230449Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-05T23:47:26.387234481Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-05T23:47:26.387238702Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-05T23:47:26.387243678Z [inf]  🔧 Validating environment configuration...
+2025-10-05T23:47:26.387248169Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-05T23:47:26.387252666Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-05T23:47:26.387256883Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-05T23:47:26.387261568Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-05T23:47:26.387265678Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-05T23:47:26.387269876Z [inf]  ✅ Database URL configured
+2025-10-05T23:47:26.387274345Z [err]  ⚠️  Object storage not fully configured:
+2025-10-05T23:47:26.387278743Z [err]     - PRIVATE_OBJECT_DIR is not set. File uploads will be disabled.
+2025-10-05T23:47:26.387282456Z [err]     - PUBLIC_OBJECT_SEARCH_PATHS is not set. Public file serving will be disabled.
+2025-10-05T23:47:26.387297549Z [err]     Object storage features will be unavailable but the server will continue to start.
+2025-10-05T23:47:26.387302807Z [err]  ⚠️  SMS service (Twilio) not configured. Driver notifications will be disabled.
+2025-10-05T23:47:26.387307083Z [inf]  ✅ Session authentication configured
+2025-10-05T23:47:26.387311511Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-05T23:47:26.387315331Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-05T23:47:26.387319471Z [inf]  🔧 Testing database connection...
+2025-10-05T23:47:26.405660776Z [err]  (node:48) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-05T23:47:26.405668622Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-05T23:47:26.424379672Z [inf]  ✅ Database connection successful
+2025-10-05T23:47:26.424386165Z [inf]  📝 Registering application routes...
+2025-10-05T23:47:26.617245999Z [inf]  ✅ Routes registered successfully
+2025-10-05T23:47:26.617251764Z [inf]  📁 Setting up static file serving for production...
+2025-10-05T23:47:26.617259390Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-05T23:47:26.617264876Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-05T23:47:26.617270424Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-05T23:47:26.617277468Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-05T23:47:26.617284357Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-05T23:47:26.617292989Z [inf]  📍 Health check endpoints available:
+2025-10-05T23:47:26.617300555Z [inf]     - GET /api/status (basic status)
+2025-10-05T23:47:26.617306238Z [inf]     - GET /api/health (health check)
+2025-10-05T23:47:26.617312138Z [inf]     - GET /api/ready (readiness check)
+2025-10-05T23:47:26.617317178Z [inf]  11:47:26 PM [express] serving on port 8080
+2025-10-05T23:47:26.820473028Z [inf]  11:47:26 PM [express] GET /api/health 200 in 6ms :: {"status":"ok","timestamp":"2025-10-05T23:47:26.7…
