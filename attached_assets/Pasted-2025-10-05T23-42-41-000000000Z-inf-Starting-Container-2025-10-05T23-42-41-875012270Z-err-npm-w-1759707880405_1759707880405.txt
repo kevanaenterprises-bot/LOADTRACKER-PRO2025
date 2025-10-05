@@ -1,0 +1,112 @@
+2025-10-05T23:42:41.000000000Z [inf]  Starting Container
+2025-10-05T23:42:41.875012270Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-05T23:42:42.215191268Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-05T23:42:42.215197232Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-05T23:42:42.833945919Z [inf]  Using 'pg' driver for database querying
+2025-10-05T23:42:42.888795020Z [inf]  [⣷] Pulling schema from database...
+2025-10-05T23:42:42.959494972Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-05T23:42:43.113680842Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-05T23:42:43.265095041Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-05T23:42:43.369543461Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-05T23:42:43.438658698Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-05T23:42:43.438665349Z [inf]  [i] No changes detected
+2025-10-05T23:42:43.599971306Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-05T23:42:43.630430715Z [inf]  
+2025-10-05T23:42:43.630439801Z [inf]  > rest-express@1.0.0 start
+2025-10-05T23:42:43.630445936Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-05T23:42:43.630452134Z [inf]  
+2025-10-05T23:42:44.394767062Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-05T23:42:44.403378280Z [err]  ⚠️ HERE API key not found. Tracking features will be disabled.
+2025-10-05T23:42:44.403387309Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-05T23:42:44.403395156Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-05T23:42:44.401Z
+2025-10-05T23:42:44.403401487Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-05T23:42:44.403408922Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-05T23:42:44.403416969Z [inf]  🔧 Process ID: 49
+2025-10-05T23:42:44.403423872Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-05T23:42:44.403429440Z [inf]  🔧 Platform: linux
+2025-10-05T23:42:44.403435431Z [inf]  🔧 Architecture: x64
+2025-10-05T23:42:44.403441487Z [inf]  🔧 Memory usage: {
+2025-10-05T23:42:44.403446448Z [inf]    "rss": 132689920,
+2025-10-05T23:42:44.403451128Z [inf]    "heapTotal": 61906944,
+2025-10-05T23:42:44.403456616Z [inf]    "heapUsed": 31127696,
+2025-10-05T23:42:44.403462293Z [inf]    "external": 3897578,
+2025-10-05T23:42:44.403469142Z [inf]    "arrayBuffers": 315505
+2025-10-05T23:42:44.403474235Z [inf]  }
+2025-10-05T23:42:44.407417362Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-05T23:42:44.407423774Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-05T23:42:44.404Z
+2025-10-05T23:42:44.407428076Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-05T23:42:44.407432220Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-05T23:42:44.404Z
+2025-10-05T23:42:44.407436213Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-05T23:42:44.407440488Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-05T23:42:44.407444670Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-05T23:42:44.407448417Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-05T23:42:44.407453386Z [inf]  🔧 Validating environment configuration...
+2025-10-05T23:42:44.407457576Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-05T23:42:44.407461546Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-05T23:42:44.407465371Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-05T23:42:44.407469250Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-05T23:42:44.407473118Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-05T23:42:44.407477265Z [inf]  ✅ Database URL configured
+2025-10-05T23:42:44.407481243Z [inf]  ✅ Session authentication configured
+2025-10-05T23:42:44.407485594Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-05T23:42:44.407490326Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-05T23:42:44.407493975Z [inf]  🔧 Testing database connection...
+2025-10-05T23:42:44.407497885Z [err]  ⚠️  Object storage not fully configured:
+2025-10-05T23:42:44.407502423Z [err]     - PRIVATE_OBJECT_DIR is not set. File uploads will be disabled.
+2025-10-05T23:42:44.407507891Z [err]     - PUBLIC_OBJECT_SEARCH_PATHS is not set. Public file serving will be disabled.
+2025-10-05T23:42:44.407512813Z [err]     Object storage features will be unavailable but the server will continue to start.
+2025-10-05T23:42:44.407517727Z [err]  ⚠️  SMS service (Twilio) not configured. Driver notifications will be disabled.
+2025-10-05T23:42:44.425562178Z [err]  (node:49) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-05T23:42:44.425567937Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-05T23:42:44.443282860Z [inf]  ✅ Database connection successful
+2025-10-05T23:42:44.443290946Z [inf]  📝 Registering application routes...
+2025-10-05T23:42:44.629527009Z [inf]  ✅ Routes registered successfully
+2025-10-05T23:42:44.629533672Z [inf]  📁 Setting up static file serving for production...
+2025-10-05T23:42:44.629538184Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-05T23:42:44.629544152Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-05T23:42:44.629548066Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-05T23:42:44.629552172Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-05T23:42:44.629556001Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-05T23:42:44.629560958Z [inf]  📍 Health check endpoints available:
+2025-10-05T23:42:44.629564754Z [inf]     - GET /api/status (basic status)
+2025-10-05T23:42:44.629568526Z [inf]     - GET /api/health (health check)
+2025-10-05T23:42:44.629572216Z [inf]     - GET /api/ready (readiness check)
+2025-10-05T23:42:44.647443941Z [inf]  11:42:44 PM [express] serving on port 8080
+2025-10-05T23:42:45.239942134Z [inf]  11:42:45 PM [express] GET /api/health 200 in 5ms :: {"status":"ok","timestamp":"2025-10-05T23:42:45.2…
+2025-10-05T23:43:55.364210322Z [inf]  🚀 Starting data migration...
+2025-10-05T23:43:55.364216121Z [inf]  
+2025-10-05T23:43:55.364221662Z [inf]  📦 Migrating drivers...
+2025-10-05T23:43:55.364226075Z [inf]    ✅ Art Harris
+2025-10-05T23:43:55.364230122Z [inf]    ✅ Torris Owen
+2025-10-05T23:43:55.364234018Z [inf]    ✅ Kevin Owen
+2025-10-05T23:43:55.364238071Z [inf]  
+2025-10-05T23:43:55.364242486Z [inf]  📍 Migrating locations...
+2025-10-05T23:43:55.364246521Z [inf]    ✅ SIMMONS PET FOODS
+2025-10-05T23:43:55.364250478Z [inf]    ✅ NESTLE FOODS
+2025-10-05T23:43:55.364254318Z [inf]    ✅ FLORES
+2025-10-05T23:43:55.364258528Z [inf]    ✅ ACW CREEKSTONE
+2025-10-05T23:43:55.364262579Z [inf]    ✅ SHINER BEERer Beer
+2025-10-05T23:43:55.364266466Z [inf]    ✅ Shiner/Plano returns
+2025-10-05T23:43:55.364271273Z [inf]    ✅ Dubuque/Plano returns
+2025-10-05T23:43:55.364276480Z [inf]    ✅ UNFI LANCASTER
+2025-10-05T23:43:55.364281928Z [inf]    ✅ AMERICOLD LOGISTICS
+2025-10-05T23:43:55.364286686Z [inf]    ✅ FINE ARTS ENGRAVING
+2025-10-05T23:43:55.364290520Z [inf]    ✅ DEL REAL FOODS
+2025-10-05T23:43:55.364294293Z [inf]    ✅ FRYTOWN DISTRIBUTION
+2025-10-05T23:43:55.364299921Z [inf]    ✅ KEHE
+2025-10-05T23:43:55.364305188Z [inf]    ✅ HEN HOUSE
+2025-10-05T23:43:55.364310767Z [inf]    ✅ MUSKET BIG SPRING
+2025-10-05T23:43:55.364316088Z [inf]    ✅ ECOTECH CONSUMER PRODUCTS
+2025-10-05T23:43:55.364321223Z [inf]    ✅ PCA Plano
+2025-10-05T23:43:55.364327071Z [inf]    ✅ SMURFIT KAPPA NORTH AMERICA
+2025-10-05T23:43:55.364332297Z [inf]    ✅ PCA GARLAND
+2025-10-05T23:43:55.364338242Z [inf]    ✅ PACSPACE
+2025-10-05T23:43:55.364343571Z [inf]    ✅ FGF TRAILER RENTAL
+2025-10-05T23:43:55.364349235Z [inf]    ✅ FUJI/CMC PUEBLO
+2025-10-05T23:43:55.364354712Z [inf]    ✅ FGF TRAILER RENTAL
+2025-10-05T23:43:55.364360230Z [inf]    ✅ TEST LOCATION
+2025-10-05T23:43:55.364365284Z [inf]  
+2025-10-05T23:43:55.364371091Z [inf]  🏢 Migrating customers...
+2025-10-05T23:43:55.364376714Z [inf]    ✅ AWESOME LOGISTICS
+2025-10-05T23:43:55.364381544Z [inf]    ✅ PCA PLANO
+2025-10-05T23:43:55.364388016Z [inf]  11:43:48 PM [express] POST /api/admin/migrate-data 200 in 85ms :: {"success":true,"summary":{"drivers…
