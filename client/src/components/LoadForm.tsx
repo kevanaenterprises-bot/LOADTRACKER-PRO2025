@@ -201,7 +201,7 @@ export default function LoadForm() {
       number109: loadNumber,
       stops,
       trackingEnabled,
-      ...(deliveryDueDate ? { deliveryDueAt: deliveryDueDate } : {}),
+      ...(deliveryDueDate ? { deliveryDueAt: deliveryDueDate.toISOString() } : {}),
       ...(showOverride && overridePassword ? { overridePassword } : {}),
     };
     createLoadMutation.mutate(submitData);
