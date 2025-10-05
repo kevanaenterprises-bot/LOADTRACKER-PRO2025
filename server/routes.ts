@@ -16,6 +16,7 @@ import {
   calculateETA, 
   getLoadTrackingStatus 
 } from "./routes/tracking";
+import { migrateDataToRailway } from "./migrate-data";
 import multer from 'multer';
 import {
   insertLoadSchema,
@@ -6553,6 +6554,27 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       timestamp: new Date().toISOString(),
       uptime: process.uptime()
     });
+  });
+
+  // Data migration endpoint (use bypass secret)
+  app.post("/api/admin/migrate-data", (req, res, next) => {
+    const bypassToken = req.headers['x-bypass-secret'];
+    if (bypassToken === BYPASS_SECRET) {
+      next();
+    } else {
+      res.status(401).json({ message: "Unauthorized - invalid bypass secret" });
+    }
+  }, async (req, res) => {
+    try {
+      const result = await migrateDataToRailway();
+      res.json(result);
+    } catch (error) {
+      console.error("Migration error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "Migration failed" 
+      });
+    }
   });
 
   // Create and return HTTP server
