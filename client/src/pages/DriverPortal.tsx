@@ -95,23 +95,17 @@ export default function DriverPortal() {
         </div>
       </div>
 
-      {/* Driver Loads Section - COMPONENT REMOVED FOR TESTING */}
+      {/* Driver Loads Section - RESTORED WITH CRASH PROTECTION */}
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Your Assigned Loads</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600 mb-4">DriverLoadsDisplay temporarily removed to test crash</p>
-          <p className="font-semibold">Driver ID: {user.id}</p>
-          <p className="text-green-600">✅ If you see this, the page is NOT crashing</p>
-        </CardContent>
-      </Card>
-
-      {/* Status Message */}
-      <Card className="mb-4">
-        <CardContent className="p-6 text-center">
-          <h3 className="font-semibold text-green-700">✅ Minimal Driver Portal</h3>
-          <p className="text-gray-600 mt-2">Testing crash fix...</p>
+          {user && user.id ? (
+            <DriverLoadsDisplay driverId={user.id} />
+          ) : (
+            <p className="text-red-600">Error: Driver ID not found</p>
+          )}
         </CardContent>
       </Card>
     </div>
