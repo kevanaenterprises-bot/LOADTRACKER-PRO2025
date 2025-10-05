@@ -27,33 +27,6 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
-  // Debug logging for load data
-  useEffect(() => {
-    console.log(`🚛 DRIVER LOADS DEBUG: Driver ID: ${driverId}`);
-    console.log(`🚛 DRIVER LOADS DEBUG: Found ${allLoads.length} loads:`, allLoads);
-    if (allLoads.length > 0) {
-      console.log(`🚛 DRIVER LOADS DEBUG: First load sample:`, {
-        id: allLoads[0].id,
-        number109: allLoads[0].number109,
-        number109Type: typeof allLoads[0].number109,
-        number109Value: JSON.stringify(allLoads[0].number109),
-        status: allLoads[0].status,
-        estimatedMiles: allLoads[0].estimatedMiles,
-        location: allLoads[0].location,
-        destination: allLoads[0].destination,
-        availableFields: Object.keys(allLoads[0])
-      });
-      console.log(`🚛 DRIVER LOADS DEBUG: CHECKING number109 field:`, {
-        hasNumber109: 'number109' in allLoads[0],
-        number109Value: allLoads[0].number109,
-        isFalsy: !allLoads[0].number109
-      });
-      console.log(`🚛 DRIVER LOADS DEBUG: Full first load:`, JSON.stringify(allLoads[0], null, 2));
-    }
-    if (error) {
-      console.error(`🚛 DRIVER LOADS ERROR for driver ${driverId}:`, error);
-    }
-  }, [allLoads, driverId, error]);
 
   // Filter out loads that have been completed (POD uploaded)
   const loads = allLoads.filter((load: any) => 
@@ -228,10 +201,6 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
                 <p className="text-sm text-gray-600">
                   {load.location?.name || load.destination || 'No destination set'} - {' '}
                   {load.location?.city || 'City'}, {load.location?.state || 'State'}
-                </p>
-                {/* Debug info to help identify data structure */}
-                <p className="text-xs text-gray-400 mt-1">
-                  ID: {load.id?.slice(-8) || 'Unknown'} | Status: {load.status || 'No status'}
                 </p>
               </div>
               <Badge className={getStatusColor(load.status || 'created')}>
