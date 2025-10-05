@@ -21,7 +21,7 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
 
   // Fetch driver's assigned loads
   const { data: allLoads = [], isLoading, error } = useQuery<any[]>({
-    queryKey: ["/api/drivers", driverId, "loads"],
+    queryKey: [`/api/drivers/${driverId}/loads`],
     retry: false,
     refetchOnWindowFocus: false,
     refetchInterval: 30000, // Refresh every 30 seconds
@@ -67,7 +67,7 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
     },
     onSuccess: () => {
       toast({ title: "Success", description: "Status updated successfully" });
-      queryClient.invalidateQueries({ queryKey: ["/api/drivers", driverId, "loads"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${driverId}/loads`] });
     },
     onError: (error: any) => {
       toast({
@@ -89,7 +89,7 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
         description: "Load status forced to next stage (business rules bypassed)",
         variant: "default"
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/drivers", driverId, "loads"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${driverId}/loads`] });
     },
     onError: (error: any) => {
       toast({
@@ -110,7 +110,7 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
         title: "Load Returned", 
         description: "Load has been returned to the admin dashboard" 
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/drivers", driverId, "loads"] });
+      queryClient.invalidateQueries({ queryKey: [`/api/drivers/${driverId}/loads`] });
     },
     onError: (error: any) => {
       toast({
@@ -397,7 +397,7 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
                   title: "Success", 
                   description: "Document signed successfully" 
                 });
-                queryClient.invalidateQueries({ queryKey: ["/api/drivers", driverId, "loads"] });
+                queryClient.invalidateQueries({ queryKey: [`/api/drivers/${driverId}/loads`] });
               }}
             />
           </div>
