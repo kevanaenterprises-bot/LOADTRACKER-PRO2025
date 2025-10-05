@@ -35,11 +35,18 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
       console.log(`🚛 DRIVER LOADS DEBUG: First load sample:`, {
         id: allLoads[0].id,
         number109: allLoads[0].number109,
+        number109Type: typeof allLoads[0].number109,
+        number109Value: JSON.stringify(allLoads[0].number109),
         status: allLoads[0].status,
         estimatedMiles: allLoads[0].estimatedMiles,
         location: allLoads[0].location,
         destination: allLoads[0].destination,
         availableFields: Object.keys(allLoads[0])
+      });
+      console.log(`🚛 DRIVER LOADS DEBUG: CHECKING number109 field:`, {
+        hasNumber109: 'number109' in allLoads[0],
+        number109Value: allLoads[0].number109,
+        isFalsy: !allLoads[0].number109
       });
       console.log(`🚛 DRIVER LOADS DEBUG: Full first load:`, JSON.stringify(allLoads[0], null, 2));
     }
