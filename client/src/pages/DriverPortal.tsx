@@ -95,14 +95,15 @@ export default function DriverPortal() {
         </div>
       </div>
 
-      {/* Driver Loads Section - MINIMAL TEST */}
+      {/* Driver Loads Section - COMPONENT REMOVED FOR TESTING */}
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Your Assigned Loads</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600 mb-4">Testing load display...</p>
-          <DriverLoadsDisplay driverId={user.id} />
+          <p className="text-sm text-gray-600 mb-4">DriverLoadsDisplay temporarily removed to test crash</p>
+          <p className="font-semibold">Driver ID: {user.id}</p>
+          <p className="text-green-600">✅ If you see this, the page is NOT crashing</p>
         </CardContent>
       </Card>
 
