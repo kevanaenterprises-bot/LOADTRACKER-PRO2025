@@ -77,16 +77,9 @@ export default function DriverPortal() {
     fullUserObject: JSON.stringify(user, null, 2)
   });
 
-  // SUCCESS: Show authenticated driver portal - BASIC VERSION
+  // SUCCESS: Show authenticated driver portal - MINIMAL VERSION FOR DEBUGGING
   return (
     <div className="max-w-lg mx-auto min-h-screen bg-gray-50 p-4">
-      {/* Trucker Tip Welcome Message */}
-      <TruckerTip 
-        message="Welcome to your Driver Portal! This is where you'll upload BOL photos and POD documents. Just follow the simple steps below!"
-        name="Driver Dave"
-        mood="happy"
-      />
-      
       {/* Header */}
       <div className="bg-white rounded-lg shadow p-6 mb-4">
         <div className="flex justify-between items-start">
@@ -94,6 +87,7 @@ export default function DriverPortal() {
             <h1 className="text-xl font-bold text-green-600">Driver Portal</h1>
             <p className="mt-1">Welcome, {user.firstName} {user.lastName}!</p>
             <p className="text-sm text-gray-600">Username: {user.username}</p>
+            <p className="text-sm text-gray-600">Driver ID: {user.id}</p>
           </div>
           <Button onClick={logout} variant="outline" size="sm">
             Logout
@@ -101,29 +95,22 @@ export default function DriverPortal() {
         </div>
       </div>
 
-      {/* Driver Loads Section - MOST IMPORTANT */}
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Your Assigned Loads</h2>
-        <DriverLoadsDisplay driverId={user.id} />
-      </div>
-
-      {/* BOL Upload Section */}
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">BOL Upload</h2>
-        <StandaloneBOLUpload />
-      </div>
-
-      {/* Notification Settings */}
-      <div className="mb-4">
-        <NotificationSettings driverId={user.id} />
-      </div>
+      {/* Driver Loads Section - MINIMAL TEST */}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>Your Assigned Loads</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-600 mb-4">Testing load display...</p>
+          <DriverLoadsDisplay driverId={user.id} />
+        </CardContent>
+      </Card>
 
       {/* Status Message */}
       <Card className="mb-4">
         <CardContent className="p-6 text-center">
-          <h3 className="font-semibold text-green-700">✅ Driver Portal Active</h3>
-          <p className="text-gray-600 mt-2">Authentication working. BOL upload ready.</p>
-          <p className="text-sm text-gray-500 mt-1">Notification settings and preferences available above.</p>
+          <h3 className="font-semibold text-green-700">✅ Minimal Driver Portal</h3>
+          <p className="text-gray-600 mt-2">Testing crash fix...</p>
         </CardContent>
       </Card>
     </div>
