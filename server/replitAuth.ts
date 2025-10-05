@@ -51,9 +51,10 @@ export function getSession() {
     rolling: true, // Reset expiration on activity
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // CRITICAL FIX: Always false to ensure cookies work in all environments
       maxAge: sessionTtl,
-      sameSite: "lax",
+      sameSite: "lax", // Works with same-origin requests
+      path: '/', // Ensure cookie is available for all paths
     },
     name: 'connect.sid',
   });
