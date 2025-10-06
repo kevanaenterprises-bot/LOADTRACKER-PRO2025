@@ -36,7 +36,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
-import { loads, locations, loadStops, rates } from "@shared/schema";
+import { loads, locations, loadStops, rates, invoiceCounter } from "@shared/schema";
 
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
