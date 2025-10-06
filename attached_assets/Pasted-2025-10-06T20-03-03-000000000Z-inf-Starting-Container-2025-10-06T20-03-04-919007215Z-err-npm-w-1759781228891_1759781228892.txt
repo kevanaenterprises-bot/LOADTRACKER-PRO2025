@@ -1,0 +1,465 @@
+2025-10-06T20:03:03.000000000Z [inf]  Starting Container
+2025-10-06T20:03:04.919007215Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T20:03:04.919011172Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-06T20:03:04.919014788Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-06T20:03:05.186186016Z [inf]  Using 'pg' driver for database querying
+2025-10-06T20:03:05.297475785Z [inf]  [⣷] Pulling schema from database...
+2025-10-06T20:03:05.418801876Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-06T20:03:05.545727515Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-06T20:03:05.673642597Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-06T20:03:05.805543794Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-06T20:03:05.918291130Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-06T20:03:05.938430723Z [inf]  [i] No changes detected
+2025-10-06T20:03:06.071297641Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T20:03:06.100093033Z [inf]  
+2025-10-06T20:03:06.100098496Z [inf]  > rest-express@1.0.0 start
+2025-10-06T20:03:06.100104005Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-06T20:03:06.100109980Z [inf]  
+2025-10-06T20:03:06.961899965Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-06T20:03:06.976936892Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-06T20:03:06.981650767Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-06T20:03:06.975Z
+2025-10-06T20:03:06.981657558Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-06T20:03:06.981661926Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-06T20:03:06.981666010Z [inf]  🔧 Process ID: 48
+2025-10-06T20:03:06.981671479Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-06T20:03:06.981675808Z [inf]  🔧 Platform: linux
+2025-10-06T20:03:06.981684864Z [inf]  🔧 Architecture: x64
+2025-10-06T20:03:06.981690355Z [inf]  🔧 Memory usage: {
+2025-10-06T20:03:06.981694683Z [inf]    "rss": 130297856,
+2025-10-06T20:03:06.981698565Z [inf]    "heapTotal": 62705664,
+2025-10-06T20:03:06.981703317Z [inf]    "heapUsed": 31672056,
+2025-10-06T20:03:06.981707209Z [inf]    "external": 3897578,
+2025-10-06T20:03:06.981711044Z [inf]    "arrayBuffers": 315505
+2025-10-06T20:03:06.981716244Z [inf]  }
+2025-10-06T20:03:06.985104202Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-06T20:03:06.985110586Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-06T20:03:06.981Z
+2025-10-06T20:03:06.985114624Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-06T20:03:06.985118685Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-06T20:03:06.982Z
+2025-10-06T20:03:06.985122719Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-06T20:03:06.985126521Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-06T20:03:06.985130378Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-06T20:03:06.985134206Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-06T20:03:06.985142887Z [inf]  🔧 Validating environment configuration...
+2025-10-06T20:03:06.985147791Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-06T20:03:06.985151864Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-06T20:03:06.985155566Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-06T20:03:06.985159540Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-06T20:03:06.985163510Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-06T20:03:06.985167776Z [inf]  ✅ Database URL configured
+2025-10-06T20:03:06.985173594Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-10-06T20:03:06.985177533Z [inf]  ✅ SMS service (Telnyx) configured
+2025-10-06T20:03:06.985181692Z [inf]  ✅ Session authentication configured
+2025-10-06T20:03:06.985185568Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-06T20:03:06.985189600Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-06T20:03:06.985193746Z [inf]  🔧 Testing database connection...
+2025-10-06T20:03:07.006838810Z [err]  (node:48) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-06T20:03:07.006845444Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-06T20:03:07.062350289Z [inf]  ✅ Database connection successful
+2025-10-06T20:03:07.062356738Z [inf]  📝 Registering application routes...
+2025-10-06T20:03:07.263735099Z [inf]  ✅ Routes registered successfully
+2025-10-06T20:03:07.263740464Z [inf]  📁 Setting up static file serving for production...
+2025-10-06T20:03:07.263745217Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-06T20:03:07.263750247Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-06T20:03:07.263755117Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-06T20:03:07.263760592Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-06T20:03:07.263767794Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-06T20:03:07.263773379Z [inf]  📍 Health check endpoints available:
+2025-10-06T20:03:07.263778432Z [inf]     - GET /api/status (basic status)
+2025-10-06T20:03:07.263784101Z [inf]     - GET /api/health (health check)
+2025-10-06T20:03:07.263789606Z [inf]     - GET /api/ready (readiness check)
+2025-10-06T20:03:07.281088773Z [inf]  8:03:07 PM [express] serving on port 8080
+2025-10-06T20:03:07.662859277Z [inf]  8:03:07 PM [express] GET /api/health 200 in 4ms :: {"status":"ok","timestamp":"2025-10-06T20:03:07.6…
+2025-10-06T20:03:37.707386053Z [inf]  Driver login attempt: {
+2025-10-06T20:03:37.707391041Z [inf]    username: 'KOWEN',
+2025-10-06T20:03:37.707395693Z [inf]    usernameLength: 5,
+2025-10-06T20:03:37.707400615Z [inf]    password: '[LENGTH:10]',
+2025-10-06T20:03:37.707405400Z [inf]    passwordActual: '"9038037500"'
+2025-10-06T20:03:37.707410958Z [inf]  }
+2025-10-06T20:03:37.707415754Z [inf]  Driver lookup result: Found for username: KOWEN
+2025-10-06T20:03:37.707421471Z [inf]  Password check: {
+2025-10-06T20:03:37.707426857Z [inf]    provided: '9038037500',
+2025-10-06T20:03:37.707431815Z [inf]    expected: '9038037500',
+2025-10-06T20:03:37.707437513Z [inf]    normalizedProvided: '9038037500',
+2025-10-06T20:03:37.707442154Z [inf]    normalizedExpected: '9038037500'
+2025-10-06T20:03:37.707448121Z [inf]  }
+2025-10-06T20:03:37.707452830Z [inf]  ✅ Driver session saved successfully
+2025-10-06T20:03:37.707457243Z [inf]  8:03:29 PM [express] POST /api/driver/login 200 in 49ms :: {"message":"Login successful","user":{"id…
+2025-10-06T20:03:37.707462467Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T20:03:37.707468478Z [inf]    role: 'driver',
+2025-10-06T20:03:37.707473754Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T20:03:37.707478926Z [inf]    lastName: 'Owen',
+2025-10-06T20:03:37.707484663Z [inf]    username: 'Kowen',
+2025-10-06T20:03:37.707490136Z [inf]    firstName: 'Kevin'
+2025-10-06T20:03:37.707495968Z [inf]  }
+2025-10-06T20:03:37.707502142Z [inf]  8:03:30 PM [express] GET /api/auth/driver-user 304 in 5ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T20:03:37.707507244Z [inf]  Bypass check: {
+2025-10-06T20:03:37.707512398Z [inf]    token: '[PROVIDED]',
+2025-10-06T20:03:37.707517910Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T20:03:37.707523352Z [inf]    isActive: true
+2025-10-06T20:03:37.707529498Z [inf]  }
+2025-10-06T20:03:37.707534646Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T20:03:37.707539362Z [inf]    adminAuth: true,
+2025-10-06T20:03:37.707543922Z [inf]    replitAuth: false,
+2025-10-06T20:03:37.707548584Z [inf]    driverAuth: true,
+2025-10-06T20:03:37.707553972Z [inf]    bypassAuth: true,
+2025-10-06T20:03:37.707562025Z [inf]    hasAuth: true,
+2025-10-06T20:03:37.707567308Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T20:03:37.707575339Z [inf]  }
+2025-10-06T20:03:37.707581043Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T20:03:37.707608699Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T20:03:37.707614118Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T20:03:37.707619336Z [inf]  8:03:30 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 11ms :: [{"i…
+2025-10-06T20:04:07.714847585Z [inf]  Bypass check: {
+2025-10-06T20:04:07.714859437Z [inf]    token: '[PROVIDED]',
+2025-10-06T20:04:07.714865887Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T20:04:07.714872536Z [inf]    isActive: true
+2025-10-06T20:04:07.714879540Z [inf]  }
+2025-10-06T20:04:07.714885225Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T20:04:07.714891319Z [inf]    adminAuth: true,
+2025-10-06T20:04:07.714897243Z [inf]    replitAuth: false,
+2025-10-06T20:04:07.714903240Z [inf]    driverAuth: true,
+2025-10-06T20:04:07.714909497Z [inf]    bypassAuth: true,
+2025-10-06T20:04:07.714916665Z [inf]    hasAuth: true,
+2025-10-06T20:04:07.714922707Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T20:04:07.714928381Z [inf]  }
+2025-10-06T20:04:07.714934552Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T20:04:07.714940536Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T20:04:07.714945962Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T20:04:07.714950666Z [inf]  8:04:01 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 62ms :: [{"i…
+2025-10-06T20:04:10.741144692Z [inf]  8:04:10 PM [express] GET /api/loads/by-number/6022337 200 in 19ms :: {"id":"20ef41b3-abfe-41e5-904e-…
+2025-10-06T20:04:10.902830853Z [inf]  8:04:10 PM [express] GET /api/bol/check/78697 304 in 9ms :: {"exists":false}
+2025-10-06T20:04:11.045497900Z [inf]  8:04:11 PM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/bol 400 in 7ms :: {"messa…
+2025-10-06T20:04:17.868373549Z [inf]  8:04:17 PM [express] GET /api/loads/by-number/6022337 304 in 13ms :: {"id":"20ef41b3-abfe-41e5-904e-…
+2025-10-06T20:04:18.013820991Z [inf]  🔐 Override flag detected - skipping duplicate BOL check for 78697
+2025-10-06T20:04:18.022785152Z [inf]  ⚠️ BOL record creation skipped (duplicate with override): 78697
+2025-10-06T20:04:18.026468648Z [inf]  8:04:18 PM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/bol 200 in 15ms :: {"id":…
+2025-10-06T20:04:38.029408305Z [inf]  Bypass check: {
+2025-10-06T20:04:38.029414414Z [inf]    token: '[PROVIDED]',
+2025-10-06T20:04:38.029419994Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T20:04:38.029426936Z [inf]    isActive: true
+2025-10-06T20:04:38.029433172Z [inf]  }
+2025-10-06T20:04:38.029438873Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T20:04:38.029445638Z [inf]    adminAuth: true,
+2025-10-06T20:04:38.029451800Z [inf]    replitAuth: false,
+2025-10-06T20:04:38.029459145Z [inf]    driverAuth: true,
+2025-10-06T20:04:38.029464904Z [inf]    bypassAuth: true,
+2025-10-06T20:04:38.029470938Z [inf]    hasAuth: true,
+2025-10-06T20:04:38.029479399Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T20:04:38.029485975Z [inf]  }
+2025-10-06T20:04:38.029490830Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T20:04:38.029495212Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T20:04:38.029499646Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T20:04:38.029503718Z [inf]  8:04:31 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 71ms :: [{"i…
+2025-10-06T20:04:43.726597806Z [inf]  📤 Direct upload - file received: receipt_38173970.pdf 45841 bytes
+2025-10-06T20:04:43.726604707Z [inf]  🔧 Initializing Google Cloud Storage client...
+2025-10-06T20:04:43.726612291Z [inf]  ✅ Private key formatted successfully (length: 1704 chars)
+2025-10-06T20:04:43.729602038Z [inf]  ✅ Google Cloud Storage client initialized successfully
+2025-10-06T20:04:43.729608915Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/1d6573de-5e58-4187-b287-35e5dea37bb5
+2025-10-06T20:04:44.019241467Z [inf]  📤 Direct upload - file received: Load_Confirmation_6022337_20251002192029.pdf 63822 bytes
+2025-10-06T20:04:44.019249230Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/d7e1300f-07e8-4fe6-b658-06f37746d880
+2025-10-06T20:04:44.026433181Z [inf]  📤 Direct upload - file received: Screenshot_6-10-2025_03043_.jpeg 373412 bytes
+2025-10-06T20:04:44.026444638Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/6d407e2c-392c-4c94-93c5-d067e4537215
+2025-10-06T20:04:44.054108213Z [err]  ❌ Direct upload error: GaxiosError: {
+2025-10-06T20:04:44.054119466Z [err]    "error": {
+2025-10-06T20:04:44.054127242Z [err]      "code": 403,
+2025-10-06T20:04:44.054134091Z [err]      "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",
+2025-10-06T20:04:44.054140605Z [err]      "errors": [
+2025-10-06T20:04:44.054147906Z [err]        {
+2025-10-06T20:04:44.054154604Z [err]          "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",
+2025-10-06T20:04:44.054161643Z [err]          "domain": "global",
+2025-10-06T20:04:44.054168463Z [err]          "reason": "forbidden"
+2025-10-06T20:04:44.054175453Z [err]        }
+2025-10-06T20:04:44.054181794Z [err]      ]
+2025-10-06T20:04:44.054188516Z [err]    }
+2025-10-06T20:04:44.054195806Z [err]  }
+2025-10-06T20:04:44.054202623Z [err]  
+2025-10-06T20:04:44.054209124Z [err]      at Gaxios._request (/app/node_modules/gaxios/build/src/gaxios.js:142:23)
+2025-10-06T20:04:44.054215258Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T20:04:44.054222714Z [err]      at async JWT.requestAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:429:18)
+2025-10-06T20:04:44.054232380Z [err]      at async Upload.makeRequest (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:724:21)
+2025-10-06T20:04:44.054239706Z [err]      at async AsyncRetry.retries (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:390:29)
+2025-10-06T20:04:44.054246285Z [err]      at async Upload.createURIAsync (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:387:21) {
+2025-10-06T20:04:44.054252620Z [err]    config: {
+2025-10-06T20:04:44.054259150Z [err]      method: 'POST',
+2025-10-06T20:04:44.054265303Z [err]      url: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2F1d6573de-5e58-4187-b287-35e5dea37bb5&uploadType=resumable',
+2025-10-06T20:04:44.054272085Z [err]      params: {
+2025-10-06T20:04:44.054278156Z [err]        name: 'private/uploads/1d6573de-5e58-4187-b287-35e5dea37bb5',
+2025-10-06T20:04:44.054284930Z [err]        uploadType: 'resumable'
+2025-10-06T20:04:44.054291245Z [err]      },
+2025-10-06T20:04:44.054297875Z [err]      data: {},
+2025-10-06T20:04:44.054304962Z [err]      headers: {
+2025-10-06T20:04:44.054311959Z [err]        'User-Agent': 'gcloud-node-storage/7.17.0 google-api-nodejs-client/9.15.1',
+2025-10-06T20:04:44.054318009Z [err]        'x-goog-api-client': 'gl-node/22.11.0 gccl/7.17.0-ESM gccl-invocation-id/86166d7c-e904-4f9d-93b1-086187662139',
+2025-10-06T20:04:44.054324285Z [err]        'X-Upload-Content-Type': 'application/pdf',
+2025-10-06T20:04:44.054331642Z [err]        Authorization: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T20:04:44.054338602Z [err]        'Content-Type': 'application/json'
+2025-10-06T20:04:44.054345291Z [err]      },
+2025-10-06T20:04:44.054351540Z [err]      validateStatus: [Function (anonymous)],
+2025-10-06T20:04:44.054357901Z [err]      paramsSerializer: [Function: paramsSerializer],
+2025-10-06T20:04:44.054365379Z [err]      body: '{}',
+2025-10-06T20:04:44.054372127Z [err]      responseType: 'unknown',
+2025-10-06T20:04:44.054378596Z [err]      errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T20:04:44.054384695Z [err]    },
+2025-10-06T20:04:44.054391157Z [err]    response: {
+2025-10-06T20:04:44.054397358Z [err]      config: {
+2025-10-06T20:04:44.054403776Z [err]        method: 'POST',
+2025-10-06T20:04:44.054409835Z [err]        url: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2F1d6573de-5e58-4187-b287-35e5dea37bb5&uploadType=resumable',
+2025-10-06T20:04:44.054417868Z [err]        params: [Object],
+2025-10-06T20:04:44.054424446Z [err]        data: {},
+2025-10-06T20:04:44.054430917Z [err]        headers: [Object],
+2025-10-06T20:04:44.054438157Z [err]        validateStatus: [Function (anonymous)],
+2025-10-06T20:04:44.054444981Z [err]        paramsSerializer: [Function: paramsSerializer],
+2025-10-06T20:04:44.054451001Z [err]        body: '{}',
+2025-10-06T20:04:44.054457030Z [err]        responseType: 'unknown',
+2025-10-06T20:04:44.054463056Z [err]        errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T20:04:44.054469567Z [err]      },
+2025-10-06T20:04:44.054475938Z [err]      data: '{\n' +
+2025-10-06T20:04:44.054482309Z [err]        '  "error": {\n' +
+2025-10-06T20:04:44.054488584Z [err]        '    "code": 403,\n' +
+2025-10-06T20:04:44.054496314Z [err]        `    "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",\n` +
+2025-10-06T20:04:44.054502446Z [err]        '    "errors": [\n' +
+2025-10-06T20:04:44.054508666Z [err]        '      {\n' +
+2025-10-06T20:04:44.054519038Z [err]        `        "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",\n` +
+2025-10-06T20:04:44.054525556Z [err]        '        "domain": "global",\n' +
+2025-10-06T20:04:44.054531775Z [err]        '        "reason": "forbidden"\n' +
+2025-10-06T20:04:44.056715611Z [err]        '      }\n' +
+2025-10-06T20:04:44.056724997Z [err]        '    ]\n' +
+2025-10-06T20:04:44.056731917Z [err]        '  }\n' +
+2025-10-06T20:04:44.056738461Z [err]        '}\n',
+2025-10-06T20:04:44.056744717Z [err]      headers: {
+2025-10-06T20:04:44.056762861Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-06T20:04:44.056771662Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-06T20:04:44.056777968Z [err]        'content-length': '632',
+2025-10-06T20:04:44.056783924Z [err]        'content-type': 'text/html; charset=UTF-8',
+2025-10-06T20:04:44.056791846Z [err]        date: 'Mon, 06 Oct 2025 20:04:43 GMT',
+2025-10-06T20:04:44.056797832Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-06T20:04:44.056804343Z [err]        pragma: 'no-cache',
+2025-10-06T20:04:44.056810532Z [err]        server: 'UploadServer',
+2025-10-06T20:04:44.056816979Z [err]        vary: 'Origin, X-Origin',
+2025-10-06T20:04:44.056823212Z [err]        'x-guploader-uploadid': 'AAwnv3KYDrpq663vrN14LbZrOLMxK8x8kkry5J5OvHGix9G2wYvjzuT5h0uIrpx-HlBAOj0F4b2pwpGS7psBPj-0tuY_jy2OwAygrK3gUl8idA'
+2025-10-06T20:04:44.056831036Z [err]      },
+2025-10-06T20:04:44.056837367Z [err]      status: 403,
+2025-10-06T20:04:44.056843986Z [err]      statusText: 'Forbidden',
+2025-10-06T20:04:44.056850058Z [err]      request: {
+2025-10-06T20:04:44.056856269Z [err]        responseURL: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2F1d6573de-5e58-4187-b287-35e5dea37bb5&uploadType=resumable'
+2025-10-06T20:04:44.056862747Z [err]      }
+2025-10-06T20:04:44.056869168Z [err]    },
+2025-10-06T20:04:44.056875326Z [err]    error: undefined,
+2025-10-06T20:04:44.056881577Z [err]    status: 403,
+2025-10-06T20:04:44.056887730Z [err]    [Symbol(gaxios-gaxios-error)]: '6.7.1'
+2025-10-06T20:04:44.056894803Z [err]  }
+2025-10-06T20:04:44.056900833Z [inf]  8:04:44 PM [express] POST /api/objects/direct-upload 500 in 454ms :: {"message":"Failed to upload fi…
+2025-10-06T20:04:44.195880155Z [err]  ❌ Direct upload error: GaxiosError: {
+2025-10-06T20:04:44.195892730Z [err]    "error": {
+2025-10-06T20:04:44.195901154Z [err]      "code": 403,
+2025-10-06T20:04:44.195910513Z [err]      "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",
+2025-10-06T20:04:44.195916461Z [err]      "errors": [
+2025-10-06T20:04:44.195922874Z [err]        {
+2025-10-06T20:04:44.195929520Z [err]          "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",
+2025-10-06T20:04:44.195938746Z [err]          "domain": "global",
+2025-10-06T20:04:44.195945407Z [err]          "reason": "forbidden"
+2025-10-06T20:04:44.195953156Z [err]        }
+2025-10-06T20:04:44.195959981Z [err]      ]
+2025-10-06T20:04:44.195968723Z [err]    }
+2025-10-06T20:04:44.195974233Z [err]  }
+2025-10-06T20:04:44.195980925Z [err]  
+2025-10-06T20:04:44.195987686Z [err]      at Gaxios._request (/app/node_modules/gaxios/build/src/gaxios.js:142:23)
+2025-10-06T20:04:44.195994478Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T20:04:44.196000912Z [err]      at async JWT.requestAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:429:18)
+2025-10-06T20:04:44.196009166Z [err]      at async Upload.makeRequest (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:724:21)
+2025-10-06T20:04:44.196015022Z [err]      at async AsyncRetry.retries (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:390:29)
+2025-10-06T20:04:44.196022132Z [err]      at async Upload.createURIAsync (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:387:21) {
+2025-10-06T20:04:44.196027405Z [err]    config: {
+2025-10-06T20:04:44.196033325Z [err]      method: 'POST',
+2025-10-06T20:04:44.196039566Z [err]      url: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2Fd7e1300f-07e8-4fe6-b658-06f37746d880&uploadType=resumable',
+2025-10-06T20:04:44.196045777Z [err]      params: {
+2025-10-06T20:04:44.196051633Z [err]        name: 'private/uploads/d7e1300f-07e8-4fe6-b658-06f37746d880',
+2025-10-06T20:04:44.196057893Z [err]        uploadType: 'resumable'
+2025-10-06T20:04:44.196064336Z [err]      },
+2025-10-06T20:04:44.196070188Z [err]      data: {},
+2025-10-06T20:04:44.196076168Z [err]      headers: {
+2025-10-06T20:04:44.196083685Z [err]        'User-Agent': 'gcloud-node-storage/7.17.0 google-api-nodejs-client/9.15.1',
+2025-10-06T20:04:44.196089960Z [err]        'x-goog-api-client': 'gl-node/22.11.0 gccl/7.17.0-ESM gccl-invocation-id/5d030713-3a33-4485-ba46-7a19d35dff4b',
+2025-10-06T20:04:44.196095658Z [err]        'X-Upload-Content-Type': 'application/pdf',
+2025-10-06T20:04:44.196101490Z [err]        Authorization: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T20:04:44.196107764Z [err]        'Content-Type': 'application/json'
+2025-10-06T20:04:44.196114293Z [err]      },
+2025-10-06T20:04:44.196121042Z [err]      validateStatus: [Function (anonymous)],
+2025-10-06T20:04:44.196854834Z [err]      paramsSerializer: [Function: paramsSerializer],
+2025-10-06T20:04:44.196864439Z [err]      body: '{}',
+2025-10-06T20:04:44.196870729Z [err]      responseType: 'unknown',
+2025-10-06T20:04:44.196876814Z [err]      errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T20:04:44.196883360Z [err]    },
+2025-10-06T20:04:44.196889787Z [err]    response: {
+2025-10-06T20:04:44.196895476Z [err]      config: {
+2025-10-06T20:04:44.196901125Z [err]        method: 'POST',
+2025-10-06T20:04:44.196906142Z [err]        url: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2Fd7e1300f-07e8-4fe6-b658-06f37746d880&uploadType=resumable',
+2025-10-06T20:04:44.196911735Z [err]        params: [Object],
+2025-10-06T20:04:44.196917340Z [err]        data: {},
+2025-10-06T20:04:44.196924102Z [err]        headers: [Object],
+2025-10-06T20:04:44.196929649Z [err]        validateStatus: [Function (anonymous)],
+2025-10-06T20:04:44.196936023Z [err]        paramsSerializer: [Function: paramsSerializer],
+2025-10-06T20:04:44.196941788Z [err]        body: '{}',
+2025-10-06T20:04:44.196947120Z [err]        responseType: 'unknown',
+2025-10-06T20:04:44.196953026Z [err]        errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T20:04:44.196960171Z [err]      },
+2025-10-06T20:04:44.196966143Z [err]      data: '{\n' +
+2025-10-06T20:04:44.196972007Z [err]        '  "error": {\n' +
+2025-10-06T20:04:44.196978008Z [err]        '    "code": 403,\n' +
+2025-10-06T20:04:44.196984442Z [err]        `    "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",\n` +
+2025-10-06T20:04:44.196990444Z [err]        '    "errors": [\n' +
+2025-10-06T20:04:44.196996727Z [err]        '      {\n' +
+2025-10-06T20:04:44.197002360Z [err]        `        "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",\n` +
+2025-10-06T20:04:44.197009564Z [err]        '        "domain": "global",\n' +
+2025-10-06T20:04:44.197015526Z [err]        '        "reason": "forbidden"\n' +
+2025-10-06T20:04:44.197022094Z [err]        '      }\n' +
+2025-10-06T20:04:44.197028326Z [err]        '    ]\n' +
+2025-10-06T20:04:44.197034217Z [err]        '  }\n' +
+2025-10-06T20:04:44.197040159Z [err]        '}\n',
+2025-10-06T20:04:44.197045678Z [err]      headers: {
+2025-10-06T20:04:44.197051480Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-06T20:04:44.197059251Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-06T20:04:44.197067121Z [err]        'content-length': '632',
+2025-10-06T20:04:44.197074161Z [err]        'content-type': 'text/html; charset=UTF-8',
+2025-10-06T20:04:44.197079948Z [err]        date: 'Mon, 06 Oct 2025 20:04:44 GMT',
+2025-10-06T20:04:44.197089657Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-06T20:04:44.197095388Z [err]        pragma: 'no-cache',
+2025-10-06T20:04:44.197101422Z [err]        server: 'UploadServer',
+2025-10-06T20:04:44.197107105Z [err]        vary: 'Origin, X-Origin',
+2025-10-06T20:04:44.197113161Z [err]        'x-guploader-uploadid': 'AAwnv3IRpK4x-QFmV4aYRKuRn6JFATAMRk3QGF_kfFk99cc4pfbjUYxQySW6uTGL3wraiBLQC7ijpMoDHfoDKflrY06ewx967hLcnyzf41kw5aU'
+2025-10-06T20:04:44.197119176Z [err]      },
+2025-10-06T20:04:44.197125414Z [err]      status: 403,
+2025-10-06T20:04:44.197130994Z [err]      statusText: 'Forbidden',
+2025-10-06T20:04:44.197137003Z [err]      request: {
+2025-10-06T20:04:44.197143580Z [err]        responseURL: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2Fd7e1300f-07e8-4fe6-b658-06f37746d880&uploadType=resumable'
+2025-10-06T20:04:44.197149772Z [err]      }
+2025-10-06T20:04:44.197155935Z [err]    },
+2025-10-06T20:04:44.197162118Z [err]    error: undefined,
+2025-10-06T20:04:44.197168252Z [err]    status: 403,
+2025-10-06T20:04:44.197175315Z [err]    [Symbol(gaxios-gaxios-error)]: '6.7.1'
+2025-10-06T20:04:44.197180873Z [err]  }
+2025-10-06T20:04:44.197187952Z [inf]  8:04:44 PM [express] POST /api/objects/direct-upload 500 in 598ms :: {"message":"Failed to upload fi…
+2025-10-06T20:04:44.201551434Z [err]  ❌ Direct upload error: GaxiosError: {
+2025-10-06T20:04:44.201557723Z [err]    "error": {
+2025-10-06T20:04:44.201569438Z [err]      "code": 403,
+2025-10-06T20:04:44.201574863Z [err]      "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",
+2025-10-06T20:04:44.201579840Z [err]      "errors": [
+2025-10-06T20:04:44.201583685Z [err]        {
+2025-10-06T20:04:44.201587527Z [err]          "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",
+2025-10-06T20:04:44.201591471Z [err]          "domain": "global",
+2025-10-06T20:04:44.201595243Z [err]          "reason": "forbidden"
+2025-10-06T20:04:44.201599337Z [err]        }
+2025-10-06T20:04:44.201603132Z [err]      ]
+2025-10-06T20:04:44.201607048Z [err]    }
+2025-10-06T20:04:44.201611039Z [err]  }
+2025-10-06T20:04:44.201615005Z [err]  
+2025-10-06T20:04:44.201619047Z [err]      at Gaxios._request (/app/node_modules/gaxios/build/src/gaxios.js:142:23)
+2025-10-06T20:04:44.201622820Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T20:04:44.201626647Z [err]      at async JWT.requestAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:429:18)
+2025-10-06T20:04:44.201630661Z [err]      at async Upload.makeRequest (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:724:21)
+2025-10-06T20:04:44.201634777Z [err]      at async AsyncRetry.retries (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:390:29)
+2025-10-06T20:04:44.201678407Z [err]      at async Upload.createURIAsync (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:387:21) {
+2025-10-06T20:04:44.201684243Z [err]    config: {
+2025-10-06T20:04:44.201690323Z [err]      method: 'POST',
+2025-10-06T20:04:44.201696344Z [err]      url: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2F6d407e2c-392c-4c94-93c5-d067e4537215&uploadType=resumable',
+2025-10-06T20:04:44.201703144Z [err]      params: {
+2025-10-06T20:04:44.201708151Z [err]        name: 'private/uploads/6d407e2c-392c-4c94-93c5-d067e4537215',
+2025-10-06T20:04:44.201712916Z [err]        uploadType: 'resumable'
+2025-10-06T20:04:44.201718565Z [err]      },
+2025-10-06T20:04:44.201723849Z [err]      data: {},
+2025-10-06T20:04:44.201729209Z [err]      headers: {
+2025-10-06T20:04:44.201734000Z [err]        'User-Agent': 'gcloud-node-storage/7.17.0 google-api-nodejs-client/9.15.1',
+2025-10-06T20:04:44.201738683Z [err]        'x-goog-api-client': 'gl-node/22.11.0 gccl/7.17.0-ESM gccl-invocation-id/2d699c01-1356-4959-a9a7-bd2379979ab6',
+2025-10-06T20:04:44.201743478Z [err]        'X-Upload-Content-Type': 'image/jpeg',
+2025-10-06T20:04:44.201748704Z [err]        Authorization: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T20:04:44.201753656Z [err]        'Content-Type': 'application/json'
+2025-10-06T20:04:44.201758777Z [err]      },
+2025-10-06T20:04:44.201763876Z [err]      validateStatus: [Function (anonymous)],
+2025-10-06T20:04:44.201769372Z [err]      paramsSerializer: [Function: paramsSerializer],
+2025-10-06T20:04:44.201774659Z [err]      body: '{}',
+2025-10-06T20:04:44.201779776Z [err]      responseType: 'unknown',
+2025-10-06T20:04:44.201785257Z [err]      errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T20:04:44.201791911Z [err]    },
+2025-10-06T20:04:44.201799530Z [err]    response: {
+2025-10-06T20:04:44.201806300Z [err]      config: {
+2025-10-06T20:04:44.201813517Z [err]        method: 'POST',
+2025-10-06T20:04:44.201820824Z [err]        url: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2F6d407e2c-392c-4c94-93c5-d067e4537215&uploadType=resumable',
+2025-10-06T20:04:44.201826531Z [err]        params: [Object],
+2025-10-06T20:04:44.201833224Z [err]        data: {},
+2025-10-06T20:04:44.201839070Z [err]        headers: [Object],
+2025-10-06T20:04:44.201845692Z [err]        validateStatus: [Function (anonymous)],
+2025-10-06T20:04:44.201851899Z [err]        paramsSerializer: [Function: paramsSerializer],
+2025-10-06T20:04:44.201859606Z [err]        body: '{}',
+2025-10-06T20:04:44.201865846Z [err]        responseType: 'unknown',
+2025-10-06T20:04:44.201872730Z [err]        errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T20:04:44.201878895Z [err]      },
+2025-10-06T20:04:44.201885127Z [err]      data: '{\n' +
+2025-10-06T20:04:44.201891599Z [err]        '  "error": {\n' +
+2025-10-06T20:04:44.201898064Z [err]        '    "code": 403,\n' +
+2025-10-06T20:04:44.201904032Z [err]        `    "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",\n` +
+2025-10-06T20:04:44.201910743Z [err]        '    "errors": [\n' +
+2025-10-06T20:04:44.201917419Z [err]        '      {\n' +
+2025-10-06T20:04:44.201924183Z [err]        `        "message": "loadtracker-storage@gen-lang-client-0438821026.iam.gserviceaccount.com does not have storage.objects.create access to the Google Cloud Storage object. Permission 'storage.objects.create' denied on resource (or it may not exist).",\n` +
+2025-10-06T20:04:44.201930175Z [err]        '        "domain": "global",\n' +
+2025-10-06T20:04:44.201936248Z [err]        '        "reason": "forbidden"\n' +
+2025-10-06T20:04:44.201943880Z [err]        '      }\n' +
+2025-10-06T20:04:44.201950261Z [err]        '    ]\n' +
+2025-10-06T20:04:44.201956519Z [err]        '  }\n' +
+2025-10-06T20:04:44.201963767Z [err]        '}\n',
+2025-10-06T20:04:44.201970052Z [err]      headers: {
+2025-10-06T20:04:44.201976291Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-06T20:04:44.201982674Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-06T20:04:44.201988348Z [err]        'content-length': '632',
+2025-10-06T20:04:44.201994639Z [err]        'content-type': 'text/html; charset=UTF-8',
+2025-10-06T20:04:44.202000778Z [err]        date: 'Mon, 06 Oct 2025 20:04:44 GMT',
+2025-10-06T20:04:44.202006732Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-06T20:04:44.202056494Z [err]        pragma: 'no-cache',
+2025-10-06T20:04:44.202063221Z [err]        server: 'UploadServer',
+2025-10-06T20:04:44.202069754Z [err]        vary: 'Origin, X-Origin',
+2025-10-06T20:04:44.202084570Z [err]        'x-guploader-uploadid': 'AAwnv3IQ5QE3kBFKOrT_vj28GqVcn---iRV0FHPGpKa4vS4EFsEi6vHd4X7tzJLdgv7WHc6wIS5N3VQQzJYmFJLEr-tEesU5ZOlMkca9OGMlNw'
+2025-10-06T20:04:44.202091359Z [err]      },
+2025-10-06T20:04:44.202101135Z [err]      status: 403,
+2025-10-06T20:04:44.202107433Z [err]      statusText: 'Forbidden',
+2025-10-06T20:04:44.202138580Z [err]      request: {
+2025-10-06T20:04:44.202146155Z [err]        responseURL: 'https://storage.googleapis.com/upload/storage/v1/b/loadtracker_documents/o?name=private%2Fuploads%2F6d407e2c-392c-4c94-93c5-d067e4537215&uploadType=resumable'
+2025-10-06T20:04:44.202157118Z [err]      }
+2025-10-06T20:04:44.202175222Z [err]    },
+2025-10-06T20:04:44.202181437Z [err]    error: undefined,
+2025-10-06T20:04:44.202189035Z [err]    status: 403,
+2025-10-06T20:04:44.202195421Z [err]    [Symbol(gaxios-gaxios-error)]: '6.7.1'
+2025-10-06T20:04:44.202204991Z [err]  }
+2025-10-06T20:04:44.205400142Z [inf]  8:04:44 PM [express] POST /api/objects/direct-upload 500 in 604ms :: {"message":"Failed to upload fi…
+2025-10-06T20:05:04.201390231Z [inf]  Bypass check: {
+2025-10-06T20:05:04.201399889Z [inf]    token: '[PROVIDED]',
+2025-10-06T20:05:04.201420724Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T20:05:04.201427425Z [inf]    isActive: true
+2025-10-06T20:05:04.201438877Z [inf]  }
+2025-10-06T20:05:04.201443399Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T20:05:04.201448569Z [inf]    adminAuth: true,
+2025-10-06T20:05:04.201453759Z [inf]    replitAuth: false,
+2025-10-06T20:05:04.201460542Z [inf]    driverAuth: true,
+2025-10-06T20:05:04.201464962Z [inf]    bypassAuth: true,
+2025-10-06T20:05:04.201469519Z [inf]    hasAuth: true,
+2025-10-06T20:05:04.201474382Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T20:05:04.201479591Z [inf]  }
+2025-10-06T20:05:04.201485007Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T20:05:04.201489524Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T20:05:04.201494228Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T20:05:04.201498609Z [inf]  8:05:01 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 62ms :: [{"i…
+2025-10-06T20:05:34.204211295Z [inf]  Bypass check: {
+2025-10-06T20:05:34.204215478Z [inf]    token: '[PROVIDED]',
+2025-10-06T20:05:34.204224438Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T20:05:34.204228718Z [inf]    isActive: true
+2025-10-06T20:05:34.204234749Z [inf]  }
+2025-10-06T20:05:34.204238704Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T20:05:34.204242487Z [inf]    adminAuth: true,
+2025-10-06T20:05:34.204246220Z [inf]    replitAuth: false,
+2025-10-06T20:05:34.204252084Z [inf]    driverAuth: true,
+2025-10-06T20:05:34.204255839Z [inf]    bypassAuth: true,
+2025-10-06T20:05:34.204259882Z [inf]    hasAuth: true,
+2025-10-06T20:05:34.204263670Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T20:05:34.204267420Z [inf]  }
+2025-10-06T20:05:34.204274504Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T20:05:34.204279788Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T20:05:34.204284659Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T20:05:34.204289579Z [inf]  8:05:31 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 56ms :: [{"i…
