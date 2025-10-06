@@ -3357,13 +3357,16 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(404).json({ message: "Load not found" });
       }
       
-      // Unassign driver from load by setting driverId to null
-      const updatedLoad = await storage.updateLoad(loadId, { driverId: null });
+      // Unassign driver AND reset status to pending so it shows in "Pending - Waiting Assignment"
+      const updatedLoad = await storage.updateLoad(loadId, { 
+        driverId: null,
+        status: "pending" // Reset to pending so it appears in the correct section
+      });
       
-      console.log(`📦 Load ${currentLoad.number109} returned to admin dashboard by driver`);
+      console.log(`📦 Load ${currentLoad.number109} returned to admin dashboard - set to pending status`);
       
       res.json({
-        message: "Load returned successfully",
+        message: "Load returned successfully and moved to pending",
         load: updatedLoad
       });
     } catch (error) {
