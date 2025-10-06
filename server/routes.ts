@@ -5040,6 +5040,77 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Direct upload endpoint - bypasses CORS by uploading through the server
+  const directUpload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  });
+
+  app.post("/api/objects/direct-upload", directUpload.single('file'), async (req, res) => {
+    try {
+      // Check authentication
+      const bypassToken = req.headers['x-bypass-token'];
+      const hasTokenBypass = bypassToken === BYPASS_SECRET;
+      const hasReplitAuth = req.isAuthenticated && req.isAuthenticated();
+      const hasDriverAuth = (req.session as any)?.driverAuth;
+      const hasAuth = hasReplitAuth || hasDriverAuth || hasTokenBypass;
+
+      if (!hasAuth) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file provided" });
+      }
+
+      console.log("📤 Direct upload - file received:", req.file.originalname, req.file.size, "bytes");
+
+      const objectStorageService = new ObjectStorageService();
+      const { Storage } = await import("@google-cloud/storage");
+      const storage = new Storage({
+        projectId: process.env.GCS_PROJECT_ID,
+        credentials: {
+          client_email: process.env.GCS_CLIENT_EMAIL,
+          private_key: process.env.GCS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        },
+      });
+
+      // Generate unique filename
+      const { randomUUID } = await import("crypto");
+      const objectId = randomUUID();
+      const bucketName = process.env.GCS_BUCKET_NAME || 'loadtracker_documents';
+      const objectName = `private/uploads/${objectId}`;
+
+      console.log("📤 Uploading to GCS:", bucketName, objectName);
+
+      // Upload file to GCS
+      const bucket = storage.bucket(bucketName);
+      const file = bucket.file(objectName);
+      
+      await file.save(req.file.buffer, {
+        metadata: {
+          contentType: req.file.mimetype,
+        },
+      });
+
+      const publicPath = `/gs://${bucketName}/${objectName}`;
+      console.log("✅ Direct upload successful:", publicPath);
+
+      res.json({ 
+        publicPath,
+        fileName: req.file.originalname,
+        fileSize: req.file.size
+      });
+    } catch (error) {
+      console.error("❌ Direct upload error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ 
+        message: "Failed to upload file",
+        error: errorMessage 
+      });
+    }
+  });
+
   app.patch("/api/loads/:id/bol-document", (req, res, next) => {
     // Flexible authentication for BOL document uploads
     const bypassToken = req.headers['x-bypass-token'];

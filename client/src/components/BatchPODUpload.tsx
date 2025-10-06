@@ -107,37 +107,32 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
         f.id === fileItem.id ? { ...f, status: 'uploading', progress: 10 } : f
       ));
 
-      // Get upload URL
-      const urlResponse = await fetch("/api/objects/upload", {
-        method: "POST",
-        credentials: "include",
-      });
+      // Create FormData for direct upload
+      const formData = new FormData();
+      formData.append('file', fileItem.file);
 
-      if (!urlResponse.ok) {
-        throw new Error(`Failed to get upload URL: ${urlResponse.status}`);
-      }
-
-      const { uploadURL, publicPath } = await urlResponse.json();
-      
       // Update progress
       setFiles(prev => prev.map(f => 
         f.id === fileItem.id ? { ...f, progress: 30 } : f
       ));
 
-      // Upload file
-      const uploadResponse = await fetch(uploadURL, {
-        method: "PUT",
-        body: fileItem.file,
-        headers: { "Content-Type": fileItem.file.type },
+      // Direct upload to server (bypasses CORS)
+      const uploadResponse = await fetch("/api/objects/direct-upload", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
       });
 
       if (!uploadResponse.ok) {
-        throw new Error(`Upload failed: ${uploadResponse.status}`);
+        const errorData = await uploadResponse.json().catch(() => ({ message: "Upload failed" }));
+        throw new Error(errorData.message || `Upload failed: ${uploadResponse.status}`);
       }
+
+      const { publicPath } = await uploadResponse.json();
 
       // Update progress
       setFiles(prev => prev.map(f => 
-        f.id === fileItem.id ? { ...f, progress: 80, url: publicPath } : f
+        f.id === fileItem.id ? { ...f, progress: 100, url: publicPath } : f
       ));
 
       return publicPath;
