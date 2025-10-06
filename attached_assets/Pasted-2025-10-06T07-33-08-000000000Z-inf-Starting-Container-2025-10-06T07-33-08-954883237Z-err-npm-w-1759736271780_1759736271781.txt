@@ -1,0 +1,641 @@
+2025-10-06T07:33:08.000000000Z [inf]  Starting Container
+2025-10-06T07:33:08.954883237Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T07:33:08.954891962Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-06T07:33:08.954900316Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-06T07:33:09.317191918Z [inf]  Using 'pg' driver for database querying
+2025-10-06T07:33:09.443339801Z [inf]  [⣷] Pulling schema from database...
+2025-10-06T07:33:09.559448058Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-06T07:33:09.697417347Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-06T07:33:09.823563159Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-06T07:33:09.958486668Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-06T07:33:10.005461534Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-06T07:33:10.042024888Z [inf]  [i] No changes detected
+2025-10-06T07:33:10.159200633Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T07:33:10.185776060Z [inf]  
+2025-10-06T07:33:10.185784837Z [inf]  > rest-express@1.0.0 start
+2025-10-06T07:33:10.185792044Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-06T07:33:10.185800003Z [inf]  
+2025-10-06T07:33:11.000806049Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-06T07:33:11.013729892Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-06T07:33:11.013735047Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-06T07:33:11.011Z
+2025-10-06T07:33:11.013740699Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-06T07:33:11.013746253Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-06T07:33:11.013751478Z [inf]  🔧 Process ID: 50
+2025-10-06T07:33:11.013756297Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-06T07:33:11.013761227Z [inf]  🔧 Platform: linux
+2025-10-06T07:33:11.013766722Z [inf]  🔧 Architecture: x64
+2025-10-06T07:33:11.013771999Z [inf]  🔧 Memory usage: {
+2025-10-06T07:33:11.013777106Z [inf]    "rss": 144756736,
+2025-10-06T07:33:11.013782946Z [inf]    "heapTotal": 61911040,
+2025-10-06T07:33:11.013787913Z [inf]    "heapUsed": 31595304,
+2025-10-06T07:33:11.013793409Z [inf]    "external": 3897578,
+2025-10-06T07:33:11.013798247Z [inf]    "arrayBuffers": 315505
+2025-10-06T07:33:11.013804763Z [inf]  }
+2025-10-06T07:33:11.017432983Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-06T07:33:11.017441137Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-06T07:33:11.015Z
+2025-10-06T07:33:11.017447703Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-06T07:33:11.017452915Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-06T07:33:11.015Z
+2025-10-06T07:33:11.017458199Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-06T07:33:11.017465108Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-06T07:33:11.017472511Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-06T07:33:11.017479039Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-06T07:33:11.017484240Z [inf]  🔧 Validating environment configuration...
+2025-10-06T07:33:11.017489124Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-06T07:33:11.017494472Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-06T07:33:11.017500130Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-06T07:33:11.017506976Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-06T07:33:11.017513944Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-06T07:33:11.017519333Z [inf]  ✅ Database URL configured
+2025-10-06T07:33:11.017526109Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-10-06T07:33:11.017531392Z [inf]  ✅ SMS service (Telnyx) configured
+2025-10-06T07:33:11.017536564Z [inf]  ✅ Session authentication configured
+2025-10-06T07:33:11.017543220Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-06T07:33:11.017550117Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-06T07:33:11.017557582Z [inf]  🔧 Testing database connection...
+2025-10-06T07:33:11.034912538Z [err]  (node:50) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-06T07:33:11.034920900Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-06T07:33:11.076594642Z [inf]  ✅ Database connection successful
+2025-10-06T07:33:11.076602145Z [inf]  📝 Registering application routes...
+2025-10-06T07:33:11.243417022Z [inf]  ✅ Routes registered successfully
+2025-10-06T07:33:11.243425631Z [inf]  📁 Setting up static file serving for production...
+2025-10-06T07:33:11.243430816Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-06T07:33:11.243436267Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-06T07:33:11.243443698Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-06T07:33:11.243451169Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-06T07:33:11.247168685Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-06T07:33:11.247178952Z [inf]  📍 Health check endpoints available:
+2025-10-06T07:33:11.247194960Z [inf]     - GET /api/status (basic status)
+2025-10-06T07:33:11.247202843Z [inf]     - GET /api/health (health check)
+2025-10-06T07:33:11.247209733Z [inf]     - GET /api/ready (readiness check)
+2025-10-06T07:33:11.265440132Z [inf]  7:33:11 AM [express] serving on port 8080
+2025-10-06T07:33:12.258167569Z [inf]  7:33:12 AM [express] GET /api/health 200 in 5ms :: {"status":"ok","timestamp":"2025-10-06T07:33:12.2…
+2025-10-06T07:34:02.265976247Z [inf]  Driver login attempt: {
+2025-10-06T07:34:02.265982312Z [inf]    username: 'KOWEN',
+2025-10-06T07:34:02.265988542Z [inf]    usernameLength: 5,
+2025-10-06T07:34:02.265994474Z [inf]    password: '[LENGTH:10]',
+2025-10-06T07:34:02.265999854Z [inf]    passwordActual: '"9038037500"'
+2025-10-06T07:34:02.266007402Z [inf]  }
+2025-10-06T07:34:02.266012491Z [inf]  Driver lookup result: Found for username: KOWEN
+2025-10-06T07:34:02.266017866Z [inf]  Password check: {
+2025-10-06T07:34:02.266023577Z [inf]    provided: '9038037500',
+2025-10-06T07:34:02.266029055Z [inf]    expected: '9038037500',
+2025-10-06T07:34:02.266034398Z [inf]    normalizedProvided: '9038037500',
+2025-10-06T07:34:02.266039226Z [inf]    normalizedExpected: '9038037500'
+2025-10-06T07:34:02.266044419Z [inf]  }
+2025-10-06T07:34:02.266050137Z [inf]  ✅ Driver session saved successfully
+2025-10-06T07:34:02.266057026Z [inf]  7:33:57 AM [express] POST /api/driver/login 200 in 71ms :: {"message":"Login successful","user":{"id…
+2025-10-06T07:34:02.266062591Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T07:34:02.266067854Z [inf]    role: 'driver',
+2025-10-06T07:34:02.266073051Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:34:02.266078823Z [inf]    lastName: 'Owen',
+2025-10-06T07:34:02.266085740Z [inf]    username: 'Kowen',
+2025-10-06T07:34:02.266091252Z [inf]    firstName: 'Kevin'
+2025-10-06T07:34:02.266098489Z [inf]  }
+2025-10-06T07:34:02.266106465Z [inf]  7:33:59 AM [express] GET /api/auth/driver-user 304 in 9ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T07:34:02.266113030Z [inf]  Bypass check: {
+2025-10-06T07:34:02.266118854Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:34:02.266124465Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:34:02.266129842Z [inf]    isActive: true
+2025-10-06T07:34:02.266135341Z [inf]  }
+2025-10-06T07:34:02.266141298Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T07:34:02.266146669Z [inf]    adminAuth: true,
+2025-10-06T07:34:02.266152250Z [inf]    replitAuth: false,
+2025-10-06T07:34:02.266157848Z [inf]    driverAuth: true,
+2025-10-06T07:34:02.266163283Z [inf]    bypassAuth: true,
+2025-10-06T07:34:02.266168550Z [inf]    hasAuth: true,
+2025-10-06T07:34:02.266173813Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T07:34:02.266179886Z [inf]  }
+2025-10-06T07:34:02.266185331Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T07:34:02.266190380Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T07:34:02.266197843Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T07:34:02.266216169Z [inf]  7:33:59 AM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 14ms :: [{"i…
+2025-10-06T07:34:22.245438312Z [inf]  Admin login attempt: {
+2025-10-06T07:34:22.245448014Z [inf]    username: 'ADMIN',
+2025-10-06T07:34:22.245455415Z [inf]    usernameLength: 5,
+2025-10-06T07:34:22.245461906Z [inf]    password: '[LENGTH:9]',
+2025-10-06T07:34:22.245467136Z [inf]    passwordActual: '"go4fc2024"',
+2025-10-06T07:34:22.245472931Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:34:22.245478085Z [inf]    hasSession: true
+2025-10-06T07:34:22.245485380Z [inf]  }
+2025-10-06T07:34:22.245491091Z [inf]  Admin credentials matched successfully
+2025-10-06T07:34:22.245496372Z [inf]  Session saved and verified, adminAuth: {
+2025-10-06T07:34:22.245501689Z [inf]    id: 'admin-001',
+2025-10-06T07:34:22.245507201Z [inf]    role: 'admin',
+2025-10-06T07:34:22.245512805Z [inf]    lastName: 'User',
+2025-10-06T07:34:22.245518436Z [inf]    username: 'admin',
+2025-10-06T07:34:22.245523942Z [inf]    firstName: 'Admin'
+2025-10-06T07:34:22.245529474Z [inf]  }
+2025-10-06T07:34:22.245536262Z [inf]  7:34:14 AM [express] POST /api/auth/admin-login 200 in 47ms :: {"message":"Login successful","user":…
+2025-10-06T07:34:22.245542343Z [inf]  Browser auth bypass token requested
+2025-10-06T07:34:22.245548062Z [inf]  7:34:14 AM [express] POST /api/auth/browser-bypass 200 in 7ms :: {"message":"Browser auth bypass tok…
+2025-10-06T07:34:22.245554277Z [inf]  Authentication failed: No user or expiration
+2025-10-06T07:34:22.245559475Z [inf]  7:34:15 AM [express] GET /api/auth/user 401 in 7ms :: {"message":"Unauthorized"}
+2025-10-06T07:34:22.245571988Z [inf]  Admin user check: {
+2025-10-06T07:34:22.245576972Z [inf]    hasSession: true,
+2025-10-06T07:34:22.245582081Z [inf]    hasAdminAuth: true,
+2025-10-06T07:34:22.245588221Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:34:22.245593624Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-06T07:34:22.245598691Z [inf]    adminAuthData: {
+2025-10-06T07:34:22.245604494Z [inf]      id: 'admin-001',
+2025-10-06T07:34:22.245610016Z [inf]      role: 'admin',
+2025-10-06T07:34:22.245615420Z [inf]      lastName: 'User',
+2025-10-06T07:34:22.245621082Z [inf]      username: 'admin',
+2025-10-06T07:34:22.245626613Z [inf]      firstName: 'Admin'
+2025-10-06T07:34:22.245632369Z [inf]    },
+2025-10-06T07:34:22.245638232Z [inf]    hasBypassToken: false
+2025-10-06T07:34:22.245643625Z [inf]  }
+2025-10-06T07:34:22.245690274Z [inf]  7:34:15 AM [express] GET /api/auth/admin-user 304 in 9ms :: {"id":"admin-001","role":"admin","lastNa…
+2025-10-06T07:34:22.245697081Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T07:34:22.245703125Z [inf]    role: 'driver',
+2025-10-06T07:34:22.245708650Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:34:22.245715591Z [inf]    lastName: 'Owen',
+2025-10-06T07:34:22.245720842Z [inf]    username: 'Kowen',
+2025-10-06T07:34:22.245726581Z [inf]    firstName: 'Kevin'
+2025-10-06T07:34:22.245732361Z [inf]  }
+2025-10-06T07:34:22.245738203Z [inf]  7:34:15 AM [express] GET /api/auth/driver-user 304 in 21ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f4864…
+2025-10-06T07:34:22.246180716Z [inf]  7:34:15 AM [express] GET /api/locations 304 in 12ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01"…
+2025-10-06T07:34:22.246186538Z [inf]  Bypass check: {
+2025-10-06T07:34:22.246197381Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:34:22.246204945Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:34:22.246209919Z [inf]    isActive: true
+2025-10-06T07:34:22.246214606Z [inf]  }
+2025-10-06T07:34:22.246219345Z [inf]  Dashboard stats auth check: {
+2025-10-06T07:34:22.246223816Z [inf]    hasAdminAuth: true,
+2025-10-06T07:34:22.246228637Z [inf]    hasReplitAuth: false,
+2025-10-06T07:34:22.246233193Z [inf]    hasTokenBypass: true,
+2025-10-06T07:34:22.246240592Z [inf]    headers: [
+2025-10-06T07:34:22.246245215Z [inf]      'host',                 'user-agent',
+2025-10-06T07:34:22.246251523Z [inf]      'accept',               'accept-encoding',
+2025-10-06T07:34:22.246256202Z [inf]      'accept-language',      'cookie',
+2025-10-06T07:34:22.246260856Z [inf]      'if-none-match',        'referer',
+2025-10-06T07:34:22.246265462Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T07:34:22.246270262Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T07:34:22.246275511Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T07:34:22.246280506Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T07:34:22.246285503Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T07:34:22.246292020Z [inf]      'x-request-start'
+2025-10-06T07:34:22.246296779Z [inf]    ],
+2025-10-06T07:34:22.246301423Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T07:34:22.246305949Z [inf]  }
+2025-10-06T07:34:22.246311208Z [inf]  7:34:15 AM [express] GET /api/drivers/available 304 in 28ms :: [{"id":"f920c664-fb37-496e-af76-1f0a4…
+2025-10-06T07:34:22.246315941Z [inf]  7:34:15 AM [express] GET /api/dashboard/stats 304 in 36ms :: {"activeLoads":"4","inTransit":"0","del…
+2025-10-06T07:34:22.246320317Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:34:22.246324955Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:34:22.246329573Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:34:22.246335681Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:34:22.246340550Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:34:22.246345395Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:34:22.246350105Z [inf]  7:34:15 AM [express] GET /api/customers 304 in 21ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8"…
+2025-10-06T07:34:22.246354901Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:34:22.246361348Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:34:22.246366133Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:34:22.246370824Z [inf]  7:34:15 AM [express] GET /api/loads 200 in 46ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:34:22.246378653Z [inf]  7:34:15 AM [express] GET /api/invoices 304 in 47ms :: []
+2025-10-06T07:34:29.955105434Z [inf]  Bypass check: {
+2025-10-06T07:34:29.955112565Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:34:29.955119919Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:34:29.955126951Z [inf]    isActive: true
+2025-10-06T07:34:29.955134954Z [inf]  }
+2025-10-06T07:34:29.955143149Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T07:34:29.955150857Z [inf]    adminAuth: true,
+2025-10-06T07:34:29.955157426Z [inf]    replitAuth: false,
+2025-10-06T07:34:29.955164709Z [inf]    driverAuth: true,
+2025-10-06T07:34:29.955172427Z [inf]    bypassAuth: true,
+2025-10-06T07:34:29.955180305Z [inf]    hasAuth: true,
+2025-10-06T07:34:29.955188387Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T07:34:29.955206564Z [inf]  }
+2025-10-06T07:34:29.955220157Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T07:34:29.955229267Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T07:34:29.955238335Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T07:34:29.958365991Z [inf]  7:34:29 AM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 51ms :: [{"i…
+2025-10-06T07:35:09.977111960Z [inf]  Bypass check: {
+2025-10-06T07:35:09.977122720Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:35:09.977144197Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:35:09.977150176Z [inf]    isActive: true
+2025-10-06T07:35:09.977155997Z [inf]  }
+2025-10-06T07:35:09.977162353Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T07:35:09.977168729Z [inf]    adminAuth: true,
+2025-10-06T07:35:09.977174789Z [inf]    replitAuth: false,
+2025-10-06T07:35:09.977202005Z [inf]    driverAuth: true,
+2025-10-06T07:35:09.977270393Z [inf]    bypassAuth: true,
+2025-10-06T07:35:09.977279372Z [inf]    hasAuth: true,
+2025-10-06T07:35:09.977285714Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T07:35:09.977291489Z [inf]  }
+2025-10-06T07:35:09.977297128Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T07:35:09.977302513Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T07:35:09.977320489Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T07:35:09.977326002Z [inf]  7:35:00 AM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 73ms :: [{"i…
+2025-10-06T07:35:29.949416389Z [inf]  7:35:20 AM [express] GET /api/loads/by-number/6022337 200 in 50ms :: {"id":"20ef41b3-abfe-41e5-904e-…
+2025-10-06T07:35:29.949423894Z [inf]  7:35:20 AM [express] GET /api/bol/check/78697 304 in 9ms :: {"exists":false}
+2025-10-06T07:35:29.949431644Z [inf]  7:35:20 AM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/bol 400 in 14ms :: {"mess…
+2025-10-06T07:35:29.949440304Z [inf]  7:35:25 AM [express] GET /api/loads/by-number/6022337 304 in 15ms :: {"id":"20ef41b3-abfe-41e5-904e-…
+2025-10-06T07:35:29.949449345Z [inf]  🔐 Override flag detected - skipping duplicate BOL check for 78697
+2025-10-06T07:35:29.949457622Z [inf]  ⚠️ BOL record creation skipped (duplicate with override): 78697
+2025-10-06T07:35:29.949465039Z [inf]  7:35:25 AM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/bol 200 in 15ms :: {"id":…
+2025-10-06T07:35:30.497317000Z [inf]  Bypass check: {
+2025-10-06T07:35:30.497327158Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:35:30.497334702Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:35:30.497342992Z [inf]    isActive: true
+2025-10-06T07:35:30.497351471Z [inf]  }
+2025-10-06T07:35:30.497361269Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T07:35:30.497368939Z [inf]    adminAuth: true,
+2025-10-06T07:35:30.497375870Z [inf]    replitAuth: false,
+2025-10-06T07:35:30.497384047Z [inf]    driverAuth: true,
+2025-10-06T07:35:30.497390920Z [inf]    bypassAuth: true,
+2025-10-06T07:35:30.497398071Z [inf]    hasAuth: true,
+2025-10-06T07:35:30.497404797Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T07:35:30.497411058Z [inf]  }
+2025-10-06T07:35:30.497419825Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T07:35:30.519204302Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T07:35:30.519216794Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T07:35:30.522457114Z [inf]  7:35:30 AM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 48ms :: [{"i…
+2025-10-06T07:35:50.536052879Z [inf]  Upload auth check: {
+2025-10-06T07:35:50.536068092Z [inf]    hasReplitAuth: false,
+2025-10-06T07:35:50.536078346Z [inf]    hasDriverAuth: {
+2025-10-06T07:35:50.536093043Z [inf]      role: 'driver',
+2025-10-06T07:35:50.536102099Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.536111417Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.536119381Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.536129181Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.536137258Z [inf]    },
+2025-10-06T07:35:50.536145978Z [inf]    hasTokenBypass: false,
+2025-10-06T07:35:50.536155569Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:35:50.536164199Z [inf]    session: Session {
+2025-10-06T07:35:50.536174587Z [inf]      cookie: {
+2025-10-06T07:35:50.536182612Z [inf]        path: '/',
+2025-10-06T07:35:50.536191005Z [inf]        _expires: 2025-10-13T07:34:14.729Z,
+2025-10-06T07:35:50.536199505Z [inf]        originalMaxAge: 604800000,
+2025-10-06T07:35:50.536207913Z [inf]        httpOnly: true,
+2025-10-06T07:35:50.536217179Z [inf]        secure: true,
+2025-10-06T07:35:50.536226766Z [inf]        sameSite: 'none'
+2025-10-06T07:35:50.536235360Z [inf]      },
+2025-10-06T07:35:50.536245580Z [inf]      adminAuth: {
+2025-10-06T07:35:50.536254390Z [inf]        id: 'admin-001',
+2025-10-06T07:35:50.536263253Z [inf]        role: 'admin',
+2025-10-06T07:35:50.536273102Z [inf]        lastName: 'User',
+2025-10-06T07:35:50.536281919Z [inf]        username: 'admin',
+2025-10-06T07:35:50.536290716Z [inf]        firstName: 'Admin'
+2025-10-06T07:35:50.536851794Z [inf]      },
+2025-10-06T07:35:50.536867283Z [inf]      driverAuth: {
+2025-10-06T07:35:50.536876056Z [inf]        role: 'driver',
+2025-10-06T07:35:50.536884419Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.536892621Z [inf]        lastName: 'Owen',
+2025-10-06T07:35:50.536916405Z [inf]        firstName: 'Kevin'
+2025-10-06T07:35:50.536916762Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.536930406Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.536939018Z [inf]      }
+2025-10-06T07:35:50.536945110Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.536956923Z [inf]    },
+2025-10-06T07:35:50.536958199Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.536972810Z [inf]    },
+2025-10-06T07:35:50.536973522Z [inf]    driverAuthData: {
+2025-10-06T07:35:50.537003841Z [inf]    hasTokenBypass: false,
+2025-10-06T07:35:50.537016607Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:35:50.537020034Z [inf]      role: 'driver',
+2025-10-06T07:35:50.537028722Z [inf]    session: Session {
+2025-10-06T07:35:50.537038159Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.537051353Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.537062949Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.537073248Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.537083969Z [inf]    },
+2025-10-06T07:35:50.537093129Z [inf]    finalAuth: {
+2025-10-06T07:35:50.537105409Z [inf]      role: 'driver',
+2025-10-06T07:35:50.537116896Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.537126292Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.537144249Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.537159607Z [inf]        username: 'Kowen',
+2025-10-06T07:35:50.537160627Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.537174429Z [inf]    }
+2025-10-06T07:35:50.537185885Z [inf]  }
+2025-10-06T07:35:50.537196685Z [inf]  Upload auth check: {
+2025-10-06T07:35:50.537209340Z [inf]    hasReplitAuth: false,
+2025-10-06T07:35:50.537221174Z [inf]    hasDriverAuth: {
+2025-10-06T07:35:50.537233863Z [inf]      role: 'driver',
+2025-10-06T07:35:50.537236359Z [inf]      cookie: {
+2025-10-06T07:35:50.537249147Z [inf]        path: '/',
+2025-10-06T07:35:50.537264451Z [inf]        _expires: 2025-10-13T07:34:14.729Z,
+2025-10-06T07:35:50.537314426Z [inf]        originalMaxAge: 604800000,
+2025-10-06T07:35:50.537325886Z [inf]        httpOnly: true,
+2025-10-06T07:35:50.537337584Z [inf]        secure: true,
+2025-10-06T07:35:50.537351070Z [inf]        sameSite: 'none'
+2025-10-06T07:35:50.537362147Z [inf]      },
+2025-10-06T07:35:50.539060853Z [inf]      adminAuth: {
+2025-10-06T07:35:50.539073835Z [inf]        id: 'admin-001',
+2025-10-06T07:35:50.539082988Z [inf]        role: 'admin',
+2025-10-06T07:35:50.539091053Z [inf]        lastName: 'User',
+2025-10-06T07:35:50.539097012Z [inf]        username: 'admin',
+2025-10-06T07:35:50.539103541Z [inf]        firstName: 'Admin'
+2025-10-06T07:35:50.539109616Z [inf]      },
+2025-10-06T07:35:50.539116570Z [inf]      driverAuth: {
+2025-10-06T07:35:50.539122127Z [inf]        role: 'driver',
+2025-10-06T07:35:50.539130858Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.539136855Z [inf]        lastName: 'Owen',
+2025-10-06T07:35:50.539142463Z [inf]        username: 'Kowen',
+2025-10-06T07:35:50.539149857Z [inf]        firstName: 'Kevin'
+2025-10-06T07:35:50.539155788Z [inf]      }
+2025-10-06T07:35:50.539161286Z [inf]    },
+2025-10-06T07:35:50.539167402Z [inf]    driverAuthData: {
+2025-10-06T07:35:50.539173081Z [inf]      role: 'driver',
+2025-10-06T07:35:50.539179271Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.539184797Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.539191236Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.539198751Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.539204730Z [inf]    },
+2025-10-06T07:35:50.539210210Z [inf]    finalAuth: {
+2025-10-06T07:35:50.539216856Z [inf]      role: 'driver',
+2025-10-06T07:35:50.539342080Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.539347766Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.539353378Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.539361236Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.539366917Z [inf]    }
+2025-10-06T07:35:50.539373466Z [inf]  }
+2025-10-06T07:35:50.539379168Z [inf]  Upload auth check: {
+2025-10-06T07:35:50.539387919Z [inf]    hasReplitAuth: false,
+2025-10-06T07:35:50.539395631Z [inf]    hasDriverAuth: {
+2025-10-06T07:35:50.539420622Z [inf]      role: 'driver',
+2025-10-06T07:35:50.539970654Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.539980096Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.539986794Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.539994113Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.540002842Z [inf]    },
+2025-10-06T07:35:50.540009251Z [inf]    hasTokenBypass: false,
+2025-10-06T07:35:50.540016430Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:35:50.540023242Z [inf]    session: Session {
+2025-10-06T07:35:50.540032388Z [inf]      cookie: {
+2025-10-06T07:35:50.540039634Z [inf]        path: '/',
+2025-10-06T07:35:50.540045890Z [inf]        _expires: 2025-10-13T07:34:14.729Z,
+2025-10-06T07:35:50.540052534Z [inf]        originalMaxAge: 604800000,
+2025-10-06T07:35:50.540058827Z [inf]        httpOnly: true,
+2025-10-06T07:35:50.540064926Z [inf]        secure: true,
+2025-10-06T07:35:50.540070982Z [inf]        sameSite: 'none'
+2025-10-06T07:35:50.540077354Z [inf]      },
+2025-10-06T07:35:50.540085995Z [inf]      adminAuth: {
+2025-10-06T07:35:50.540092983Z [inf]        id: 'admin-001',
+2025-10-06T07:35:50.540099798Z [inf]        role: 'admin',
+2025-10-06T07:35:50.540106560Z [inf]        lastName: 'User',
+2025-10-06T07:35:50.540113339Z [inf]        username: 'admin',
+2025-10-06T07:35:50.540232710Z [inf]        firstName: 'Admin'
+2025-10-06T07:35:50.540238884Z [inf]      },
+2025-10-06T07:35:50.540245037Z [inf]      driverAuth: {
+2025-10-06T07:35:50.540251331Z [inf]        role: 'driver',
+2025-10-06T07:35:50.540257503Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.540263670Z [inf]        lastName: 'Owen',
+2025-10-06T07:35:50.540269864Z [inf]        username: 'Kowen',
+2025-10-06T07:35:50.540276015Z [inf]        firstName: 'Kevin'
+2025-10-06T07:35:50.540283016Z [inf]      }
+2025-10-06T07:35:50.540288883Z [inf]    },
+2025-10-06T07:35:50.540294787Z [inf]    driverAuthData: {
+2025-10-06T07:35:50.540300343Z [inf]      role: 'driver',
+2025-10-06T07:35:50.540305833Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.540312914Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.540319503Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.540326753Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.540333445Z [inf]    },
+2025-10-06T07:35:50.540339620Z [inf]    finalAuth: {
+2025-10-06T07:35:50.540347898Z [inf]      role: 'driver',
+2025-10-06T07:35:50.540357497Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:50.540364110Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:50.540370477Z [inf]      username: 'Kowen',
+2025-10-06T07:35:50.540379327Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:50.540385688Z [inf]    }
+2025-10-06T07:35:50.540391695Z [inf]  }
+2025-10-06T07:35:50.540398012Z [err]  Error getting upload URL: TypeError: fetch failed
+2025-10-06T07:35:50.540404185Z [err]      at node:internal/deps/undici/undici:13392:13
+2025-10-06T07:35:50.540410193Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T07:35:50.540416243Z [err]      at async signObjectURL (file:///app/dist/index.js:601:20)
+2025-10-06T07:35:50.540444518Z [err]        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1610:16) {
+2025-10-06T07:35:50.540455032Z [err]      errno: -111,
+2025-10-06T07:35:50.540464817Z [err]      code: 'ECONNREFUSED',
+2025-10-06T07:35:50.540473561Z [err]      syscall: 'connect',
+2025-10-06T07:35:50.540482227Z [err]      address: '127.0.0.1',
+2025-10-06T07:35:50.540490981Z [err]      port: 1106
+2025-10-06T07:35:50.540496698Z [err]      at async file:///app/dist/index.js:7271:25 {
+2025-10-06T07:35:50.540506708Z [err]    }
+2025-10-06T07:35:50.540506922Z [err]    [cause]: Error: connect ECONNREFUSED 127.0.0.1:1106
+2025-10-06T07:35:50.540522011Z [err]  }
+2025-10-06T07:35:50.540525970Z [err]        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1610:16) {
+2025-10-06T07:35:50.540537595Z [err]      errno: -111,
+2025-10-06T07:35:50.540539819Z [inf]  7:35:44 AM [express] POST /api/objects/upload 500 in 51ms :: {"message":"Failed to get upload URL"}
+2025-10-06T07:35:50.540545838Z [err]      code: 'ECONNREFUSED',
+2025-10-06T07:35:50.540556525Z [err]  Error getting upload URL: TypeError: fetch failed
+2025-10-06T07:35:50.540556620Z [err]      syscall: 'connect',
+2025-10-06T07:35:50.540566433Z [err]      address: '127.0.0.1',
+2025-10-06T07:35:50.540571782Z [err]      at node:internal/deps/undici/undici:13392:13
+2025-10-06T07:35:50.540576879Z [err]      port: 1106
+2025-10-06T07:35:50.540587861Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T07:35:50.540588071Z [err]    }
+2025-10-06T07:35:50.540597073Z [err]  }
+2025-10-06T07:35:50.540604636Z [err]      at async signObjectURL (file:///app/dist/index.js:601:20)
+2025-10-06T07:35:50.540608699Z [err]  Error getting upload URL: TypeError: fetch failed
+2025-10-06T07:35:50.540620059Z [err]      at node:internal/deps/undici/undici:13392:13
+2025-10-06T07:35:50.540620419Z [err]      at async file:///app/dist/index.js:7271:25 {
+2025-10-06T07:35:50.540633026Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T07:35:50.540641137Z [err]    [cause]: Error: connect ECONNREFUSED 127.0.0.1:1106
+2025-10-06T07:35:50.540642661Z [err]      at async signObjectURL (file:///app/dist/index.js:601:20)
+2025-10-06T07:35:50.540650950Z [err]      at async file:///app/dist/index.js:7271:25 {
+2025-10-06T07:35:50.540658280Z [err]        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1610:16) {
+2025-10-06T07:35:50.540659939Z [err]    [cause]: Error: connect ECONNREFUSED 127.0.0.1:1106
+2025-10-06T07:35:50.540669506Z [err]      errno: -111,
+2025-10-06T07:35:50.540678292Z [err]      code: 'ECONNREFUSED',
+2025-10-06T07:35:50.540686709Z [err]      syscall: 'connect',
+2025-10-06T07:35:50.540695246Z [err]      address: '127.0.0.1',
+2025-10-06T07:35:50.541356550Z [err]      port: 1106
+2025-10-06T07:35:50.541362678Z [err]    }
+2025-10-06T07:35:50.541368192Z [err]  }
+2025-10-06T07:35:50.541373910Z [inf]  7:35:44 AM [express] POST /api/objects/upload 500 in 56ms :: {"message":"Failed to get upload URL"}
+2025-10-06T07:35:50.541379314Z [inf]  7:35:44 AM [express] POST /api/objects/upload 500 in 56ms :: {"message":"Failed to get upload URL"}
+2025-10-06T07:35:54.696547272Z [inf]  Upload auth check: {
+2025-10-06T07:35:54.696558988Z [inf]    hasReplitAuth: false,
+2025-10-06T07:35:54.696566368Z [inf]    hasDriverAuth: {
+2025-10-06T07:35:54.696572243Z [inf]      role: 'driver',
+2025-10-06T07:35:54.696578149Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.696583968Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.696589688Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.696595419Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.696601714Z [inf]    },
+2025-10-06T07:35:54.696607454Z [inf]    hasTokenBypass: false,
+2025-10-06T07:35:54.696613907Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:35:54.696619127Z [inf]    session: Session {
+2025-10-06T07:35:54.696627214Z [inf]      cookie: {
+2025-10-06T07:35:54.696632424Z [inf]        path: '/',
+2025-10-06T07:35:54.696637895Z [inf]        _expires: 2025-10-13T07:34:14.729Z,
+2025-10-06T07:35:54.696643994Z [inf]        originalMaxAge: 604800000,
+2025-10-06T07:35:54.696650184Z [inf]        httpOnly: true,
+2025-10-06T07:35:54.696656205Z [inf]        secure: true,
+2025-10-06T07:35:54.696661467Z [inf]        sameSite: 'none'
+2025-10-06T07:35:54.696667342Z [inf]      },
+2025-10-06T07:35:54.696673455Z [inf]      adminAuth: {
+2025-10-06T07:35:54.696679822Z [inf]        id: 'admin-001',
+2025-10-06T07:35:54.696691596Z [inf]        role: 'admin',
+2025-10-06T07:35:54.696697935Z [inf]        lastName: 'User',
+2025-10-06T07:35:54.696703788Z [inf]        username: 'admin',
+2025-10-06T07:35:54.696709617Z [inf]        firstName: 'Admin'
+2025-10-06T07:35:54.696716433Z [inf]      },
+2025-10-06T07:35:54.696723846Z [inf]      driverAuth: {
+2025-10-06T07:35:54.696730110Z [inf]        role: 'driver',
+2025-10-06T07:35:54.696736507Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.696742922Z [inf]        lastName: 'Owen',
+2025-10-06T07:35:54.696749306Z [inf]        username: 'Kowen',
+2025-10-06T07:35:54.696756790Z [inf]        firstName: 'Kevin'
+2025-10-06T07:35:54.696763021Z [inf]      }
+2025-10-06T07:35:54.696769255Z [inf]    },
+2025-10-06T07:35:54.696777035Z [inf]    driverAuthData: {
+2025-10-06T07:35:54.696784833Z [inf]      role: 'driver',
+2025-10-06T07:35:54.696791203Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.696797096Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.696802666Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.696808138Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.696814050Z [inf]    },
+2025-10-06T07:35:54.696820511Z [inf]    finalAuth: {
+2025-10-06T07:35:54.696829620Z [inf]      role: 'driver',
+2025-10-06T07:35:54.696837163Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.696843183Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.696849569Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.696855743Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.696863096Z [inf]    }
+2025-10-06T07:35:54.696870849Z [inf]  }
+2025-10-06T07:35:54.697320696Z [inf]  Upload auth check: {
+2025-10-06T07:35:54.697329528Z [inf]    hasReplitAuth: false,
+2025-10-06T07:35:54.697338001Z [inf]    hasDriverAuth: {
+2025-10-06T07:35:54.697345660Z [inf]      role: 'driver',
+2025-10-06T07:35:54.697352509Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.697362071Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.697369718Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.697377875Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.697385724Z [inf]    },
+2025-10-06T07:35:54.697393069Z [inf]    hasTokenBypass: false,
+2025-10-06T07:35:54.697401331Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:35:54.697409451Z [inf]    session: Session {
+2025-10-06T07:35:54.697416833Z [inf]      cookie: {
+2025-10-06T07:35:54.697425093Z [inf]        path: '/',
+2025-10-06T07:35:54.697431905Z [inf]        _expires: 2025-10-13T07:34:14.729Z,
+2025-10-06T07:35:54.697439012Z [inf]        originalMaxAge: 604800000,
+2025-10-06T07:35:54.697445848Z [inf]        httpOnly: true,
+2025-10-06T07:35:54.697453401Z [inf]        secure: true,
+2025-10-06T07:35:54.697460627Z [inf]        sameSite: 'none'
+2025-10-06T07:35:54.697467130Z [inf]      },
+2025-10-06T07:35:54.697474190Z [inf]      adminAuth: {
+2025-10-06T07:35:54.697482101Z [inf]        id: 'admin-001',
+2025-10-06T07:35:54.697489296Z [inf]        role: 'admin',
+2025-10-06T07:35:54.697497706Z [inf]        lastName: 'User',
+2025-10-06T07:35:54.697507537Z [inf]        username: 'admin',
+2025-10-06T07:35:54.697516561Z [inf]        firstName: 'Admin'
+2025-10-06T07:35:54.697524214Z [inf]      },
+2025-10-06T07:35:54.697531019Z [inf]      driverAuth: {
+2025-10-06T07:35:54.697537625Z [inf]        role: 'driver',
+2025-10-06T07:35:54.697543810Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.697551594Z [inf]        lastName: 'Owen',
+2025-10-06T07:35:54.697557580Z [inf]        username: 'Kowen',
+2025-10-06T07:35:54.697564466Z [inf]        firstName: 'Kevin'
+2025-10-06T07:35:54.697573562Z [inf]      }
+2025-10-06T07:35:54.697581199Z [inf]    },
+2025-10-06T07:35:54.697589009Z [inf]    driverAuthData: {
+2025-10-06T07:35:54.697598239Z [inf]      role: 'driver',
+2025-10-06T07:35:54.697606948Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.697616119Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.697626237Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.697632680Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.697640405Z [inf]    },
+2025-10-06T07:35:54.697646524Z [inf]    finalAuth: {
+2025-10-06T07:35:54.697653162Z [inf]      role: 'driver',
+2025-10-06T07:35:54.697659473Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.697668140Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.697674872Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.697683477Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.697690604Z [inf]    }
+2025-10-06T07:35:54.697697944Z [inf]  }
+2025-10-06T07:35:54.700924948Z [inf]  Upload auth check: {
+2025-10-06T07:35:54.700936183Z [inf]    hasReplitAuth: false,
+2025-10-06T07:35:54.700945852Z [inf]    hasDriverAuth: {
+2025-10-06T07:35:54.700953891Z [inf]      role: 'driver',
+2025-10-06T07:35:54.700961216Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.700968863Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.700979933Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.700987267Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.701021060Z [inf]    },
+2025-10-06T07:35:54.701029414Z [inf]    hasTokenBypass: false,
+2025-10-06T07:35:54.701038006Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:35:54.701046141Z [inf]    session: Session {
+2025-10-06T07:35:54.701054589Z [inf]      cookie: {
+2025-10-06T07:35:54.701062914Z [inf]        path: '/',
+2025-10-06T07:35:54.701074208Z [inf]        _expires: 2025-10-13T07:34:14.729Z,
+2025-10-06T07:35:54.701082441Z [inf]        originalMaxAge: 604800000,
+2025-10-06T07:35:54.701090733Z [inf]        httpOnly: true,
+2025-10-06T07:35:54.701098056Z [inf]        secure: true,
+2025-10-06T07:35:54.701107116Z [inf]        sameSite: 'none'
+2025-10-06T07:35:54.701115797Z [inf]      },
+2025-10-06T07:35:54.701122757Z [inf]      adminAuth: {
+2025-10-06T07:35:54.701131014Z [inf]        id: 'admin-001',
+2025-10-06T07:35:54.701139376Z [inf]        role: 'admin',
+2025-10-06T07:35:54.701149116Z [inf]        lastName: 'User',
+2025-10-06T07:35:54.701157056Z [inf]        username: 'admin',
+2025-10-06T07:35:54.701164847Z [inf]        firstName: 'Admin'
+2025-10-06T07:35:54.701172583Z [inf]      },
+2025-10-06T07:35:54.701180480Z [inf]      driverAuth: {
+2025-10-06T07:35:54.701191000Z [inf]        role: 'driver',
+2025-10-06T07:35:54.701199459Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.701207348Z [inf]        lastName: 'Owen',
+2025-10-06T07:35:54.701236716Z [inf]        username: 'Kowen',
+2025-10-06T07:35:54.701244879Z [inf]        firstName: 'Kevin'
+2025-10-06T07:35:54.701254383Z [inf]      }
+2025-10-06T07:35:54.701263036Z [inf]    },
+2025-10-06T07:35:54.701271730Z [inf]    driverAuthData: {
+2025-10-06T07:35:54.701319195Z [inf]      role: 'driver',
+2025-10-06T07:35:54.701327134Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.701336800Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.701345879Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.701354208Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.701362778Z [inf]    },
+2025-10-06T07:35:54.701370382Z [inf]    finalAuth: {
+2025-10-06T07:35:54.701378315Z [inf]      role: 'driver',
+2025-10-06T07:35:54.701386643Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:35:54.701395735Z [inf]      lastName: 'Owen',
+2025-10-06T07:35:54.701404361Z [inf]      username: 'Kowen',
+2025-10-06T07:35:54.701414137Z [inf]      firstName: 'Kevin'
+2025-10-06T07:35:54.701422056Z [inf]    }
+2025-10-06T07:35:54.701429593Z [inf]  }
+2025-10-06T07:35:54.701436981Z [err]  Error getting upload URL: TypeError: fetch failed
+2025-10-06T07:35:54.701444989Z [err]      at node:internal/deps/undici/undici:13392:13
+2025-10-06T07:35:54.701452756Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T07:35:54.701460807Z [err]      at async signObjectURL (file:///app/dist/index.js:601:20)
+2025-10-06T07:35:54.701469921Z [err]      at async file:///app/dist/index.js:7271:25 {
+2025-10-06T07:35:54.701478781Z [err]    [cause]: Error: connect ECONNREFUSED 127.0.0.1:1106
+2025-10-06T07:35:54.701487131Z [err]        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1610:16) {
+2025-10-06T07:35:54.701495146Z [err]      errno: -111,
+2025-10-06T07:35:54.702044498Z [err]      code: 'ECONNREFUSED',
+2025-10-06T07:35:54.702052149Z [err]      syscall: 'connect',
+2025-10-06T07:35:54.702058473Z [err]      address: '127.0.0.1',
+2025-10-06T07:35:54.702065021Z [err]      port: 1106
+2025-10-06T07:35:54.702071682Z [err]    }
+2025-10-06T07:35:54.702078216Z [err]  }
+2025-10-06T07:35:54.703576440Z [err]  Error getting upload URL: TypeError: fetch failed
+2025-10-06T07:35:54.703585878Z [err]      at node:internal/deps/undici/undici:13392:13
+2025-10-06T07:35:54.703593096Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T07:35:54.703602328Z [err]      at async signObjectURL (file:///app/dist/index.js:601:20)
+2025-10-06T07:35:54.703608631Z [err]      at async file:///app/dist/index.js:7271:25 {
+2025-10-06T07:35:54.703614993Z [err]    [cause]: Error: connect ECONNREFUSED 127.0.0.1:1106
+2025-10-06T07:35:54.703621298Z [err]        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1610:16) {
+2025-10-06T07:35:54.703628107Z [err]      errno: -111,
+2025-10-06T07:35:54.703634948Z [err]      code: 'ECONNREFUSED',
+2025-10-06T07:35:54.703641861Z [err]      syscall: 'connect',
+2025-10-06T07:35:54.703648436Z [err]      address: '127.0.0.1',
+2025-10-06T07:35:54.703655009Z [err]      port: 1106
+2025-10-06T07:35:54.703661404Z [err]    }
+2025-10-06T07:35:54.703668511Z [err]  }
+2025-10-06T07:35:54.703676662Z [err]  Error getting upload URL: TypeError: fetch failed
+2025-10-06T07:35:54.703685140Z [err]      at node:internal/deps/undici/undici:13392:13
+2025-10-06T07:35:54.703693928Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T07:35:54.703703724Z [err]      at async signObjectURL (file:///app/dist/index.js:601:20)
+2025-10-06T07:35:54.703711310Z [err]      at async file:///app/dist/index.js:7271:25 {
+2025-10-06T07:35:54.703718832Z [err]    [cause]: Error: connect ECONNREFUSED 127.0.0.1:1106
+2025-10-06T07:35:54.703726082Z [err]        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1610:16) {
+2025-10-06T07:35:54.703733571Z [err]      errno: -111,
+2025-10-06T07:35:54.703740752Z [err]      code: 'ECONNREFUSED',
+2025-10-06T07:35:54.703750887Z [err]      syscall: 'connect',
+2025-10-06T07:35:54.703757829Z [err]      address: '127.0.0.1',
+2025-10-06T07:35:54.703764992Z [err]      port: 1106
+2025-10-06T07:35:54.703892990Z [err]    }
+2025-10-06T07:35:54.703900765Z [err]  }
+2025-10-06T07:35:54.706579686Z [inf]  7:35:54 AM [express] POST /api/objects/upload 500 in 44ms :: {"message":"Failed to get upload URL"}
+2025-10-06T07:35:54.706591481Z [inf]  7:35:54 AM [express] POST /api/objects/upload 500 in 43ms :: {"message":"Failed to get upload URL"}
+2025-10-06T07:35:54.706598782Z [inf]  7:35:54 AM [express] POST /api/objects/upload 500 in 44ms :: {"message":"Failed to get upload URL"}
