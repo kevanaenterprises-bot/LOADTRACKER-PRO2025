@@ -5458,13 +5458,33 @@ Reply YES to confirm acceptance or NO to decline.`
                 finalizedAt: now, // Mark as finalized immediately since POD is embedded
               };
               
-              // Fetch POD snapshot data for embedding
-              const podSnapshot = await fetchPodSnapshot(podDocumentURL);
-              if (podSnapshot) {
-                invoiceData.podSnapshot = podSnapshot;
-                console.log(`📄 POD snapshot embedded into POD-triggered invoice for load ${loadForInvoice.number109}`);
-              } else {
-                console.log(`⚠️ POD snapshot fetch failed for POD-triggered invoice of load ${loadForInvoice.number109}`);
+              // Fetch POD snapshot data for embedding AT UPLOAD TIME (critical for Railway)
+              console.log(`📄 CRITICAL: Fetching POD snapshot to embed at upload time for ${loadForInvoice.number109}`);
+              console.log(`📄 POD URL to fetch: ${podDocumentURL}`);
+              
+              try {
+                const podSnapshot = await fetchPodSnapshot(podDocumentURL);
+                if (podSnapshot) {
+                  invoiceData.podSnapshot = [podSnapshot]; // Store as array for multi-POD consistency
+                  console.log(`✅ SUCCESS: POD snapshot embedded at upload time:`, {
+                    load: loadForInvoice.number109,
+                    size: podSnapshot.size,
+                    contentType: podSnapshot.contentType,
+                    base64Length: podSnapshot.contentBase64?.length || 0,
+                    sourcePath: podSnapshot.sourcePath
+                  });
+                } else {
+                  console.error(`❌ CRITICAL: POD snapshot returned NULL for ${loadForInvoice.number109}`);
+                  console.error(`   This means the invoice will be created WITHOUT the POD image!`);
+                  console.error(`   URL attempted: ${podDocumentURL}`);
+                }
+              } catch (podError) {
+                console.error(`❌ EXCEPTION during POD fetch at upload time:`, {
+                  load: loadForInvoice.number109,
+                  error: podError instanceof Error ? podError.message : String(podError),
+                  stack: podError instanceof Error ? podError.stack : 'No stack',
+                  podURL: podDocumentURL
+                });
               }
               
               await storage.createInvoice(invoiceData);
