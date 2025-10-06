@@ -4834,6 +4834,19 @@ Reply YES to confirm acceptance or NO to decline.`
       const { customerId } = req.body;
       const load = await storage.getLoad(loadId);
       
+      console.log(`📋 INVOICE GENERATION for load ${loadId}:`, {
+        loadNumber: load?.number109,
+        hasLoad: !!load,
+        hasLocation: !!load?.location,
+        locationCity: load?.location?.city,
+        locationState: load?.location?.state,
+        tripRate: load?.tripRate,
+        lumperCharge: load?.lumperCharge,
+        extraStops: load?.extraStops,
+        podDocumentPath: load?.podDocumentPath,
+        bolNumber: load?.bolNumber
+      });
+      
       if (!load) {
         return res.status(404).json({ message: "Load not found" });
       }
@@ -4847,28 +4860,46 @@ Reply YES to confirm acceptance or NO to decline.`
       const hasInvoice = existingInvoices.some((inv: any) => inv.loadId === load.id);
       
       if (hasInvoice) {
+        console.log(`⚠️ Invoice already exists for load ${load.number109}`);
         return res.status(400).json({ message: "Invoice already exists for this load" });
       }
 
-      // Get rate for the location
+      // Get rate for the location (optional if tripRate is set on load)
       const rate = (load.location?.city && load.location?.state) ? await storage.getRateByLocation(
         load.location.city, 
         load.location.state
       ) : null;
       
-      if (!rate) {
+      console.log(`📊 RATE LOOKUP for ${load.location.city}, ${load.location.state}:`, {
+        foundRate: !!rate,
+        flatRate: rate?.flatRate
+      });
+      
+      // Calculate invoice amount based on flat rate system
+      // Priority: 1) tripRate from load (manual override), 2) database flat rate, 3) error
+      const tripRate = parseFloat(load.tripRate?.toString() || "0");
+      
+      // Check if we have ANY rate source
+      if (tripRate <= 0 && !rate) {
         return res.status(400).json({ 
-          message: `No rate found for ${load.location.city}, ${load.location.state}. Please add a rate first.` 
+          message: `No rate found for ${load.location.city}, ${load.location.state} and load has no tripRate set. Please add a rate or set tripRate on the load.` 
         });
       }
-
-      // Calculate invoice amount based on flat rate system
-      // Use tripRate if specified, otherwise fall back to database flat rate
-      const tripRate = parseFloat(load.tripRate?.toString() || "0");
-      const flatRate = tripRate > 0 ? tripRate : parseFloat(rate.flatRate.toString());
+      
+      const flatRate = tripRate > 0 ? tripRate : (rate ? parseFloat(rate.flatRate.toString()) : 0);
       const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
       const extraStopsCharge = parseFloat(load.extraStops?.toString() || "0");
       const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+      
+      console.log(`💰 INVOICE CALCULATION:`, {
+        tripRateFromLoad: tripRate,
+        flatRateFromLocation: rate?.flatRate,
+        finalFlatRate: flatRate,
+        usingTripRate: tripRate > 0,
+        lumperCharge,
+        extraStopsCharge,
+        totalAmount
+      });
 
       // Generate sequential invoice number starting with GO6000
       const invoiceNumber = await storage.getNextInvoiceNumber();
@@ -4888,22 +4919,32 @@ Reply YES to confirm acceptance or NO to decline.`
       };
       
       // Embed POD if available on the load
+      console.log(`📄 POD CHECK for load ${load.number109}:`, {
+        hasPodDocumentPath: !!load.podDocumentPath,
+        podDocumentPath: load.podDocumentPath,
+        podPathLength: load.podDocumentPath?.length
+      });
+      
       if (load.podDocumentPath) {
         invoiceData.podUrl = load.podDocumentPath;
         invoiceData.podAttachedAt = now;
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized"; // Set to finalized since POD is embedded
         
+        console.log(`📄 Fetching POD snapshot for: ${load.podDocumentPath}`);
+        
         // Fetch POD snapshot data for embedding
         const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
         if (podSnapshot) {
           invoiceData.podSnapshot = podSnapshot;
-          console.log(`📄 POD snapshot embedded into manual invoice for load ${load.number109}`);
+          console.log(`✅ POD snapshot embedded into manual invoice for load ${load.number109} (${podSnapshot.size} bytes)`);
         } else {
           console.log(`⚠️ POD snapshot fetch failed for manual invoice of load ${load.number109}`);
         }
         
         console.log(`📄 POD found and embedded into manual invoice for load ${load.number109}`);
+      } else {
+        console.log(`⚠️ NO POD document path found on load ${load.number109} - invoice will not include POD`);
       }
       
       const invoice = await storage.createInvoice(invoiceData);
