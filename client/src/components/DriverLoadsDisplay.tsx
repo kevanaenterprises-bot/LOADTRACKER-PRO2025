@@ -29,8 +29,9 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
 
 
   // Filter out loads that have been completed (POD uploaded)
+  // Keep "delivered" loads so drivers can force-advance to invoicing
   const loads = allLoads.filter((load: any) => 
-    !['delivered', 'awaiting_invoicing', 'awaiting_payment', 'completed', 'paid'].includes(load.status)
+    !['awaiting_invoicing', 'awaiting_payment', 'completed', 'paid'].includes(load.status)
   );
 
   // Status update mutation
@@ -249,7 +250,7 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
                 View Details
               </Button>
               
-              {load.status !== "delivered" && load.status !== "completed" && (
+              {load.status !== "completed" && (
                 <>
                   {/* Main action button - Always Accept Tracking */}
                   <Button 
