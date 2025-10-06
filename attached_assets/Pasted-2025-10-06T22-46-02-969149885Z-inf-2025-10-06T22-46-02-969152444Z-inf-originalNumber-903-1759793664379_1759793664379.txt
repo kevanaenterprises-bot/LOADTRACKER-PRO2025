@@ -1,0 +1,1001 @@
+2025-10-06T22:46:02.969149885Z [inf]  }
+2025-10-06T22:46:02.969152444Z [inf]    originalNumber: '9038037500',
+2025-10-06T22:46:02.969157093Z [inf]    normalizedNumber: '+19038037500',
+2025-10-06T22:46:03.467849355Z [inf]  ✅ SMS SENT WITH TELNYX: 403199bb-b40c-4cf9-bdc6-94162f6150ed {
+2025-10-06T22:46:03.467856041Z [inf]    id: '403199bb-b40c-4cf9-bdc6-94162f6150ed',
+2025-10-06T22:46:03.467861950Z [inf]    to: [
+2025-10-06T22:46:03.467868335Z [inf]      {
+2025-10-06T22:46:03.467875305Z [inf]        phone_number: '+19038037500',
+2025-10-06T22:46:03.467881377Z [inf]        status: 'queued',
+2025-10-06T22:46:03.467887036Z [inf]        carrier: 'NEW CINGULAR WIRELESS PCS, LLC - IL',
+2025-10-06T22:46:03.467892548Z [inf]        line_type: 'Wireless'
+2025-10-06T22:46:03.467897945Z [inf]      }
+2025-10-06T22:46:03.467903398Z [inf]    ],
+2025-10-06T22:46:03.467908611Z [inf]    from: {
+2025-10-06T22:46:03.467913706Z [inf]      phone_number: '+12148170744',
+2025-10-06T22:46:03.467919004Z [inf]      carrier: 'Telnyx',
+2025-10-06T22:46:03.467924431Z [inf]      line_type: 'Wireless'
+2025-10-06T22:46:03.467930220Z [inf]    },
+2025-10-06T22:46:03.467935261Z [inf]    direction: 'outbound',
+2025-10-06T22:46:03.467941264Z [inf]    messaging_profile_id: '4001991c-e085-43d1-aea5-2c79e9b2b0bf',
+2025-10-06T22:46:03.467946195Z [inf]    text: '🚛 NEW LOAD ASSIGNED: 602337 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.'
+2025-10-06T22:46:03.467952936Z [inf]  }
+2025-10-06T22:46:03.467966591Z [inf]  ✅ SUCCESS: SMS sent via Telnyx - LOWEST COST ($0.004/SMS) with highest performance!
+2025-10-06T22:46:03.467972835Z [inf]      - Message ID: 403199bb-b40c-4cf9-bdc6-94162f6150ed
+2025-10-06T22:46:03.467978185Z [inf]      - Direction: outbound
+2025-10-06T22:46:03.467983192Z [inf]      - Messaging Profile: 4001991c-e085-43d1-aea5-2c79e9b2b0bf
+2025-10-06T22:46:03.467989163Z [inf]  🔔 In-app notifications not yet implemented for driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T22:46:03.467994430Z [inf]  ✅ Notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: [ { method: 'sms', success: true } ]
+2025-10-06T22:46:03.468000191Z [inf]  ✅ SMS notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35 for load 602337
+2025-10-06T22:46:03.471590542Z [inf]  10:46:03 PM [express] PATCH /api/loads/784c24d7-150e-4bcf-acbf-6aa957317f59/assign 200 in 526ms :: {"…
+2025-10-06T22:46:03.633072571Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T22:46:03.633078776Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T22:46:03.633084884Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T22:46:03.633090450Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T22:46:03.633096261Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T22:46:03.633102051Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T22:46:03.642082129Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T22:46:03.642091341Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T22:46:03.642097145Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T22:46:03.642103517Z [inf]  10:46:03 PM [express] GET /api/loads 200 in 12ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T22:46:03.702196494Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T22:46:03.702204791Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T22:46:03.702210768Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T22:46:03.702216112Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T22:46:03.702221417Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T22:46:03.702226744Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T22:46:03.713858605Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T22:46:03.713863233Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T22:46:03.713867563Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T22:46:03.713873053Z [inf]  10:46:03 PM [express] GET /api/loads 200 in 13ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T22:46:03.732462616Z [inf]  Bypass check: {
+2025-10-06T22:46:03.732469058Z [inf]    token: '[PROVIDED]',
+2025-10-06T22:46:03.732474902Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T22:46:03.732480980Z [inf]    isActive: true
+2025-10-06T22:46:03.732485826Z [inf]  }
+2025-10-06T22:46:03.732491219Z [inf]  Dashboard stats auth check: {
+2025-10-06T22:46:03.732496501Z [inf]    hasAdminAuth: true,
+2025-10-06T22:46:03.732500928Z [inf]    hasReplitAuth: false,
+2025-10-06T22:46:03.732506866Z [inf]    hasTokenBypass: true,
+2025-10-06T22:46:03.732512887Z [inf]    headers: [
+2025-10-06T22:46:03.732518526Z [inf]      'host',                 'user-agent',
+2025-10-06T22:46:03.732524789Z [inf]      'accept',               'accept-encoding',
+2025-10-06T22:46:03.732529689Z [inf]      'accept-language',      'cookie',
+2025-10-06T22:46:03.732535261Z [inf]      'if-none-match',        'referer',
+2025-10-06T22:46:03.732543537Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T22:46:03.732548519Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T22:46:03.732554570Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T22:46:03.732560773Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T22:46:03.732567041Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T22:46:03.732573024Z [inf]      'x-request-start'
+2025-10-06T22:46:03.732578274Z [inf]    ],
+2025-10-06T22:46:03.732583263Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T22:46:03.732588214Z [inf]  }
+2025-10-06T22:46:03.740628413Z [inf]  10:46:03 PM [express] GET /api/dashboard/stats 200 in 36ms :: {"activeLoads":"4","inTransit":"0","del…
+2025-10-06T22:46:03.740633590Z [inf]  10:46:03 PM [express] GET /api/drivers/available 304 in 39ms :: [{"id":"f920c664-fb37-496e-af76-1f0a4…
+2025-10-06T22:46:03.982339740Z [inf]  10:46:03 PM [express] GET /api/customers 304 in 5ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T22:46:34.016043285Z [inf]  Bypass check: {
+2025-10-06T22:46:34.016047409Z [inf]    token: '[PROVIDED]',
+2025-10-06T22:46:34.016053271Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T22:46:34.016058780Z [inf]    isActive: true
+2025-10-06T22:46:34.016064143Z [inf]  }
+2025-10-06T22:46:34.016069204Z [inf]  Driver assignment auth check: {
+2025-10-06T22:46:34.016073295Z [inf]    hasSession: true,
+2025-10-06T22:46:34.016078399Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T22:46:34.016091784Z [inf]    hasAdminAuth: true,
+2025-10-06T22:46:34.016096139Z [inf]    hasReplitAuth: false,
+2025-10-06T22:46:34.016100567Z [inf]    hasDriverAuth: true,
+2025-10-06T22:46:34.016105601Z [inf]    hasTokenBypass: true,
+2025-10-06T22:46:34.016110787Z [inf]    bypassToken: '[PROVIDED]',
+2025-10-06T22:46:34.016115381Z [inf]    adminAuthData: {
+2025-10-06T22:46:34.016122467Z [inf]      id: 'admin-001',
+2025-10-06T22:46:34.016127063Z [inf]      role: 'admin',
+2025-10-06T22:46:34.016130978Z [inf]      lastName: 'User',
+2025-10-06T22:46:34.016134684Z [inf]      username: 'admin',
+2025-10-06T22:46:34.016138939Z [inf]      firstName: 'Admin'
+2025-10-06T22:46:34.016146132Z [inf]    },
+2025-10-06T22:46:34.016150164Z [inf]    userAuth: false
+2025-10-06T22:46:34.016510588Z [inf]  }
+2025-10-06T22:46:34.016525336Z [inf]  🔔 Sending notification to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: {
+2025-10-06T22:46:34.016534230Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T22:46:34.016540357Z [inf]    apiKeyLength: 58
+2025-10-06T22:46:34.016542578Z [inf]    type: 'load_assignment',
+2025-10-06T22:46:34.016550909Z [inf]    message: '🚛 NEW LOAD ASSIGNED: 602337 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.',
+2025-10-06T22:46:34.016556175Z [inf]  }
+2025-10-06T22:46:34.016558641Z [inf]    loadId: '784c24d7-150e-4bcf-acbf-6aa957317f59',
+2025-10-06T22:46:34.016565314Z [inf]  🚀 SMS SEND ATTEMPT: {
+2025-10-06T22:46:34.016568693Z [inf]    urgent: true
+2025-10-06T22:46:34.016573104Z [inf]    originalNumber: '9038037500',
+2025-10-06T22:46:34.016582992Z [inf]    normalizedNumber: '+19038037500',
+2025-10-06T22:46:34.016590792Z [inf]    from: '+12148170744',
+2025-10-06T22:46:34.016592792Z [inf]      }
+2025-10-06T22:46:34.016598552Z [inf]    messageLength: 135,
+2025-10-06T22:46:34.016610652Z [inf]    hasClient: true,
+2025-10-06T22:46:34.016617717Z [inf]    timestamp: '2025-10-06T22:46:28.735Z'
+2025-10-06T22:46:34.016625834Z [inf]  }
+2025-10-06T22:46:34.016629071Z [inf]    to: [
+2025-10-06T22:46:34.016637443Z [inf]      {
+2025-10-06T22:46:34.016647398Z [inf]        phone_number: '+19038037500',
+2025-10-06T22:46:34.016648531Z [inf]  📱 ATTEMPTING TO SEND SMS WITH TELNYX: {
+2025-10-06T22:46:34.016655146Z [inf]        status: 'queued',
+2025-10-06T22:46:34.016663825Z [inf]    from: '+12148170744',
+2025-10-06T22:46:34.016664672Z [inf]        carrier: 'NEW CINGULAR WIRELESS PCS, LLC - IL',
+2025-10-06T22:46:34.016673560Z [inf]        line_type: 'Wireless'
+2025-10-06T22:46:34.016673604Z [inf]    to: '+19038037500',
+2025-10-06T22:46:34.016674179Z [inf]    ],
+2025-10-06T22:46:34.016677796Z [inf]  }
+2025-10-06T22:46:34.016682740Z [inf]    messagePreview: '🚛 NEW LOAD ASSIGNED: 602337 to UNFI LANCASTER. Go...'
+2025-10-06T22:46:34.016687941Z [inf]  🔍 SMS Service Debug Check: {
+2025-10-06T22:46:34.016689923Z [inf]    from: {
+2025-10-06T22:46:34.016690023Z [inf]  }
+2025-10-06T22:46:34.016696579Z [inf]    hasTelnyxClient: true,
+2025-10-06T22:46:34.016697467Z [inf]  ✅ SMS SENT WITH TELNYX: 403199bb-b471-4206-aee1-2295e444d97d {
+2025-10-06T22:46:34.016704437Z [inf]      phone_number: '+12148170744',
+2025-10-06T22:46:34.016707110Z [inf]    id: '403199bb-b471-4206-aee1-2295e444d97d',
+2025-10-06T22:46:34.016707337Z [inf]    hasFromNumber: true,
+2025-10-06T22:46:34.016716308Z [inf]      carrier: 'Telnyx',
+2025-10-06T22:46:34.016716391Z [inf]    fromNumberValue: '+12148170744',
+2025-10-06T22:46:34.016724702Z [inf]      line_type: 'Wireless'
+2025-10-06T22:46:34.016732720Z [inf]    },
+2025-10-06T22:46:34.016740310Z [inf]    direction: 'outbound',
+2025-10-06T22:46:34.016747222Z [inf]    messaging_profile_id: '4001991c-e085-43d1-aea5-2c79e9b2b0bf',
+2025-10-06T22:46:34.016754018Z [inf]    text: '🚛 NEW LOAD ASSIGNED: 602337 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.'
+2025-10-06T22:46:34.016766516Z [inf]  }
+2025-10-06T22:46:34.016772803Z [inf]  ✅ SUCCESS: SMS sent via Telnyx - LOWEST COST ($0.004/SMS) with highest performance!
+2025-10-06T22:46:34.016778473Z [inf]      - Message ID: 403199bb-b471-4206-aee1-2295e444d97d
+2025-10-06T22:46:34.016785635Z [inf]      - Direction: outbound
+2025-10-06T22:46:34.016792205Z [inf]      - Messaging Profile: 4001991c-e085-43d1-aea5-2c79e9b2b0bf
+2025-10-06T22:46:34.016798433Z [inf]  🔔 In-app notifications not yet implemented for driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T22:46:34.016804360Z [inf]  ✅ Notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: [ { method: 'sms', success: true } ]
+2025-10-06T22:46:34.016810718Z [inf]  ✅ SMS notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35 for load 602337
+2025-10-06T22:46:34.016818702Z [inf]  10:46:29 PM [express] PATCH /api/loads/784c24d7-150e-4bcf-acbf-6aa957317f59/assign 200 in 365ms :: {"…
+2025-10-06T22:46:34.016826576Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T22:46:34.017097494Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T22:46:34.017106456Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T22:46:34.017113206Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T22:46:34.017446679Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T22:46:34.017452611Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T22:46:34.017457445Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T22:46:34.017461937Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T22:46:34.017466250Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T22:46:34.017470651Z [inf]  10:46:29 PM [express] GET /api/loads 200 in 12ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T22:46:34.017475161Z [inf]  Load status update auth check: {
+2025-10-06T22:46:34.017479460Z [inf]    hasAdminAuth: true,
+2025-10-06T22:46:34.017483815Z [inf]    hasReplitAuth: false,
+2025-10-06T22:46:34.017488421Z [inf]    hasDriverAuth: true,
+2025-10-06T22:46:34.017492384Z [inf]    hasTokenBypass: true,
+2025-10-06T22:46:34.017496657Z [inf]    finalAuth: true
+2025-10-06T22:46:34.017500972Z [inf]  }
+2025-10-06T22:46:34.017505391Z [inf]  MOBILE DEBUG - Status update request: {
+2025-10-06T22:46:34.017509921Z [inf]    loadId: '784c24d7-150e-4bcf-acbf-6aa957317f59',
+2025-10-06T22:46:34.017514876Z [inf]    requestBody: { status: 'assigned' },
+2025-10-06T22:46:34.017520646Z [inf]    headers: [
+2025-10-06T22:46:34.017527098Z [inf]      'host',                 'user-agent',
+2025-10-06T22:46:34.017532043Z [inf]      'content-length',       'accept',
+2025-10-06T22:46:34.017536900Z [inf]      'accept-encoding',      'accept-language',
+2025-10-06T22:46:34.017541151Z [inf]      'content-type',         'cookie',
+2025-10-06T22:46:34.017545635Z [inf]      'origin',               'referer',
+2025-10-06T22:46:34.017549970Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T22:46:34.017555015Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T22:46:34.017559531Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T22:46:34.017570308Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T22:46:34.017576022Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T22:46:34.017581279Z [inf]      'x-request-start'
+2025-10-06T22:46:34.017586241Z [inf]    ],
+2025-10-06T22:46:34.017591021Z [inf]    contentType: 'application/json',
+2025-10-06T22:46:34.017595976Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-06T22:46:34.017602373Z [inf]  }
+2025-10-06T22:46:34.017606929Z [inf]  Updating load 784c24d7-150e-4bcf-acbf-6aa957317f59 status to: assigned
+2025-10-06T22:46:34.017611605Z [inf]  ✅ Status history added: Load 784c24d7-150e-4bcf-acbf-6aa957317f59 → assigned
+2025-10-06T22:46:34.017616348Z [inf]  Load status updated successfully: assigned
+2025-10-06T22:46:34.017621488Z [inf]  10:46:29 PM [express] PATCH /api/loads/784c24d7-150e-4bcf-acbf-6aa957317f59/status 200 in 11ms :: {"i…
+2025-10-06T22:50:14.154821408Z [inf]  Bypass check: {
+2025-10-06T22:50:14.154834696Z [inf]    token: '[PROVIDED]',
+2025-10-06T22:50:14.154842600Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T22:50:14.154848887Z [inf]    isActive: true
+2025-10-06T22:50:14.154854269Z [inf]  }
+2025-10-06T22:50:14.154862448Z [inf]  Driver assignment auth check: {
+2025-10-06T22:50:14.154869894Z [inf]    hasSession: true,
+2025-10-06T22:50:14.154877040Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T22:50:14.154883585Z [inf]    hasAdminAuth: true,
+2025-10-06T22:50:14.154891071Z [inf]    hasReplitAuth: false,
+2025-10-06T22:50:14.154898185Z [inf]    hasDriverAuth: true,
+2025-10-06T22:50:14.154905493Z [inf]    hasTokenBypass: true,
+2025-10-06T22:50:14.154912194Z [inf]    bypassToken: '[PROVIDED]',
+2025-10-06T22:50:14.154920189Z [inf]    adminAuthData: {
+2025-10-06T22:50:14.154925893Z [inf]      id: 'admin-001',
+2025-10-06T22:50:14.154933559Z [inf]      role: 'admin',
+2025-10-06T22:50:14.154942835Z [inf]      lastName: 'User',
+2025-10-06T22:50:14.154949731Z [inf]      username: 'admin',
+2025-10-06T22:50:14.154955492Z [inf]      firstName: 'Admin'
+2025-10-06T22:50:14.154960813Z [inf]    },
+2025-10-06T22:50:14.154994474Z [inf]    userAuth: false
+2025-10-06T22:50:14.155000993Z [inf]  }
+2025-10-06T22:50:14.155006051Z [inf]  🔔 Sending notification to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: {
+2025-10-06T22:50:14.155010582Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T22:50:14.155015616Z [inf]    type: 'load_assignment',
+2025-10-06T22:50:14.155020962Z [inf]    message: '🚛 NEW LOAD ASSIGNED: 602337 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.',
+2025-10-06T22:50:14.155492195Z [inf]    loadId: '784c24d7-150e-4bcf-acbf-6aa957317f59',
+2025-10-06T22:50:14.155497126Z [inf]    urgent: true
+2025-10-06T22:50:14.155501487Z [inf]  }
+2025-10-06T22:50:14.155506039Z [inf]  🔍 SMS Service Debug Check: {
+2025-10-06T22:50:14.155509921Z [inf]    hasTelnyxClient: true,
+2025-10-06T22:50:14.155513543Z [inf]    hasFromNumber: true,
+2025-10-06T22:50:14.155517260Z [inf]    fromNumberValue: '+12148170744',
+2025-10-06T22:50:14.155520851Z [inf]    apiKeyLength: 58
+2025-10-06T22:50:14.155524889Z [inf]  }
+2025-10-06T22:50:14.155530992Z [inf]  🚀 SMS SEND ATTEMPT: {
+2025-10-06T22:50:14.155534681Z [inf]    originalNumber: '9038037500',
+2025-10-06T22:50:14.155538328Z [inf]    normalizedNumber: '+19038037500',
+2025-10-06T22:50:14.155542076Z [inf]    from: '+12148170744',
+2025-10-06T22:50:14.155547006Z [inf]    messageLength: 135,
+2025-10-06T22:50:14.155551062Z [inf]    hasClient: true,
+2025-10-06T22:50:14.155555252Z [inf]    timestamp: '2025-10-06T22:50:07.357Z'
+2025-10-06T22:50:14.155561360Z [inf]  }
+2025-10-06T22:50:14.155565511Z [inf]  📱 ATTEMPTING TO SEND SMS WITH TELNYX: {
+2025-10-06T22:50:14.155569329Z [inf]    from: '+12148170744',
+2025-10-06T22:50:14.155572852Z [inf]    to: '+19038037500',
+2025-10-06T22:50:14.155576270Z [inf]    messagePreview: '🚛 NEW LOAD ASSIGNED: 602337 to UNFI LANCASTER. Go...'
+2025-10-06T22:50:14.155580440Z [inf]  }
+2025-10-06T22:50:14.155584127Z [inf]  ✅ SMS SENT WITH TELNYX: 403199bb-b7c7-48b6-8cb7-5caaca64d24b {
+2025-10-06T22:50:14.155588054Z [inf]    id: '403199bb-b7c7-48b6-8cb7-5caaca64d24b',
+2025-10-06T22:50:14.155591666Z [inf]    to: [
+2025-10-06T22:50:14.155595021Z [inf]      {
+2025-10-06T22:50:14.155598584Z [inf]        phone_number: '+19038037500',
+2025-10-06T22:50:14.155603521Z [inf]        status: 'queued',
+2025-10-06T22:50:14.155607341Z [inf]        carrier: 'NEW CINGULAR WIRELESS PCS, LLC - IL',
+2025-10-06T22:50:14.155611120Z [inf]        line_type: 'Wireless'
+2025-10-06T22:50:14.155617745Z [inf]      }
+2025-10-06T22:50:14.155621827Z [inf]    ],
+2025-10-06T22:50:14.155625524Z [inf]    from: {
+2025-10-06T22:50:14.155629540Z [inf]      phone_number: '+12148170744',
+2025-10-06T22:50:14.155633397Z [inf]      carrier: 'Telnyx',
+2025-10-06T22:50:14.155637366Z [inf]      line_type: 'Wireless'
+2025-10-06T22:50:14.155641285Z [inf]    },
+2025-10-06T22:50:14.155645424Z [inf]    direction: 'outbound',
+2025-10-06T22:50:14.155649272Z [inf]    messaging_profile_id: '4001991c-e085-43d1-aea5-2c79e9b2b0bf',
+2025-10-06T22:50:14.155653340Z [inf]    text: '🚛 NEW LOAD ASSIGNED: 602337 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.'
+2025-10-06T22:50:14.155657007Z [inf]  }
+2025-10-06T22:50:14.155660865Z [inf]  ✅ SUCCESS: SMS sent via Telnyx - LOWEST COST ($0.004/SMS) with highest performance!
+2025-10-06T22:50:14.155664630Z [inf]      - Message ID: 403199bb-b7c7-48b6-8cb7-5caaca64d24b
+2025-10-06T22:50:14.155668470Z [inf]      - Direction: outbound
+2025-10-06T22:50:14.155672318Z [inf]      - Messaging Profile: 4001991c-e085-43d1-aea5-2c79e9b2b0bf
+2025-10-06T22:50:14.155676400Z [inf]  🔔 In-app notifications not yet implemented for driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T22:50:14.155679976Z [inf]  ✅ Notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: [ { method: 'sms', success: true } ]
+2025-10-06T22:50:14.155685398Z [inf]  ✅ SMS notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35 for load 602337
+2025-10-06T22:50:14.155689016Z [inf]  10:50:07 PM [express] PATCH /api/loads/784c24d7-150e-4bcf-acbf-6aa957317f59/assign 200 in 516ms :: {"…
+2025-10-06T22:50:14.155692994Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T22:50:14.155696826Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T22:50:14.155700673Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T22:50:14.155706565Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T22:50:14.155710624Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T22:50:14.155714683Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T22:50:14.155719042Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T22:50:14.155723901Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T22:50:14.155728535Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T22:50:14.155733306Z [inf]  10:50:08 PM [express] GET /api/loads 200 in 23ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T22:50:14.155738324Z [inf]  Load status update auth check: {
+2025-10-06T22:50:14.155742937Z [inf]    hasAdminAuth: true,
+2025-10-06T22:50:14.155747454Z [inf]    hasReplitAuth: false,
+2025-10-06T22:50:14.155751999Z [inf]    hasDriverAuth: true,
+2025-10-06T22:50:14.155756286Z [inf]    hasTokenBypass: true,
+2025-10-06T22:50:14.155760505Z [inf]    finalAuth: true
+2025-10-06T22:50:14.155765792Z [inf]  }
+2025-10-06T22:50:14.155771484Z [inf]  MOBILE DEBUG - Status update request: {
+2025-10-06T22:50:14.155777789Z [inf]    loadId: '784c24d7-150e-4bcf-acbf-6aa957317f59',
+2025-10-06T22:50:14.155782687Z [inf]    requestBody: { status: 'assigned' },
+2025-10-06T22:50:14.155787106Z [inf]    headers: [
+2025-10-06T22:50:14.155791858Z [inf]      'host',                 'user-agent',
+2025-10-06T22:50:14.155796062Z [inf]      'content-length',       'accept',
+2025-10-06T22:50:14.155803389Z [inf]      'accept-encoding',      'accept-language',
+2025-10-06T22:50:14.155808221Z [inf]      'content-type',         'cookie',
+2025-10-06T22:50:14.155812376Z [inf]      'origin',               'referer',
+2025-10-06T22:50:14.155816511Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T22:50:14.155821380Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T22:50:14.155826289Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T22:50:14.155831136Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T22:50:14.155835923Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T22:50:14.155840643Z [inf]      'x-request-start'
+2025-10-06T22:50:14.155845079Z [inf]    ],
+2025-10-06T22:50:14.155849798Z [inf]    contentType: 'application/json',
+2025-10-06T22:50:14.155854233Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-06T22:50:14.155858161Z [inf]  }
+2025-10-06T22:50:14.155862833Z [inf]  Updating load 784c24d7-150e-4bcf-acbf-6aa957317f59 status to: assigned
+2025-10-06T22:50:14.155867372Z [inf]  ✅ Status history added: Load 784c24d7-150e-4bcf-acbf-6aa957317f59 → assigned
+2025-10-06T22:50:14.155873417Z [inf]  Load status updated successfully: assigned
+2025-10-06T22:50:14.155878148Z [inf]  10:50:08 PM [express] PATCH /api/loads/784c24d7-150e-4bcf-acbf-6aa957317f59/status 200 in 13ms :: {"i…
+2025-10-06T22:51:24.170810812Z [inf]  Driver login attempt: {
+2025-10-06T22:51:24.170817926Z [inf]    username: 'KOWEN',
+2025-10-06T22:51:24.170824849Z [inf]    usernameLength: 5,
+2025-10-06T22:51:24.170843200Z [inf]    password: '[LENGTH:10]',
+2025-10-06T22:51:24.170850439Z [inf]    passwordActual: '"9038037500"'
+2025-10-06T22:51:24.170856668Z [inf]  }
+2025-10-06T22:51:24.170863321Z [inf]  Driver lookup result: Found for username: KOWEN
+2025-10-06T22:51:24.170869875Z [inf]  Password check: {
+2025-10-06T22:51:24.170876336Z [inf]    provided: '9038037500',
+2025-10-06T22:51:24.170883029Z [inf]    expected: '9038037500',
+2025-10-06T22:51:24.170889491Z [inf]    normalizedProvided: '9038037500',
+2025-10-06T22:51:24.170929051Z [inf]    normalizedExpected: '9038037500'
+2025-10-06T22:51:24.170947679Z [inf]  }
+2025-10-06T22:51:24.170954150Z [inf]  ✅ Driver session saved successfully
+2025-10-06T22:51:24.170960494Z [inf]  10:51:22 PM [express] POST /api/driver/login 200 in 59ms :: {"message":"Login successful","user":{"id…
+2025-10-06T22:51:25.422194209Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T22:51:25.422199700Z [inf]    role: 'driver',
+2025-10-06T22:51:25.422205192Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T22:51:25.422210190Z [inf]    lastName: 'Owen',
+2025-10-06T22:51:25.422215956Z [inf]    username: 'Kowen',
+2025-10-06T22:51:25.422221183Z [inf]    firstName: 'Kevin'
+2025-10-06T22:51:25.422228159Z [inf]  }
+2025-10-06T22:51:25.422232652Z [inf]  10:51:25 PM [express] GET /api/auth/driver-user 304 in 3ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T22:51:25.590671179Z [inf]  Bypass check: {
+2025-10-06T22:51:25.590684064Z [inf]    token: '[PROVIDED]',
+2025-10-06T22:51:25.590690474Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T22:51:25.590697003Z [inf]    isActive: true
+2025-10-06T22:51:25.590702765Z [inf]  }
+2025-10-06T22:51:25.590709096Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T22:51:25.590714740Z [inf]    adminAuth: true,
+2025-10-06T22:51:25.590720147Z [inf]    replitAuth: false,
+2025-10-06T22:51:25.590725353Z [inf]    driverAuth: true,
+2025-10-06T22:51:25.590731089Z [inf]    bypassAuth: true,
+2025-10-06T22:51:25.590740071Z [inf]    hasAuth: true,
+2025-10-06T22:51:25.590766202Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T22:51:25.590772934Z [inf]  }
+2025-10-06T22:51:25.590779406Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T22:51:25.593654651Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T22:51:25.593660681Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T22:51:25.593670342Z [inf]  10:51:25 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 8ms :: [{"id…
+2025-10-06T22:56:35.752785881Z [inf]  Bypass check: {
+2025-10-06T22:56:35.752790315Z [inf]    token: '[PROVIDED]',
+2025-10-06T22:56:35.752794404Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T22:56:35.752798571Z [inf]    isActive: true
+2025-10-06T22:56:35.752802881Z [inf]  }
+2025-10-06T22:56:35.752809373Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T22:56:35.752813245Z [inf]    adminAuth: true,
+2025-10-06T22:56:35.752819281Z [inf]    replitAuth: false,
+2025-10-06T22:56:35.752823412Z [inf]    driverAuth: true,
+2025-10-06T22:56:35.752827577Z [inf]    bypassAuth: true,
+2025-10-06T22:56:35.752831435Z [inf]    hasAuth: true,
+2025-10-06T22:56:35.752835110Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T22:56:35.752840821Z [inf]  }
+2025-10-06T22:56:35.752844941Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T22:56:35.752848772Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T22:56:35.752852812Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T22:56:35.752856583Z [inf]  10:56:29 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 50ms :: [{"i…
+2025-10-06T22:57:05.761684986Z [inf]  🗑️ SERVER DELETE: Load deletion auth check: {
+2025-10-06T22:57:05.761694581Z [inf]    loadId: '4d0be27c-73c2-4dc0-ac43-e04b77580fcf',
+2025-10-06T22:57:05.761703109Z [inf]    hasReplitAuth: false,
+2025-10-06T22:57:05.761712966Z [inf]    hasAdminAuth: {
+2025-10-06T22:57:05.761724096Z [inf]      id: 'admin-001',
+2025-10-06T22:57:05.761735923Z [inf]      role: 'admin',
+2025-10-06T22:57:05.761744495Z [inf]      lastName: 'User',
+2025-10-06T22:57:05.761752997Z [inf]      username: 'admin',
+2025-10-06T22:57:05.761760601Z [inf]      firstName: 'Admin'
+2025-10-06T22:57:05.761767539Z [inf]    },
+2025-10-06T22:57:05.761775190Z [inf]    hasTokenBypass: true,
+2025-10-06T22:57:05.761780573Z [inf]    bypassTokenProvided: true,
+2025-10-06T22:57:05.761786275Z [inf]    bypassTokenMatches: true,
+2025-10-06T22:57:05.761791404Z [inf]    finalAuth: {
+2025-10-06T22:57:05.761803224Z [inf]      id: 'admin-001',
+2025-10-06T22:57:05.761812039Z [inf]      role: 'admin',
+2025-10-06T22:57:05.761823901Z [inf]      lastName: 'User',
+2025-10-06T22:57:05.761833268Z [inf]      username: 'admin',
+2025-10-06T22:57:05.761840781Z [inf]      firstName: 'Admin'
+2025-10-06T22:57:05.761849044Z [inf]    }
+2025-10-06T22:57:05.761856639Z [inf]  }
+2025-10-06T22:57:05.761871393Z [inf]  🗑️ SERVER DELETE: Processing deletion request for load ID: 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.761880981Z [inf]  🗑️ SERVER DELETE: Found load 6022331 (ID: 4d0be27c-73c2-4dc0-ac43-e04b77580fcf), proceeding with deletion
+2025-10-06T22:57:05.761888698Z [inf]  🗑️ DELETING LOAD: Starting deletion process for load ID: 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762218677Z [inf]  🗑️ Step 0: Getting load details to check for attachments
+2025-10-06T22:57:05.762336856Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T22:57:05.762342841Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T22:57:05.762351001Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T22:57:05.762365566Z [inf]  📄 No file attachments found for load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762377647Z [inf]  🗑️ TRANSACTION: Starting database transaction for load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762384511Z [inf]  🗑️ Step 1: Deleting notification logs for load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762390023Z [inf]  🗑️ Step 1 completed: Deleted 1 notification log records
+2025-10-06T22:57:05.762395381Z [inf]  🗑️ Step 2: Deleting load status history for load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762401778Z [inf]  🗑️ Step 2 completed: Deleted 2 status history records
+2025-10-06T22:57:05.762404239Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T22:57:05.762407583Z [inf]  🗑️ Step 3: Deleting load stops for load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762413186Z [inf]  🗑️ Step 3 completed: Deleted 2 load stops
+2025-10-06T22:57:05.762419802Z [inf]  🗑️ Step 4: Deleting invoices for load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762420518Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T22:57:05.762423640Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-06T22:57:05.762426106Z [inf]  🗑️ Step 4 completed: Deleted 0 invoices
+2025-10-06T22:57:05.762427914Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-06T22:57:05.762432607Z [inf]  🗑️ Step 5: Deleting BOL numbers for load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762438836Z [inf]  🗑️ Step 5 completed: Deleted 0 BOL numbers
+2025-10-06T22:57:05.762444897Z [inf]  🔥 RETURNING: 3 loads
+2025-10-06T22:57:05.762446031Z [inf]  🗑️ Step 6: Deleting the main load record for 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762449716Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T22:57:05.762452603Z [inf]  🗑️ Step 6 completed: Deleted 1 load record
+2025-10-06T22:57:05.762456452Z [inf]  10:56:56 PM [express] GET /api/loads 200 in 25ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T22:57:05.762459190Z [inf]  🗑️ TRANSACTION: All database operations completed successfully for load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T22:57:05.762459978Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T22:57:05.762461205Z [inf]    isActive: true
+2025-10-06T22:57:05.762466236Z [inf]  ✅ SUCCESS: Load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf deleted successfully with all attachments cleaned up
+2025-10-06T22:57:05.762470724Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T22:57:05.762472932Z [inf]  🗑️ SERVER DELETE: Successfully deleted load 6022331
+2025-10-06T22:57:05.762478889Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-06T22:57:05.762482349Z [inf]      'accept-language',      'cookie',
+2025-10-06T22:57:05.762483472Z [inf]  }
+2025-10-06T22:57:05.762485432Z [inf]  10:56:55 PM [express] DELETE /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf 200 in 56ms :: {"message…
+2025-10-06T22:57:05.762492180Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T22:57:05.762496923Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T22:57:05.762499165Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-06T22:57:05.762504360Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T22:57:05.762511087Z [inf]  🔥 RETURNING: 3 loads
+2025-10-06T22:57:05.762512745Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T22:57:05.762513738Z [inf]    token: '[PROVIDED]',
+2025-10-06T22:57:05.762521406Z [inf]      'if-none-match',        'referer',
+2025-10-06T22:57:05.762521803Z [inf]  10:56:56 PM [express] GET /api/loads 200 in 11ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T22:57:05.762533210Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T22:57:05.762537450Z [inf]    role: 'driver',
+2025-10-06T22:57:05.762537959Z [inf]  Bypass check: {
+2025-10-06T22:57:05.762539375Z [inf]    headers: [
+2025-10-06T22:57:05.762545315Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T22:57:05.762550766Z [inf]    hasTokenBypass: true,
+2025-10-06T22:57:05.762567972Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T22:57:05.762572057Z [inf]  Dashboard stats auth check: {
+2025-10-06T22:57:05.762579609Z [inf]    hasAdminAuth: true,
+2025-10-06T22:57:05.762581206Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T22:57:05.762584289Z [inf]      'host',                 'user-agent',
+2025-10-06T22:57:05.762587486Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T22:57:05.762592547Z [inf]      'accept',               'accept-encoding',
+2025-10-06T22:57:05.762594688Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T22:57:05.762599150Z [inf]    hasReplitAuth: false,
+2025-10-06T22:57:05.762599448Z [inf]    ],
+2025-10-06T22:57:05.762603346Z [inf]      'x-request-start'
+2025-10-06T22:57:05.762605231Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T22:57:05.762607808Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T22:57:05.762618786Z [inf]    hasAdminAuth: true,
+2025-10-06T22:57:05.762619599Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-06T22:57:05.762622741Z [inf]  }
+2025-10-06T22:57:05.762623351Z [inf]    firstName: 'Kevin'
+2025-10-06T22:57:05.762635940Z [inf]  10:56:56 PM [express] GET /api/dashboard/stats 200 in 19ms :: {"activeLoads":"3","inTransit":"0","del…
+2025-10-06T22:57:05.762636187Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T22:57:05.762636652Z [inf]  }
+2025-10-06T22:57:05.762643516Z [inf]  Admin user check: {
+2025-10-06T22:57:05.762647456Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T22:57:05.762650867Z [inf]    lastName: 'Owen',
+2025-10-06T22:57:05.762656018Z [inf]    adminAuthData: {
+2025-10-06T22:57:05.762658862Z [inf]    hasSession: true,
+2025-10-06T22:57:05.762663003Z [inf]    username: 'Kowen',
+2025-10-06T22:57:05.762717684Z [inf]      id: 'admin-001',
+2025-10-06T22:57:05.763756800Z [inf]      role: 'admin',
+2025-10-06T22:57:05.763775136Z [inf]      lastName: 'User',
+2025-10-06T22:57:05.763783688Z [inf]      username: 'admin',
+2025-10-06T22:57:05.763792687Z [inf]      firstName: 'Admin'
+2025-10-06T22:57:05.763801065Z [inf]    },
+2025-10-06T22:57:05.763810096Z [inf]    hasBypassToken: false
+2025-10-06T22:57:05.763818715Z [inf]  }
+2025-10-06T22:57:05.763828074Z [inf]  10:56:57 PM [express] GET /api/auth/driver-user 200 in 9ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T22:57:05.763836181Z [inf]  10:56:57 PM [express] GET /api/auth/admin-user 200 in 9ms :: {"id":"admin-001","role":"admin","lastNa…
+2025-10-06T22:57:05.763844165Z [inf]  Authentication failed: No user or expiration
+2025-10-06T22:57:05.763851282Z [inf]  10:56:57 PM [express] GET /api/auth/user 401 in 21ms :: {"message":"Unauthorized"}
+2025-10-06T22:57:05.763859312Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T22:57:05.763868308Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T22:57:05.763876308Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T22:57:05.763885425Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T22:57:05.763893838Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T22:57:05.763902171Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T22:57:05.763910688Z [inf]  10:56:57 PM [express] GET /api/locations 304 in 7ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01",…
+2025-10-06T22:57:05.763919792Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-06T22:57:05.763929725Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-06T22:57:05.763938474Z [inf]  🔥 RETURNING: 3 loads
+2025-10-06T22:57:05.763946865Z [inf]  10:56:57 PM [express] GET /api/loads 304 in 11ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T22:57:05.763955657Z [inf]  10:56:57 PM [express] GET /api/customers 304 in 6ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T22:57:05.763964674Z [inf]  Bypass check: {
+2025-10-06T22:57:05.763973009Z [inf]    token: '[PROVIDED]',
+2025-10-06T22:57:05.763984617Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T22:57:05.763992307Z [inf]    isActive: true
+2025-10-06T22:57:05.763999467Z [inf]  }
+2025-10-06T22:57:05.764008486Z [inf]  Dashboard stats auth check: {
+2025-10-06T22:57:05.764017717Z [inf]    hasAdminAuth: true,
+2025-10-06T22:57:05.764026264Z [inf]    hasReplitAuth: false,
+2025-10-06T22:57:05.764035533Z [inf]    hasTokenBypass: true,
+2025-10-06T22:57:05.764043833Z [inf]    headers: [
+2025-10-06T22:57:05.764052221Z [inf]      'host',                 'user-agent',
+2025-10-06T22:57:05.764059929Z [inf]      'accept',               'accept-encoding',
+2025-10-06T22:57:05.764068579Z [inf]      'accept-language',      'cookie',
+2025-10-06T22:57:05.764076648Z [inf]      'if-none-match',        'referer',
+2025-10-06T22:57:05.764085778Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T22:57:05.764093625Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T22:57:05.764102398Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T22:57:05.764111259Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T22:57:05.764118976Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T22:57:05.764127405Z [inf]      'x-request-start'
+2025-10-06T22:57:05.764135461Z [inf]    ],
+2025-10-06T22:57:05.764143746Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T22:57:05.764150972Z [inf]  }
+2025-10-06T22:57:05.764163518Z [inf]  10:56:57 PM [express] GET /api/drivers/available 304 in 9ms :: [{"id":"f920c664-fb37-496e-af76-1f0a43…
+2025-10-06T22:57:05.764171940Z [inf]  10:56:57 PM [express] GET /api/invoices 304 in 11ms :: []
+2025-10-06T22:57:05.764180270Z [inf]  10:56:57 PM [express] GET /api/dashboard/stats 304 in 19ms :: {"activeLoads":"3","inTransit":"0","del…
+2025-10-06T23:07:46.025813943Z [inf]  🗑️ SERVER DELETE: Load deletion auth check: {
+2025-10-06T23:07:46.025818301Z [inf]    loadId: 'c1392e57-d0df-44e7-92e3-0bd1dbaf1360',
+2025-10-06T23:07:46.025822740Z [inf]    hasReplitAuth: false,
+2025-10-06T23:07:46.025826813Z [inf]    hasAdminAuth: {
+2025-10-06T23:07:46.025831219Z [inf]      id: 'admin-001',
+2025-10-06T23:07:46.025835350Z [inf]      role: 'admin',
+2025-10-06T23:07:46.025839330Z [inf]      lastName: 'User',
+2025-10-06T23:07:46.025842913Z [inf]      username: 'admin',
+2025-10-06T23:07:46.025847371Z [inf]      firstName: 'Admin'
+2025-10-06T23:07:46.025853329Z [inf]    },
+2025-10-06T23:07:46.025857223Z [inf]    hasTokenBypass: true,
+2025-10-06T23:07:46.025861140Z [inf]    bypassTokenProvided: true,
+2025-10-06T23:07:46.025864919Z [inf]    bypassTokenMatches: true,
+2025-10-06T23:07:46.025868912Z [inf]    finalAuth: {
+2025-10-06T23:07:46.025872881Z [inf]      id: 'admin-001',
+2025-10-06T23:07:46.025876668Z [inf]      role: 'admin',
+2025-10-06T23:07:46.025880929Z [inf]      lastName: 'User',
+2025-10-06T23:07:46.025884609Z [inf]      username: 'admin',
+2025-10-06T23:07:46.025888932Z [inf]      firstName: 'Admin'
+2025-10-06T23:07:46.025892675Z [inf]    }
+2025-10-06T23:07:46.025896391Z [inf]  }
+2025-10-06T23:07:46.025900195Z [inf]  🗑️ SERVER DELETE: Processing deletion request for load ID: c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.025903890Z [inf]  🗑️ SERVER DELETE: Found load 6022305 (ID: c1392e57-d0df-44e7-92e3-0bd1dbaf1360), proceeding with deletion
+2025-10-06T23:07:46.026375234Z [inf]  🗑️ DELETING LOAD: Starting deletion process for load ID: c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026387192Z [inf]  🗑️ Step 6: Deleting the main load record for c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026392610Z [inf]  🗑️ Step 0: Getting load details to check for attachments
+2025-10-06T23:07:46.026406667Z [inf]  📄 No file attachments found for load c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026406875Z [inf]  🗑️ Step 6 completed: Deleted 1 load record
+2025-10-06T23:07:46.026413500Z [inf]  🗑️ TRANSACTION: Starting database transaction for load c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026419258Z [inf]  🗑️ TRANSACTION: All database operations completed successfully for load c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026427306Z [inf]  🗑️ Step 1: Deleting notification logs for load c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026430023Z [inf]  ✅ SUCCESS: Load c1392e57-d0df-44e7-92e3-0bd1dbaf1360 deleted successfully with all attachments cleaned up
+2025-10-06T23:07:46.026440333Z [inf]  🗑️ Step 1 completed: Deleted 1 notification log records
+2025-10-06T23:07:46.026442679Z [inf]  🗑️ SERVER DELETE: Successfully deleted load 6022305
+2025-10-06T23:07:46.026451114Z [inf]  🗑️ Step 2: Deleting load status history for load c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026453373Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-06T23:07:46.026456649Z [inf]    username: 'Kowen',
+2025-10-06T23:07:46.026459071Z [inf]  🔥 RETURNING: 2 loads
+2025-10-06T23:07:46.026463267Z [inf]  11:07:40 PM [express] DELETE /api/loads/c1392e57-d0df-44e7-92e3-0bd1dbaf1360 200 in 64ms :: {"message…
+2025-10-06T23:07:46.026463710Z [inf]  🗑️ Step 2 completed: Deleted 2 status history records
+2025-10-06T23:07:46.026471468Z [inf]  11:07:40 PM [express] GET /api/loads 200 in 19ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T23:07:46.026471982Z [inf]    firstName: 'Kevin'
+2025-10-06T23:07:46.026473599Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T23:07:46.026475918Z [inf]  🔥 RETURNING: 2 loads
+2025-10-06T23:07:46.026476136Z [inf]  🗑️ Step 3: Deleting load stops for load c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026483229Z [inf]  }
+2025-10-06T23:07:46.026490456Z [inf]  🗑️ Step 3 completed: Deleted 2 load stops
+2025-10-06T23:07:46.026491807Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T23:07:46.026495666Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T23:07:46.026499098Z [inf]  11:07:40 PM [express] GET /api/loads 200 in 10ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T23:07:46.026499491Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:07:46.026499991Z [inf]  11:07:42 PM [express] GET /api/auth/admin-user 200 in 4ms :: {"id":"admin-001","role":"admin","lastNa…
+2025-10-06T23:07:46.026501822Z [inf]  🗑️ Step 4: Deleting invoices for load c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026504317Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T23:07:46.026511530Z [inf]  🗑️ Step 4 completed: Deleted 0 invoices
+2025-10-06T23:07:46.026512890Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T23:07:46.026513782Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T23:07:46.026515707Z [inf]  Bypass check: {
+2025-10-06T23:07:46.026515904Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-06T23:07:46.026519200Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T23:07:46.026522186Z [inf]  🗑️ Step 5: Deleting BOL numbers for load c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T23:07:46.026522288Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:07:46.026525626Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-06T23:07:46.026526381Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T23:07:46.026528600Z [inf]  }
+2025-10-06T23:07:46.026531615Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:07:46.026531680Z [inf]  🗑️ Step 5 completed: Deleted 0 BOL numbers
+2025-10-06T23:07:46.026533676Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T23:07:46.026537715Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:07:46.026539115Z [inf]  11:07:40 PM [express] GET /api/dashboard/stats 200 in 18ms :: {"activeLoads":"2","inTransit":"0","del…
+2025-10-06T23:07:46.026541965Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T23:07:46.026542856Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T23:07:46.026549354Z [inf]  Admin user check: {
+2025-10-06T23:07:46.026554227Z [inf]      id: 'admin-001',
+2025-10-06T23:07:46.026554291Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T23:07:46.026554613Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-06T23:07:46.026558353Z [inf]    hasAdminAuth: true,
+2025-10-06T23:07:46.026561241Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T23:07:46.026562897Z [inf]    hasSession: true,
+2025-10-06T23:07:46.026563043Z [inf]    hasBypassToken: false
+2025-10-06T23:07:46.026564193Z [inf]    isActive: true
+2025-10-06T23:07:46.026564728Z [inf]    hasAdminAuth: true,
+2025-10-06T23:07:46.026573992Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T23:07:46.026574544Z [inf]      'accept',               'accept-encoding',
+2025-10-06T23:07:46.026576187Z [inf]  }
+2025-10-06T23:07:46.026577342Z [inf]      role: 'admin',
+2025-10-06T23:07:46.026577995Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T23:07:46.026584246Z [inf]  }
+2025-10-06T23:07:46.026584638Z [inf]    hasReplitAuth: false,
+2025-10-06T23:07:46.026588791Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T23:07:46.026588901Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-06T23:07:46.026593220Z [inf]      'accept-language',      'cookie',
+2025-10-06T23:07:46.026594100Z [inf]      'x-request-start'
+2025-10-06T23:07:46.026594790Z [inf]      lastName: 'User',
+2025-10-06T23:07:46.026601434Z [inf]  Dashboard stats auth check: {
+2025-10-06T23:07:46.026601902Z [inf]    hasTokenBypass: true,
+2025-10-06T23:07:46.026604130Z [inf]    role: 'driver',
+2025-10-06T23:07:46.026605444Z [inf]      'if-none-match',        'referer',
+2025-10-06T23:07:46.026607637Z [inf]    ],
+2025-10-06T23:07:46.026609760Z [inf]      username: 'admin',
+2025-10-06T23:07:46.026614973Z [inf]    adminAuthData: {
+2025-10-06T23:07:46.026615108Z [inf]    headers: [
+2025-10-06T23:07:46.026616700Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T23:07:46.026617176Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T23:07:46.026625168Z [inf]      firstName: 'Admin'
+2025-10-06T23:07:46.026626846Z [inf]      'host',                 'user-agent',
+2025-10-06T23:07:46.026628923Z [inf]    lastName: 'Owen',
+2025-10-06T23:07:46.026629159Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T23:07:46.026637671Z [inf]    },
+2025-10-06T23:07:46.027738620Z [inf]  11:07:42 PM [express] GET /api/auth/driver-user 200 in 4ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T23:07:46.027746162Z [inf]  Authentication failed: No user or expiration
+2025-10-06T23:07:46.027751066Z [inf]  11:07:42 PM [express] GET /api/auth/user 401 in 15ms :: {"message":"Unauthorized"}
+2025-10-06T23:07:46.027755476Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:07:46.027759010Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T23:07:46.027763171Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T23:07:46.027766837Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T23:07:46.027770827Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T23:07:46.027774839Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T23:07:46.027779024Z [inf]  11:07:42 PM [express] GET /api/locations 304 in 7ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01",…
+2025-10-06T23:07:46.027783206Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-06T23:07:46.027788773Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-06T23:07:46.027792403Z [inf]  🔥 RETURNING: 2 loads
+2025-10-06T23:07:46.027797758Z [inf]  11:07:42 PM [express] GET /api/loads 304 in 10ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T23:07:46.027802553Z [inf]  11:07:42 PM [express] GET /api/drivers/available 304 in 5ms :: [{"id":"f920c664-fb37-496e-af76-1f0a43…
+2025-10-06T23:07:46.027806301Z [inf]  Bypass check: {
+2025-10-06T23:07:46.027810284Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:07:46.027814122Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:07:46.027817656Z [inf]    isActive: true
+2025-10-06T23:07:46.027827136Z [inf]  }
+2025-10-06T23:07:46.027834978Z [inf]  Dashboard stats auth check: {
+2025-10-06T23:07:46.027838876Z [inf]    hasAdminAuth: true,
+2025-10-06T23:07:46.027842839Z [inf]    hasReplitAuth: false,
+2025-10-06T23:07:46.027846799Z [inf]    hasTokenBypass: true,
+2025-10-06T23:07:46.027850420Z [inf]    headers: [
+2025-10-06T23:07:46.027854440Z [inf]      'host',                 'user-agent',
+2025-10-06T23:07:46.027858733Z [inf]      'accept',               'accept-encoding',
+2025-10-06T23:07:46.027867323Z [inf]      'accept-language',      'cookie',
+2025-10-06T23:07:46.027874848Z [inf]      'if-none-match',        'referer',
+2025-10-06T23:07:46.027879471Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T23:07:46.027883358Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T23:07:46.027887789Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T23:07:46.027892025Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T23:07:46.027897604Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T23:07:46.027901894Z [inf]      'x-request-start'
+2025-10-06T23:07:46.027907274Z [inf]    ],
+2025-10-06T23:07:46.027912473Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T23:07:46.027916584Z [inf]  }
+2025-10-06T23:07:46.027921113Z [inf]  11:07:42 PM [express] GET /api/customers 304 in 10ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8"…
+2025-10-06T23:07:46.027924750Z [inf]  11:07:42 PM [express] GET /api/dashboard/stats 304 in 14ms :: {"activeLoads":"2","inTransit":"0","del…
+2025-10-06T23:07:46.027928697Z [inf]  11:07:42 PM [express] GET /api/invoices 304 in 23ms :: []
+2025-10-06T23:10:36.064638068Z [inf]  11:10:32 PM [express] GET /api/rates 200 in 45ms :: [{"id":"8fdc284e-8a6c-471a-8b4e-8336e8b07c7f","ci…
+2025-10-06T23:14:36.177029905Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T23:14:36.177041809Z [inf]    role: 'driver',
+2025-10-06T23:14:36.177046235Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T23:14:36.177050052Z [inf]    lastName: 'Owen',
+2025-10-06T23:14:36.177053922Z [inf]    username: 'Kowen',
+2025-10-06T23:14:36.177058731Z [inf]    firstName: 'Kevin'
+2025-10-06T23:14:36.177064548Z [inf]  }
+2025-10-06T23:14:36.177070497Z [inf]  11:14:27 PM [express] GET /api/auth/driver-user 304 in 5ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T23:14:36.177076676Z [inf]  Bypass check: {
+2025-10-06T23:14:36.177082346Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:14:36.177086617Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:14:36.177091132Z [inf]    isActive: true
+2025-10-06T23:14:36.177095839Z [inf]  }
+2025-10-06T23:14:36.177101205Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T23:14:36.177106459Z [inf]    adminAuth: true,
+2025-10-06T23:14:36.177111307Z [inf]    replitAuth: false,
+2025-10-06T23:14:36.177115970Z [inf]    driverAuth: true,
+2025-10-06T23:14:36.177120507Z [inf]    bypassAuth: true,
+2025-10-06T23:14:36.177126073Z [inf]    hasAuth: true,
+2025-10-06T23:14:36.177130621Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T23:14:36.177135476Z [inf]  }
+2025-10-06T23:14:36.177140202Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T23:14:36.177144565Z [inf]  📋 Direct lookup: Found 2 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T23:14:36.177149652Z [inf]  ✅ FINAL RESULT: Returning 2 loads for driver portal
+2025-10-06T23:14:36.177154241Z [inf]  11:14:27 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 18ms :: [{"i…
+2025-10-06T23:15:06.167710691Z [inf]  Bypass check: {
+2025-10-06T23:15:06.167719863Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:15:06.167725697Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:15:06.167731593Z [inf]    isActive: true
+2025-10-06T23:15:06.167737415Z [inf]  }
+2025-10-06T23:15:06.167742609Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T23:15:06.167748034Z [inf]    adminAuth: true,
+2025-10-06T23:15:06.167756100Z [inf]    replitAuth: false,
+2025-10-06T23:15:06.167762061Z [inf]    driverAuth: true,
+2025-10-06T23:15:06.167767974Z [inf]    bypassAuth: true,
+2025-10-06T23:15:06.167774246Z [inf]    hasAuth: true,
+2025-10-06T23:15:06.167779088Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T23:15:06.167783707Z [inf]  }
+2025-10-06T23:15:06.167789557Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T23:15:06.167794030Z [inf]  📋 Direct lookup: Found 2 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T23:15:06.167799743Z [inf]  ✅ FINAL RESULT: Returning 2 loads for driver portal
+2025-10-06T23:15:06.167803577Z [inf]  11:14:57 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 46ms :: [{"i…
+2025-10-06T23:15:36.175938426Z [inf]  Bypass check: {
+2025-10-06T23:15:36.175943306Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:15:36.175949221Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:15:36.175980926Z [inf]    isActive: true
+2025-10-06T23:15:36.175987523Z [inf]  }
+2025-10-06T23:15:36.175994225Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T23:15:36.175999545Z [inf]    adminAuth: true,
+2025-10-06T23:15:36.176003659Z [inf]    replitAuth: false,
+2025-10-06T23:15:36.176007886Z [inf]    driverAuth: true,
+2025-10-06T23:15:36.176012865Z [inf]    bypassAuth: true,
+2025-10-06T23:15:36.176017113Z [inf]    hasAuth: true,
+2025-10-06T23:15:36.176021459Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T23:15:36.176025594Z [inf]  }
+2025-10-06T23:15:36.176029325Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T23:15:36.176033169Z [inf]  📋 Direct lookup: Found 2 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T23:15:36.176037032Z [inf]  ✅ FINAL RESULT: Returning 2 loads for driver portal
+2025-10-06T23:15:36.176043314Z [inf]  11:15:28 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 51ms :: [{"i…
+2025-10-06T23:15:56.178401110Z [inf]  Tracking endpoint reached
+2025-10-06T23:15:56.178407887Z [inf]  Found tracking loads: 0
+2025-10-06T23:15:56.178414242Z [inf]  11:15:55 PM [express] GET /api/tracking/loads 200 in 34ms :: []
+2025-10-06T23:16:26.185620201Z [inf]  Load return auth check: {
+2025-10-06T23:16:26.185624454Z [inf]    hasReplitAuth: false,
+2025-10-06T23:16:26.185628498Z [inf]    hasDriverAuth: {
+2025-10-06T23:16:26.185633747Z [inf]      role: 'driver',
+2025-10-06T23:16:26.185637746Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T23:16:26.185641759Z [inf]      lastName: 'Owen',
+2025-10-06T23:16:26.185646371Z [inf]      username: 'Kowen',
+2025-10-06T23:16:26.185650982Z [inf]      firstName: 'Kevin'
+2025-10-06T23:16:26.185655054Z [inf]    },
+2025-10-06T23:16:26.185659003Z [inf]    hasAdminAuth: {
+2025-10-06T23:16:26.185662834Z [inf]      id: 'admin-001',
+2025-10-06T23:16:26.185667122Z [inf]      role: 'admin',
+2025-10-06T23:16:26.185694432Z [inf]      lastName: 'User',
+2025-10-06T23:16:26.185698947Z [inf]      username: 'admin',
+2025-10-06T23:16:26.185703452Z [inf]      firstName: 'Admin'
+2025-10-06T23:16:26.185707391Z [inf]    },
+2025-10-06T23:16:26.185711146Z [inf]    hasTokenBypass: true,
+2025-10-06T23:16:26.185715013Z [inf]    finalAuth: {
+2025-10-06T23:16:26.185719208Z [inf]      role: 'driver',
+2025-10-06T23:16:26.185723464Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T23:16:26.185727657Z [inf]      lastName: 'Owen',
+2025-10-06T23:16:26.185732959Z [inf]      username: 'Kowen',
+2025-10-06T23:16:26.185736877Z [inf]      firstName: 'Kevin'
+2025-10-06T23:16:26.185741991Z [inf]    }
+2025-10-06T23:16:26.186193991Z [inf]  }
+2025-10-06T23:16:26.186200461Z [inf]  📦 Load 602337 returned to admin dashboard by driver
+2025-10-06T23:16:26.186204480Z [inf]  11:16:20 PM [express] PATCH /api/loads/784c24d7-150e-4bcf-acbf-6aa957317f59/return-load 200 in 40ms :…
+2025-10-06T23:16:26.186208373Z [inf]  Bypass check: {
+2025-10-06T23:16:26.186212080Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:16:26.186216983Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:16:26.186330028Z [inf]    isActive: true
+2025-10-06T23:16:26.186335310Z [inf]  }
+2025-10-06T23:16:26.186340207Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T23:16:26.186345585Z [inf]    adminAuth: true,
+2025-10-06T23:16:26.186349797Z [inf]    replitAuth: false,
+2025-10-06T23:16:26.186353544Z [inf]    driverAuth: true,
+2025-10-06T23:16:26.186357416Z [inf]    bypassAuth: true,
+2025-10-06T23:16:26.186362836Z [inf]    hasAuth: true,
+2025-10-06T23:16:26.186366941Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T23:16:26.186371037Z [inf]  }
+2025-10-06T23:16:26.186375324Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T23:16:26.186379335Z [inf]  📋 Direct lookup: Found 1 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T23:16:26.186383008Z [inf]  ✅ FINAL RESULT: Returning 1 loads for driver portal
+2025-10-06T23:16:26.186386818Z [inf]  11:16:20 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 7ms :: [{"id…
+2025-10-06T23:16:26.186390650Z [inf]  Tracking endpoint reached
+2025-10-06T23:16:26.186394363Z [inf]  Found tracking loads: 0
+2025-10-06T23:16:26.186397946Z [inf]  11:16:25 PM [express] GET /api/tracking/loads 304 in 10ms :: []
+2025-10-06T23:16:33.478468526Z [inf]  11:16:33 PM [express] GET /api/drivers/available 304 in 7ms :: [{"id":"f920c664-fb37-496e-af76-1f0a43…
+2025-10-06T23:16:33.518479933Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:16:33.518483733Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T23:16:33.518488472Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T23:16:33.518492609Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T23:16:33.518496442Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T23:16:33.518500030Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T23:16:33.518503755Z [inf]  11:16:33 PM [express] GET /api/invoices 304 in 45ms :: []
+2025-10-06T23:16:33.544013037Z [inf]  11:16:33 PM [express] GET /api/customers 304 in 66ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8"…
+2025-10-06T23:16:33.544022606Z [inf]  11:16:33 PM [express] GET /api/locations 304 in 70ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01"…
+2025-10-06T23:16:33.544028854Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-06T23:16:33.544035045Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-06T23:16:33.544040763Z [inf]  🔥 RETURNING: 2 loads
+2025-10-06T23:16:33.546388795Z [inf]  11:16:33 PM [express] GET /api/loads 200 in 74ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T23:17:03.550984809Z [inf]  Authentication failed: No user or expiration
+2025-10-06T23:17:03.550988882Z [inf]  11:16:55 PM [express] GET /api/auth/user 401 in 4ms :: {"message":"Unauthorized"}
+2025-10-06T23:17:03.550992817Z [inf]  Admin user check: {
+2025-10-06T23:17:03.550996974Z [inf]    hasSession: true,
+2025-10-06T23:17:03.551000668Z [inf]    hasAdminAuth: true,
+2025-10-06T23:17:03.551004766Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T23:17:03.551008386Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-06T23:17:03.551013303Z [inf]    adminAuthData: {
+2025-10-06T23:17:03.551017364Z [inf]      id: 'admin-001',
+2025-10-06T23:17:03.551021084Z [inf]      role: 'admin',
+2025-10-06T23:17:03.551024676Z [inf]      lastName: 'User',
+2025-10-06T23:17:03.551028303Z [inf]      username: 'admin',
+2025-10-06T23:17:03.551032410Z [inf]      firstName: 'Admin'
+2025-10-06T23:17:03.551035966Z [inf]    },
+2025-10-06T23:17:03.551039571Z [inf]    hasBypassToken: false
+2025-10-06T23:17:03.551043475Z [inf]  }
+2025-10-06T23:17:03.551047424Z [inf]  11:16:55 PM [express] GET /api/auth/admin-user 304 in 15ms :: {"id":"admin-001","role":"admin","lastN…
+2025-10-06T23:17:03.551051145Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T23:17:03.551054723Z [inf]    role: 'driver',
+2025-10-06T23:17:03.551058334Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T23:17:03.551062131Z [inf]    lastName: 'Owen',
+2025-10-06T23:17:03.551065876Z [inf]    username: 'Kowen',
+2025-10-06T23:17:03.551069349Z [inf]    firstName: 'Kevin'
+2025-10-06T23:17:03.551073178Z [inf]  }
+2025-10-06T23:17:03.551076802Z [inf]  11:16:55 PM [express] GET /api/auth/driver-user 304 in 5ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T23:17:03.551080269Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:17:03.551084402Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T23:17:03.551094488Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T23:17:03.551098425Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T23:17:03.551102421Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T23:17:03.551106158Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T23:17:03.551109593Z [inf]  11:16:56 PM [express] GET /api/locations 304 in 14ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01"…
+2025-10-06T23:17:03.551113241Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-06T23:17:03.551116939Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-06T23:17:03.551120459Z [inf]  🔥 RETURNING: 2 loads
+2025-10-06T23:17:03.551125924Z [inf]  11:16:56 PM [express] GET /api/invoices 304 in 7ms :: []
+2025-10-06T23:17:03.551129456Z [inf]  11:16:56 PM [express] GET /api/loads 304 in 12ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T23:17:03.551132936Z [inf]  11:16:56 PM [express] GET /api/drivers/available 304 in 5ms :: [{"id":"f920c664-fb37-496e-af76-1f0a43…
+2025-10-06T23:17:03.551136539Z [inf]  11:16:56 PM [express] GET /api/customers 304 in 10ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8"…
+2025-10-06T23:17:03.551140355Z [inf]  Bypass check: {
+2025-10-06T23:17:03.551143982Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:17:03.551147662Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:17:03.551152047Z [inf]    isActive: true
+2025-10-06T23:17:03.551155629Z [inf]  }
+2025-10-06T23:17:03.551159261Z [inf]  Dashboard stats auth check: {
+2025-10-06T23:17:03.551163016Z [inf]    hasAdminAuth: true,
+2025-10-06T23:17:03.551167919Z [inf]    hasReplitAuth: false,
+2025-10-06T23:17:03.551171653Z [inf]    hasTokenBypass: true,
+2025-10-06T23:17:03.551175115Z [inf]    headers: [
+2025-10-06T23:17:03.551179002Z [inf]      'host',                 'user-agent',
+2025-10-06T23:17:03.551182841Z [inf]      'accept',               'accept-encoding',
+2025-10-06T23:17:03.551186497Z [inf]      'accept-language',      'cookie',
+2025-10-06T23:17:03.551190031Z [inf]      'if-none-match',        'referer',
+2025-10-06T23:17:03.551193800Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T23:17:03.551197273Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T23:17:03.551200925Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T23:17:03.551205679Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T23:17:03.551465685Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T23:17:03.551481435Z [inf]      'x-request-start'
+2025-10-06T23:17:03.551485848Z [inf]    ],
+2025-10-06T23:17:03.551512824Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T23:17:03.551518189Z [inf]  }
+2025-10-06T23:17:03.551521933Z [inf]  11:16:56 PM [express] GET /api/dashboard/stats 200 in 22ms :: {"activeLoads":"1","inTransit":"0","del…
+2025-10-06T23:21:53.640685127Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:21:53.640697139Z [inf]  Bypass check: {
+2025-10-06T23:21:53.640702978Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:21:53.640708508Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:21:53.640713937Z [inf]    isActive: false
+2025-10-06T23:21:53.640719534Z [inf]  }
+2025-10-06T23:21:53.640725142Z [inf]  11:21:46 PM [express] GET /api/loads 401 in 1ms :: {"message":"Authentication required"}
+2025-10-06T23:21:53.640731222Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:21:53.640736725Z [inf]  Bypass check: {
+2025-10-06T23:21:53.640742872Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:21:53.640748753Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:21:53.640754223Z [inf]    isActive: false
+2025-10-06T23:21:53.640759505Z [inf]  }
+2025-10-06T23:21:53.640765922Z [inf]  11:21:48 PM [express] GET /api/loads 401 in 1ms :: {"message":"Authentication required"}
+2025-10-06T23:22:00.345543394Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:22:00.345547291Z [inf]  Bypass check: {
+2025-10-06T23:22:00.345551481Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:22:00.345555130Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:22:00.345559613Z [inf]    isActive: false
+2025-10-06T23:22:00.345565888Z [inf]  }
+2025-10-06T23:22:00.345569901Z [inf]  11:22:00 PM [express] GET /api/loads 401 in 1ms :: {"message":"Authentication required"}
+2025-10-06T23:25:40.457113883Z [inf]  ❌ API 404: Unmatched API route GET /admin/fix-orphaned-loads
+2025-10-06T23:25:40.457118579Z [inf]  11:25:33 PM [express] GET /api/admin/fix-orphaned-loads 404 in 34ms :: {"error":"API route not found"}
+2025-10-06T23:32:30.683515776Z [inf]  Bypass check: {
+2025-10-06T23:32:30.683520195Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:32:30.683525446Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:32:30.683529721Z [inf]    isActive: true
+2025-10-06T23:32:30.683534025Z [inf]  }
+2025-10-06T23:32:30.683538185Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T23:32:30.683542467Z [inf]    adminAuth: true,
+2025-10-06T23:32:30.683546239Z [inf]    replitAuth: false,
+2025-10-06T23:32:30.683550779Z [inf]    driverAuth: true,
+2025-10-06T23:32:30.683554670Z [inf]    bypassAuth: true,
+2025-10-06T23:32:30.683559190Z [inf]    hasAuth: true,
+2025-10-06T23:32:30.683563398Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T23:32:30.683567952Z [inf]  }
+2025-10-06T23:32:30.683572527Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T23:32:30.683576845Z [inf]  📋 Direct lookup: Found 1 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T23:32:30.683583494Z [inf]  ✅ FINAL RESULT: Returning 1 loads for driver portal
+2025-10-06T23:32:30.683589311Z [inf]  11:32:26 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 49ms :: [{"i…
+2025-10-06T23:32:36.085235837Z [inf]  Load return auth check: {
+2025-10-06T23:32:36.085240704Z [inf]    hasReplitAuth: false,
+2025-10-06T23:32:36.085245001Z [inf]    hasDriverAuth: {
+2025-10-06T23:32:36.085248973Z [inf]      role: 'driver',
+2025-10-06T23:32:36.085254517Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T23:32:36.085260255Z [inf]      lastName: 'Owen',
+2025-10-06T23:32:36.085264523Z [inf]      username: 'Kowen',
+2025-10-06T23:32:36.085268572Z [inf]      firstName: 'Kevin'
+2025-10-06T23:32:36.085272485Z [inf]    },
+2025-10-06T23:32:36.085276398Z [inf]    hasAdminAuth: {
+2025-10-06T23:32:36.085280256Z [inf]      id: 'admin-001',
+2025-10-06T23:32:36.085285601Z [inf]      role: 'admin',
+2025-10-06T23:32:36.085289678Z [inf]      lastName: 'User',
+2025-10-06T23:32:36.085294105Z [inf]      username: 'admin',
+2025-10-06T23:32:36.085297977Z [inf]      firstName: 'Admin'
+2025-10-06T23:32:36.085301907Z [inf]    },
+2025-10-06T23:32:36.085306158Z [inf]    hasTokenBypass: true,
+2025-10-06T23:32:36.085310491Z [inf]    finalAuth: {
+2025-10-06T23:32:36.085315178Z [inf]      role: 'driver',
+2025-10-06T23:32:36.085343781Z [inf]      userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T23:32:36.085350628Z [inf]      lastName: 'Owen',
+2025-10-06T23:32:36.085356066Z [inf]      username: 'Kowen',
+2025-10-06T23:32:36.085362427Z [inf]      firstName: 'Kevin'
+2025-10-06T23:32:36.085368915Z [inf]    }
+2025-10-06T23:32:36.085375855Z [inf]  }
+2025-10-06T23:32:36.085382426Z [inf]  📦 Load 6022058 returned to admin dashboard by driver
+2025-10-06T23:32:36.085389240Z [inf]  11:32:36 PM [express] PATCH /api/loads/ac83116e-86ee-4ab8-8761-43680b0b15e4/return-load 200 in 17ms :…
+2025-10-06T23:32:36.240378942Z [inf]  Bypass check: {
+2025-10-06T23:32:36.240387359Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:32:36.240392662Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:32:36.240401541Z [inf]    isActive: true
+2025-10-06T23:32:36.240406353Z [inf]  }
+2025-10-06T23:32:36.240411307Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T23:32:36.240416009Z [inf]    adminAuth: true,
+2025-10-06T23:32:36.240427305Z [inf]    replitAuth: false,
+2025-10-06T23:32:36.240432154Z [inf]    driverAuth: true,
+2025-10-06T23:32:36.240436237Z [inf]    bypassAuth: true,
+2025-10-06T23:32:36.240440232Z [inf]    hasAuth: true,
+2025-10-06T23:32:36.240444149Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T23:32:36.240448629Z [inf]  }
+2025-10-06T23:32:36.240453218Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T23:32:36.243546682Z [inf]  📋 Direct lookup: Found 0 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T23:32:36.243555400Z [inf]  🔄 No direct loads found. Trying username mapping...
+2025-10-06T23:32:36.243561586Z [inf]  🔍 Getting filtered loads with filters: {}
+2025-10-06T23:32:36.247820115Z [inf]  📊 Found 2 loads matching filters
+2025-10-06T23:32:36.247827685Z [inf]  🎯 Username mapping: Found 0 Kevin Owen loads
+2025-10-06T23:32:36.247831957Z [inf]  ✅ FINAL RESULT: Returning 0 loads for driver portal
+2025-10-06T23:32:36.247835887Z [inf]  11:32:36 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 11ms :: []
+2025-10-06T23:33:16.271943583Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T23:33:16.271950791Z [inf]    role: 'driver',
+2025-10-06T23:33:16.271954850Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T23:33:16.271959364Z [inf]    lastName: 'Owen',
+2025-10-06T23:33:16.271963430Z [inf]    username: 'Kowen',
+2025-10-06T23:33:16.271967303Z [inf]    firstName: 'Kevin'
+2025-10-06T23:33:16.271970951Z [inf]  }
+2025-10-06T23:33:16.271976397Z [inf]  11:33:12 PM [express] GET /api/auth/driver-user 304 in 5ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T23:33:16.271980535Z [inf]  Admin user check: {
+2025-10-06T23:33:16.271984369Z [inf]    hasSession: true,
+2025-10-06T23:33:16.271988087Z [inf]    hasAdminAuth: true,
+2025-10-06T23:33:16.271992375Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T23:33:16.271997057Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-06T23:33:16.272001107Z [inf]    adminAuthData: {
+2025-10-06T23:33:16.272004940Z [inf]      id: 'admin-001',
+2025-10-06T23:33:16.272008885Z [inf]      role: 'admin',
+2025-10-06T23:33:16.272012465Z [inf]      lastName: 'User',
+2025-10-06T23:33:16.272017138Z [inf]      username: 'admin',
+2025-10-06T23:33:16.272020772Z [inf]      firstName: 'Admin'
+2025-10-06T23:33:16.272025237Z [inf]    },
+2025-10-06T23:33:16.272029238Z [inf]    hasBypassToken: false
+2025-10-06T23:33:16.272033373Z [inf]  }
+2025-10-06T23:33:16.272037019Z [inf]  11:33:12 PM [express] GET /api/auth/admin-user 304 in 15ms :: {"id":"admin-001","role":"admin","lastN…
+2025-10-06T23:33:16.272040629Z [inf]  Authentication failed: No user or expiration
+2025-10-06T23:33:16.272044707Z [inf]  11:33:12 PM [express] GET /api/auth/user 401 in 3ms :: {"message":"Unauthorized"}
+2025-10-06T23:33:16.272048582Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T23:33:16.272052879Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T23:33:16.272057883Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T23:33:16.272061616Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T23:33:16.272066171Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T23:33:16.272069901Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T23:33:16.272073624Z [inf]  11:33:13 PM [express] GET /api/locations 304 in 19ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01"…
+2025-10-06T23:33:16.272077387Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-06T23:33:16.272082136Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-06T23:33:16.272086049Z [inf]  🔥 RETURNING: 2 loads
+2025-10-06T23:33:16.272090036Z [inf]  11:33:13 PM [express] GET /api/loads 200 in 22ms :: [{"id":"784c24d7-150e-4bcf-acbf-6aa957317f59","nu…
+2025-10-06T23:33:16.272093648Z [inf]  11:33:13 PM [express] GET /api/customers 304 in 7ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T23:33:16.272098220Z [inf]  Bypass check: {
+2025-10-06T23:33:16.272102774Z [inf]    token: '[PROVIDED]',
+2025-10-06T23:33:16.272106457Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T23:33:16.272110561Z [inf]    isActive: true
+2025-10-06T23:33:16.272117843Z [inf]  }
+2025-10-06T23:33:16.272121629Z [inf]  Dashboard stats auth check: {
+2025-10-06T23:33:16.272125187Z [inf]    hasAdminAuth: true,
+2025-10-06T23:33:16.272128976Z [inf]    hasReplitAuth: false,
+2025-10-06T23:33:16.272132720Z [inf]    hasTokenBypass: true,
+2025-10-06T23:33:16.272136797Z [inf]    headers: [
+2025-10-06T23:33:16.272141788Z [inf]      'host',                 'user-agent',
+2025-10-06T23:33:16.272145369Z [inf]      'accept',               'accept-encoding',
+2025-10-06T23:33:16.272149009Z [inf]      'accept-language',      'cookie',
+2025-10-06T23:33:16.272152827Z [inf]      'if-none-match',        'referer',
+2025-10-06T23:33:16.272156657Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T23:33:16.272160315Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T23:33:16.272164089Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T23:33:16.272168175Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T23:33:16.272172371Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T23:33:16.272176407Z [inf]      'x-request-start'
+2025-10-06T23:33:16.272180127Z [inf]    ],
+2025-10-06T23:33:16.272184243Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T23:33:16.272188211Z [inf]  }
+2025-10-06T23:33:16.272191974Z [inf]  11:33:13 PM [express] GET /api/invoices 304 in 7ms :: []
+2025-10-06T23:33:16.272197061Z [inf]  11:33:13 PM [express] GET /api/dashboard/stats 200 in 11ms :: {"activeLoads":"0","inTransit":"0","del…
+2025-10-06T23:33:16.272529054Z [inf]  11:33:13 PM [express] GET /api/drivers/available 304 in 19ms :: [{"id":"f920c664-fb37-496e-af76-1f0a4…
