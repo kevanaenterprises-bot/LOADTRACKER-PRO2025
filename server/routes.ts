@@ -4827,6 +4827,87 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Import rates from Replit - ONE-CLICK ENDPOINT
+  app.get("/api/admin/import-rates", async (req, res) => {
+    try {
+      console.log("📊 Importing rates from Replit backup...");
+      
+      const ratesToImport = [
+        { id: 'a50a5c62-e34d-4cfc-9bb3-79c7c7011037', city: 'Arkansas City', state: 'KS', flatRate: '1350.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: 'f6de5a70-d432-449e-b1b7-5300721f439d', city: 'Big Spring', state: 'TX', flatRate: '1400.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: 'e53447d5-e6d3-4433-a199-6a4e534e013c', city: 'DALLAS', state: 'TX', flatRate: '0.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: 'af15abd8-affb-47f9-a7f7-e2962a299c1c', city: 'Dubuque', state: 'IA', flatRate: '2750.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: 'e5902143-4c14-4185-b898-ded34f3ab761', city: 'Dubuque/Plano Teturns', state: 'TX', flatRate: '2750.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '8fdc284e-8a6c-471a-8b4e-8336e8b07c7f', city: 'FAYETTEVILLE', state: 'AR', flatRate: '1200.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: 'e773eae8-b709-4dc8-a2d6-1858d4231f2d', city: 'Fort Smith', state: 'AR', flatRate: '1200.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '1f0580ad-43ad-4ec5-9c8c-5e3f8933aaa1', city: 'Garland', state: 'TX', flatRate: '800.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '3df310ad-14a7-4897-a51e-3c1fc14044b9', city: 'Lancaster', state: 'TX', flatRate: '3000.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '6a389070-bb24-44c4-a86e-179962d97887', city: 'Moore', state: 'Ok', flatRate: '1400.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '68ced315-7a51-4896-86bc-dd7edb6ba5f9', city: 'Oklahoma City', state: 'Ok', flatRate: '1400.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '2eef97ff-ee36-4965-819a-8e61e36601c4', city: 'OKLAHOMA CITY', state: 'OK', flatRate: '1400.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '30d8edce-fbbf-4733-bc9e-2af081514056', city: 'Plano', state: 'TX', flatRate: '0.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: 'c1391e8d-f9ab-47c1-983a-e7db0780d6b1', city: 'PUEBLO', state: 'CO', flatRate: '3000.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '2cc2c704-a402-4438-8c51-d2aca7404adf', city: 'SAN ANTON', state: 'TX', flatRate: '1400.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '1fef4767-3179-4e5a-9e96-7490c5559867', city: 'San Antonio', state: 'TX', flatRate: '950.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
+        { id: '85cca4d3-115e-410e-8afd-75eb3174e9a7', city: 'Shiner', state: 'Tx', flatRate: '1200.00', lumperCharge: '0.00', extraStopCharge: '50.00' }
+      ];
+      
+      let imported = 0;
+      let updated = 0;
+      
+      for (const rate of ratesToImport) {
+        try {
+          // Check if rate exists
+          const existing = await storage.getRateByLocation(rate.city, rate.state);
+          
+          if (existing) {
+            // Update existing rate
+            await db.update(rates)
+              .set({
+                flatRate: rate.flatRate,
+                lumperCharge: rate.lumperCharge,
+                extraStopCharge: rate.extraStopCharge,
+                updatedAt: new Date()
+              })
+              .where(eq(rates.id, existing.id));
+            updated++;
+            console.log(`✅ Updated rate for ${rate.city}, ${rate.state}`);
+          } else {
+            // Insert new rate
+            await db.insert(rates).values({
+              id: rate.id,
+              city: rate.city,
+              state: rate.state,
+              flatRate: rate.flatRate,
+              lumperCharge: rate.lumperCharge,
+              extraStopCharge: rate.extraStopCharge,
+              isActive: true,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            });
+            imported++;
+            console.log(`✅ Imported rate for ${rate.city}, ${rate.state}`);
+          }
+        } catch (error) {
+          console.error(`❌ Failed to import rate for ${rate.city}, ${rate.state}:`, error);
+        }
+      }
+      
+      console.log(`📊 Rate import complete: ${imported} imported, ${updated} updated`);
+      
+      res.json({
+        message: "Rates imported successfully from Replit backup",
+        imported,
+        updated,
+        total: ratesToImport.length
+      });
+      
+    } catch (error) {
+      console.error("❌ Rate import failed:", error);
+      res.status(500).json({ message: "Failed to import rates", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Manual invoice generation endpoint - COMPLETELY OPEN FOR TESTING
   app.post("/api/loads/:id/generate-invoice", async (req, res) => {
     try {
