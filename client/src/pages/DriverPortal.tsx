@@ -108,6 +108,9 @@ export default function DriverPortal() {
           )}
         </CardContent>
       </Card>
+
+      {/* BOL Upload Section */}
+      <StandaloneBOLUpload />
     </div>
   );
 }
