@@ -146,6 +146,7 @@ export class NotificationService {
       type: 'load_assignment',
       message: `🚛 NEW LOAD ASSIGNED: ${loadNumber} to ${destination}. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.`,
       loadId,
+      urgent: true, // Load assignments bypass quiet hours since they're time-sensitive
     });
   }
 
