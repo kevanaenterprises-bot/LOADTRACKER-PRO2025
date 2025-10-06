@@ -318,6 +318,8 @@ export const insertLoadSchema = createInsertSchema(loads).omit({
   updatedAt: true,
   deliveredAt: true,
   completedAt: true,
+}).extend({
+  deliveryDueAt: z.string().datetime().transform(val => new Date(val)).optional().or(z.date().optional()),
 });
 
 export const insertLoadStopSchema = createInsertSchema(loadStops).omit({
