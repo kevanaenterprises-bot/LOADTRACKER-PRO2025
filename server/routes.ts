@@ -4827,6 +4827,51 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Reset invoice counter to specific number
+  app.get("/api/admin/reset-invoice-counter/:number", async (req, res) => {
+    try {
+      const targetNumber = parseInt(req.params.number);
+      
+      if (isNaN(targetNumber) || targetNumber < 1) {
+        return res.status(400).json({ message: "Invalid invoice number. Must be a positive integer." });
+      }
+      
+      console.log(`🔢 Resetting invoice counter to ${targetNumber}...`);
+      
+      // Get or create counter
+      const [counter] = await db.select().from(invoiceCounter).limit(1);
+      
+      if (!counter) {
+        // Create new counter with target number
+        await db.insert(invoiceCounter).values({ 
+          currentNumber: targetNumber,
+          lastUpdated: new Date()
+        });
+        console.log(`✅ Created new invoice counter at ${targetNumber}`);
+      } else {
+        // Update existing counter
+        await db.update(invoiceCounter)
+          .set({ 
+            currentNumber: targetNumber,
+            lastUpdated: new Date()
+          })
+          .where(eq(invoiceCounter.id, counter.id));
+        console.log(`✅ Updated invoice counter from ${counter.currentNumber} to ${targetNumber}`);
+      }
+      
+      res.json({
+        success: true,
+        message: `Invoice counter set to ${targetNumber}. Next invoice will be GO${targetNumber + 1}`,
+        currentNumber: targetNumber,
+        nextInvoice: `GO${targetNumber + 1}`
+      });
+      
+    } catch (error) {
+      console.error("❌ Failed to reset invoice counter:", error);
+      res.status(500).json({ message: "Failed to reset invoice counter", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Import rates from Replit - ONE-CLICK ENDPOINT WITH FORCED INSERT
   app.get("/api/admin/import-rates-force", async (req, res) => {
     try {
