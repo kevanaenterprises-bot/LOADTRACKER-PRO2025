@@ -23,8 +23,8 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
   const { data: allLoads = [], isLoading, error } = useQuery<any[]>({
     queryKey: [`/api/drivers/${driverId}/loads`],
     retry: false,
-    refetchOnWindowFocus: false,
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchOnWindowFocus: true, // Auto-refresh when switching back to app (mobile fix!)
+    refetchInterval: 15000, // Refresh every 15 seconds for faster updates
   });
 
 
