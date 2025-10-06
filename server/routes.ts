@@ -4839,6 +4839,38 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Fix orphaned loads (loads without driver but wrong status)
+  app.get("/api/admin/fix-orphaned-loads", async (req, res) => {
+    try {
+      console.log("🔧 Searching for orphaned loads (no driver but not pending)...");
+      
+      const allLoads = await storage.getLoads();
+      const orphanedLoads = allLoads.filter((load: any) => 
+        !load.driverId && load.status !== "pending" && load.status !== "created"
+      );
+      
+      console.log(`Found ${orphanedLoads.length} orphaned loads to fix`);
+      
+      const fixed: string[] = [];
+      for (const load of orphanedLoads) {
+        await storage.updateLoad(load.id, { status: "pending" });
+        fixed.push(`${load.number109} (was ${load.status})`);
+        console.log(`✅ Fixed load ${load.number109}: ${load.status} → pending`);
+      }
+      
+      res.json({
+        success: true,
+        message: `Fixed ${orphanedLoads.length} orphaned load(s)`,
+        fixed,
+        total: orphanedLoads.length
+      });
+      
+    } catch (error) {
+      console.error("❌ Failed to fix orphaned loads:", error);
+      res.status(500).json({ message: "Failed to fix orphaned loads", error: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Reset invoice counter to specific number
   app.get("/api/admin/reset-invoice-counter/:number", async (req, res) => {
     try {
