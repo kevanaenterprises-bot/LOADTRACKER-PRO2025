@@ -70,6 +70,7 @@ export class ObjectStorageService {
 
   // Gets the public object search paths.
   getPublicObjectSearchPaths(): Array<string> {
+    // Support both Replit (PUBLIC_OBJECT_SEARCH_PATHS) and Railway (GCS_BUCKET_NAME) environments
     const pathsStr = process.env.PUBLIC_OBJECT_SEARCH_PATHS || "";
     const paths = Array.from(
       new Set(
@@ -79,10 +80,17 @@ export class ObjectStorageService {
           .filter((path) => path.length > 0)
       )
     );
+    
     if (paths.length === 0) {
+      // For Railway, construct public path from GCS_BUCKET_NAME
+      const bucketName = process.env.GCS_BUCKET_NAME;
+      if (bucketName) {
+        return [`gs://${bucketName}/public`];
+      }
+      
       throw new Error(
-        "PUBLIC_OBJECT_SEARCH_PATHS not set. Create a bucket in 'Object Storage' " +
-          "tool and set PUBLIC_OBJECT_SEARCH_PATHS env var (comma-separated paths)."
+        "Neither PUBLIC_OBJECT_SEARCH_PATHS nor GCS_BUCKET_NAME is set. " +
+        "Set GCS_BUCKET_NAME for Railway deployment or PUBLIC_OBJECT_SEARCH_PATHS for Replit."
       );
     }
     return paths;
@@ -90,14 +98,22 @@ export class ObjectStorageService {
 
   // Gets the private object directory.
   getPrivateObjectDir(): string {
-    const dir = process.env.PRIVATE_OBJECT_DIR || "";
-    if (!dir) {
-      throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
-      );
+    // Support both Replit (PRIVATE_OBJECT_DIR) and Railway (GCS_BUCKET_NAME) environments
+    const replitDir = process.env.PRIVATE_OBJECT_DIR;
+    if (replitDir) {
+      return replitDir;
     }
-    return dir;
+    
+    // For Railway, construct the path from GCS_BUCKET_NAME
+    const bucketName = process.env.GCS_BUCKET_NAME;
+    if (bucketName) {
+      return `gs://${bucketName}/private`;
+    }
+    
+    throw new Error(
+      "Neither PRIVATE_OBJECT_DIR nor GCS_BUCKET_NAME is set. " +
+      "Set GCS_BUCKET_NAME for Railway deployment or PRIVATE_OBJECT_DIR for Replit."
+    );
   }
 
   // Search for a public object from the search paths.
