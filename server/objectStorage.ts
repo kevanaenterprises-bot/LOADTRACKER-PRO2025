@@ -365,6 +365,8 @@ async function signObjectURL({
   ttlSec: number;
 }): Promise<string> {
   // Use Google Cloud Storage's native signed URL generation
+  console.log('🔐 Generating signed URL:', { bucketName, objectName, method, ttlSec });
+  
   const storage = getObjectStorageClient();
   const bucket = storage.bucket(bucketName);
   const file = bucket.file(objectName);
@@ -378,6 +380,10 @@ async function signObjectURL({
     expires: Date.now() + ttlSec * 1000,
   };
   
+  console.log('🔐 Signed URL options:', options);
+  
   const [signedUrl] = await file.getSignedUrl(options);
+  console.log('✅ Signed URL generated:', signedUrl.substring(0, 100) + '...');
+  
   return signedUrl;
 }
