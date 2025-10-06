@@ -5015,19 +5015,28 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   }, async (req, res) => {
     try {
+      console.log("📤 Starting POD upload URL generation...");
       const objectStorageService = new ObjectStorageService();
       const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      console.log("✅ Upload URL generated successfully");
       
       // Generate the permanent object path from the upload URL
       const publicPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      console.log("✅ Public path normalized:", publicPath);
       
       res.json({ 
         uploadURL,
         publicPath // Send permanent path that frontend should use
       });
     } catch (error) {
-      console.error("Error getting upload URL:", error);
-      res.status(500).json({ message: "Failed to get upload URL" });
+      console.error("❌ Error getting upload URL:");
+      console.error("Error details:", error);
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ 
+        message: "Failed to get upload URL",
+        error: errorMessage 
+      });
     }
   });
 
@@ -5166,21 +5175,25 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   }, async (req, res) => {
     try {
+      console.log(`📄 Starting POD update for load ${req.params.id}`);
       const { podDocumentURL } = req.body;
       
       if (!podDocumentURL) {
+        console.error("❌ No POD document URL provided");
         return res.status(400).json({ message: "POD document URL is required" });
       }
 
       // SIMPLIFIED: Just save the POD URL directly
-      console.log(`📄 POD upload for load ${req.params.id}: ${podDocumentURL}`);
+      console.log(`📄 POD URL for load ${req.params.id}: ${podDocumentURL}`);
       
       // Update load with POD document path
+      console.log(`📄 Calling storage.updateLoadPOD...`);
       const load = await storage.updateLoadPOD(req.params.id, podDocumentURL);
       console.log(`✅ POD saved for load: ${load.number109}`);
       
       // First set status to delivered when POD is uploaded
       if (load.status !== "delivered" && load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {
+        console.log(`📄 Updating load status to delivered...`);
         await storage.updateLoadStatus(req.params.id, "delivered");
         // Set delivered timestamp using direct database update
         await db.update(loads).set({ 
@@ -5191,8 +5204,10 @@ Reply YES to confirm acceptance or NO to decline.`
       }
 
       // FIXED WORKFLOW: Set to awaiting_invoicing first, then auto-generate
+      console.log(`📄 Getting load details for invoicing workflow...`);
       const loadWithDetails = await storage.getLoad(req.params.id);
       if (loadWithDetails && loadWithDetails.status === "delivered") {
+        console.log(`📄 Moving to awaiting_invoicing status...`);
         await storage.updateLoadStatus(req.params.id, "awaiting_invoicing");
         console.log(`📋 Load ${req.params.id} moved to AWAITING_INVOICING - ready for invoice generation`);
       }
@@ -5267,8 +5282,14 @@ Reply YES to confirm acceptance or NO to decline.`
 
       res.json(load);
     } catch (error) {
-      console.error("Error updating POD:", error);
-      res.status(500).json({ message: "Failed to update POD document" });
+      console.error("❌ Error updating POD:");
+      console.error("Error details:", error);
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      res.status(500).json({ 
+        message: "Failed to update POD document",
+        error: errorMessage 
+      });
     }
   });
 
