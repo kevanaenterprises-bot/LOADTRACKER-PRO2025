@@ -4827,10 +4827,10 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  // Import rates from Replit - ONE-CLICK ENDPOINT
-  app.get("/api/admin/import-rates", async (req, res) => {
+  // Import rates from Replit - ONE-CLICK ENDPOINT WITH FORCED INSERT
+  app.get("/api/admin/import-rates-force", async (req, res) => {
     try {
-      console.log("📊 Importing rates from Replit backup...");
+      console.log("📊 FORCE importing all rates from Replit backup...");
       
       const ratesToImport = [
         { id: 'a50a5c62-e34d-4cfc-9bb3-79c7c7011037', city: 'Arkansas City', state: 'KS', flatRate: '1350.00', lumperCharge: '0.00', extraStopCharge: '50.00' },
@@ -4853,53 +4853,50 @@ Reply YES to confirm acceptance or NO to decline.`
       ];
       
       let imported = 0;
-      let updated = 0;
+      let skipped = 0;
+      const details: string[] = [];
       
       for (const rate of ratesToImport) {
         try {
-          // Check if rate exists
-          const existing = await storage.getRateByLocation(rate.city, rate.state);
-          
-          if (existing) {
-            // Update existing rate
-            await db.update(rates)
-              .set({
-                flatRate: rate.flatRate,
-                lumperCharge: rate.lumperCharge,
-                extraStopCharge: rate.extraStopCharge,
-                updatedAt: new Date()
-              })
-              .where(eq(rates.id, existing.id));
-            updated++;
-            console.log(`✅ Updated rate for ${rate.city}, ${rate.state}`);
+          // Try to insert, skip if ID already exists
+          await db.insert(rates).values({
+            id: rate.id,
+            city: rate.city,
+            state: rate.state,
+            flatRate: rate.flatRate,
+            lumperCharge: rate.lumperCharge,
+            extraStopCharge: rate.extraStopCharge,
+            isActive: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+          imported++;
+          details.push(`✅ ${rate.city}, ${rate.state}: $${rate.flatRate}`);
+          console.log(`✅ Imported rate for ${rate.city}, ${rate.state}`);
+        } catch (error: any) {
+          if (error?.code === '23505') { // Duplicate key error
+            skipped++;
+            details.push(`⏭️ ${rate.city}, ${rate.state}: already exists`);
+            console.log(`⏭️ Skipped existing rate for ${rate.city}, ${rate.state}`);
           } else {
-            // Insert new rate
-            await db.insert(rates).values({
-              id: rate.id,
-              city: rate.city,
-              state: rate.state,
-              flatRate: rate.flatRate,
-              lumperCharge: rate.lumperCharge,
-              extraStopCharge: rate.extraStopCharge,
-              isActive: true,
-              createdAt: new Date(),
-              updatedAt: new Date()
-            });
-            imported++;
-            console.log(`✅ Imported rate for ${rate.city}, ${rate.state}`);
+            details.push(`❌ ${rate.city}, ${rate.state}: ${error?.message || 'unknown error'}`);
+            console.error(`❌ Failed to import rate for ${rate.city}, ${rate.state}:`, error);
           }
-        } catch (error) {
-          console.error(`❌ Failed to import rate for ${rate.city}, ${rate.state}:`, error);
         }
       }
       
-      console.log(`📊 Rate import complete: ${imported} imported, ${updated} updated`);
+      // Get final count
+      const [countResult] = await db.select({ count: sql<number>`count(*)` }).from(rates);
+      const totalInDB = countResult?.count || 0;
+      
+      console.log(`📊 Rate import complete: ${imported} new, ${skipped} skipped, ${totalInDB} total in database`);
       
       res.json({
-        message: "Rates imported successfully from Replit backup",
+        message: `Rate import complete: ${imported} new rates imported, ${skipped} already existed`,
         imported,
-        updated,
-        total: ratesToImport.length
+        skipped,
+        totalInDatabase: totalInDB,
+        details
       });
       
     } catch (error) {
