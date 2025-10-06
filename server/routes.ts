@@ -5065,15 +5065,9 @@ Reply YES to confirm acceptance or NO to decline.`
 
       console.log("📤 Direct upload - file received:", req.file.originalname, req.file.size, "bytes");
 
-      const objectStorageService = new ObjectStorageService();
-      const { Storage } = await import("@google-cloud/storage");
-      const storage = new Storage({
-        projectId: process.env.GCS_PROJECT_ID,
-        credentials: {
-          client_email: process.env.GCS_CLIENT_EMAIL,
-          private_key: process.env.GCS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        },
-      });
+      // Use the existing properly-configured GCS client
+      const { getObjectStorageClient } = await import("./objectStorage");
+      const storage = getObjectStorageClient();
 
       // Generate unique filename
       const { randomUUID } = await import("crypto");

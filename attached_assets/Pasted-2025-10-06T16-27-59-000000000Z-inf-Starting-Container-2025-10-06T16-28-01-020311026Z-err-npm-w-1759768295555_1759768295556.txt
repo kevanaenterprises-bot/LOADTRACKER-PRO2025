@@ -1,0 +1,185 @@
+2025-10-06T16:27:59.000000000Z [inf]  Starting Container
+2025-10-06T16:28:01.020311026Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T16:28:01.020315504Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-06T16:28:01.020319716Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-06T16:28:01.020323836Z [inf]  Using 'pg' driver for database querying
+2025-10-06T16:28:01.020328921Z [inf]  [⣷] Pulling schema from database...
+2025-10-06T16:28:01.143891190Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-06T16:28:01.273957712Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-06T16:28:01.395890680Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-06T16:28:01.524632970Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-06T16:28:01.562701742Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-06T16:28:01.587023456Z [inf]  [i] No changes detected
+2025-10-06T16:28:01.716023519Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T16:28:01.727750607Z [inf]  
+2025-10-06T16:28:01.727757522Z [inf]  > rest-express@1.0.0 start
+2025-10-06T16:28:01.727762066Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-06T16:28:01.727767988Z [inf]  
+2025-10-06T16:28:02.392315999Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-06T16:28:02.411775073Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-06T16:28:02.411778881Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-06T16:28:02.402Z
+2025-10-06T16:28:02.411782560Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-06T16:28:02.411787245Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-06T16:28:02.411793344Z [inf]  🔧 Process ID: 50
+2025-10-06T16:28:02.411799386Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-06T16:28:02.411806638Z [inf]  🔧 Platform: linux
+2025-10-06T16:28:02.411812058Z [inf]  🔧 Architecture: x64
+2025-10-06T16:28:02.411818304Z [inf]  🔧 Memory usage: {
+2025-10-06T16:28:02.411825579Z [inf]    "rss": 134438912,
+2025-10-06T16:28:02.411831758Z [inf]    "heapTotal": 62181376,
+2025-10-06T16:28:02.411836838Z [inf]    "heapUsed": 31594264,
+2025-10-06T16:28:02.411841158Z [inf]    "external": 3897578,
+2025-10-06T16:28:02.411845220Z [inf]    "arrayBuffers": 315505
+2025-10-06T16:28:02.411848839Z [inf]  }
+2025-10-06T16:28:02.411853148Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-06T16:28:02.411856999Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-06T16:28:02.405Z
+2025-10-06T16:28:02.411860788Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-06T16:28:02.411864438Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-06T16:28:02.405Z
+2025-10-06T16:28:02.411868603Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-06T16:28:02.411875719Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-06T16:28:02.411879930Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-06T16:28:02.411883549Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-06T16:28:02.411887192Z [inf]  🔧 Validating environment configuration...
+2025-10-06T16:28:02.411891156Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-06T16:28:02.411894855Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-06T16:28:02.411904368Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-06T16:28:02.411908180Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-06T16:28:02.411913306Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-06T16:28:02.411917108Z [inf]  ✅ Database URL configured
+2025-10-06T16:28:02.411920703Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-10-06T16:28:02.411924433Z [inf]  ✅ SMS service (Telnyx) configured
+2025-10-06T16:28:02.411928179Z [inf]  ✅ Session authentication configured
+2025-10-06T16:28:02.411933619Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-06T16:28:02.411937544Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-06T16:28:02.411941426Z [inf]  🔧 Testing database connection...
+2025-10-06T16:28:02.419526855Z [err]  (node:50) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-06T16:28:02.419532765Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-06T16:28:02.462991311Z [inf]  ✅ Database connection successful
+2025-10-06T16:28:02.462998835Z [inf]  📝 Registering application routes...
+2025-10-06T16:28:02.639320811Z [inf]  ✅ Routes registered successfully
+2025-10-06T16:28:02.639327324Z [inf]  📁 Setting up static file serving for production...
+2025-10-06T16:28:02.639331394Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-06T16:28:02.639335534Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-06T16:28:02.639339689Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-06T16:28:02.639346654Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-06T16:28:02.639350869Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-06T16:28:02.639354714Z [inf]  📍 Health check endpoints available:
+2025-10-06T16:28:02.639358959Z [inf]     - GET /api/status (basic status)
+2025-10-06T16:28:02.639363370Z [inf]     - GET /api/health (health check)
+2025-10-06T16:28:02.639366997Z [inf]     - GET /api/ready (readiness check)
+2025-10-06T16:28:02.657048224Z [inf]  4:28:02 PM [express] serving on port 8080
+2025-10-06T16:28:02.683168568Z [inf]  4:28:02 PM [express] GET /api/health 200 in 3ms :: {"status":"ok","timestamp":"2025-10-06T16:28:02.6…
+2025-10-06T16:28:32.697074868Z [inf]  Driver login attempt: {
+2025-10-06T16:28:32.697083263Z [inf]    username: 'KOWEN',
+2025-10-06T16:28:32.697089170Z [inf]    usernameLength: 5,
+2025-10-06T16:28:32.697093456Z [inf]    password: '[LENGTH:10]',
+2025-10-06T16:28:32.697097396Z [inf]    passwordActual: '"9038037500"'
+2025-10-06T16:28:32.697101339Z [inf]  }
+2025-10-06T16:28:32.697105356Z [inf]  Driver lookup result: Found for username: KOWEN
+2025-10-06T16:28:32.697110116Z [inf]  Password check: {
+2025-10-06T16:28:32.697114178Z [inf]    provided: '9038037500',
+2025-10-06T16:28:32.697117848Z [inf]    expected: '9038037500',
+2025-10-06T16:28:32.697121439Z [inf]    normalizedProvided: '9038037500',
+2025-10-06T16:28:32.697125472Z [inf]    normalizedExpected: '9038037500'
+2025-10-06T16:28:32.697129338Z [inf]  }
+2025-10-06T16:28:32.697132973Z [inf]  4:28:28 PM [express] POST /api/driver/login 200 in 8ms :: {"message":"Login successful","user":{"id"…
+2025-10-06T16:28:32.697136841Z [inf]  ✅ Driver session saved successfully
+2025-10-06T16:28:32.697140730Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T16:28:32.697144421Z [inf]    role: 'driver',
+2025-10-06T16:28:32.697150521Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T16:28:32.697155703Z [inf]    lastName: 'Owen',
+2025-10-06T16:28:32.697159739Z [inf]    username: 'Kowen',
+2025-10-06T16:28:32.697163289Z [inf]    firstName: 'Kevin'
+2025-10-06T16:28:32.697167363Z [inf]  }
+2025-10-06T16:28:32.697171329Z [inf]  4:28:29 PM [express] GET /api/auth/driver-user 304 in 4ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-06T16:28:32.697175267Z [inf]  Bypass check: {
+2025-10-06T16:28:32.697178908Z [inf]    token: '[PROVIDED]',
+2025-10-06T16:28:32.697182754Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T16:28:32.697186340Z [inf]    isActive: true
+2025-10-06T16:28:32.697190239Z [inf]  }
+2025-10-06T16:28:32.697197076Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T16:28:32.697200945Z [inf]    adminAuth: true,
+2025-10-06T16:28:32.697204574Z [inf]    replitAuth: false,
+2025-10-06T16:28:32.697208375Z [inf]    driverAuth: true,
+2025-10-06T16:28:32.697212939Z [inf]    bypassAuth: true,
+2025-10-06T16:28:32.697216822Z [inf]    hasAuth: true,
+2025-10-06T16:28:32.697221224Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T16:28:32.697226298Z [inf]  }
+2025-10-06T16:28:32.697230432Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T16:28:32.697235570Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T16:28:32.697239408Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T16:28:32.697243153Z [inf]  4:28:29 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 9ms :: [{"id…
+2025-10-06T16:29:12.713418636Z [inf]  4:29:07 PM [express] GET /api/loads/by-number/602233 404 in 47ms :: {"message":"Load not found"}
+2025-10-06T16:29:12.713424453Z [inf]  Bypass check: {
+2025-10-06T16:29:12.713431129Z [inf]    token: '[PROVIDED]',
+2025-10-06T16:29:12.713436704Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T16:29:12.713442483Z [inf]    isActive: true
+2025-10-06T16:29:12.713447918Z [inf]  }
+2025-10-06T16:29:12.713453030Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T16:29:12.713459753Z [inf]    adminAuth: true,
+2025-10-06T16:29:12.713465774Z [inf]    replitAuth: false,
+2025-10-06T16:29:12.713470981Z [inf]    driverAuth: true,
+2025-10-06T16:29:12.713476637Z [inf]    bypassAuth: true,
+2025-10-06T16:29:12.713482100Z [inf]    hasAuth: true,
+2025-10-06T16:29:12.713488593Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T16:29:12.713493054Z [inf]  }
+2025-10-06T16:29:12.713497543Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T16:29:12.713501333Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T16:29:12.713505387Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T16:29:12.713509613Z [inf]  4:29:07 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 8ms :: [{"id…
+2025-10-06T16:29:32.710757956Z [inf]  4:29:29 PM [express] GET /api/loads/by-number/6022337 200 in 40ms :: {"id":"20ef41b3-abfe-41e5-904e-…
+2025-10-06T16:29:32.710764649Z [inf]  4:29:30 PM [express] GET /api/bol/check/374- 200 in 7ms :: {"exists":false}
+2025-10-06T16:29:32.710768786Z [inf]  4:29:30 PM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/bol 200 in 15ms :: {"id":…
+2025-10-06T16:29:38.191781216Z [inf]  Bypass check: {
+2025-10-06T16:29:38.191788102Z [inf]    token: '[PROVIDED]',
+2025-10-06T16:29:38.191792868Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T16:29:38.191797138Z [inf]    isActive: true
+2025-10-06T16:29:38.191801133Z [inf]  }
+2025-10-06T16:29:38.191805234Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T16:29:38.191810215Z [inf]    adminAuth: true,
+2025-10-06T16:29:38.191816428Z [inf]    replitAuth: false,
+2025-10-06T16:29:38.191820256Z [inf]    driverAuth: true,
+2025-10-06T16:29:38.191824748Z [inf]    bypassAuth: true,
+2025-10-06T16:29:38.191828762Z [inf]    hasAuth: true,
+2025-10-06T16:29:38.191832691Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T16:29:38.191836377Z [inf]  }
+2025-10-06T16:29:38.191840302Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T16:29:38.199789563Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T16:29:38.199795908Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T16:29:38.203597095Z [inf]  4:29:38 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 12ms :: [{"i…
+2025-10-06T16:29:45.889955362Z [inf]  📤 Direct upload - file received: Load_Confirmation_6022337_20251002192029.pdf 63822 bytes
+2025-10-06T16:29:45.893509314Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/42bd8623-44cf-48de-8fe3-56041edf1f76
+2025-10-06T16:29:45.911105099Z [err]  ❌ Direct upload error: Error: error:1E08010C:DECODER routines::unsupported
+2025-10-06T16:29:45.911114408Z [err]      at Sign.sign (node:internal/crypto/sig:128:29)
+2025-10-06T16:29:45.911118984Z [err]      at Object.sign (/app/node_modules/jwa/index.js:166:45)
+2025-10-06T16:29:45.911122944Z [err]      at Object.jwsSign [as sign] (/app/node_modules/jws/lib/sign-stream.js:32:24)
+2025-10-06T16:29:45.911126702Z [err]      at GoogleToken._GoogleToken_requestToken (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:235:27)
+2025-10-06T16:29:45.911130716Z [err]      at GoogleToken._GoogleToken_getTokenAsyncInner (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:180:97)
+2025-10-06T16:29:45.911134791Z [err]      at GoogleToken._GoogleToken_getTokenAsync (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:160:173)
+2025-10-06T16:29:45.911138682Z [err]      at GoogleToken.getToken (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:110:102)
+2025-10-06T16:29:45.911157983Z [err]      at JWT.refreshTokenNoCache (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/jwtclient.js:173:36)
+2025-10-06T16:29:45.911162669Z [err]      at JWT.refreshToken (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:187:24)
+2025-10-06T16:29:45.911167665Z [err]      at JWT.getRequestMetadataAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:333:28) {
+2025-10-06T16:29:45.911173285Z [err]    opensslErrorStack: [ 'error:1E08010C:DECODER routines::unsupported' ],
+2025-10-06T16:29:45.911178874Z [err]    library: 'DECODER routines',
+2025-10-06T16:29:45.911184284Z [err]    reason: 'unsupported',
+2025-10-06T16:29:45.911189611Z [err]    code: 'ERR_OSSL_UNSUPPORTED'
+2025-10-06T16:29:45.911195343Z [err]  }
+2025-10-06T16:29:45.915025680Z [inf]  4:29:45 PM [express] POST /api/objects/direct-upload 500 in 286ms :: {"message":"Failed to upload fi…
+2025-10-06T16:30:15.913788903Z [inf]  Bypass check: {
+2025-10-06T16:30:15.913794533Z [inf]    token: '[PROVIDED]',
+2025-10-06T16:30:15.913800822Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T16:30:15.913806159Z [inf]    isActive: true
+2025-10-06T16:30:15.913811409Z [inf]  }
+2025-10-06T16:30:15.913817527Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T16:30:15.913822908Z [inf]    adminAuth: true,
+2025-10-06T16:30:15.913828132Z [inf]    replitAuth: false,
+2025-10-06T16:30:15.913833735Z [inf]    driverAuth: true,
+2025-10-06T16:30:15.913839132Z [inf]    bypassAuth: true,
+2025-10-06T16:30:15.913844278Z [inf]    hasAuth: true,
+2025-10-06T16:30:15.913849583Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T16:30:15.913856149Z [inf]  }
+2025-10-06T16:30:15.913861946Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T16:30:15.913867385Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T16:30:15.913873814Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T16:30:15.913879425Z [inf]  4:30:08 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 47ms :: [{"i…
