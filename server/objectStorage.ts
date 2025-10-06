@@ -337,29 +337,20 @@ async function signObjectURL({
   method: "GET" | "PUT" | "DELETE" | "HEAD";
   ttlSec: number;
 }): Promise<string> {
-  const request = {
-    bucket_name: bucketName,
-    object_name: objectName,
-    method,
-    expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
+  // Use Google Cloud Storage's native signed URL generation
+  const storage = getObjectStorageClient();
+  const bucket = storage.bucket(bucketName);
+  const file = bucket.file(objectName);
+  
+  const options = {
+    version: 'v4' as const,
+    action: method === 'GET' ? 'read' as const : 
+            method === 'PUT' ? 'write' as const :
+            method === 'DELETE' ? 'delete' as const : 
+            'read' as const,
+    expires: Date.now() + ttlSec * 1000,
   };
-  const response = await fetch(
-    `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
-    }
-  );
-  if (!response.ok) {
-    throw new Error(
-      `Failed to sign object URL, errorcode: ${response.status}, ` +
-        `make sure you're running on Replit`
-    );
-  }
-
-  const { signed_url: signedURL } = await response.json();
-  return signedURL;
+  
+  const [signedUrl] = await file.getSignedUrl(options);
+  return signedUrl;
 }
