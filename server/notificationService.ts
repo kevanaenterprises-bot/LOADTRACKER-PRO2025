@@ -140,11 +140,19 @@ export class NotificationService {
   }
 
   // Predefined notification templates
-  async sendLoadAssignmentNotification(driverId: string, loadNumber: string, destination: string, loadId: string): Promise<void> {
+  async sendLoadAssignmentNotification(
+    driverId: string, 
+    loadNumber: string, 
+    pickupLocation: string,
+    dropoffLocation: string, 
+    mileage: number | null,
+    loadId: string
+  ): Promise<void> {
+    const mileageText = mileage ? ` (${mileage} miles)` : '';
     await this.sendNotification({
       driverId,
       type: 'load_assignment',
-      message: `🚛 NEW LOAD ASSIGNED: ${loadNumber} to ${destination}. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.`,
+      message: `🚛 NEW LOAD: ${loadNumber}\n📍 Pickup: ${pickupLocation}\n📍 Dropoff: ${dropoffLocation}${mileageText}\nGo to https://gofarmsmobilupload.com`,
       loadId,
       urgent: true, // Load assignments bypass quiet hours since they're time-sensitive
     });

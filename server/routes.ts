@@ -3158,12 +3158,17 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Send SMS notification via notification service (respects driver preferences)
       try {
+        const pickupLocation = load.pickupAddress || 'See load details';
         const location = load.location;
-        const destination = location?.name || (load.companyName || 'See load details');
+        const dropoffLocation = location?.city ? `${location.name || load.companyName}, ${location.city}, ${location.state}` : (location?.name || load.companyName || 'See load details');
+        const mileage = load.estimatedMiles ? parseInt(load.estimatedMiles.toString()) : null;
+        
         await notificationService.sendLoadAssignmentNotification(
           driverId,
           load.number109,
-          destination,
+          pickupLocation,
+          dropoffLocation,
+          mileage,
           loadId
         );
         console.log(`✅ SMS notification sent to driver ${driverId} for load ${load.number109}`);
@@ -3699,14 +3704,18 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Send notification to the assigned driver using new notification service
       try {
+        const pickupLocation = load.pickupAddress || 'See load details';
         const location = load.location;
         const destinationName = location?.name || load.companyName || 'Unknown Destination';
-        const fullDestination = location?.city ? `${destinationName}, ${location.city}, ${location.state}` : destinationName;
+        const dropoffLocation = location?.city ? `${destinationName}, ${location.city}, ${location.state}` : destinationName;
+        const mileage = load.estimatedMiles ? parseInt(load.estimatedMiles.toString()) : null;
         
         await notificationService.sendLoadAssignmentNotification(
           driverId,
           load.number109,
-          fullDestination,
+          pickupLocation,
+          dropoffLocation,
+          mileage,
           loadId
         );
         console.log(`🔔 Load assignment notification sent to driver ${driverId}`);
