@@ -23,22 +23,24 @@ function getObjectStorageClient(): Storage {
   if (!objectStorageClient) {
     try {
       console.log('🔧 Initializing Google Cloud Storage client...');
+      
+      const projectId = process.env.GCS_PROJECT_ID;
+      const clientEmail = process.env.GCS_CLIENT_EMAIL;
+      const privateKey = process.env.GCS_PRIVATE_KEY;
+      
+      if (!projectId || !clientEmail || !privateKey) {
+        throw new Error('Missing GCS credentials. Required: GCS_PROJECT_ID, GCS_CLIENT_EMAIL, GCS_PRIVATE_KEY');
+      }
+      
+      // Replace escaped newlines in private key if present
+      const formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+      
       objectStorageClient = new Storage({
+        projectId,
         credentials: {
-          audience: "replit",
-          subject_token_type: "access_token",
-          token_url: `${REPLIT_SIDECAR_ENDPOINT}/token`,
-          type: "external_account",
-          credential_source: {
-            url: `${REPLIT_SIDECAR_ENDPOINT}/credential`,
-            format: {
-              type: "json",
-              subject_token_field_name: "access_token",
-            },
-          },
-          universe_domain: "googleapis.com",
+          client_email: clientEmail,
+          private_key: formattedPrivateKey,
         },
-        projectId: "",
       });
       console.log('✅ Google Cloud Storage client initialized successfully');
     } catch (error) {
