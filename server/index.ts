@@ -175,26 +175,43 @@ async function startServer() {
     console.log('✅ Database URL configured');
     
     // Object storage validation (warn if missing, don't fail)
+    // Support both Replit (PRIVATE_OBJECT_DIR) and Railway (GCS_BUCKET_NAME) environments
     const hasPrivateObjectDir = !!process.env.PRIVATE_OBJECT_DIR;
     const hasPublicSearchPaths = !!process.env.PUBLIC_OBJECT_SEARCH_PATHS;
+    const hasGCSBucket = !!process.env.GCS_BUCKET_NAME;
+    const hasGCSCredentials = !!(process.env.GCS_PROJECT_ID && process.env.GCS_CLIENT_EMAIL && process.env.GCS_PRIVATE_KEY);
     
-    if (!hasPrivateObjectDir || !hasPublicSearchPaths) {
+    const objectStorageConfigured = (hasPrivateObjectDir && hasPublicSearchPaths) || (hasGCSBucket && hasGCSCredentials);
+    
+    if (!objectStorageConfigured) {
       console.warn('⚠️  Object storage not fully configured:');
-      if (!hasPrivateObjectDir) {
-        console.warn('   - PRIVATE_OBJECT_DIR is not set. File uploads will be disabled.');
+      if (!hasPrivateObjectDir && !hasGCSBucket) {
+        console.warn('   - Neither PRIVATE_OBJECT_DIR nor GCS_BUCKET_NAME is set. File uploads will be disabled.');
       }
-      if (!hasPublicSearchPaths) {
-        console.warn('   - PUBLIC_OBJECT_SEARCH_PATHS is not set. Public file serving will be disabled.');
+      if (!hasPublicSearchPaths && !hasGCSBucket) {
+        console.warn('   - Neither PUBLIC_OBJECT_SEARCH_PATHS nor GCS_BUCKET_NAME is set. Public file serving will be disabled.');
+      }
+      if (hasGCSBucket && !hasGCSCredentials) {
+        console.warn('   - GCS_BUCKET_NAME is set but missing credentials (GCS_PROJECT_ID, GCS_CLIENT_EMAIL, GCS_PRIVATE_KEY)');
       }
       console.warn('   Object storage features will be unavailable but the server will continue to start.');
     } else {
-      console.log('✅ Object storage environment variables configured');
+      if (hasGCSBucket && hasGCSCredentials) {
+        console.log('✅ Object storage environment variables configured (Google Cloud Storage)');
+      } else {
+        console.log('✅ Object storage environment variables configured');
+      }
     }
     
-    // Optional service validation (Twilio, etc.)
+    // Optional service validation (SMS - Telnyx or Twilio)
+    const hasTelnyx = !!(process.env.TELNYX_API_KEY && process.env.TELNYX_PHONE_NUMBER);
     const hasTwilio = !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN);
-    if (!hasTwilio) {
-      console.warn('⚠️  SMS service (Twilio) not configured. Driver notifications will be disabled.');
+    const hasSMS = hasTelnyx || hasTwilio;
+    
+    if (!hasSMS) {
+      console.warn('⚠️  SMS service not configured. Driver notifications will be disabled.');
+    } else if (hasTelnyx) {
+      console.log('✅ SMS service (Telnyx) configured');
     } else {
       console.log('✅ SMS service (Twilio) configured');
     }

@@ -1,0 +1,619 @@
+2025-10-06T07:09:19.000000000Z [inf]  Starting Container
+2025-10-06T07:09:19.849609968Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T07:09:19.849614064Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-06T07:09:19.849618321Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-06T07:09:20.058658886Z [inf]  Using 'pg' driver for database querying
+2025-10-06T07:09:20.174940645Z [inf]  [⣷] Pulling schema from database...
+2025-10-06T07:09:20.295408425Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-06T07:09:20.431377009Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-06T07:09:20.550624603Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-06T07:09:20.679576388Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-06T07:09:20.679606904Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-06T07:09:20.706823844Z [inf]  [i] No changes detected
+2025-10-06T07:09:20.856428203Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T07:09:20.859062725Z [inf]  
+2025-10-06T07:09:20.859067099Z [inf]  > rest-express@1.0.0 start
+2025-10-06T07:09:20.859071268Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-06T07:09:20.859075427Z [inf]  
+2025-10-06T07:09:21.520045370Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-06T07:09:21.530203809Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-06T07:09:21.530212533Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-06T07:09:21.529Z
+2025-10-06T07:09:21.534965303Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-06T07:09:21.534969489Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-06T07:09:21.534975005Z [inf]  🔧 Process ID: 51
+2025-10-06T07:09:21.534979650Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-06T07:09:21.534985320Z [inf]  🔧 Platform: linux
+2025-10-06T07:09:21.534989612Z [inf]  🔧 Architecture: x64
+2025-10-06T07:09:21.534993250Z [inf]  🔧 Memory usage: {
+2025-10-06T07:09:21.534997274Z [inf]    "rss": 129466368,
+2025-10-06T07:09:21.535001657Z [inf]    "heapTotal": 62431232,
+2025-10-06T07:09:21.535006355Z [inf]    "heapUsed": 31371592,
+2025-10-06T07:09:21.535015559Z [inf]    "external": 3897578,
+2025-10-06T07:09:21.535020887Z [inf]    "arrayBuffers": 315505
+2025-10-06T07:09:21.535026210Z [inf]  }
+2025-10-06T07:09:21.535032314Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-06T07:09:21.535038046Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-06T07:09:21.533Z
+2025-10-06T07:09:21.535043447Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-06T07:09:21.535047402Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-06T07:09:21.533Z
+2025-10-06T07:09:21.535052323Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-06T07:09:21.535056188Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-06T07:09:21.535060275Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-06T07:09:21.535064269Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-06T07:09:21.535068260Z [inf]  🔧 Validating environment configuration...
+2025-10-06T07:09:21.535072345Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-06T07:09:21.535076076Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-06T07:09:21.535081016Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-06T07:09:21.535084933Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-06T07:09:21.535091451Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-06T07:09:21.535097076Z [inf]  ✅ Database URL configured
+2025-10-06T07:09:21.535102482Z [err]  ⚠️  Object storage not fully configured:
+2025-10-06T07:09:21.535107754Z [err]     - PRIVATE_OBJECT_DIR is not set. File uploads will be disabled.
+2025-10-06T07:09:21.535113707Z [err]     - PUBLIC_OBJECT_SEARCH_PATHS is not set. Public file serving will be disabled.
+2025-10-06T07:09:21.535120066Z [err]     Object storage features will be unavailable but the server will continue to start.
+2025-10-06T07:09:21.535125247Z [inf]  ✅ Session authentication configured
+2025-10-06T07:09:21.535130331Z [err]  ⚠️  SMS service (Twilio) not configured. Driver notifications will be disabled.
+2025-10-06T07:09:21.535140639Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-06T07:09:21.535145649Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-06T07:09:21.535149866Z [inf]  🔧 Testing database connection...
+2025-10-06T07:09:21.546312719Z [err]  (node:51) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-06T07:09:21.546320140Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-06T07:09:21.586618336Z [inf]  ✅ Database connection successful
+2025-10-06T07:09:21.586625501Z [inf]  📝 Registering application routes...
+2025-10-06T07:09:21.736440987Z [inf]  ✅ Routes registered successfully
+2025-10-06T07:09:21.736444989Z [inf]  📁 Setting up static file serving for production...
+2025-10-06T07:09:21.736448655Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-06T07:09:21.736452379Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-06T07:09:21.736456061Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-06T07:09:21.736460515Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-06T07:09:21.738860782Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-06T07:09:21.738868160Z [inf]  📍 Health check endpoints available:
+2025-10-06T07:09:21.738874031Z [inf]     - GET /api/status (basic status)
+2025-10-06T07:09:21.738878423Z [inf]     - GET /api/health (health check)
+2025-10-06T07:09:21.738882811Z [inf]     - GET /api/ready (readiness check)
+2025-10-06T07:09:21.754579804Z [inf]  7:09:21 AM [express] serving on port 8080
+2025-10-06T07:09:21.763612767Z [inf]  7:09:21 AM [express] GET /api/health 200 in 4ms :: {"status":"ok","timestamp":"2025-10-06T07:09:21.7…
+2025-10-06T07:10:51.789936254Z [inf]  Bypass check: {
+2025-10-06T07:10:51.789941569Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:10:51.789947100Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:10:51.789951953Z [inf]    isActive: true
+2025-10-06T07:10:51.789956685Z [inf]  }
+2025-10-06T07:10:51.789962309Z [inf]  Load creation auth check: {
+2025-10-06T07:10:51.789966341Z [inf]    hasAdminAuth: true,
+2025-10-06T07:10:51.789970216Z [inf]    hasReplitAuth: false,
+2025-10-06T07:10:51.789973905Z [inf]    hasDriverAuth: true,
+2025-10-06T07:10:51.789977385Z [inf]    hasTokenBypass: true,
+2025-10-06T07:10:51.789980977Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:10:51.789984975Z [inf]    requestBody: '{"number109":"6022331","stops":[{"stopType":"pickup","stopSequence":1,"locationId":"03ad71e6-c601-4825-ae99-eb4e70ad5086","companyName":"FRYTOWN DISTRIBUTION","address":"5195 FARMERS AVE","contactName',
+2025-10-06T07:10:51.789988681Z [inf]    headers: [
+2025-10-06T07:10:51.789992604Z [inf]      'host',                 'user-agent',
+2025-10-06T07:10:51.789996284Z [inf]      'content-length',       'accept',
+2025-10-06T07:10:51.789999948Z [inf]      'accept-encoding',      'accept-language',
+2025-10-06T07:10:51.790003768Z [inf]      'content-type',         'cookie',
+2025-10-06T07:10:51.790007394Z [inf]      'origin',               'referer',
+2025-10-06T07:10:51.790013652Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T07:10:51.790017239Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T07:10:51.790020810Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T07:10:51.790024510Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T07:10:51.790028238Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T07:10:51.790033159Z [inf]      'x-request-start'
+2025-10-06T07:10:51.790038501Z [inf]    ]
+2025-10-06T07:10:51.790045471Z [inf]  }
+2025-10-06T07:10:51.790050369Z [inf]  Load creation - validating request body: {"number109":"6022331","stops":[{"stopType":"pickup","stopSequence":1,"locationId":"03ad71e6-c601-4825-ae99-eb4e70ad5086","companyName":"FRYTOWN DISTRIBUTION","address":"5195 FARMERS AVE","contactName":"","contactPhone":"","notes":""},{"stopType":"dropoff","stopSequence":2,"locationId":"6d5161f0-92ac-4414-9d22-d5eb12bda40d","companyName":"UNFI LANCASTER","address":"2100 DANIELDALE RD","contactName":"","contactPhone":"","notes":""}],"trackingEnabled":true,"deliveryDueAt":"2025-10-02T05:00:00.000Z"}
+2025-10-06T07:10:51.790055507Z [inf]  Load creation - validation successful, creating load: {
+2025-10-06T07:10:51.790060707Z [inf]    number109: '6022331',
+2025-10-06T07:10:51.790066623Z [inf]    deliveryDueAt: 2025-10-02T05:00:00.000Z,
+2025-10-06T07:10:51.790072556Z [inf]    trackingEnabled: true
+2025-10-06T07:10:51.790078003Z [inf]  }
+2025-10-06T07:10:51.790083660Z [inf]  Load creation - stops validated: 2
+2025-10-06T07:10:51.790090017Z [inf]  Load creation - setting main locationId to LAST delivery stop for rate lookup: 6d5161f0-92ac-4414-9d22-d5eb12bda40d
+2025-10-06T07:10:51.790095123Z [inf]  ✅ Status history added: Load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf → created
+2025-10-06T07:10:51.790099229Z [inf]  🚛 Load created with pickup location: 03ad71e6-c601-4825-ae99-eb4e70ad5086, delivery location: 6d5161f0-92ac-4414-9d22-d5eb12bda40d
+2025-10-06T07:10:51.790102923Z [inf]  Load creation successful: 4d0be27c-73c2-4dc0-ac43-e04b77580fcf
+2025-10-06T07:10:51.790107347Z [inf]  7:10:48 AM [express] POST /api/loads 201 in 95ms :: {"id":"4d0be27c-73c2-4dc0-ac43-e04b77580fcf","nu…
+2025-10-06T07:10:51.790111202Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:10:51.790117770Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:10:51.790121386Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:10:51.790128996Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:10:51.790133849Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:10:51.790461013Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:10:51.790465056Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-06T07:10:51.790468589Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-06T07:10:51.790472320Z [inf]  🔥 RETURNING: 3 loads
+2025-10-06T07:10:51.790475775Z [inf]  7:10:48 AM [express] GET /api/loads 200 in 27ms :: [{"id":"4d0be27c-73c2-4dc0-ac43-e04b77580fcf","nu…
+2025-10-06T07:10:51.790479594Z [inf]  Bypass check: {
+2025-10-06T07:10:51.790483182Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:10:51.790486742Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:10:51.790490075Z [inf]    isActive: true
+2025-10-06T07:10:51.790493878Z [inf]  }
+2025-10-06T07:10:51.790497472Z [inf]  Dashboard stats auth check: {
+2025-10-06T07:10:51.790500951Z [inf]    hasAdminAuth: true,
+2025-10-06T07:10:51.790504364Z [inf]    hasReplitAuth: false,
+2025-10-06T07:10:51.790507849Z [inf]    hasTokenBypass: true,
+2025-10-06T07:10:51.790511436Z [inf]    headers: [
+2025-10-06T07:10:51.790514802Z [inf]      'host',                 'user-agent',
+2025-10-06T07:10:51.790518409Z [inf]      'accept',               'accept-encoding',
+2025-10-06T07:10:51.790521903Z [inf]      'accept-language',      'cookie',
+2025-10-06T07:10:51.790525491Z [inf]      'if-none-match',        'referer',
+2025-10-06T07:10:51.790528961Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T07:10:51.790532566Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T07:10:51.790536023Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T07:10:51.790539380Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T07:10:51.790543212Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T07:10:51.790546562Z [inf]      'x-request-start'
+2025-10-06T07:10:51.790556070Z [inf]    ],
+2025-10-06T07:10:51.790560379Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T07:10:51.790564185Z [inf]  }
+2025-10-06T07:10:51.790568315Z [inf]  7:10:48 AM [express] GET /api/dashboard/stats 200 in 18ms :: {"activeLoads":"2","inTransit":"0","del…
+2025-10-06T07:10:53.556789554Z [inf]  Bypass check: {
+2025-10-06T07:10:53.556793643Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:10:53.556798643Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:10:53.556802541Z [inf]    isActive: true
+2025-10-06T07:10:53.556806701Z [inf]  }
+2025-10-06T07:10:53.571769025Z [inf]  7:10:53 AM [express] GET /api/loads/ac83116e-86ee-4ab8-8761-43680b0b15e4 200 in 20ms :: {"id":"ac831…
+2025-10-06T07:10:53.723764957Z [inf]  Bypass check: {
+2025-10-06T07:10:53.723769049Z [inf]    token: '[MISSING]',
+2025-10-06T07:10:53.723773341Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:10:53.723777335Z [inf]    isActive: false
+2025-10-06T07:10:53.723783097Z [inf]  }
+2025-10-06T07:10:53.723787241Z [inf]  7:10:53 AM [express] GET /api/loads/ac83116e-86ee-4ab8-8761-43680b0b15e4/stops 401 in 7ms :: {"messa…
+2025-10-06T07:10:53.748222616Z [inf]  7:10:53 AM [express] GET /api/customers 304 in 7ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T07:11:01.815127906Z [inf]  Bypass check: {
+2025-10-06T07:11:01.815132413Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:11:01.815137586Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:11:01.815141491Z [inf]    isActive: true
+2025-10-06T07:11:01.815145502Z [inf]  }
+2025-10-06T07:11:01.822908636Z [inf]  7:11:01 AM [express] GET /api/loads/ac83116e-86ee-4ab8-8761-43680b0b15e4 304 in 12ms :: {"id":"ac831…
+2025-10-06T07:11:02.050271954Z [inf]  Bypass check: {
+2025-10-06T07:11:02.050279219Z [inf]    token: '[MISSING]',
+2025-10-06T07:11:02.050284119Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:11:02.050288868Z [inf]    isActive: false
+2025-10-06T07:11:02.050294357Z [inf]  }
+2025-10-06T07:11:02.053698939Z [inf]  7:11:02 AM [express] GET /api/loads/ac83116e-86ee-4ab8-8761-43680b0b15e4/stops 401 in 5ms :: {"messa…
+2025-10-06T07:11:02.134888365Z [inf]  7:11:02 AM [express] GET /api/customers 304 in 9ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T07:11:10.490212718Z [inf]  Bypass check: {
+2025-10-06T07:11:10.490217059Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:11:10.490221150Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:11:10.490225236Z [inf]    isActive: true
+2025-10-06T07:11:10.490229339Z [inf]  }
+2025-10-06T07:11:10.490233628Z [inf]  7:11:10 AM [express] GET /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf 200 in 11ms :: {"id":"4d0be…
+2025-10-06T07:11:10.634527839Z [inf]  Bypass check: {
+2025-10-06T07:11:10.634531753Z [inf]    token: '[MISSING]',
+2025-10-06T07:11:10.634535752Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:11:10.634540491Z [inf]    isActive: false
+2025-10-06T07:11:10.634544936Z [inf]  }
+2025-10-06T07:11:10.637599446Z [inf]  7:11:10 AM [express] GET /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf/stops 401 in 5ms :: {"messa…
+2025-10-06T07:11:10.714719900Z [inf]  7:11:10 AM [express] GET /api/customers 304 in 6ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T07:11:12.538899923Z [inf]  🚛 Backend route calculation: 5195 FARMERS AVE → 2100 DANIELDALE RD
+2025-10-06T07:11:13.264748518Z [inf]  ✅ Route calculated: 871.28 miles, 757 minutes
+2025-10-06T07:11:13.268846079Z [inf]  7:11:13 AM [express] POST /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf/calculate-route 200 in 732…
+2025-10-06T07:11:13.668304138Z [inf]  7:11:13 AM [express] PATCH /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf/financials 200 in 8ms :: …
+2025-10-06T07:11:13.839636711Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:11:13.839643885Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:11:13.839648658Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:11:13.839654485Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:11:13.839658610Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:11:13.839662756Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:11:13.839669881Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-06T07:11:13.839676520Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-06T07:11:13.839681921Z [inf]  🔥 RETURNING: 3 loads
+2025-10-06T07:11:13.848457509Z [inf]  7:11:13 AM [express] GET /api/loads 200 in 17ms :: [{"id":"4d0be27c-73c2-4dc0-ac43-e04b77580fcf","nu…
+2025-10-06T07:11:33.877439004Z [inf]  Bypass check: {
+2025-10-06T07:11:33.877445365Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:11:33.877452076Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:11:33.877459649Z [inf]    isActive: true
+2025-10-06T07:11:33.877465786Z [inf]  }
+2025-10-06T07:11:33.877472066Z [inf]  Driver assignment auth check: {
+2025-10-06T07:11:33.877477909Z [inf]    hasSession: true,
+2025-10-06T07:11:33.877484077Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:11:33.877489760Z [inf]    hasAdminAuth: true,
+2025-10-06T07:11:33.877495936Z [inf]    hasReplitAuth: false,
+2025-10-06T07:11:33.877502352Z [inf]    hasDriverAuth: true,
+2025-10-06T07:11:33.877507989Z [inf]    hasTokenBypass: true,
+2025-10-06T07:11:33.877513579Z [inf]    bypassToken: '[PROVIDED]',
+2025-10-06T07:11:33.877546225Z [inf]    adminAuthData: {
+2025-10-06T07:11:33.877552589Z [inf]      id: 'admin-001',
+2025-10-06T07:11:33.877558412Z [inf]      role: 'admin',
+2025-10-06T07:11:33.877564688Z [inf]      lastName: 'User',
+2025-10-06T07:11:33.878011760Z [inf]      username: 'admin',
+2025-10-06T07:11:33.878017091Z [inf]      firstName: 'Admin'
+2025-10-06T07:11:33.878022844Z [inf]    },
+2025-10-06T07:11:33.878028800Z [inf]    userAuth: false
+2025-10-06T07:11:33.878033778Z [inf]  }
+2025-10-06T07:11:33.878039595Z [inf]  🔔 Sending notification to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: {
+2025-10-06T07:11:33.878044637Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:11:33.878050154Z [inf]    type: 'load_assignment',
+2025-10-06T07:11:33.878054673Z [inf]    message: '🚛 NEW LOAD ASSIGNED: 6022331 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.',
+2025-10-06T07:11:33.878061016Z [inf]    loadId: '4d0be27c-73c2-4dc0-ac43-e04b77580fcf'
+2025-10-06T07:11:33.878065254Z [inf]  }
+2025-10-06T07:11:33.878069794Z [inf]  🔍 SMS Service Debug Check: {
+2025-10-06T07:11:33.878074961Z [inf]    hasTelnyxClient: true,
+2025-10-06T07:11:33.878079846Z [inf]    hasFromNumber: true,
+2025-10-06T07:11:33.878085058Z [inf]    fromNumberValue: '+12148170744',
+2025-10-06T07:11:33.878090388Z [inf]    apiKeyLength: 58
+2025-10-06T07:11:33.878096424Z [inf]  }
+2025-10-06T07:11:33.878101557Z [inf]  🚀 SMS SEND ATTEMPT: {
+2025-10-06T07:11:33.878106250Z [inf]    originalNumber: '9038037500',
+2025-10-06T07:11:33.878111839Z [inf]    normalizedNumber: '+19038037500',
+2025-10-06T07:11:33.878116773Z [inf]    from: '+12148170744',
+2025-10-06T07:11:33.878121106Z [inf]    messageLength: 136,
+2025-10-06T07:11:33.878125270Z [inf]    hasClient: true,
+2025-10-06T07:11:33.878132373Z [inf]    timestamp: '2025-10-06T07:11:31.179Z'
+2025-10-06T07:11:33.878136979Z [inf]  }
+2025-10-06T07:11:33.878156865Z [inf]  📱 ATTEMPTING TO SEND SMS WITH TELNYX: {
+2025-10-06T07:11:33.878162381Z [inf]    from: '+12148170744',
+2025-10-06T07:11:33.878166395Z [inf]    to: '+19038037500',
+2025-10-06T07:11:33.878170013Z [inf]    messagePreview: '🚛 NEW LOAD ASSIGNED: 6022331 to UNFI LANCASTER. G...'
+2025-10-06T07:11:33.878174298Z [inf]  }
+2025-10-06T07:11:33.878178634Z [inf]  ✅ SMS SENT WITH TELNYX: 403199b8-5c76-48c8-ae86-29a1565af872 {
+2025-10-06T07:11:33.878182917Z [inf]    id: '403199b8-5c76-48c8-ae86-29a1565af872',
+2025-10-06T07:11:33.878186668Z [inf]    to: [
+2025-10-06T07:11:33.878190618Z [inf]      {
+2025-10-06T07:11:33.878194399Z [inf]        phone_number: '+19038037500',
+2025-10-06T07:11:33.878198230Z [inf]        status: 'queued',
+2025-10-06T07:11:33.878201839Z [inf]        carrier: 'NEW CINGULAR WIRELESS PCS, LLC - IL',
+2025-10-06T07:11:33.878205432Z [inf]        line_type: 'Wireless'
+2025-10-06T07:11:33.878209709Z [inf]      }
+2025-10-06T07:11:33.878214255Z [inf]    ],
+2025-10-06T07:11:33.878217850Z [inf]    from: {
+2025-10-06T07:11:33.878221444Z [inf]      phone_number: '+12148170744',
+2025-10-06T07:11:33.878224973Z [inf]      carrier: 'Telnyx',
+2025-10-06T07:11:33.878228493Z [inf]      line_type: 'Wireless'
+2025-10-06T07:11:33.878232048Z [inf]    },
+2025-10-06T07:11:33.878235630Z [inf]    direction: 'outbound',
+2025-10-06T07:11:33.878239300Z [inf]    messaging_profile_id: '4001991c-e085-43d1-aea5-2c79e9b2b0bf',
+2025-10-06T07:11:33.878242711Z [inf]    text: '🚛 NEW LOAD ASSIGNED: 6022331 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.'
+2025-10-06T07:11:33.878246530Z [inf]  }
+2025-10-06T07:11:33.878250143Z [inf]  ✅ SUCCESS: SMS sent via Telnyx - LOWEST COST ($0.004/SMS) with highest performance!
+2025-10-06T07:11:33.878253656Z [inf]      - Message ID: 403199b8-5c76-48c8-ae86-29a1565af872
+2025-10-06T07:11:33.878257250Z [inf]      - Direction: outbound
+2025-10-06T07:11:33.878260836Z [inf]      - Messaging Profile: 4001991c-e085-43d1-aea5-2c79e9b2b0bf
+2025-10-06T07:11:33.878265107Z [inf]  🔔 In-app notifications not yet implemented for driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T07:11:33.878268690Z [inf]  ✅ Notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: [ { method: 'sms', success: true } ]
+2025-10-06T07:11:33.878272098Z [inf]  ✅ SMS notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35 for load 6022331
+2025-10-06T07:11:33.878275828Z [inf]  7:11:31 AM [express] PATCH /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf/assign 200 in 573ms :: {"…
+2025-10-06T07:11:33.878279418Z [inf]  Load status update auth check: {
+2025-10-06T07:11:33.878282842Z [inf]    hasAdminAuth: true,
+2025-10-06T07:11:33.878287443Z [inf]    hasReplitAuth: false,
+2025-10-06T07:11:33.878290862Z [inf]    hasDriverAuth: true,
+2025-10-06T07:11:33.878294349Z [inf]    hasTokenBypass: true,
+2025-10-06T07:11:33.878298133Z [inf]    finalAuth: true
+2025-10-06T07:11:33.878301960Z [inf]  }
+2025-10-06T07:11:33.878306205Z [inf]  MOBILE DEBUG - Status update request: {
+2025-10-06T07:11:33.878311318Z [inf]    loadId: '4d0be27c-73c2-4dc0-ac43-e04b77580fcf',
+2025-10-06T07:11:33.878315066Z [inf]    requestBody: { status: 'assigned' },
+2025-10-06T07:11:33.878319086Z [inf]    headers: [
+2025-10-06T07:11:33.878323529Z [inf]      'host',                 'user-agent',
+2025-10-06T07:11:33.878327520Z [inf]      'content-length',       'accept',
+2025-10-06T07:11:33.878452726Z [inf]      'accept-encoding',      'accept-language',
+2025-10-06T07:11:33.878457304Z [inf]      'content-type',         'cookie',
+2025-10-06T07:11:33.878461544Z [inf]      'origin',               'referer',
+2025-10-06T07:11:33.878466196Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T07:11:33.878470763Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T07:11:33.878476828Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T07:11:33.878482972Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T07:11:33.878488274Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T07:11:33.878494067Z [inf]      'x-request-start'
+2025-10-06T07:11:33.878501770Z [inf]    ],
+2025-10-06T07:11:33.878507251Z [inf]    contentType: 'application/json',
+2025-10-06T07:11:33.878513134Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-06T07:11:33.878520231Z [inf]  }
+2025-10-06T07:11:33.878526689Z [inf]  Updating load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf status to: assigned
+2025-10-06T07:11:33.878531523Z [inf]  ✅ Status history added: Load 4d0be27c-73c2-4dc0-ac43-e04b77580fcf → assigned
+2025-10-06T07:11:33.878536530Z [inf]  Load status updated successfully: assigned
+2025-10-06T07:11:33.878541342Z [inf]  7:11:31 AM [express] PATCH /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf/status 200 in 13ms :: {"i…
+2025-10-06T07:11:33.878546486Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:11:33.878550362Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:11:33.878554395Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:11:33.878558411Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:11:33.878566658Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:11:33.878572002Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:11:33.878577056Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-06T07:11:33.878582773Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-06T07:11:33.878586981Z [inf]  🔥 RETURNING: 3 loads
+2025-10-06T07:11:33.878591537Z [inf]  7:11:32 AM [express] GET /api/loads 200 in 11ms :: [{"id":"4d0be27c-73c2-4dc0-ac43-e04b77580fcf","nu…
+2025-10-06T07:13:13.914589256Z [inf]  Bypass check: {
+2025-10-06T07:13:13.914596149Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:13:13.914600702Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:13:13.914610287Z [inf]    isActive: true
+2025-10-06T07:13:13.914616644Z [inf]  }
+2025-10-06T07:13:13.914620996Z [inf]  Load creation auth check: {
+2025-10-06T07:13:13.914625046Z [inf]    hasAdminAuth: true,
+2025-10-06T07:13:13.914628846Z [inf]    hasReplitAuth: false,
+2025-10-06T07:13:13.914632646Z [inf]    hasDriverAuth: true,
+2025-10-06T07:13:13.914636585Z [inf]    hasTokenBypass: true,
+2025-10-06T07:13:13.914642117Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:13:13.914646286Z [inf]    requestBody: '{"number109":"6022305","stops":[{"stopType":"pickup","stopSequence":1,"locationId":"03ad71e6-c601-4825-ae99-eb4e70ad5086","companyName":"FRYTOWN DISTRIBUTION","address":"5195 FARMERS AVE","contactName',
+2025-10-06T07:13:13.914650707Z [inf]    headers: [
+2025-10-06T07:13:13.914654294Z [inf]      'host',                 'user-agent',
+2025-10-06T07:13:13.914658031Z [inf]      'content-length',       'accept',
+2025-10-06T07:13:13.914661651Z [inf]      'accept-encoding',      'accept-language',
+2025-10-06T07:13:13.914665693Z [inf]      'content-type',         'cookie',
+2025-10-06T07:13:13.914670291Z [inf]      'origin',               'referer',
+2025-10-06T07:13:13.914674110Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T07:13:13.914677846Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T07:13:13.914681788Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T07:13:13.914685905Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T07:13:13.914689758Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T07:13:13.914695445Z [inf]      'x-request-start'
+2025-10-06T07:13:13.914699379Z [inf]    ]
+2025-10-06T07:13:13.914703221Z [inf]  }
+2025-10-06T07:13:13.914707003Z [inf]  Load creation - validating request body: {"number109":"6022305","stops":[{"stopType":"pickup","stopSequence":1,"locationId":"03ad71e6-c601-4825-ae99-eb4e70ad5086","companyName":"FRYTOWN DISTRIBUTION","address":"5195 FARMERS AVE","contactName":"","contactPhone":"","notes":""},{"stopType":"dropoff","stopSequence":2,"locationId":"6d5161f0-92ac-4414-9d22-d5eb12bda40d","companyName":"UNFI LANCASTER","address":"2100 DANIELDALE RD","contactName":"","contactPhone":"","notes":""}],"trackingEnabled":true,"deliveryDueAt":"2025-09-25T05:00:00.000Z"}
+2025-10-06T07:13:13.914711128Z [inf]  Load creation - validation successful, creating load: {
+2025-10-06T07:13:13.914715285Z [inf]    number109: '6022305',
+2025-10-06T07:13:13.914719403Z [inf]    deliveryDueAt: 2025-09-25T05:00:00.000Z,
+2025-10-06T07:13:13.914724390Z [inf]    trackingEnabled: true
+2025-10-06T07:13:13.914728527Z [inf]  }
+2025-10-06T07:13:13.914732592Z [inf]  Load creation - stops validated: 2
+2025-10-06T07:13:13.914736294Z [inf]  Load creation - setting main locationId to LAST delivery stop for rate lookup: 6d5161f0-92ac-4414-9d22-d5eb12bda40d
+2025-10-06T07:13:13.914740152Z [inf]  ✅ Status history added: Load c1392e57-d0df-44e7-92e3-0bd1dbaf1360 → created
+2025-10-06T07:13:13.914744349Z [inf]  🚛 Load created with pickup location: 03ad71e6-c601-4825-ae99-eb4e70ad5086, delivery location: 6d5161f0-92ac-4414-9d22-d5eb12bda40d
+2025-10-06T07:13:13.914748256Z [inf]  Load creation successful: c1392e57-d0df-44e7-92e3-0bd1dbaf1360
+2025-10-06T07:13:13.914752457Z [inf]  7:13:09 AM [express] POST /api/loads 201 in 74ms :: {"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:13:13.914756379Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:13:13.914760179Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:13:13.914764084Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:13:13.914768106Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:13:13.914773744Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:13:13.914778778Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:13:13.914782895Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:13:13.914786858Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:13:13.914791154Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:13:13.914794929Z [inf]  7:13:09 AM [express] GET /api/loads 200 in 22ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:13:13.914799001Z [inf]  Bypass check: {
+2025-10-06T07:13:13.914803698Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:13:13.914808583Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:13:13.914812534Z [inf]    isActive: true
+2025-10-06T07:13:13.914816267Z [inf]  }
+2025-10-06T07:13:13.914820123Z [inf]  Dashboard stats auth check: {
+2025-10-06T07:13:13.915285635Z [inf]    hasAdminAuth: true,
+2025-10-06T07:13:13.915290738Z [inf]    hasReplitAuth: false,
+2025-10-06T07:13:13.915294619Z [inf]    hasTokenBypass: true,
+2025-10-06T07:13:13.915298514Z [inf]    headers: [
+2025-10-06T07:13:13.915302283Z [inf]      'host',                 'user-agent',
+2025-10-06T07:13:13.915306242Z [inf]      'accept',               'accept-encoding',
+2025-10-06T07:13:13.915310409Z [inf]      'accept-language',      'cookie',
+2025-10-06T07:13:13.915314036Z [inf]      'if-none-match',        'referer',
+2025-10-06T07:13:13.915317932Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T07:13:13.915322331Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T07:13:13.915325991Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T07:13:13.915329803Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T07:13:13.915333500Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T07:13:13.915337664Z [inf]      'x-request-start'
+2025-10-06T07:13:13.915341502Z [inf]    ],
+2025-10-06T07:13:13.915345136Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-06T07:13:13.915349025Z [inf]  }
+2025-10-06T07:13:13.915352958Z [inf]  7:13:09 AM [express] GET /api/dashboard/stats 200 in 9ms :: {"activeLoads":"3","inTransit":"0","deli…
+2025-10-06T07:13:16.342913329Z [inf]  Bypass check: {
+2025-10-06T07:13:16.342917362Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:13:16.342921194Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:13:16.342924822Z [inf]    isActive: true
+2025-10-06T07:13:16.342928650Z [inf]  }
+2025-10-06T07:13:16.342933890Z [inf]  Driver assignment auth check: {
+2025-10-06T07:13:16.342937515Z [inf]    hasSession: true,
+2025-10-06T07:13:16.342941188Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-06T07:13:16.342945782Z [inf]    hasAdminAuth: true,
+2025-10-06T07:13:16.342949912Z [inf]    hasReplitAuth: false,
+2025-10-06T07:13:16.342953881Z [inf]    hasDriverAuth: true,
+2025-10-06T07:13:16.342957647Z [inf]    hasTokenBypass: true,
+2025-10-06T07:13:16.342961423Z [inf]    bypassToken: '[PROVIDED]',
+2025-10-06T07:13:16.342965298Z [inf]    adminAuthData: {
+2025-10-06T07:13:16.342975978Z [inf]      id: 'admin-001',
+2025-10-06T07:13:16.342980181Z [inf]      role: 'admin',
+2025-10-06T07:13:16.342983883Z [inf]      lastName: 'User',
+2025-10-06T07:13:16.342987499Z [inf]      username: 'admin',
+2025-10-06T07:13:16.342991199Z [inf]      firstName: 'Admin'
+2025-10-06T07:13:16.342995144Z [inf]    },
+2025-10-06T07:13:16.342998958Z [inf]    userAuth: false
+2025-10-06T07:13:16.343003364Z [inf]  }
+2025-10-06T07:13:16.356472015Z [inf]  🔔 Sending notification to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: {
+2025-10-06T07:13:16.356476460Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T07:13:16.356481133Z [inf]    type: 'load_assignment',
+2025-10-06T07:13:16.356487139Z [inf]    message: '🚛 NEW LOAD ASSIGNED: 6022305 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.',
+2025-10-06T07:13:16.356491018Z [inf]    loadId: 'c1392e57-d0df-44e7-92e3-0bd1dbaf1360'
+2025-10-06T07:13:16.356495170Z [inf]  }
+2025-10-06T07:13:16.361376899Z [inf]  🔍 SMS Service Debug Check: {
+2025-10-06T07:13:16.361381836Z [inf]    hasTelnyxClient: true,
+2025-10-06T07:13:16.361386080Z [inf]    hasFromNumber: true,
+2025-10-06T07:13:16.361390170Z [inf]    fromNumberValue: '+12148170744',
+2025-10-06T07:13:16.361395065Z [inf]    apiKeyLength: 58
+2025-10-06T07:13:16.361399414Z [inf]  }
+2025-10-06T07:13:16.361403576Z [inf]  🚀 SMS SEND ATTEMPT: {
+2025-10-06T07:13:16.361407759Z [inf]    originalNumber: '9038037500',
+2025-10-06T07:13:16.361411971Z [inf]    normalizedNumber: '+19038037500',
+2025-10-06T07:13:16.361416220Z [inf]    from: '+12148170744',
+2025-10-06T07:13:16.361421263Z [inf]    messageLength: 136,
+2025-10-06T07:13:16.361427122Z [inf]    hasClient: true,
+2025-10-06T07:13:16.361431957Z [inf]    timestamp: '2025-10-06T07:13:16.357Z'
+2025-10-06T07:13:16.361436171Z [inf]  }
+2025-10-06T07:13:16.361440450Z [inf]  📱 ATTEMPTING TO SEND SMS WITH TELNYX: {
+2025-10-06T07:13:16.361444866Z [inf]    from: '+12148170744',
+2025-10-06T07:13:16.361449038Z [inf]    to: '+19038037500',
+2025-10-06T07:13:16.361453022Z [inf]    messagePreview: '🚛 NEW LOAD ASSIGNED: 6022305 to UNFI LANCASTER. G...'
+2025-10-06T07:13:16.361457194Z [inf]  }
+2025-10-06T07:13:16.864062742Z [inf]  ✅ SMS SENT WITH TELNYX: 403199b8-5e11-49fb-943e-99fbef672af9 {
+2025-10-06T07:13:16.864066968Z [inf]    id: '403199b8-5e11-49fb-943e-99fbef672af9',
+2025-10-06T07:13:16.864070726Z [inf]    to: [
+2025-10-06T07:13:16.864074306Z [inf]      {
+2025-10-06T07:13:16.864078518Z [inf]        phone_number: '+19038037500',
+2025-10-06T07:13:16.864082297Z [inf]        status: 'queued',
+2025-10-06T07:13:16.864086394Z [inf]        carrier: 'NEW CINGULAR WIRELESS PCS, LLC - IL',
+2025-10-06T07:13:16.864090329Z [inf]        line_type: 'Wireless'
+2025-10-06T07:13:16.864094036Z [inf]      }
+2025-10-06T07:13:16.864097665Z [inf]    ],
+2025-10-06T07:13:16.864101314Z [inf]    from: {
+2025-10-06T07:13:16.864105661Z [inf]      phone_number: '+12148170744',
+2025-10-06T07:13:16.864109197Z [inf]      carrier: 'Telnyx',
+2025-10-06T07:13:16.864112856Z [inf]      line_type: 'Wireless'
+2025-10-06T07:13:16.864116674Z [inf]    },
+2025-10-06T07:13:16.864120436Z [inf]    direction: 'outbound',
+2025-10-06T07:13:16.864124516Z [inf]    messaging_profile_id: '4001991c-e085-43d1-aea5-2c79e9b2b0bf',
+2025-10-06T07:13:16.864128384Z [inf]    text: '🚛 NEW LOAD ASSIGNED: 6022305 to UNFI LANCASTER. Go to https://gofarmsmobilupload.com to access your driver portal and manage this load.'
+2025-10-06T07:13:16.864132211Z [inf]  }
+2025-10-06T07:13:16.864136919Z [inf]  ✅ SUCCESS: SMS sent via Telnyx - LOWEST COST ($0.004/SMS) with highest performance!
+2025-10-06T07:13:16.864140890Z [inf]      - Message ID: 403199b8-5e11-49fb-943e-99fbef672af9
+2025-10-06T07:13:16.864144993Z [inf]      - Direction: outbound
+2025-10-06T07:13:16.864149016Z [inf]      - Messaging Profile: 4001991c-e085-43d1-aea5-2c79e9b2b0bf
+2025-10-06T07:13:16.866878665Z [inf]  🔔 In-app notifications not yet implemented for driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T07:13:16.866884343Z [inf]  ✅ Notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: [ { method: 'sms', success: true } ]
+2025-10-06T07:13:16.866888951Z [inf]  ✅ SMS notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35 for load 6022305
+2025-10-06T07:13:16.869706231Z [inf]  7:13:16 AM [express] PATCH /api/loads/c1392e57-d0df-44e7-92e3-0bd1dbaf1360/assign 200 in 528ms :: {"…
+2025-10-06T07:13:17.045886745Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:13:17.045890146Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:13:17.045894007Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:13:17.045897589Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:13:17.045904365Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:13:17.045908135Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:13:17.049886736Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:13:17.049892417Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:13:17.049897958Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:13:17.052996878Z [inf]  7:13:17 AM [express] GET /api/loads 200 in 13ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:13:17.112304881Z [inf]  Load status update auth check: {
+2025-10-06T07:13:17.112311604Z [inf]    hasAdminAuth: true,
+2025-10-06T07:13:17.112315789Z [inf]    hasReplitAuth: false,
+2025-10-06T07:13:17.112321354Z [inf]    hasDriverAuth: true,
+2025-10-06T07:13:17.112326879Z [inf]    hasTokenBypass: true,
+2025-10-06T07:13:17.112331252Z [inf]    finalAuth: true
+2025-10-06T07:13:17.112336908Z [inf]  }
+2025-10-06T07:13:17.112341827Z [inf]  MOBILE DEBUG - Status update request: {
+2025-10-06T07:13:17.112347304Z [inf]    loadId: 'c1392e57-d0df-44e7-92e3-0bd1dbaf1360',
+2025-10-06T07:13:17.112353344Z [inf]    requestBody: { status: 'assigned' },
+2025-10-06T07:13:17.112358365Z [inf]    headers: [
+2025-10-06T07:13:17.112363802Z [inf]      'host',                 'user-agent',
+2025-10-06T07:13:17.112369443Z [inf]      'content-length',       'accept',
+2025-10-06T07:13:17.112374841Z [inf]      'accept-encoding',      'accept-language',
+2025-10-06T07:13:17.112380844Z [inf]      'content-type',         'cookie',
+2025-10-06T07:13:17.112386501Z [inf]      'origin',               'referer',
+2025-10-06T07:13:17.112393414Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-06T07:13:17.112399540Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-06T07:13:17.112405668Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-06T07:13:17.112410140Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-06T07:13:17.112414542Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-06T07:13:17.112418428Z [inf]      'x-request-start'
+2025-10-06T07:13:17.112422373Z [inf]    ],
+2025-10-06T07:13:17.112427254Z [inf]    contentType: 'application/json',
+2025-10-06T07:13:17.112432403Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-06T07:13:17.112436993Z [inf]  }
+2025-10-06T07:13:17.112441226Z [inf]  Updating load c1392e57-d0df-44e7-92e3-0bd1dbaf1360 status to: assigned
+2025-10-06T07:13:17.118630856Z [inf]  ✅ Status history added: Load c1392e57-d0df-44e7-92e3-0bd1dbaf1360 → assigned
+2025-10-06T07:13:17.118637299Z [inf]  Load status updated successfully: assigned
+2025-10-06T07:13:17.122500037Z [inf]  7:13:17 AM [express] PATCH /api/loads/c1392e57-d0df-44e7-92e3-0bd1dbaf1360/status 200 in 10ms :: {"i…
+2025-10-06T07:13:17.714721048Z [inf]  Bypass check: {
+2025-10-06T07:13:17.714725015Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:13:17.714729160Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:13:17.714732894Z [inf]    isActive: true
+2025-10-06T07:13:17.714736645Z [inf]  }
+2025-10-06T07:13:17.722381187Z [inf]  7:13:17 AM [express] GET /api/loads/c1392e57-d0df-44e7-92e3-0bd1dbaf1360 200 in 11ms :: {"id":"c1392…
+2025-10-06T07:13:17.868591264Z [inf]  Bypass check: {
+2025-10-06T07:13:17.868600504Z [inf]    token: '[MISSING]',
+2025-10-06T07:13:17.868606906Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:13:17.868613314Z [inf]    isActive: false
+2025-10-06T07:13:17.868618952Z [inf]  }
+2025-10-06T07:13:17.872424922Z [inf]  7:13:17 AM [express] GET /api/loads/c1392e57-d0df-44e7-92e3-0bd1dbaf1360/stops 401 in 5ms :: {"messa…
+2025-10-06T07:13:17.901472022Z [inf]  7:13:17 AM [express] GET /api/customers 304 in 5ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T07:13:19.664469381Z [inf]  🚛 Backend route calculation: 5195 FARMERS AVE → 2100 DANIELDALE RD
+2025-10-06T07:13:20.313913719Z [inf]  ✅ Route calculated: 871.28 miles, 757 minutes
+2025-10-06T07:13:20.313919609Z [inf]  7:13:20 AM [express] POST /api/loads/c1392e57-d0df-44e7-92e3-0bd1dbaf1360/calculate-route 200 in 655…
+2025-10-06T07:13:20.545295666Z [inf]  7:13:20 AM [express] PATCH /api/loads/c1392e57-d0df-44e7-92e3-0bd1dbaf1360/financials 200 in 6ms :: …
+2025-10-06T07:13:20.714964733Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:13:20.714968589Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:13:20.714972669Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:13:20.714977715Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:13:20.714981826Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:13:20.714986595Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:13:20.714990133Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:13:20.714993685Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:13:20.714997628Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:13:20.715002088Z [inf]  7:13:20 AM [express] GET /api/loads 200 in 13ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:14:00.708554378Z [inf]  7:13:55 AM [express] PATCH /api/loads/c1392e57-d0df-44e7-92e3-0bd1dbaf1360/financials 200 in 49ms ::…
+2025-10-06T07:14:00.708561442Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:14:00.708565719Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:14:00.708570517Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:14:00.708576692Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:14:00.708581034Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:14:00.708585513Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:14:00.708589773Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:14:00.708593818Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:14:00.708598236Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:14:00.708602562Z [inf]  7:13:56 AM [express] GET /api/loads 200 in 21ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:14:50.709102823Z [inf]  Bypass check: {
+2025-10-06T07:14:50.709119391Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:14:50.709124304Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:14:50.709128750Z [inf]    isActive: true
+2025-10-06T07:14:50.709133554Z [inf]  }
+2025-10-06T07:14:50.709138053Z [inf]  7:14:48 AM [express] GET /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd 200 in 50ms :: {"id":"20ef4…
+2025-10-06T07:14:50.709142237Z [inf]  Bypass check: {
+2025-10-06T07:14:50.709146121Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:14:50.709149869Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:14:50.709153548Z [inf]    isActive: true
+2025-10-06T07:14:50.709157213Z [inf]  }
+2025-10-06T07:14:50.709161228Z [inf]  7:14:48 AM [express] GET /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd 200 in 10ms :: {"id":"20ef4…
+2025-10-06T07:14:50.709165386Z [inf]  Bypass check: {
+2025-10-06T07:14:50.709170207Z [inf]    token: '[MISSING]',
+2025-10-06T07:14:50.709175097Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:14:50.709178854Z [inf]    isActive: false
+2025-10-06T07:14:50.709182586Z [inf]  }
+2025-10-06T07:14:50.709187665Z [inf]  7:14:48 AM [express] GET /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/stops 401 in 7ms :: {"messa…
+2025-10-06T07:14:50.709193296Z [inf]  7:14:48 AM [express] GET /api/customers 304 in 6ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T07:14:50.709198676Z [inf]  Bypass check: {
+2025-10-06T07:14:50.709203843Z [inf]    token: '[MISSING]',
+2025-10-06T07:14:50.709210863Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:14:50.709216716Z [inf]    isActive: false
+2025-10-06T07:14:50.709220461Z [inf]  }
+2025-10-06T07:14:50.709224057Z [inf]  7:14:48 AM [express] GET /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/stops 401 in 4ms :: {"messa…
+2025-10-06T07:14:57.315068354Z [inf]  7:14:57 AM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/financials 200 in 6ms :: …
+2025-10-06T07:14:57.478451553Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:14:57.478457984Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:14:57.478464296Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:14:57.478470736Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:14:57.478476491Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:14:57.478482305Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:14:57.515232382Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:14:57.515242865Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:14:57.515248552Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:14:57.515986863Z [inf]  7:14:57 AM [express] GET /api/loads 200 in 41ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:15:02.301966628Z [inf]  7:15:02 AM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/financials 200 in 8ms :: …
+2025-10-06T07:15:02.474425712Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:15:02.474430314Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:15:02.474434824Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:15:02.474439846Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:15:02.474444156Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:15:02.474448135Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:15:02.482584056Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:15:02.482590760Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:15:02.482596349Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:15:02.482600684Z [inf]  7:15:02 AM [express] GET /api/loads 200 in 12ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:15:22.487742319Z [inf]  7:15:17 AM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/financials 200 in 40ms ::…
+2025-10-06T07:15:22.487763519Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:15:22.487768261Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:15:22.487772604Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:15:22.487776385Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:15:22.487780279Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:15:22.487784113Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:15:22.487789528Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:15:22.487793450Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:15:22.487797260Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:15:22.487801020Z [inf]  7:15:17 AM [express] GET /api/loads 200 in 11ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…
+2025-10-06T07:16:12.496514719Z [inf]  Bypass check: {
+2025-10-06T07:16:12.496522137Z [inf]    token: '[PROVIDED]',
+2025-10-06T07:16:12.496530306Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:16:12.496536561Z [inf]    isActive: true
+2025-10-06T07:16:12.496542517Z [inf]  }
+2025-10-06T07:16:12.496547757Z [inf]  7:16:09 AM [express] GET /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf 200 in 56ms :: {"id":"4d0be…
+2025-10-06T07:16:12.496553584Z [inf]  7:16:09 AM [express] GET /api/customers 304 in 5ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-06T07:16:12.496559060Z [inf]  Bypass check: {
+2025-10-06T07:16:12.496565195Z [inf]    token: '[MISSING]',
+2025-10-06T07:16:12.496572245Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T07:16:12.496578464Z [inf]    isActive: false
+2025-10-06T07:16:12.496583640Z [inf]  }
+2025-10-06T07:16:12.496589467Z [inf]  7:16:09 AM [express] GET /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf/stops 401 in 4ms :: {"messa…
+2025-10-06T07:16:42.496954651Z [inf]  7:16:34 AM [express] PATCH /api/loads/4d0be27c-73c2-4dc0-ac43-e04b77580fcf/financials 200 in 35ms ::…
+2025-10-06T07:16:42.496961056Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-06T07:16:42.496965225Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-06T07:16:42.496999477Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-06T07:16:42.497004816Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-06T07:16:42.497008970Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-06T07:16:42.497012926Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-06T07:16:42.497016860Z [inf]  📋 ADMIN: Returning 4 loads
+2025-10-06T07:16:42.497020646Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 4 loads
+2025-10-06T07:16:42.497024359Z [inf]  🔥 RETURNING: 4 loads
+2025-10-06T07:16:42.497028122Z [inf]  7:16:34 AM [express] GET /api/loads 200 in 41ms :: [{"id":"c1392e57-d0df-44e7-92e3-0bd1dbaf1360","nu…

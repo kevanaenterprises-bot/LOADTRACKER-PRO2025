@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**October 6, 2025 - Railway Deployment Fixes**
+- ✅ **Google Cloud Storage Integration** - Fixed GCS authentication for Railway deployment
+- ✅ **Railway Environment Support** - Updated object storage validation to support both Replit and Railway environments
+- ✅ **POD Upload Fix** - Resolved 500 errors on POD uploads by properly configuring GCS credentials
+- ✅ **SMS Service Detection** - Enhanced validation to support both Telnyx and Twilio SMS services
+- ✅ **Load Assignment Notifications** - Made load assignments urgent to bypass quiet hours (10 PM - 6 AM)
+- ✅ **Driver Portal Enhancements** - Fixed "Force Next Stage" button visibility after delivery completion
+- ✅ **BOL Upload Section** - Restored missing BOL upload component in driver portal
+- ✅ **Date Serialization Fix** - Backend now accepts ISO date strings from frontend using Zod preprocessing
+
 **September 20, 2025 - Fixed Lumper Charge Validation Error**
 - ✅ **Resolved Pattern Validation Error** - Fixed "The string did not match the expected pattern" error when updating lumper charges
 - ✅ **Enhanced Input Validation** - Added client-side validation for financial fields (trip rate, lumper fees, extra stops)
