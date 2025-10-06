@@ -5009,18 +5009,35 @@ Reply YES to confirm acceptance or NO to decline.`
         invoiceData.finalizedAt = now;
         invoiceData.status = "finalized"; // Set to finalized since POD is embedded
         
-        console.log(`📄 Fetching POD snapshot for: ${load.podDocumentPath}`);
+        console.log(`📄 POD CHECK - Fetching POD snapshot for load ${load.number109}:`, {
+          podDocumentPath: load.podDocumentPath,
+          pathLength: load.podDocumentPath.length,
+          pathType: typeof load.podDocumentPath
+        });
         
-        // Fetch POD snapshot data for embedding
-        const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
-        if (podSnapshot) {
-          invoiceData.podSnapshot = podSnapshot;
-          console.log(`✅ POD snapshot embedded into manual invoice for load ${load.number109} (${podSnapshot.size} bytes)`);
-        } else {
-          console.log(`⚠️ POD snapshot fetch failed for manual invoice of load ${load.number109}`);
+        // Fetch POD snapshot data for embedding with detailed error handling
+        try {
+          const podSnapshot = await fetchPodSnapshot(load.podDocumentPath);
+          if (podSnapshot) {
+            invoiceData.podSnapshot = [podSnapshot]; // Store as array for consistency with multi-POD
+            console.log(`✅ POD snapshot embedded into manual invoice for load ${load.number109}:`, {
+              size: podSnapshot.size,
+              contentType: podSnapshot.contentType,
+              sourcePath: podSnapshot.sourcePath,
+              base64Length: podSnapshot.contentBase64?.length || 0
+            });
+          } else {
+            console.error(`❌ POD snapshot fetch returned NULL for load ${load.number109} - POD will not be in invoice!`);
+          }
+        } catch (podFetchError) {
+          console.error(`❌ POD snapshot fetch EXCEPTION for load ${load.number109}:`, {
+            error: podFetchError instanceof Error ? podFetchError.message : String(podFetchError),
+            stack: podFetchError instanceof Error ? podFetchError.stack : 'No stack',
+            podPath: load.podDocumentPath
+          });
         }
         
-        console.log(`📄 POD found and embedded into manual invoice for load ${load.number109}`);
+        console.log(`📄 POD path found on load ${load.number109} - attempted to embed`);
       } else {
         console.log(`⚠️ NO POD document path found on load ${load.number109} - invoice will not include POD`);
       }
