@@ -6309,8 +6309,20 @@ function generateInvoiceOnlyHTML(invoice: any, load: any, deliveryLocationText: 
         <tbody>
           <tr>
             <td>Transportation Services - ${deliveryLocationText} - BOL/POD: ${bolPodText}</td>
-            <td>$${(parseFloat(invoice?.totalAmount || '0')).toFixed(2)}</td>
+            <td>$${(parseFloat(invoice?.flatRate || '0')).toFixed(2)}</td>
           </tr>
+          ${parseFloat(invoice?.lumperCharge || '0') > 0 ? `
+          <tr>
+            <td>Lumper Charge</td>
+            <td>$${(parseFloat(invoice?.lumperCharge || '0')).toFixed(2)}</td>
+          </tr>
+          ` : ''}
+          ${parseFloat(invoice?.extraStopsCharge || '0') > 0 ? `
+          <tr>
+            <td>Extra Stops Charge${invoice?.extraStopsCount > 0 ? ` (${invoice.extraStopsCount})` : ''}</td>
+            <td>$${(parseFloat(invoice?.extraStopsCharge || '0')).toFixed(2)}</td>
+          </tr>
+          ` : ''}
         </tbody>
       </table>
 
