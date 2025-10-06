@@ -27,12 +27,24 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
     refetchInterval: 15000, // Refresh every 15 seconds for faster updates
   });
 
-
   // Filter out loads that have been completed (POD uploaded)
   // Keep "delivered" loads so drivers can force-advance to invoicing
   const loads = allLoads.filter((load: any) => 
     !['awaiting_invoicing', 'awaiting_payment', 'completed', 'paid'].includes(load.status)
   );
+
+  // Debug logging for mobile troubleshooting
+  useEffect(() => {
+    console.log("🚛 DRIVER LOADS DEBUG:", {
+      driverId,
+      isLoading,
+      hasError: !!error,
+      errorMessage: error?.message,
+      allLoadsCount: allLoads?.length || 0,
+      allLoads: allLoads,
+      filteredLoadsCount: loads?.length || 0
+    });
+  }, [allLoads, isLoading, error, loads, driverId]);
 
   // Status update mutation
   const statusUpdateMutation = useMutation({
