@@ -1,0 +1,416 @@
+2025-10-06T16:42:10.000000000Z [inf]  Starting Container
+2025-10-06T16:42:11.842633082Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T16:42:11.844647360Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-06T16:42:11.844656461Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-06T16:42:12.420787308Z [inf]  Using 'pg' driver for database querying
+2025-10-06T16:42:12.753956021Z [inf]  [⣷] Pulling schema from database...
+2025-10-06T16:42:12.787357904Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-06T16:42:12.845892572Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-06T16:42:12.945580558Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-06T16:42:13.071443778Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-06T16:42:13.116595901Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-06T16:42:13.166841823Z [inf]  [i] No changes detected
+2025-10-06T16:42:13.362057910Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-06T16:42:13.416558041Z [inf]  
+2025-10-06T16:42:13.416566248Z [inf]  > rest-express@1.0.0 start
+2025-10-06T16:42:13.416574370Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-06T16:42:13.416582866Z [inf]  
+2025-10-06T16:42:14.404212336Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-06T16:42:14.414546342Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-06T16:42:14.414555280Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-06T16:42:14.408Z
+2025-10-06T16:42:14.414561266Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-06T16:42:14.414566497Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-06T16:42:14.414572655Z [inf]  🔧 Process ID: 52
+2025-10-06T16:42:14.414598844Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-06T16:42:14.416512946Z [inf]  🔧 Platform: linux
+2025-10-06T16:42:14.416540205Z [inf]  🔧 Architecture: x64
+2025-10-06T16:42:14.416547004Z [inf]  🔧 Memory usage: {
+2025-10-06T16:42:14.416555887Z [inf]    "rss": 122441728,
+2025-10-06T16:42:14.416561808Z [inf]    "heapTotal": 58515456,
+2025-10-06T16:42:14.416567080Z [inf]    "heapUsed": 34147424,
+2025-10-06T16:42:14.416572869Z [inf]    "external": 3660394,
+2025-10-06T16:42:14.416578243Z [inf]    "arrayBuffers": 78321
+2025-10-06T16:42:14.416583308Z [inf]  }
+2025-10-06T16:42:14.416588839Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-06T16:42:14.416593820Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-06T16:42:14.413Z
+2025-10-06T16:42:14.417776528Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-06T16:42:14.417783970Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-06T16:42:14.413Z
+2025-10-06T16:42:14.417789070Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-06T16:42:14.417793332Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-06T16:42:14.417797421Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-06T16:42:14.417805444Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-06T16:42:14.417811491Z [inf]  🔧 Validating environment configuration...
+2025-10-06T16:42:14.417817827Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-06T16:42:14.417825876Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-06T16:42:14.417831283Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-06T16:42:14.417836406Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-06T16:42:14.417842109Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-06T16:42:14.417847389Z [inf]  ✅ Database URL configured
+2025-10-06T16:42:14.417852961Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-10-06T16:42:14.417862563Z [inf]  ✅ SMS service (Telnyx) configured
+2025-10-06T16:42:14.417868397Z [inf]  ✅ Session authentication configured
+2025-10-06T16:42:14.417873189Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-06T16:42:14.417878818Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-06T16:42:14.417884191Z [inf]  🔧 Testing database connection...
+2025-10-06T16:42:14.432978657Z [err]  (node:52) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-06T16:42:14.432984992Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-06T16:42:14.507620463Z [inf]  ✅ Database connection successful
+2025-10-06T16:42:14.507626250Z [inf]  📝 Registering application routes...
+2025-10-06T16:42:14.681581527Z [inf]  ✅ Routes registered successfully
+2025-10-06T16:42:14.681590967Z [inf]  📁 Setting up static file serving for production...
+2025-10-06T16:42:14.681597524Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-06T16:42:14.681603180Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-06T16:42:14.681609606Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-06T16:42:14.681616513Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-06T16:42:14.685251058Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-06T16:42:14.685259243Z [inf]  📍 Health check endpoints available:
+2025-10-06T16:42:14.685264385Z [inf]     - GET /api/status (basic status)
+2025-10-06T16:42:14.685269498Z [inf]     - GET /api/health (health check)
+2025-10-06T16:42:14.685274173Z [inf]     - GET /api/ready (readiness check)
+2025-10-06T16:42:14.702854209Z [inf]  4:42:14 PM [express] serving on port 8080
+2025-10-06T16:42:15.551417047Z [inf]  4:42:15 PM [express] GET /api/health 200 in 7ms :: {"status":"ok","timestamp":"2025-10-06T16:42:15.5…
+2025-10-06T19:48:26.123556625Z [inf]  Driver login attempt: {
+2025-10-06T19:48:26.123562865Z [inf]    username: 'KOWEN',
+2025-10-06T19:48:26.123569408Z [inf]    usernameLength: 5,
+2025-10-06T19:48:26.123575775Z [inf]    password: '[LENGTH:10]',
+2025-10-06T19:48:26.123581834Z [inf]    passwordActual: '"9038037500"'
+2025-10-06T19:48:26.123588006Z [inf]  }
+2025-10-06T19:48:26.123597014Z [inf]  Driver lookup result: Found for username: KOWEN
+2025-10-06T19:48:26.123602613Z [inf]  Password check: {
+2025-10-06T19:48:26.123607663Z [inf]    provided: '9038037500',
+2025-10-06T19:48:26.123612995Z [inf]    expected: '9038037500',
+2025-10-06T19:48:26.123619501Z [inf]    normalizedProvided: '9038037500',
+2025-10-06T19:48:26.123624907Z [inf]    normalizedExpected: '9038037500'
+2025-10-06T19:48:26.123630182Z [inf]  }
+2025-10-06T19:48:26.123636746Z [inf]  ✅ Driver session saved successfully
+2025-10-06T19:48:26.123641997Z [inf]  7:48:19 PM [express] POST /api/driver/login 200 in 59ms :: {"message":"Login successful","user":{"id…
+2025-10-06T19:48:26.123648728Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-06T19:48:26.123653798Z [inf]    role: 'driver',
+2025-10-06T19:48:26.123658685Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-06T19:48:26.123663538Z [inf]    lastName: 'Owen',
+2025-10-06T19:48:26.123668667Z [inf]    username: 'Kowen',
+2025-10-06T19:48:26.123674702Z [inf]    firstName: 'Kevin'
+2025-10-06T19:48:26.123679963Z [inf]  }
+2025-10-06T19:48:26.123685016Z [inf]  7:48:20 PM [express] GET /api/auth/driver-user 304 in 28ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f4864…
+2025-10-06T19:48:26.123690326Z [inf]  Bypass check: {
+2025-10-06T19:48:26.123696655Z [inf]    token: '[PROVIDED]',
+2025-10-06T19:48:26.123702024Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T19:48:26.123707374Z [inf]    isActive: true
+2025-10-06T19:48:26.123712571Z [inf]  }
+2025-10-06T19:48:26.123718079Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T19:48:26.123723304Z [inf]    adminAuth: true,
+2025-10-06T19:48:26.123728796Z [inf]    replitAuth: false,
+2025-10-06T19:48:26.123734034Z [inf]    driverAuth: true,
+2025-10-06T19:48:26.123739342Z [inf]    bypassAuth: true,
+2025-10-06T19:48:26.123744964Z [inf]    hasAuth: true,
+2025-10-06T19:48:26.123750528Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T19:48:26.123757235Z [inf]  }
+2025-10-06T19:48:26.123762671Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T19:48:26.123767960Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T19:48:26.123773563Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T19:48:26.123778718Z [inf]  7:48:21 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 21ms :: [{"i…
+2025-10-06T19:48:56.116722314Z [inf]  Bypass check: {
+2025-10-06T19:48:56.116727329Z [inf]    token: '[PROVIDED]',
+2025-10-06T19:48:56.116731906Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T19:48:56.116736996Z [inf]    isActive: true
+2025-10-06T19:48:56.116741513Z [inf]  }
+2025-10-06T19:48:56.116746277Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T19:48:56.116751202Z [inf]    adminAuth: true,
+2025-10-06T19:48:56.116755226Z [inf]    replitAuth: false,
+2025-10-06T19:48:56.116758854Z [inf]    driverAuth: true,
+2025-10-06T19:48:56.116762962Z [inf]    bypassAuth: true,
+2025-10-06T19:48:56.116767370Z [inf]    hasAuth: true,
+2025-10-06T19:48:56.116771329Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T19:48:56.116775458Z [inf]  }
+2025-10-06T19:48:56.116779867Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T19:48:56.116784711Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T19:48:56.116789024Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T19:48:56.116792886Z [inf]  7:48:51 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 62ms :: [{"i…
+2025-10-06T19:49:00.767187664Z [inf]  7:49:00 PM [express] GET /api/loads/by-number/6022337 200 in 16ms :: {"id":"20ef41b3-abfe-41e5-904e-…
+2025-10-06T19:49:00.929531014Z [inf]  7:49:00 PM [express] GET /api/bol/check/78697 304 in 8ms :: {"exists":false}
+2025-10-06T19:49:01.091528210Z [inf]  7:49:01 PM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/bol 400 in 8ms :: {"messa…
+2025-10-06T19:49:09.191529501Z [inf]  7:49:09 PM [express] GET /api/loads/by-number/6022337 304 in 13ms :: {"id":"20ef41b3-abfe-41e5-904e-…
+2025-10-06T19:49:09.347272549Z [inf]  🔐 Override flag detected - skipping duplicate BOL check for 78697
+2025-10-06T19:49:09.354752831Z [inf]  ⚠️ BOL record creation skipped (duplicate with override): 78697
+2025-10-06T19:49:09.357640947Z [inf]  7:49:09 PM [express] PATCH /api/loads/20ef41b3-abfe-41e5-904e-3f5a85b230dd/bol 200 in 19ms :: {"id":…
+2025-10-06T19:49:29.336856212Z [inf]  Bypass check: {
+2025-10-06T19:49:29.336863135Z [inf]    token: '[PROVIDED]',
+2025-10-06T19:49:29.336867082Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T19:49:29.336870750Z [inf]    isActive: true
+2025-10-06T19:49:29.336874944Z [inf]  }
+2025-10-06T19:49:29.336879458Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T19:49:29.336889237Z [inf]    adminAuth: true,
+2025-10-06T19:49:29.336893159Z [inf]    replitAuth: false,
+2025-10-06T19:49:29.336897125Z [inf]    driverAuth: true,
+2025-10-06T19:49:29.336901274Z [inf]    bypassAuth: true,
+2025-10-06T19:49:29.336904948Z [inf]    hasAuth: true,
+2025-10-06T19:49:29.336908882Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T19:49:29.336912629Z [inf]  }
+2025-10-06T19:49:29.336917285Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T19:49:29.336921563Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T19:49:29.336925333Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T19:49:29.336928940Z [inf]  7:49:21 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 58ms :: [{"i…
+2025-10-06T19:49:34.435520714Z [inf]  📤 Direct upload - file received: Load_Confirmation_6022337_20251002192029.pdf 63822 bytes
+2025-10-06T19:49:34.435527977Z [inf]  🔧 Initializing Google Cloud Storage client...
+2025-10-06T19:49:34.435534673Z [inf]  ✅ Private key formatted successfully (length: 1704 chars)
+2025-10-06T19:49:34.435541638Z [inf]  ✅ Google Cloud Storage client initialized successfully
+2025-10-06T19:49:34.435549492Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/c96b0d64-90b4-4491-848e-d463a725d2a0
+2025-10-06T19:49:34.435556530Z [err]  ❌ Direct upload error: GaxiosError: invalid_grant: Invalid grant: account not found
+2025-10-06T19:49:34.435564590Z [err]      at Gaxios._request (/app/node_modules/gaxios/build/src/gaxios.js:142:23)
+2025-10-06T19:49:34.435571385Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T19:49:34.435578838Z [err]      at async GoogleToken._GoogleToken_requestToken (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:241:19)
+2025-10-06T19:49:34.435585250Z [err]      at async GoogleToken._GoogleToken_getTokenAsync (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:160:16)
+2025-10-06T19:49:34.435591037Z [err]      at async JWT.refreshTokenNoCache (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/jwtclient.js:173:23)
+2025-10-06T19:49:34.435596872Z [err]      at async JWT.getRequestMetadataAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:333:17)
+2025-10-06T19:49:34.435602924Z [err]      at async JWT.requestAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:418:23)
+2025-10-06T19:49:34.435609172Z [err]      at async Upload.makeRequest (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:724:21)
+2025-10-06T19:49:34.435614394Z [err]      at async AsyncRetry.retries (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:390:29)
+2025-10-06T19:49:34.435622200Z [err]      at async Upload.createURIAsync (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:387:21) {
+2025-10-06T19:49:34.435630062Z [err]    config: {
+2025-10-06T19:49:34.435636176Z [err]      method: 'POST',
+2025-10-06T19:49:34.435642329Z [err]      url: 'https://www.googleapis.com/oauth2/v4/token',
+2025-10-06T19:49:34.435648502Z [err]      data: {
+2025-10-06T19:49:34.437159777Z [err]        grant_type: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:34.437189398Z [err]        assertion: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.'
+2025-10-06T19:49:34.437195660Z [err]      },
+2025-10-06T19:49:34.437199934Z [err]      headers: {
+2025-10-06T19:49:34.437204303Z [err]        'Content-Type': 'application/x-www-form-urlencoded',
+2025-10-06T19:49:34.437209101Z [err]        'User-Agent': 'google-api-nodejs-client/9.15.1',
+2025-10-06T19:49:34.437213304Z [err]        'x-goog-api-client': 'gl-node/22.11.0',
+2025-10-06T19:49:34.437217395Z [err]        Accept: 'application/json'
+2025-10-06T19:49:34.437223658Z [err]      },
+2025-10-06T19:49:34.437229472Z [err]      responseType: 'json',
+2025-10-06T19:49:34.437234950Z [err]      retryConfig: {
+2025-10-06T19:49:34.437240063Z [err]        httpMethodsToRetry: [Array],
+2025-10-06T19:49:34.437246325Z [err]        currentRetryAttempt: 0,
+2025-10-06T19:49:34.437251883Z [err]        retry: 3,
+2025-10-06T19:49:34.437257269Z [err]        noResponseRetries: 2,
+2025-10-06T19:49:34.437267941Z [err]        retryDelayMultiplier: 2,
+2025-10-06T19:49:34.437273131Z [err]        timeOfFirstRequest: 1759780174385,
+2025-10-06T19:49:34.437278205Z [err]        totalTimeout: 9007199254740991,
+2025-10-06T19:49:34.437283272Z [err]        maxRetryDelay: 9007199254740991,
+2025-10-06T19:49:34.437289320Z [err]        statusCodesToRetry: [Array]
+2025-10-06T19:49:34.437936182Z [err]      },
+2025-10-06T19:49:34.437943720Z [err]      paramsSerializer: [Function: paramsSerializer],
+2025-10-06T19:49:34.437949563Z [err]      body: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:34.437956006Z [err]      validateStatus: [Function: validateStatus],
+2025-10-06T19:49:34.437962420Z [err]      errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T19:49:34.437970417Z [err]    },
+2025-10-06T19:49:34.437977409Z [err]    response: {
+2025-10-06T19:49:34.437986315Z [err]      config: {
+2025-10-06T19:49:34.437992376Z [err]        method: 'POST',
+2025-10-06T19:49:34.437997491Z [err]        url: 'https://www.googleapis.com/oauth2/v4/token',
+2025-10-06T19:49:34.438003205Z [err]        data: [Object],
+2025-10-06T19:49:34.438008656Z [err]        headers: [Object],
+2025-10-06T19:49:34.438014737Z [err]        responseType: 'json',
+2025-10-06T19:49:34.438019921Z [err]        retryConfig: [Object],
+2025-10-06T19:49:34.438025637Z [err]        paramsSerializer: [Function: paramsSerializer],
+2025-10-06T19:49:34.438030811Z [err]        body: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:34.438037544Z [err]        validateStatus: [Function: validateStatus],
+2025-10-06T19:49:34.438043865Z [err]        errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T19:49:34.438049312Z [err]      },
+2025-10-06T19:49:34.438055304Z [err]      data: {
+2025-10-06T19:49:34.438060602Z [err]        error: 'invalid_grant',
+2025-10-06T19:49:34.438066390Z [err]        error_description: 'Invalid grant: account not found'
+2025-10-06T19:49:34.438072397Z [err]      },
+2025-10-06T19:49:34.438078429Z [err]      headers: {
+2025-10-06T19:49:34.438084874Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-06T19:49:34.438090602Z [err]        'content-encoding': 'gzip',
+2025-10-06T19:49:34.438097077Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-06T19:49:34.438102017Z [err]        date: 'Mon, 06 Oct 2025 19:49:34 GMT',
+2025-10-06T19:49:34.438106817Z [err]        server: 'scaffolding on HTTPServer2',
+2025-10-06T19:49:34.438111614Z [err]        'transfer-encoding': 'chunked',
+2025-10-06T19:49:34.438116540Z [err]        vary: 'Origin, X-Origin, Referer',
+2025-10-06T19:49:34.438121667Z [err]        'x-content-type-options': 'nosniff',
+2025-10-06T19:49:34.438127359Z [err]        'x-frame-options': 'SAMEORIGIN',
+2025-10-06T19:49:34.438137996Z [err]        'x-xss-protection': '0'
+2025-10-06T19:49:34.438143619Z [err]      },
+2025-10-06T19:49:34.438149545Z [err]      status: 400,
+2025-10-06T19:49:34.438154947Z [err]      statusText: 'Bad Request',
+2025-10-06T19:49:34.438160839Z [err]      request: { responseURL: 'https://www.googleapis.com/oauth2/v4/token' }
+2025-10-06T19:49:34.438166576Z [err]    },
+2025-10-06T19:49:34.438171720Z [err]    error: undefined,
+2025-10-06T19:49:34.438177919Z [err]    status: 400,
+2025-10-06T19:49:34.438183869Z [err]    [Symbol(gaxios-gaxios-error)]: '6.7.1'
+2025-10-06T19:49:34.438190170Z [err]  }
+2025-10-06T19:49:34.438196478Z [inf]  7:49:34 PM [express] POST /api/objects/direct-upload 500 in 486ms :: {"message":"Failed to upload fi…
+2025-10-06T19:49:35.457959536Z [inf]  📤 Direct upload - file received: Screenshot_6-10-2025_03043_.jpeg 373412 bytes
+2025-10-06T19:49:35.457967309Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/36d49864-898b-44ed-9d36-0b1d93356b01
+2025-10-06T19:49:35.457972853Z [err]  ❌ Direct upload error: GaxiosError: invalid_grant: Invalid grant: account not found
+2025-10-06T19:49:35.457978109Z [err]      at Gaxios._request (/app/node_modules/gaxios/build/src/gaxios.js:142:23)
+2025-10-06T19:49:35.457983411Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T19:49:35.457988697Z [err]      at async GoogleToken._GoogleToken_requestToken (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:241:19)
+2025-10-06T19:49:35.457995889Z [err]      at async GoogleToken._GoogleToken_getTokenAsync (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:160:16)
+2025-10-06T19:49:35.458003721Z [err]      at async JWT.refreshTokenNoCache (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/jwtclient.js:173:23)
+2025-10-06T19:49:35.458012162Z [err]      at async JWT.getRequestMetadataAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:333:17)
+2025-10-06T19:49:35.458019765Z [err]      at async JWT.requestAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:418:23)
+2025-10-06T19:49:35.458026817Z [err]      at async Upload.makeRequest (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:724:21)
+2025-10-06T19:49:35.458033582Z [err]      at async AsyncRetry.retries (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:390:29)
+2025-10-06T19:49:35.458040883Z [err]      at async Upload.createURIAsync (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:387:21) {
+2025-10-06T19:49:35.458978512Z [err]    config: {
+2025-10-06T19:49:35.458992595Z [err]      method: 'POST',
+2025-10-06T19:49:35.459000410Z [err]      url: 'https://www.googleapis.com/oauth2/v4/token',
+2025-10-06T19:49:35.459006648Z [err]      data: {
+2025-10-06T19:49:35.459013078Z [err]        grant_type: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:35.459018544Z [err]        assertion: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.'
+2025-10-06T19:49:35.459029075Z [err]      },
+2025-10-06T19:49:35.459034255Z [err]      headers: {
+2025-10-06T19:49:35.459041386Z [err]        'Content-Type': 'application/x-www-form-urlencoded',
+2025-10-06T19:49:35.459046295Z [err]        'User-Agent': 'google-api-nodejs-client/9.15.1',
+2025-10-06T19:49:35.459051367Z [err]        'x-goog-api-client': 'gl-node/22.11.0',
+2025-10-06T19:49:35.459056511Z [err]        Accept: 'application/json'
+2025-10-06T19:49:35.459062269Z [err]      },
+2025-10-06T19:49:35.459067429Z [err]      responseType: 'json',
+2025-10-06T19:49:35.459072517Z [err]      retryConfig: {
+2025-10-06T19:49:35.459078081Z [err]        httpMethodsToRetry: [Array],
+2025-10-06T19:49:35.459084646Z [err]        currentRetryAttempt: 0,
+2025-10-06T19:49:35.459090501Z [err]        retry: 3,
+2025-10-06T19:49:35.459096148Z [err]        noResponseRetries: 2,
+2025-10-06T19:49:35.459101473Z [err]        retryDelayMultiplier: 2,
+2025-10-06T19:49:35.459107241Z [err]        timeOfFirstRequest: 1759780175403,
+2025-10-06T19:49:35.459113497Z [err]        totalTimeout: 9007199254740991,
+2025-10-06T19:49:35.459119183Z [err]        maxRetryDelay: 9007199254740991,
+2025-10-06T19:49:35.459123978Z [err]        statusCodesToRetry: [Array]
+2025-10-06T19:49:35.459129595Z [err]      },
+2025-10-06T19:49:35.459135328Z [err]      paramsSerializer: [Function: paramsSerializer],
+2025-10-06T19:49:35.459140318Z [err]      body: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:35.459145231Z [err]      validateStatus: [Function: validateStatus],
+2025-10-06T19:49:35.459150391Z [err]      errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T19:49:35.459155654Z [err]    },
+2025-10-06T19:49:35.459160957Z [err]    response: {
+2025-10-06T19:49:35.459166159Z [err]      config: {
+2025-10-06T19:49:35.459170959Z [err]        method: 'POST',
+2025-10-06T19:49:35.459176338Z [err]        url: 'https://www.googleapis.com/oauth2/v4/token',
+2025-10-06T19:49:35.459181619Z [err]        data: [Object],
+2025-10-06T19:49:35.459186632Z [err]        headers: [Object],
+2025-10-06T19:49:35.459191683Z [err]        responseType: 'json',
+2025-10-06T19:49:35.459196748Z [err]        retryConfig: [Object],
+2025-10-06T19:49:35.459201746Z [err]        paramsSerializer: [Function: paramsSerializer],
+2025-10-06T19:49:35.459206444Z [err]        body: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:35.459211682Z [err]        validateStatus: [Function: validateStatus],
+2025-10-06T19:49:35.459218334Z [err]        errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T19:49:35.459223417Z [err]      },
+2025-10-06T19:49:35.459228135Z [err]      data: {
+2025-10-06T19:49:35.459233151Z [err]        error: 'invalid_grant',
+2025-10-06T19:49:35.459237757Z [err]        error_description: 'Invalid grant: account not found'
+2025-10-06T19:49:35.459242743Z [err]      },
+2025-10-06T19:49:35.459248410Z [err]      headers: {
+2025-10-06T19:49:35.459254414Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-06T19:49:35.459259156Z [err]        'content-encoding': 'gzip',
+2025-10-06T19:49:35.459264504Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-06T19:49:35.459269925Z [err]        date: 'Mon, 06 Oct 2025 19:49:35 GMT',
+2025-10-06T19:49:35.459274652Z [err]        server: 'scaffolding on HTTPServer2',
+2025-10-06T19:49:35.459279831Z [err]        'transfer-encoding': 'chunked',
+2025-10-06T19:49:35.459285471Z [err]        vary: 'Origin, X-Origin, Referer',
+2025-10-06T19:49:35.459292807Z [err]        'x-content-type-options': 'nosniff',
+2025-10-06T19:49:35.459297719Z [err]        'x-frame-options': 'SAMEORIGIN',
+2025-10-06T19:49:35.459704919Z [err]        'x-xss-protection': '0'
+2025-10-06T19:49:35.459713691Z [err]      },
+2025-10-06T19:49:35.459718977Z [err]      status: 400,
+2025-10-06T19:49:35.459724410Z [err]      statusText: 'Bad Request',
+2025-10-06T19:49:35.459729785Z [err]      request: { responseURL: 'https://www.googleapis.com/oauth2/v4/token' }
+2025-10-06T19:49:35.459734071Z [err]    },
+2025-10-06T19:49:35.459738629Z [err]    error: undefined,
+2025-10-06T19:49:35.459743366Z [err]    status: 400,
+2025-10-06T19:49:35.459748771Z [err]    [Symbol(gaxios-gaxios-error)]: '6.7.1'
+2025-10-06T19:49:35.459753783Z [err]  }
+2025-10-06T19:49:35.459760240Z [inf]  7:49:35 PM [express] POST /api/objects/direct-upload 500 in 1500ms :: {"message":"Failed to upload f…
+2025-10-06T19:49:35.604845053Z [inf]  📤 Direct upload - file received: receipt_38173970.pdf 45841 bytes
+2025-10-06T19:49:35.604853684Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/152ff505-c30c-4168-82b9-47aa82b7bff0
+2025-10-06T19:49:35.642904746Z [err]  ❌ Direct upload error: GaxiosError: invalid_grant: Invalid grant: account not found
+2025-10-06T19:49:35.642909493Z [err]      at Gaxios._request (/app/node_modules/gaxios/build/src/gaxios.js:142:23)
+2025-10-06T19:49:35.642913739Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-06T19:49:35.642918128Z [err]      at async GoogleToken._GoogleToken_requestToken (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:241:19)
+2025-10-06T19:49:35.642922088Z [err]      at async GoogleToken._GoogleToken_getTokenAsync (/app/node_modules/@google-cloud/storage/node_modules/gtoken/build/src/index.js:160:16)
+2025-10-06T19:49:35.642926658Z [err]      at async JWT.refreshTokenNoCache (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/jwtclient.js:173:23)
+2025-10-06T19:49:35.642932111Z [err]      at async JWT.getRequestMetadataAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:333:17)
+2025-10-06T19:49:35.642936545Z [err]      at async JWT.requestAsync (/app/node_modules/@google-cloud/storage/node_modules/google-auth-library/build/src/auth/oauth2client.js:418:23)
+2025-10-06T19:49:35.642940993Z [err]      at async Upload.makeRequest (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:724:21)
+2025-10-06T19:49:35.642946185Z [err]      at async AsyncRetry.retries (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:390:29)
+2025-10-06T19:49:35.642950137Z [err]      at async Upload.createURIAsync (file:///app/node_modules/@google-cloud/storage/build/esm/src/resumable-upload.js:387:21) {
+2025-10-06T19:49:35.642954370Z [err]    config: {
+2025-10-06T19:49:35.642961103Z [err]      method: 'POST',
+2025-10-06T19:49:35.642965323Z [err]      url: 'https://www.googleapis.com/oauth2/v4/token',
+2025-10-06T19:49:35.642969748Z [err]      data: {
+2025-10-06T19:49:35.642974226Z [err]        grant_type: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:35.642978002Z [err]        assertion: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.'
+2025-10-06T19:49:35.642982632Z [err]      },
+2025-10-06T19:49:35.642986554Z [err]      headers: {
+2025-10-06T19:49:35.642992513Z [err]        'Content-Type': 'application/x-www-form-urlencoded',
+2025-10-06T19:49:35.642996745Z [err]        'User-Agent': 'google-api-nodejs-client/9.15.1',
+2025-10-06T19:49:35.643000525Z [err]        'x-goog-api-client': 'gl-node/22.11.0',
+2025-10-06T19:49:35.643004483Z [err]        Accept: 'application/json'
+2025-10-06T19:49:35.643008439Z [err]      },
+2025-10-06T19:49:35.643012541Z [err]      responseType: 'json',
+2025-10-06T19:49:35.643016420Z [err]      retryConfig: {
+2025-10-06T19:49:35.643024423Z [err]        httpMethodsToRetry: [Array],
+2025-10-06T19:49:35.643028609Z [err]        currentRetryAttempt: 0,
+2025-10-06T19:49:35.643032389Z [err]        retry: 3,
+2025-10-06T19:49:35.643036645Z [err]        noResponseRetries: 2,
+2025-10-06T19:49:35.643041518Z [err]        retryDelayMultiplier: 2,
+2025-10-06T19:49:35.643045319Z [err]        timeOfFirstRequest: 1759780175622,
+2025-10-06T19:49:35.643049096Z [err]        totalTimeout: 9007199254740991,
+2025-10-06T19:49:35.643055036Z [err]        maxRetryDelay: 9007199254740991,
+2025-10-06T19:49:35.643059056Z [err]        statusCodesToRetry: [Array]
+2025-10-06T19:49:35.643063168Z [err]      },
+2025-10-06T19:49:35.643067184Z [err]      paramsSerializer: [Function: paramsSerializer],
+2025-10-06T19:49:35.643070902Z [err]      body: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:35.643074837Z [err]      validateStatus: [Function: validateStatus],
+2025-10-06T19:49:35.643078693Z [err]      errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T19:49:35.643083046Z [err]    },
+2025-10-06T19:49:35.643088270Z [err]    response: {
+2025-10-06T19:49:35.643617026Z [err]      config: {
+2025-10-06T19:49:35.643622167Z [err]        method: 'POST',
+2025-10-06T19:49:35.643626536Z [err]        url: 'https://www.googleapis.com/oauth2/v4/token',
+2025-10-06T19:49:35.643630432Z [err]        data: [Object],
+2025-10-06T19:49:35.643634029Z [err]        headers: [Object],
+2025-10-06T19:49:35.643637800Z [err]        responseType: 'json',
+2025-10-06T19:49:35.643641788Z [err]        retryConfig: [Object],
+2025-10-06T19:49:35.643646183Z [err]        paramsSerializer: [Function: paramsSerializer],
+2025-10-06T19:49:35.643651655Z [err]        body: '<<REDACTED> - See `errorRedactor` option in `gaxios` for configuration>.',
+2025-10-06T19:49:35.643655972Z [err]        validateStatus: [Function: validateStatus],
+2025-10-06T19:49:35.643659948Z [err]        errorRedactor: [Function: defaultErrorRedactor]
+2025-10-06T19:49:35.643663884Z [err]      },
+2025-10-06T19:49:35.643667683Z [err]      data: {
+2025-10-06T19:49:35.643671920Z [err]        error: 'invalid_grant',
+2025-10-06T19:49:35.643676367Z [err]        error_description: 'Invalid grant: account not found'
+2025-10-06T19:49:35.643680368Z [err]      },
+2025-10-06T19:49:35.643684302Z [err]      headers: {
+2025-10-06T19:49:35.643688610Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-06T19:49:35.643692580Z [err]        'content-encoding': 'gzip',
+2025-10-06T19:49:35.643697587Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-06T19:49:35.643703177Z [err]        date: 'Mon, 06 Oct 2025 19:49:35 GMT',
+2025-10-06T19:49:35.643708368Z [err]        server: 'scaffolding on HTTPServer2',
+2025-10-06T19:49:35.643713654Z [err]        'transfer-encoding': 'chunked',
+2025-10-06T19:49:35.643718146Z [err]        vary: 'Origin, X-Origin, Referer',
+2025-10-06T19:49:35.643722979Z [err]        'x-content-type-options': 'nosniff',
+2025-10-06T19:49:35.643729993Z [err]        'x-frame-options': 'SAMEORIGIN',
+2025-10-06T19:49:35.643735437Z [err]        'x-xss-protection': '0'
+2025-10-06T19:49:35.643742007Z [err]      },
+2025-10-06T19:49:35.643747365Z [err]      status: 400,
+2025-10-06T19:49:35.643753004Z [err]      statusText: 'Bad Request',
+2025-10-06T19:49:35.643758246Z [err]      request: { responseURL: 'https://www.googleapis.com/oauth2/v4/token' }
+2025-10-06T19:49:35.643763891Z [err]    },
+2025-10-06T19:49:35.643769583Z [err]    error: undefined,
+2025-10-06T19:49:35.643778671Z [err]    status: 400,
+2025-10-06T19:49:35.643783751Z [err]    [Symbol(gaxios-gaxios-error)]: '6.7.1'
+2025-10-06T19:49:35.643788688Z [err]  }
+2025-10-06T19:49:35.643792928Z [inf]  7:49:35 PM [express] POST /api/objects/direct-upload 500 in 1719ms :: {"message":"Failed to upload f…
+2025-10-06T19:49:55.569626282Z [inf]  Bypass check: {
+2025-10-06T19:49:55.569630049Z [inf]    token: '[PROVIDED]',
+2025-10-06T19:49:55.569634284Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-06T19:49:55.569638130Z [inf]    isActive: true
+2025-10-06T19:49:55.569642189Z [inf]  }
+2025-10-06T19:49:55.569646186Z [inf]  🔒 DRIVER LOADS AUTH: {
+2025-10-06T19:49:55.569650008Z [inf]    adminAuth: true,
+2025-10-06T19:49:55.569653585Z [inf]    replitAuth: false,
+2025-10-06T19:49:55.569657309Z [inf]    driverAuth: true,
+2025-10-06T19:49:55.569661275Z [inf]    bypassAuth: true,
+2025-10-06T19:49:55.569672978Z [inf]    hasAuth: true,
+2025-10-06T19:49:55.569676833Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35'
+2025-10-06T19:49:55.569680597Z [inf]  }
+2025-10-06T19:49:55.569684451Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-06T19:49:55.569689540Z [inf]  📋 Direct lookup: Found 4 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-06T19:49:55.569693726Z [inf]  ✅ FINAL RESULT: Returning 4 loads for driver portal
+2025-10-06T19:49:55.569698739Z [inf]  7:49:52 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 56ms :: [{"i…
+2025-10-06T19:51:05.628143982Z [inf]  7:50:55 PM [express] GET /api/health 200 in 0ms :: {"status":"ok","timestamp":"2025-10-06T19:50:55.6…
