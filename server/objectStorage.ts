@@ -26,14 +26,41 @@ function getObjectStorageClient(): Storage {
       
       const projectId = process.env.GCS_PROJECT_ID;
       const clientEmail = process.env.GCS_CLIENT_EMAIL;
-      const privateKey = process.env.GCS_PRIVATE_KEY;
+      let privateKey = process.env.GCS_PRIVATE_KEY;
       
       if (!projectId || !clientEmail || !privateKey) {
         throw new Error('Missing GCS credentials. Required: GCS_PROJECT_ID, GCS_CLIENT_EMAIL, GCS_PRIVATE_KEY');
       }
       
-      // Replace escaped newlines in private key if present
-      const formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+      // Format private key - handle various input formats from Railway env vars
+      // 1. Replace literal \n with actual newlines
+      privateKey = privateKey.replace(/\\n/g, '\n');
+      
+      // 2. Validate PEM format
+      if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+        throw new Error('GCS_PRIVATE_KEY must include -----BEGIN PRIVATE KEY----- header');
+      }
+      if (!privateKey.includes('-----END PRIVATE KEY-----')) {
+        throw new Error('GCS_PRIVATE_KEY must include -----END PRIVATE KEY----- footer');
+      }
+      
+      // 3. Clean up and reformat the key properly
+      // Extract just the key content between headers
+      const keyMatch = privateKey.match(/-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/);
+      if (!keyMatch) {
+        throw new Error('Could not parse GCS_PRIVATE_KEY - invalid PEM format');
+      }
+      
+      // Get the base64 content and clean it up
+      const keyContent = keyMatch[1]
+        .replace(/\s+/g, '') // Remove all whitespace
+        .match(/.{1,64}/g)   // Split into 64-character lines
+        ?.join('\n') || '';  // Join with newlines
+      
+      // Reconstruct the properly formatted key
+      const formattedPrivateKey = `-----BEGIN PRIVATE KEY-----\n${keyContent}\n-----END PRIVATE KEY-----\n`;
+      
+      console.log('✅ Private key formatted successfully (length:', formattedPrivateKey.length, 'chars)');
       
       objectStorageClient = new Storage({
         projectId,

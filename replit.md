@@ -15,6 +15,7 @@ Preferred communication style: Simple, everyday language.
 - ✅ **Railway Environment Support** - Updated object storage validation to support both Replit and Railway environments
 - ✅ **POD Upload Fix** - Resolved 500 errors on POD uploads by properly configuring GCS credentials
 - ✅ **Signed URL Generation** - Replaced Replit sidecar with native GCS signed URL functionality
+- ✅ **Enhanced Private Key Formatting** - Improved GCS private key parser to handle Railway env var formatting (removes whitespace, reformats to proper PEM with 64-char lines)
 - ✅ **SMS Service Detection** - Enhanced validation to support both Telnyx and Twilio SMS services
 - ✅ **Load Assignment Notifications** - Made load assignments urgent to bypass quiet hours (10 PM - 6 AM)
 - ✅ **Driver Portal Enhancements** - Fixed "Force Next Stage" button visibility after delivery completion
