@@ -1,19 +1,19 @@
 import nodemailer from 'nodemailer';
 import puppeteer from 'puppeteer';
 
-// Create Outlook SMTP transporter
+// Create GoDaddy SMTP transporter (was Outlook, but email is hosted by GoDaddy)
 const createTransporter = () => {
-  console.log('🔍 Creating transporter with:', {
-    host: 'smtp-mail.outlook.com',
-    port: 587,
+  console.log('🔍 Creating GoDaddy SMTP transporter with:', {
+    host: 'smtpout.secureserver.net',
+    port: 465,
     user: process.env.OUTLOOK_EMAIL,
     hasPassword: !!process.env.OUTLOOK_PASSWORD
   });
   
   return nodemailer.createTransport({
-    host: 'smtp-mail.outlook.com',
-    port: 587,
-    secure: false, // Will upgrade to TLS
+    host: 'smtpout.secureserver.net', // GoDaddy SMTP server
+    port: 465,
+    secure: true, // SSL
     auth: {
       user: process.env.OUTLOOK_EMAIL,
       pass: process.env.OUTLOOK_PASSWORD,
