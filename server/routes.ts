@@ -5570,20 +5570,37 @@ Reply YES to confirm acceptance or NO to decline.`
   }, async (req, res) => {
     try {
       console.log(`📄 Starting POD update for load ${req.params.id}`);
-      const { podDocumentURL } = req.body;
+      const { podDocumentURL, iftaTruckNumber, iftaMiles, fuelGallons, fuelAmount } = req.body;
       
       if (!podDocumentURL) {
         console.error("❌ No POD document URL provided");
         return res.status(400).json({ message: "POD document URL is required" });
       }
 
+      // Validate required IFTA fields
+      if (!iftaTruckNumber || !iftaMiles) {
+        console.error("❌ Missing required IFTA fields");
+        return res.status(400).json({ message: "Truck # and Total Miles are required for IFTA reporting" });
+      }
+
       // SIMPLIFIED: Just save the POD URL directly
       console.log(`📄 POD URL for load ${req.params.id}: ${podDocumentURL}`);
+      console.log(`🚛 IFTA Data - Truck: ${iftaTruckNumber}, Miles: ${iftaMiles}, Fuel: ${fuelGallons || 'N/A'}gal, Amount: $${fuelAmount || 'N/A'}`);
       
       // Update load with POD document path
       console.log(`📄 Calling storage.updateLoadPOD...`);
       const load = await storage.updateLoadPOD(req.params.id, podDocumentURL);
       console.log(`✅ POD saved for load: ${load.number109}`);
+
+      // Update load with IFTA data
+      console.log(`🚛 Saving IFTA data for load ${req.params.id}...`);
+      await storage.updateLoad(req.params.id, {
+        iftaTruckNumber: iftaTruckNumber.trim(),
+        iftaMiles: iftaMiles.toString(),
+        fuelGallons: fuelGallons ? fuelGallons.toString() : null,
+        fuelAmount: fuelAmount ? fuelAmount.toString() : null,
+      });
+      console.log(`✅ IFTA data saved for load: ${load.number109}`);
       
       // First set status to delivered when POD is uploaded
       if (load.status !== "delivered" && load.status !== "awaiting_invoicing" && load.status !== "awaiting_payment" && load.status !== "paid") {

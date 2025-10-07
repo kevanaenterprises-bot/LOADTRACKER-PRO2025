@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { X, Upload, FileImage, FileText } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { X, Upload, FileImage, FileText, TruckIcon, Fuel } from "lucide-react";
 
 interface BatchPODUploadProps {
   loadId: string;
@@ -27,6 +28,12 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  
+  // IFTA reporting fields
+  const [iftaTruckNumber, setIftaTruckNumber] = useState('');
+  const [iftaMiles, setIftaMiles] = useState('');
+  const [fuelGallons, setFuelGallons] = useState('');
+  const [fuelAmount, setFuelAmount] = useState('');
 
   const processFiles = (fileList: FileList | File[]) => {
     const selectedFiles = Array.from(fileList);
@@ -154,6 +161,25 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
       return;
     }
 
+    // Validate required IFTA fields
+    if (!iftaTruckNumber.trim()) {
+      toast({
+        title: "Truck # Required",
+        description: "Please enter the truck number for IFTA reporting",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!iftaMiles.trim() || parseFloat(iftaMiles) <= 0) {
+      toast({
+        title: "Total Miles Required",
+        description: "Please enter the total miles (including deadhead) for IFTA reporting",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -165,14 +191,20 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
       setFiles(prev => prev.map(f => ({ ...f, status: 'success', progress: 100 })));
       setUploadProgress(60);
 
-      // Update load with all POD documents (combine URLs)
+      // Update load with all POD documents (combine URLs) AND IFTA data
       const podDocumentPath = uploadedUrls.join(','); // Store as comma-separated URLs
       
       const updateResponse = await fetch(`/api/loads/${loadId}/pod`, {
         method: "PATCH",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ podDocumentURL: podDocumentPath }),
+        body: JSON.stringify({ 
+          podDocumentURL: podDocumentPath,
+          iftaTruckNumber: iftaTruckNumber.trim(),
+          iftaMiles: parseFloat(iftaMiles),
+          fuelGallons: fuelGallons.trim() ? parseFloat(fuelGallons) : null,
+          fuelAmount: fuelAmount.trim() ? parseFloat(fuelAmount) : null,
+        }),
       });
 
       if (!updateResponse.ok) {
@@ -183,7 +215,7 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
       
       toast({
         title: "Upload Successful!",
-        description: `${files.length} POD document(s) uploaded for load ${loadNumber}`,
+        description: `${files.length} POD document(s) and IFTA data saved for load ${loadNumber}`,
       });
 
       // Auto-invoke generation and refresh
@@ -311,6 +343,97 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
           </div>
         )}
 
+        {/* IFTA Reporting Data */}
+        {files.length > 0 && (
+          <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <TruckIcon className="h-4 w-4" />
+                IFTA Reporting Data (Required)
+              </CardTitle>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Enter trip details for fuel tax reporting. Truck # and Total Miles are mandatory.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Truck Number - MANDATORY */}
+                <div className="space-y-2">
+                  <Label htmlFor="iftaTruckNumber" className="text-sm font-medium">
+                    Truck # <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="iftaTruckNumber"
+                    data-testid="input-ifta-truck-number"
+                    type="text"
+                    placeholder="e.g., 109, T-42"
+                    value={iftaTruckNumber}
+                    onChange={(e) => setIftaTruckNumber(e.target.value)}
+                    disabled={isUploading}
+                    required
+                  />
+                </div>
+
+                {/* Total Miles - MANDATORY */}
+                <div className="space-y-2">
+                  <Label htmlFor="iftaMiles" className="text-sm font-medium">
+                    Total Miles <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="iftaMiles"
+                    data-testid="input-ifta-miles"
+                    type="number"
+                    step="0.01"
+                    placeholder="Include deadhead miles"
+                    value={iftaMiles}
+                    onChange={(e) => setIftaMiles(e.target.value)}
+                    disabled={isUploading}
+                    required
+                  />
+                  <p className="text-xs text-gray-500">
+                    Total miles for complete trip (loaded + deadhead)
+                  </p>
+                </div>
+
+                {/* Fuel Gallons - OPTIONAL */}
+                <div className="space-y-2">
+                  <Label htmlFor="fuelGallons" className="text-sm font-medium flex items-center gap-1">
+                    <Fuel className="h-3 w-3" />
+                    Fuel Gallons (Optional)
+                  </Label>
+                  <Input
+                    id="fuelGallons"
+                    data-testid="input-fuel-gallons"
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g., 125.5"
+                    value={fuelGallons}
+                    onChange={(e) => setFuelGallons(e.target.value)}
+                    disabled={isUploading}
+                  />
+                </div>
+
+                {/* Fuel Amount - OPTIONAL */}
+                <div className="space-y-2">
+                  <Label htmlFor="fuelAmount" className="text-sm font-medium">
+                    Fuel Amount $ (Optional)
+                  </Label>
+                  <Input
+                    id="fuelAmount"
+                    data-testid="input-fuel-amount"
+                    type="number"
+                    step="0.01"
+                    placeholder="e.g., 450.25"
+                    value={fuelAmount}
+                    onChange={(e) => setFuelAmount(e.target.value)}
+                    disabled={isUploading}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Upload Progress */}
         {isUploading && (
           <div className="space-y-2">
@@ -328,14 +451,16 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
             onClick={uploadAllFiles}
             disabled={files.length === 0 || isUploading}
             className="flex-1"
+            data-testid="button-upload-pod-with-ifta"
           >
-            {isUploading ? 'Uploading...' : `Upload ${files.length} POD Document(s)`}
+            {isUploading ? 'Uploading...' : `Upload ${files.length} POD Document(s) + IFTA Data`}
           </Button>
           {files.length > 0 && !isUploading && (
             <Button 
               variant="outline" 
               onClick={() => setFiles([])}
               className="px-6"
+              data-testid="button-clear-files"
             >
               Clear All
             </Button>
