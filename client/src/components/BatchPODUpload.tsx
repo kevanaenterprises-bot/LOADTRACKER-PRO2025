@@ -161,6 +161,14 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
       return;
     }
 
+    // Strict numeric validation helper
+    const isValidNumber = (value: string): boolean => {
+      const trimmed = value.trim();
+      if (trimmed === '') return false;
+      // Only allow digits, single decimal point, no commas or other characters
+      return /^[0-9]+(\.[0-9]+)?$/.test(trimmed);
+    };
+
     // Validate required IFTA fields
     if (!iftaTruckNumber.trim()) {
       toast({
@@ -171,10 +179,29 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
       return;
     }
 
-    if (!iftaMiles.trim() || parseFloat(iftaMiles) <= 0) {
+    if (!isValidNumber(iftaMiles) || parseFloat(iftaMiles) <= 0) {
       toast({
-        title: "Total Miles Required",
-        description: "Please enter the total miles (including deadhead) for IFTA reporting",
+        title: "Valid Total Miles Required",
+        description: "Please enter a valid number for total miles (no commas or letters)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate optional fuel fields if provided
+    if (fuelGallons.trim() && (!isValidNumber(fuelGallons) || parseFloat(fuelGallons) < 0)) {
+      toast({
+        title: "Invalid Fuel Gallons",
+        description: "Please enter a valid number for fuel gallons (no commas or letters)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (fuelAmount.trim() && (!isValidNumber(fuelAmount) || parseFloat(fuelAmount) < 0)) {
+      toast({
+        title: "Invalid Fuel Amount",
+        description: "Please enter a valid dollar amount for fuel (no commas or symbols)",
         variant: "destructive",
       });
       return;

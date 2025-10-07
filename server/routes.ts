@@ -5583,6 +5583,36 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(400).json({ message: "Truck # and Total Miles are required for IFTA reporting" });
       }
 
+      // Strict numeric validation helper
+      const isValidNumber = (value: any): boolean => {
+        if (typeof value !== 'string' && typeof value !== 'number') return false;
+        const str = String(value).trim();
+        if (str === '') return false;
+        // Only allow digits, single decimal point, no commas or other characters
+        return /^[0-9]+(\.[0-9]+)?$/.test(str);
+      };
+
+      // Validate IFTA numeric fields with strict validation
+      if (!isValidNumber(iftaMiles) || parseFloat(iftaMiles) <= 0) {
+        console.error("❌ Invalid IFTA miles value:", iftaMiles);
+        return res.status(400).json({ message: "Total Miles must be a valid positive number (no commas or letters)" });
+      }
+
+      // Validate optional fuel fields if provided
+      if (fuelGallons !== null && fuelGallons !== undefined) {
+        if (!isValidNumber(fuelGallons) || parseFloat(fuelGallons) < 0) {
+          console.error("❌ Invalid fuel gallons value:", fuelGallons);
+          return res.status(400).json({ message: "Fuel Gallons must be a valid non-negative number (no commas or letters)" });
+        }
+      }
+
+      if (fuelAmount !== null && fuelAmount !== undefined) {
+        if (!isValidNumber(fuelAmount) || parseFloat(fuelAmount) < 0) {
+          console.error("❌ Invalid fuel amount value:", fuelAmount);
+          return res.status(400).json({ message: "Fuel Amount must be a valid non-negative number (no commas or symbols)" });
+        }
+      }
+
       // SIMPLIFIED: Just save the POD URL directly
       console.log(`📄 POD URL for load ${req.params.id}: ${podDocumentURL}`);
       console.log(`🚛 IFTA Data - Truck: ${iftaTruckNumber}, Miles: ${iftaMiles}, Fuel: ${fuelGallons || 'N/A'}gal, Amount: $${fuelAmount || 'N/A'}`);
