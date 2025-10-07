@@ -6637,13 +6637,13 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
         return `
           <div style="margin-top: 40px; padding: 20px; border-top: 3px solid #2d5aa0;">
             <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
-              <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
-              <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
+              <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD ${index + 1})</h2>
+              <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - PDF Document</p>
             </div>
             <div style="text-align: center; padding: 40px; background: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px;">
-              <p style="color: #1976d2; font-weight: bold; font-size: 16px;">📄 POD Document (PDF Format)</p>
-              <p style="color: #424242; font-size: 14px; margin-top: 10px;">This POD is a PDF file and will be attached as a separate file.</p>
-              <p style="color: #757575; font-size: 12px; margin-top: 5px;">PDF files cannot be embedded inline.</p>
+              <p style="color: #1976d2; font-weight: bold; font-size: 16px;">📄 PDF POD Document</p>
+              <p style="color: #424242; font-size: 14px; margin-top: 10px;">This PDF will be included in the merged invoice when emailed.</p>
+              <p style="color: #757575; font-size: 12px; margin-top: 5px;">(Cannot be displayed in print preview, but is included in email attachment)</p>
             </div>
           </div>
         `;

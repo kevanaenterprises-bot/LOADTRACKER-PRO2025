@@ -157,13 +157,15 @@ export default function LoadsTable() {
     mutationFn: async (updates: any) => {
       return apiRequest(`/api/loads/${selectedLoad?.id}`, "PUT", updates);
     },
-    onSuccess: () => {
+    onSuccess: (updatedLoad: any) => {
       toast({
         title: "Success",
         description: "Load updated successfully!"
       });
       setEditMode(false);
       setEditFormData({});
+      // Update the selectedLoad state with fresh data from server
+      setSelectedLoad(updatedLoad);
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       // Refresh the selected load data
       if (selectedLoad) {
