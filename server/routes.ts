@@ -5655,8 +5655,23 @@ Reply YES to confirm acceptance or NO to decline.`
         fuelAmount: fuelAmount ? fuelAmount.toString() : null,
       };
 
-      // TODO: Add HERE Maps state-by-state mileage breakdown
-      // For now, just save the calculated miles
+      // Get HERE Maps state-by-state mileage breakdown
+      console.log(`🗺️  Fetching state-by-state mileage from HERE Maps...`);
+      const { getLoadStateMileage } = await import("./hereRoutingService");
+      const loadWithCoordinates = await storage.getLoad(req.params.id);
+      
+      if (loadWithCoordinates) {
+        const routeAnalysis = await getLoadStateMileage(loadWithCoordinates);
+        
+        if (routeAnalysis && routeAnalysis.milesByState) {
+          iftaData.milesByState = routeAnalysis.milesByState;
+          console.log(`✅ State-by-state mileage calculated:`, routeAnalysis.milesByState);
+          console.log(`   HERE Maps total: ${routeAnalysis.totalMiles} miles vs Odometer: ${calculatedMiles || 'N/A'} miles`);
+        } else {
+          console.log(`⚠️  Could not calculate state-by-state mileage (missing coordinates or API error)`);
+        }
+      }
+
       await storage.updateLoad(req.params.id, iftaData);
       console.log(`✅ IFTA data saved for load: ${load.number109}`);
       
