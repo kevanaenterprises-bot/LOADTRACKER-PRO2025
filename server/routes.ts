@@ -6263,14 +6263,28 @@ Reply YES to confirm acceptance or NO to decline.`
       
       // FIXED: Get ALL POD snapshots for multi-POD loads (print preview)
       const allPodSnapshots = await getAllPodSnapshots(invoice, load.podDocumentPath || undefined);
+      const pdfPods: Array<{content: Buffer, type: string, filename: string}> = [];
+      
       if (allPodSnapshots.length > 0) {
         console.log(`🖨️ Using ${allPodSnapshots.length} POD(s) for print preview: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
         allPodSnapshots.forEach((snapshot, index) => {
           const podBuffer = convertPodSnapshotToBuffer(snapshot);
-          podImages.push(podBuffer);
-          console.log(`🖨️ POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes)`);
+          
+          // Check if POD is a PDF - if so, track separately (cannot embed as image)
+          if (podBuffer.type === 'application/pdf') {
+            console.log(`📎 POD ${index + 1} is a PDF - will note in preview (cannot embed as image)`);
+            pdfPods.push({
+              content: podBuffer.content,
+              type: podBuffer.type,
+              filename: `POD-${load.number109}-Page${index + 1}.pdf`
+            });
+          } else {
+            // Only add image PODs to the embedding list
+            podImages.push(podBuffer);
+            console.log(`🖨️ POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes) - will embed as image`);
+          }
         });
-        console.log(`✅ ${allPodSnapshots.length} POD(s) prepared for print preview`);
+        console.log(`✅ PODs processed: ${podImages.length} images to embed, ${pdfPods.length} PDFs noted`);
       } else {
         console.log(`⚠️ No POD document uploaded for load ${load.number109} (ID: ${load.id}) - preview will show invoice only`);
         console.log(`🔍 DIAGNOSIS: If POD was recently uploaded but not showing:`);
@@ -6291,17 +6305,33 @@ Reply YES to confirm acceptance or NO to decline.`
           console.log(`⚠️ Falling back to preview without POD`);
         }
       }
+      
+      // Add note for PDF PODs that will be attached separately
+      if (pdfPods.length > 0) {
+        console.log(`📎 Adding note about ${pdfPods.length} PDF POD(s) that will be attached separately`);
+        const pdfNotesHTML = pdfPods.map((pdf, index) => 
+          generatePODSectionHTML([{content: pdf.content, type: pdf.type}], load.number109).replace('POD', `POD (PDF ${index + 1})`)
+        ).join('');
+        previewHTML = previewHTML.replace('</body>', `${pdfNotesHTML}</body>`);
+      }
 
       res.json({
         success: true,
         previewHTML,
         invoice,
         load,
-        podAttachments: podImages.map((img, index) => ({
-          filename: `POD_${load.number109}_${index + 1}.jpg`,
-          contentType: img.type,
-          size: img.content.length
-        }))
+        podAttachments: [
+          ...podImages.map((img, index) => ({
+            filename: `POD_${load.number109}_${index + 1}.jpg`,
+            contentType: img.type,
+            size: img.content.length
+          })),
+          ...pdfPods.map((pdf, index) => ({
+            filename: pdf.filename,
+            contentType: pdf.type,
+            size: pdf.content.length
+          }))
+        ]
       });
 
     } catch (error) {
@@ -6533,8 +6563,8 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
             </div>
             <div style="text-align: center; padding: 40px; background: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px;">
               <p style="color: #1976d2; font-weight: bold; font-size: 16px;">📄 POD Document (PDF Format)</p>
-              <p style="color: #424242; font-size: 14px; margin-top: 10px;">This POD is a PDF file and has been attached separately to this email.</p>
-              <p style="color: #757575; font-size: 12px; margin-top: 5px;">PDF files cannot be embedded as images.</p>
+              <p style="color: #424242; font-size: 14px; margin-top: 10px;">This POD is a PDF file and will be attached as a separate file.</p>
+              <p style="color: #757575; font-size: 12px; margin-top: 5px;">PDF files cannot be embedded inline.</p>
             </div>
           </div>
         `;
