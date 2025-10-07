@@ -2161,11 +2161,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const driverAuth = !!(req.session as any)?.driverAuth;
     const bypassAuth = isBypassActive(req);
     
+    // MOBILE FIX: Always allow with bypass token (Safari cookie issues)
+    if (bypassAuth) {
+      console.log("✅ DRIVER LOADS: Bypass token authenticated");
+      return next();
+    }
+    
     // CRITICAL FIX: Also check if the session has driver auth by checking the user role
     const sessionHasDriverAuth = (req.session as any)?.driverAuth?.role === 'driver' || 
                                  (req.session as any)?.user?.role === 'driver';
     
-    const hasAuth = adminAuth || replitAuth || driverAuth || bypassAuth || sessionHasDriverAuth;
+    const hasAuth = adminAuth || replitAuth || driverAuth || sessionHasDriverAuth;
     
     console.log("🔒 DRIVER LOADS AUTH DEBUG:", {
       adminAuth,
