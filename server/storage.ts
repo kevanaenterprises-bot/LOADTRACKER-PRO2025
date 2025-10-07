@@ -40,7 +40,7 @@ import {
   type Truck,
   type InsertTruck,
 } from "@shared/schema";
-import { db } from "./db";
+import { db, queryWithRetry } from "./db";
 import { eq, desc, and, sql, not } from "drizzle-orm";
 
 export interface IStorage {
@@ -360,34 +360,36 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getLoads(): Promise<LoadWithDetails[]> {
-    const result = await db
-      .select({
-        load: loads,
-        driver: users,
-        location: locations,
-        invoice: invoices,
-      })
-      .from(loads)
-      .leftJoin(users, eq(loads.driverId, users.id))
-      .leftJoin(locations, eq(loads.locationId, locations.id))
-      .leftJoin(invoices, eq(loads.id, invoices.loadId))
-      .orderBy(desc(loads.createdAt));
+    return queryWithRetry(async () => {
+      const result = await db
+        .select({
+          load: loads,
+          driver: users,
+          location: locations,
+          invoice: invoices,
+        })
+        .from(loads)
+        .leftJoin(users, eq(loads.driverId, users.id))
+        .leftJoin(locations, eq(loads.locationId, locations.id))
+        .leftJoin(invoices, eq(loads.id, invoices.loadId))
+        .orderBy(desc(loads.createdAt));
 
-    // Get stops for each load
-    const loadsWithStops = await Promise.all(
-      result.map(async (row) => {
-        const stops = await this.getLoadStops(row.load.id);
-        return {
-          ...row.load,
-          driver: row.driver || undefined,
-          location: row.location || undefined,
-          invoice: row.invoice || undefined,
-          stops: stops || [],
-        };
-      })
-    );
+      // Get stops for each load
+      const loadsWithStops = await Promise.all(
+        result.map(async (row) => {
+          const stops = await this.getLoadStops(row.load.id);
+          return {
+            ...row.load,
+            driver: row.driver || undefined,
+            location: row.location || undefined,
+            invoice: row.invoice || undefined,
+            stops: stops || [],
+          };
+        })
+      );
 
-    return loadsWithStops;
+      return loadsWithStops;
+    });
   }
 
   async getLoad(id: string): Promise<LoadWithDetails | undefined> {
