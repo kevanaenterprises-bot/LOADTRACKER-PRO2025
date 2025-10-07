@@ -954,6 +954,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName: driver.lastName
       };
 
+      // Generate a mobile auth token as fallback for Safari cookie issues
+      const mobileToken = `DRIVER_${driver.id}_${Date.now()}`;
+
       // Force save session to ensure persistence
       req.session.save((err) => {
         if (err) {
@@ -965,6 +968,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ 
         message: "Login successful",
+        mobileAuthToken: mobileToken, // Mobile fallback token
         user: {
           id: driver.id,
           username: driver.username,
