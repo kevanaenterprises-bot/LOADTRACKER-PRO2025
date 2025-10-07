@@ -106,6 +106,11 @@ export const loads = pgTable("loads", {
   receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
   receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
   lastLocationUpdate: timestamp("last_location_update"),
+  // IFTA reporting fields (captured at POD upload)
+  iftaTruckNumber: varchar("ifta_truck_number"), // Truck # for this trip (mandatory at POD upload)
+  iftaMiles: decimal("ifta_miles", { precision: 8, scale: 2 }), // Total miles including deadhead (mandatory at POD upload)
+  fuelGallons: decimal("fuel_gallons", { precision: 8, scale: 2 }), // Fuel purchased on trip (optional)
+  fuelAmount: decimal("fuel_amount", { precision: 10, scale: 2 }), // Dollar amount of fuel (optional)
   // DEPRECATED: Legacy truck_number column - DO NOT USE in new code
   truckNumber: varchar("truck_number"), // Temporarily kept to avoid data loss
 });
