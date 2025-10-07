@@ -239,7 +239,7 @@ export function TrackingDashboard({ loadId, driverId, onClose }: TrackingDashboa
               {currentLoad.status || 'Unknown'}
             </Badge>
             <span className="text-sm text-muted-foreground">
-              Driver: {currentLoad.driverName || 'Unassigned'}
+              Driver: {currentLoad.driver ? `${currentLoad.driver.firstName} ${currentLoad.driver.lastName}` : 'Unassigned'}
             </span>
           </div>
         </CardContent>
@@ -298,7 +298,7 @@ export function TrackingDashboard({ loadId, driverId, onClose }: TrackingDashboa
       </Card>
 
       {/* Current Location & ETA */}
-      {currentLocation && (
+      {(currentLocation || (currentLoad.currentLatitude && currentLoad.currentLongitude)) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -311,7 +311,10 @@ export function TrackingDashboard({ loadId, driverId, onClose }: TrackingDashboa
               <div>
                 <h4 className="font-medium mb-2">Current Location</h4>
                 <p className="text-sm text-muted-foreground">
-                  {currentLocation.lat.toFixed(6)}, {currentLocation.lng.toFixed(6)}
+                  {currentLocation 
+                    ? `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`
+                    : `${parseFloat(currentLoad.currentLatitude).toFixed(6)}, ${parseFloat(currentLoad.currentLongitude).toFixed(6)}`
+                  }
                 </p>
               </div>
               
