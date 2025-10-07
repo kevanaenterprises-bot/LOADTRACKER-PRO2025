@@ -21,6 +21,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **GPS Tracking**: Automatic GPS tracking for drivers, providing real-time location updates and status changes ("at shipper," "left shipper," "at receiver") based on proximity.
 - **Load Management**: Comprehensive lifecycle tracking, including support for multiple stops per load, flexible load number formats, and automated status updates.
 - **Communication**: Telnyx for SMS notifications to drivers, Resend for email delivery (transactional email API - works with Railway/cloud hosting without SMTP port blocking).
+- **IFTA Reporting**: Odometer-based mileage tracking with automatic state-by-state breakdown using HERE Maps API v8 for International Fuel Tax Agreement compliance. System captures odometer readings at POD upload, calculates trip miles, and uses truck-specific routing to determine jurisdiction-specific mileage.
 
 ### Feature Specifications
 - **Load Management**: Create, track, and update loads with real-time status, driver assignment, and support for multiple pickup/delivery stops.
@@ -40,6 +41,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Telnyx**: SMS API for driver communications.
 - **Resend**: Transactional email API for invoice delivery (cloud-friendly, no SMTP port blocking).
 - **Anthropic Claude 4.0 Sonnet**: OCR service for rate confirmation scanning.
+- **HERE Maps API v8**: Truck routing and state-by-state mileage breakdown for IFTA reporting.
 
 ### Development Tools
 - **Vite**: Frontend build tool.
