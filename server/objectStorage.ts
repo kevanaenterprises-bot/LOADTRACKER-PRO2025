@@ -271,32 +271,43 @@ export class ObjectStorageService {
   normalizeObjectEntityPath(
     rawPath: string,
   ): string {
+    console.log('🔍 Normalizing object path:', rawPath);
+    
     if (!rawPath.startsWith("https://storage.googleapis.com/")) {
+      console.log('📄 Path is not a Google Storage URL, returning as-is');
       return rawPath;
     }
   
     // Extract the path from the URL by removing query parameters and domain
     const url = new URL(rawPath);
     const rawObjectPath = url.pathname;
+    console.log('📄 Extracted pathname from URL:', rawObjectPath);
   
     let objectEntityDir = this.getPrivateObjectDir();
+    console.log('📄 Private object dir (raw):', objectEntityDir);
     
     // RAILWAY FIX: Convert gs:// format to pathname format for comparison
     if (objectEntityDir.startsWith("gs://")) {
       objectEntityDir = objectEntityDir.replace("gs://", "/");
+      console.log('📄 Converted gs:// to / format:', objectEntityDir);
     }
     
     if (!objectEntityDir.endsWith("/")) {
       objectEntityDir = `${objectEntityDir}/`;
     }
   
+    console.log('📄 Checking if pathname starts with dir:', { rawObjectPath, objectEntityDir });
+    
     if (!rawObjectPath.startsWith(objectEntityDir)) {
+      console.log('⚠️ Path does not match private dir, returning raw pathname:', rawObjectPath);
       return rawObjectPath;
     }
   
     // Extract the entity ID from the path
     const entityId = rawObjectPath.slice(objectEntityDir.length);
-    return `/objects/${entityId}`;
+    const normalizedPath = `/objects/${entityId}`;
+    console.log('✅ Normalized to objects path:', normalizedPath);
+    return normalizedPath;
   }
 
   // Tries to set the ACL policy for the object entity and return the normalized path.
