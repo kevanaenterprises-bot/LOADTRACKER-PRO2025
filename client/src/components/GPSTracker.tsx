@@ -243,11 +243,30 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
         <div className="space-y-2 pt-4 border-t">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Pickup:</span>
-            <span className="font-medium">{load.pickupAddress || 'Not specified'}</span>
+            <span className="font-medium text-right">
+              {load.pickupAddress || load.companyName || 'Not specified'}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Delivery:</span>
-            <span className="font-medium">{load.deliveryAddress || 'Not specified'}</span>
+            <span className="font-medium text-right">
+              {load.deliveryAddress || 
+               (load.location ? 
+                 (() => {
+                   const parts = [load.location.name];
+                   if (load.location.address) parts.push(load.location.address);
+                   if (load.location.city && load.location.state) {
+                     parts.push(`${load.location.city}, ${load.location.state}`);
+                   } else if (load.location.city) {
+                     parts.push(load.location.city);
+                   } else if (load.location.state) {
+                     parts.push(load.location.state);
+                   }
+                   const result = parts.filter(Boolean).join(' - ');
+                   return result || 'Not specified';
+                 })()
+                 : 'Not specified')}
+            </span>
           </div>
           {load.appointmentTime && (
             <div className="flex justify-between text-sm">
