@@ -2163,13 +2163,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     const hasAuth = adminAuth || replitAuth || driverAuth || bypassAuth || sessionHasDriverAuth;
     
-    console.log("🔒 DRIVER LOADS AUTH:", {
+    console.log("🔒 DRIVER LOADS AUTH DEBUG:", {
       adminAuth,
       replitAuth,
       driverAuth,
       bypassAuth,
       hasAuth,
-      driverId: req.params.driverId
+      driverId: req.params.driverId,
+      sessionId: req.session?.id,
+      hasSession: !!req.session,
+      sessionData: JSON.stringify(req.session),
+      cookies: req.headers.cookie,
+      userAgent: req.headers['user-agent']
     });
     
     if (hasAuth) {
