@@ -316,18 +316,25 @@ export class ObjectStorageService {
     aclPolicy: ObjectAclPolicy
   ): Promise<string> {
     try {
+      console.log('🔐 Setting ACL for path:', rawPath);
       const normalizedPath = this.normalizeObjectEntityPath(rawPath);
+      console.log('🔐 Normalized path for ACL:', normalizedPath);
+      
       if (!normalizedPath.startsWith("/")) {
+        console.log('🔐 Path does not start with /, returning as-is:', normalizedPath);
         return normalizedPath;
       }
 
       const objectFile = await this.getObjectEntityFile(normalizedPath);
       await setObjectAclPolicy(objectFile, aclPolicy);
+      console.log('✅ ACL set successfully, returning:', normalizedPath);
       return normalizedPath;
     } catch (error) {
       console.error('⚠️ Failed to set ACL policy on object entity:', error);
-      // Return the normalized path even if ACL setting fails to avoid breaking the caller
-      return this.normalizeObjectEntityPath(rawPath);
+      console.error('⚠️ Returning original raw path instead:', rawPath);
+      // RAILWAY FIX: Return the original raw path, not the normalized one, when ACL fails
+      // This ensures we keep the full Google Cloud Storage URL instead of a broken pathname
+      return rawPath;
     }
   }
 
