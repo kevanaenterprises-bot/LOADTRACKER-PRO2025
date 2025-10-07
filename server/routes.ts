@@ -37,6 +37,7 @@ import {
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
 import { loads, locations, loadStops, rates, invoiceCounter } from "@shared/schema";
+import { PDFDocument } from 'pdf-lib';
 
 // Bypass secret for testing and mobile auth
 const BYPASS_SECRET = "LOADTRACKER_BYPASS_2025";
@@ -242,6 +243,99 @@ function getFileExtension(contentType: string): string {
       return 'webp';
     default:
       return 'pdf'; // Default to PDF for unknown types
+  }
+}
+
+/**
+ * Builds final invoice PDF by merging invoice HTML with all POD documents (images and PDFs)
+ * This ensures ONE PDF attachment per load as required by payment processor
+ */
+async function buildFinalInvoicePdf(
+  invoiceHTML: string,
+  podDocuments: Array<{content: Buffer, type: string}>,
+  loadNumber: string
+): Promise<Buffer> {
+  console.log(`📄 Building final invoice PDF for load ${loadNumber}...`);
+  console.log(`📄 POD documents to merge: ${podDocuments.length}`);
+  
+  try {
+    // Step 1: Generate invoice PDF from HTML (existing flow)
+    const { generatePDF } = await import('./emailService');
+    const invoicePdfBuffer = await generatePDF(invoiceHTML);
+    console.log(`✅ Invoice PDF generated: ${invoicePdfBuffer.length} bytes`);
+    
+    // Step 2: Load invoice PDF with pdf-lib
+    const pdfDoc = await PDFDocument.load(invoicePdfBuffer);
+    console.log(`✅ Invoice PDF loaded into pdf-lib`);
+    
+    // Step 3: Process each POD document
+    for (let i = 0; i < podDocuments.length; i++) {
+      const pod = podDocuments[i];
+      console.log(`📎 Processing POD ${i + 1}/${podDocuments.length} (${pod.type})`);
+      
+      if (pod.type === 'application/pdf') {
+        // For PDF PODs: Load and copy all pages
+        try {
+          const podPdfDoc = await PDFDocument.load(pod.content);
+          const copiedPages = await pdfDoc.copyPages(podPdfDoc, podPdfDoc.getPageIndices());
+          copiedPages.forEach(page => pdfDoc.addPage(page));
+          console.log(`✅ PDF POD ${i + 1}: Added ${copiedPages.length} pages`);
+        } catch (pdfError) {
+          console.error(`❌ Failed to merge PDF POD ${i + 1}:`, pdfError);
+          throw new Error(`Failed to merge PDF POD: ${pdfError instanceof Error ? pdfError.message : 'Unknown error'}`);
+        }
+      } else if (pod.type.startsWith('image/')) {
+        // For image PODs: Embed as new pages
+        try {
+          let image;
+          if (pod.type === 'image/png') {
+            image = await pdfDoc.embedPng(pod.content);
+          } else {
+            // Convert all other images to JPEG for embedding
+            image = await pdfDoc.embedJpg(pod.content);
+          }
+          
+          // Calculate page size to fit image while maintaining aspect ratio
+          const page = pdfDoc.addPage();
+          const { width: pageWidth, height: pageHeight } = page.getSize();
+          const { width: imgWidth, height: imgHeight } = image.scale(1);
+          
+          // Scale image to fit page
+          const scale = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+          const scaledWidth = imgWidth * scale;
+          const scaledHeight = imgHeight * scale;
+          
+          // Center image on page
+          const x = (pageWidth - scaledWidth) / 2;
+          const y = (pageHeight - scaledHeight) / 2;
+          
+          page.drawImage(image, {
+            x,
+            y,
+            width: scaledWidth,
+            height: scaledHeight,
+          });
+          
+          console.log(`✅ Image POD ${i + 1}: Embedded as new page`);
+        } catch (imgError) {
+          console.error(`❌ Failed to embed image POD ${i + 1}:`, imgError);
+          throw new Error(`Failed to embed image POD: ${imgError instanceof Error ? imgError.message : 'Unknown error'}`);
+        }
+      }
+    }
+    
+    // Step 4: Save and return final combined PDF
+    const finalPdfBytes = await pdfDoc.save();
+    const finalPdfBuffer = Buffer.from(finalPdfBytes);
+    
+    console.log(`✅ Final combined PDF created: ${finalPdfBuffer.length} bytes`);
+    console.log(`📄 Total pages: ${pdfDoc.getPageCount()}`);
+    
+    return finalPdfBuffer;
+    
+  } catch (error) {
+    console.error(`❌ Error building final invoice PDF:`, error);
+    throw error;
   }
 }
 
