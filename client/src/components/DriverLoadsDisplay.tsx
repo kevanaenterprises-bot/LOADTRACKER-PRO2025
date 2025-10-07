@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import { DigitalSignaturePad } from "@/components/DigitalSignaturePad";
 import { apiRequest } from "@/lib/queryClient";
+import GPSTracker from "@/components/GPSTracker";
 
 interface DriverLoadsDisplayProps {
   driverId: string;
@@ -255,6 +256,13 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
               <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
                 <p className="text-sm font-medium text-yellow-800">Special Instructions:</p>
                 <p className="text-sm text-yellow-700">{load.specialInstructions}</p>
+              </div>
+            )}
+
+            {/* GPS Tracker Component - Only show for loads with tracking enabled */}
+            {load.trackingEnabled && (
+              <div className="mb-4">
+                <GPSTracker load={load} driverId={driverId} />
               </div>
             )}
 
