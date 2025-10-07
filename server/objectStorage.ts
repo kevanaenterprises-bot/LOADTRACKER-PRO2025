@@ -280,6 +280,12 @@ export class ObjectStorageService {
     const rawObjectPath = url.pathname;
   
     let objectEntityDir = this.getPrivateObjectDir();
+    
+    // RAILWAY FIX: Convert gs:// format to pathname format for comparison
+    if (objectEntityDir.startsWith("gs://")) {
+      objectEntityDir = objectEntityDir.replace("gs://", "/");
+    }
+    
     if (!objectEntityDir.endsWith("/")) {
       objectEntityDir = `${objectEntityDir}/`;
     }
