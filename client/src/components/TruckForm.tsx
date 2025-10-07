@@ -29,7 +29,7 @@ const truckSchema = z.object({
   make: z.string().min(1, "Make is required"),
   model: z.string().min(1, "Model is required"),
   year: z.coerce.number().min(1900, "Enter a valid year").max(new Date().getFullYear() + 1, "Year cannot be in the future"),
-  vinNumber: z.string().min(17, "VIN must be 17 characters").max(17, "VIN must be 17 characters").regex(/^[A-HJ-NPR-Z0-9]{17}$/, "Invalid VIN format"),
+  vinNumber: z.string().min(1, "VIN is required"),
   mileage: z.coerce.number().min(0, "Mileage must be non-negative"),
 });
 
