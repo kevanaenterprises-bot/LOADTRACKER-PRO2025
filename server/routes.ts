@@ -3964,14 +3964,23 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`📧 Using ${allPodSnapshots.length} POD(s) for email: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
         allPodSnapshots.forEach((snapshot, index) => {
           const podBuffer = convertPodSnapshotToBuffer(snapshot);
-          podImages.push(podBuffer);
-          console.log(`📧 POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes)`);
+          
+          // Check if POD is a PDF - if so, attach separately instead of embedding
+          if (podBuffer.type === 'application/pdf') {
+            console.log(`📎 POD ${index + 1} is a PDF - attaching separately (cannot embed as image)`);
+            attachments.push({
+              filename: `POD-${primaryLoadNumber}-Page${index + 1}.pdf`,
+              content: podBuffer.content,
+              contentType: 'application/pdf'
+            });
+          } else {
+            // Only add image PODs to the embedding list
+            podImages.push(podBuffer);
+            console.log(`📧 POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes) - will embed as image`);
+          }
         });
         
-        // ❌ REMOVED: Don't send separate POD attachments for complete package
-        // The PODs are already embedded in the Combined PDF above
-        console.log(`✅ PODs embedded in Complete Package PDF - no separate attachments needed`);
-        console.log(`📧 Complete Package will be single PDF with ${allPodSnapshots.length} POD(s) embedded`);
+        console.log(`✅ PODs processed: ${podImages.length} images to embed, ${attachments.length} PDFs attached separately`);
       } else {
         console.log(`⚠️ No POD available for load ${primaryLoadNumber} - email will contain invoice only`);
       }
@@ -6514,8 +6523,21 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       // Normalize content type
       let contentType = pod.type || 'image/jpeg';
       if (contentType === 'application/pdf') {
-        console.log(`⚠️ PDF content detected for POD ${index + 1} - converting display`);
-        contentType = 'application/pdf';
+        console.log(`⚠️ PDF content detected for POD ${index + 1} - skipping embed (PDFs cannot be displayed as images)`);
+        // Skip PDF PODs - they can't be embedded as images in HTML/PDF
+        return `
+          <div style="margin-top: 40px; padding: 20px; border-top: 3px solid #2d5aa0;">
+            <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px;">
+              <h2 style="color: #2d5aa0; margin: 0;">Proof of Delivery (POD)</h2>
+              <p style="color: #666; margin: 5px 0;">Load ${loadNumber} - Page ${index + 1}</p>
+            </div>
+            <div style="text-align: center; padding: 40px; background: #e3f2fd; border: 2px solid #2196f3; border-radius: 8px;">
+              <p style="color: #1976d2; font-weight: bold; font-size: 16px;">📄 POD Document (PDF Format)</p>
+              <p style="color: #424242; font-size: 14px; margin-top: 10px;">This POD is a PDF file and has been attached separately to this email.</p>
+              <p style="color: #757575; font-size: 12px; margin-top: 5px;">PDF files cannot be embedded as images.</p>
+            </div>
+          </div>
+        `;
       } else if (!contentType.startsWith('image/')) {
         console.log(`🔧 Unknown content type "${contentType}" - defaulting to image/jpeg`);
         contentType = 'image/jpeg';
