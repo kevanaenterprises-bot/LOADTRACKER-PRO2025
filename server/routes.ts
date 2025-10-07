@@ -5327,7 +5327,8 @@ Reply YES to confirm acceptance or NO to decline.`
         },
       });
 
-      const publicPath = `/gs://${bucketName}/${objectName}`;
+      // RAILWAY FIX: Return proper Google Cloud Storage URL, not /gs:// format
+      const publicPath = `https://storage.googleapis.com/${bucketName}/${objectName}`;
       console.log("✅ Direct upload successful:", publicPath);
 
       res.json({ 

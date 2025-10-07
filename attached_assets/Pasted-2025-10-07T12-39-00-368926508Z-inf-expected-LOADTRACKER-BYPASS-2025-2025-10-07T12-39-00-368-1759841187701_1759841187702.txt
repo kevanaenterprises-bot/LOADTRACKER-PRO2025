@@ -1,0 +1,1001 @@
+2025-10-07T12:39:00.368926508Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:39:00.368930167Z [inf]    isActive: true
+2025-10-07T12:39:00.368934113Z [inf]  }
+2025-10-07T12:39:00.368938252Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:39:00.368942116Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:39:00.368946222Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:39:00.368951229Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:39:00.368955207Z [inf]  12:38:53 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 11ms :: [{"i…
+2025-10-07T12:39:50.411857967Z [inf]  📤 Direct upload - file received: Load_Confirmation_6022337_20251002192029.pdf 63822 bytes
+2025-10-07T12:39:50.411866869Z [inf]  🔧 Initializing Google Cloud Storage client...
+2025-10-07T12:39:50.411873366Z [inf]  ✅ Private key formatted successfully (length: 1704 chars)
+2025-10-07T12:39:50.411880333Z [inf]  ✅ Google Cloud Storage client initialized successfully
+2025-10-07T12:39:50.411887526Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83
+2025-10-07T12:39:50.411894230Z [inf]  📤 Direct upload - file received: Screenshot_6-10-2025_03043_.jpeg 373412 bytes
+2025-10-07T12:39:50.411899637Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc
+2025-10-07T12:39:50.411906561Z [inf]  📤 Direct upload - file received: receipt_38173970.pdf 45841 bytes
+2025-10-07T12:39:50.411913683Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:39:50.411920030Z [inf]  ✅ Direct upload successful: /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83
+2025-10-07T12:39:50.411927055Z [inf]  12:39:45 PM [express] POST /api/objects/direct-upload 200 in 840ms :: {"publicPath":"/gs://loadtracke…
+2025-10-07T12:39:50.411932911Z [inf]  ✅ Direct upload successful: /gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:39:50.411937302Z [inf]  12:39:46 PM [express] POST /api/objects/direct-upload 200 in 1035ms :: {"publicPath":"/gs://loadtrack…
+2025-10-07T12:39:50.411941545Z [inf]  ✅ Direct upload successful: /gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc
+2025-10-07T12:39:50.411947031Z [inf]  12:39:46 PM [express] POST /api/objects/direct-upload 200 in 1296ms :: {"publicPath":"/gs://loadtrack…
+2025-10-07T12:39:50.411952477Z [inf]  📄 Starting POD update for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:39:50.411958752Z [inf]  📄 POD URL for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c: /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83,/gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc,/gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:39:50.411967236Z [inf]  📄 Calling storage.updateLoadPOD...
+2025-10-07T12:39:50.411972851Z [inf]  ✅ POD saved for load: 6022337
+2025-10-07T12:39:50.411977171Z [inf]  📄 Getting load details for invoicing workflow...
+2025-10-07T12:39:50.411982285Z [inf]  📄 Invoice already exists for load 6022337 - skipping invoice generation
+2025-10-07T12:39:50.411988327Z [inf]  12:39:47 PM [express] PATCH /api/loads/631cb8e0-c50a-43b7-95cd-6ef166bb8f5c/pod 200 in 56ms :: {"id":…
+2025-10-07T12:39:50.411993826Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:39:50.411999271Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:39:50.412007194Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:39:50.412012443Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:39:50.412017565Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:39:50.412023588Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:39:50.412029457Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:39:50.412035351Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:39:50.412040165Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:39:50.412045021Z [inf]  12:39:48 PM [express] GET /api/loads 200 in 23ms :: [{"id":"631cb8e0-c50a-43b7-95cd-6ef166bb8f5c","nu…
+2025-10-07T12:40:10.416059274Z [inf]  Bypass check: {
+2025-10-07T12:40:10.416068828Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:40:10.416076052Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:40:10.416082145Z [inf]    isActive: true
+2025-10-07T12:40:10.416088936Z [inf]  }
+2025-10-07T12:40:10.416094861Z [inf]  12:40:01 PM [express] GET /api/loads/631cb8e0-c50a-43b7-95cd-6ef166bb8f5c 200 in 46ms :: {"id":"631cb…
+2025-10-07T12:40:10.416101520Z [inf]  Bypass check: {
+2025-10-07T12:40:10.416107976Z [inf]    token: '[MISSING]',
+2025-10-07T12:40:10.416113793Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:40:10.416119649Z [inf]    isActive: false
+2025-10-07T12:40:10.416125281Z [inf]  }
+2025-10-07T12:40:10.416131568Z [inf]  12:40:01 PM [express] GET /api/loads/631cb8e0-c50a-43b7-95cd-6ef166bb8f5c/stops 401 in 4ms :: {"messa…
+2025-10-07T12:40:10.416137490Z [inf]  12:40:01 PM [express] GET /api/customers 304 in 5ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-07T12:40:10.799878103Z [inf]  🔥 PRINT-PREVIEW ENDPOINT HIT! Invoice ID: GO5251
+2025-10-07T12:40:10.799885088Z [inf]  🔥 Request body: { loadId: '631cb8e0-c50a-43b7-95cd-6ef166bb8f5c' }
+2025-10-07T12:40:10.799891354Z [inf]  🔥 Headers: { auth: 'BYPASS_PROVIDED', contentType: 'application/json' }
+2025-10-07T12:40:10.799896241Z [inf]  🔥 Auth check result: { hasAuth: true }
+2025-10-07T12:40:10.799900706Z [inf]  🚀 SERVER: Print preview API called for invoice: GO5251
+2025-10-07T12:40:10.799919325Z [inf]  🚀 SERVER: Request body: { loadId: '631cb8e0-c50a-43b7-95cd-6ef166bb8f5c' }
+2025-10-07T12:40:10.799933157Z [inf]  🚀 SERVER: Request headers: { auth: 'BYPASS' }
+2025-10-07T12:40:10.799940097Z [inf]  🔍 Looking up invoice: GO5251
+2025-10-07T12:40:10.799950145Z [inf]  🖨️ POD Status for preview: {
+2025-10-07T12:40:10.799954341Z [inf]    loadNumber: '6022337',
+2025-10-07T12:40:10.799958706Z [inf]    loadId: '631cb8e0-c50a-43b7-95cd-6ef166bb8f5c',
+2025-10-07T12:40:10.799964211Z [inf]    podDocumentPath: '/gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83,/gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc,/gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081',
+2025-10-07T12:40:10.799969531Z [inf]    hasPOD: true,
+2025-10-07T12:40:10.799974975Z [inf]    createdAt: 2025-10-07T07:38:37.346Z,
+2025-10-07T12:40:10.799979317Z [inf]    updatedAt: 2025-10-07T12:39:47.017Z
+2025-10-07T12:40:10.799983732Z [inf]  }
+2025-10-07T12:40:10.799988168Z [inf]  🔍 DATABASE DEBUG: Current DATABASE_URL environment: {
+2025-10-07T12:40:10.799992339Z [inf]    hasDbUrl: true,
+2025-10-07T12:40:10.799996763Z [inf]    dbUrlPrefix: 'postgresql://postgres:bqmYaNgBsxAuTWFmYjuyEczERHPI',
+2025-10-07T12:40:10.800001113Z [inf]    nodeEnv: 'production'
+2025-10-07T12:40:10.800005363Z [inf]  }
+2025-10-07T12:40:10.800009947Z [inf]  🔍 DATABASE DEBUG: Checking all loads in current database...
+2025-10-07T12:40:10.809461049Z [inf]  🔍 DATABASE DEBUG: Found 3 total loads in database
+2025-10-07T12:40:10.809473958Z [inf]  ❌ LOAD 109-41936 NOT FOUND IN DATABASE! Available loads: [
+2025-10-07T12:40:10.809480948Z [inf]    {
+2025-10-07T12:40:10.809487074Z [inf]      id: '631cb8e0-c50a-43b7-95cd-6ef166bb8f5c',
+2025-10-07T12:40:10.809493548Z [inf]      number109: '6022337',
+2025-10-07T12:40:10.809499599Z [inf]      podPath: '/gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83,/gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc,/gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081'
+2025-10-07T12:40:10.809504896Z [inf]    },
+2025-10-07T12:40:10.809510230Z [inf]    {
+2025-10-07T12:40:10.809515348Z [inf]      id: '6986abbf-cf60-4761-9441-733a4f48b85b',
+2025-10-07T12:40:10.809520655Z [inf]      number109: '109-39834',
+2025-10-07T12:40:10.809526355Z [inf]      podPath: null
+2025-10-07T12:40:10.809532425Z [inf]    },
+2025-10-07T12:40:10.809537745Z [inf]    {
+2025-10-07T12:40:10.809543053Z [inf]      id: 'ac83116e-86ee-4ab8-8761-43680b0b15e4',
+2025-10-07T12:40:10.809548403Z [inf]      number109: '6022058',
+2025-10-07T12:40:10.809553813Z [inf]      podPath: '/gs://loadtracker_documents/private/uploads/49e1c47b-a147-4bd7-b0ed-92e16c9cb9b4,/gs://loadtracker_documents/private/uploads/7658b445-8759-430b-b5d4-d3d87846a223,/gs://loadtracker_documents/private/uploads/a538019f-e046-474d-82ec-cfcd9bca0716'
+2025-10-07T12:40:10.809559354Z [inf]    }
+2025-10-07T12:40:10.809565062Z [inf]  ]
+2025-10-07T12:40:10.809570605Z [inf]  📄 Getting ALL POD snapshots - checking BOTH stored snapshots AND object storage...
+2025-10-07T12:40:10.809575737Z [inf]  🔍 Also checking object storage for additional PODs...
+2025-10-07T12:40:10.809581031Z [inf]  📄 Fetching ALL PODs from object storage: /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83,/gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc,/gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:40:10.809588447Z [inf]  📄 Processing 3 POD document(s):
+2025-10-07T12:40:10.809593318Z [inf]    1. /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83
+2025-10-07T12:40:10.809597271Z [inf]    2. /gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc
+2025-10-07T12:40:10.809601315Z [inf]    3. /gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:40:10.809605376Z [inf]  📄 Processing POD 1/3: /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83
+2025-10-07T12:40:10.809609990Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83
+2025-10-07T12:40:10.809614446Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:40:10.809618214Z [inf]  📄 Normalized POD path 1: /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83
+2025-10-07T12:40:10.812898665Z [err]  ❌ Failed to process POD 1 (/gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83): _ObjectNotFoundError: Object not found
+2025-10-07T12:40:10.812905716Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:40:10.812910904Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:40:10.812915337Z [err]      at getAllPodSnapshots (file:///app/dist/index.js:3244:31)
+2025-10-07T12:40:10.812919771Z [err]      at file:///app/dist/index.js:8293:37
+2025-10-07T12:40:10.812924273Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:40:10.812928612Z [inf]  📄 Processing POD 2/3: /gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc
+2025-10-07T12:40:10.812933087Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc
+2025-10-07T12:40:10.812937367Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:40:10.812941555Z [inf]  📄 Normalized POD path 2: /gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc
+2025-10-07T12:40:10.812945701Z [err]  ❌ Failed to process POD 2 (/gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc): _ObjectNotFoundError: Object not found
+2025-10-07T12:40:10.812951575Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:40:10.812955664Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:40:10.812959910Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:40:10.812964030Z [err]      at async getAllPodSnapshots (file:///app/dist/index.js:3244:25)
+2025-10-07T12:40:10.812968088Z [err]      at async file:///app/dist/index.js:8293:31
+2025-10-07T12:40:10.812972066Z [inf]  📄 Processing POD 3/3: /gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:40:10.812980784Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:40:10.812984611Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:40:10.812988586Z [inf]  📄 Normalized POD path 3: /gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:40:10.812993783Z [err]  ❌ Failed to process POD 3 (/gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081): _ObjectNotFoundError: Object not found
+2025-10-07T12:40:10.812997315Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:40:10.813001077Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:40:10.813004910Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:40:10.813008711Z [err]      at async getAllPodSnapshots (file:///app/dist/index.js:3244:25)
+2025-10-07T12:40:10.813012695Z [err]      at async file:///app/dist/index.js:8293:31
+2025-10-07T12:40:10.813016399Z [inf]  ✅ Successfully processed 0/3 POD documents
+2025-10-07T12:40:10.813020187Z [inf]  📋 TOTAL PODs available: 0
+2025-10-07T12:40:10.813025333Z [inf]  ⚠️ No POD document uploaded for load 6022337 (ID: 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c) - preview will show invoice only
+2025-10-07T12:40:10.813029201Z [inf]  🔍 DIAGNOSIS: If POD was recently uploaded but not showing:
+2025-10-07T12:40:10.813032814Z [inf]     - Check if load was deleted and recreated (new ID breaks POD links)
+2025-10-07T12:40:10.813037493Z [inf]     - Verify POD upload completed successfully
+2025-10-07T12:40:10.813041346Z [inf]     - Check object storage for orphaned files
+2025-10-07T12:40:10.815946949Z [inf]  12:40:10 PM [express] POST /api/invoices/GO5251/print-preview 200 in 23ms :: {"success":true,"preview…
+2025-10-07T12:40:40.815369330Z [inf]  🗑️ SERVER DELETE: Load deletion auth check: {
+2025-10-07T12:40:40.815379941Z [inf]    loadId: '631cb8e0-c50a-43b7-95cd-6ef166bb8f5c',
+2025-10-07T12:40:40.815386853Z [inf]    hasReplitAuth: false,
+2025-10-07T12:40:40.815394963Z [inf]    hasAdminAuth: {
+2025-10-07T12:40:40.815401810Z [inf]      id: 'admin-001',
+2025-10-07T12:40:40.815408829Z [inf]      role: 'admin',
+2025-10-07T12:40:40.815415433Z [inf]      lastName: 'User',
+2025-10-07T12:40:40.815422218Z [inf]      username: 'admin',
+2025-10-07T12:40:40.815428739Z [inf]      firstName: 'Admin'
+2025-10-07T12:40:40.815435582Z [inf]    },
+2025-10-07T12:40:40.815445861Z [inf]    hasTokenBypass: true,
+2025-10-07T12:40:40.815452641Z [inf]    bypassTokenProvided: true,
+2025-10-07T12:40:40.815459244Z [inf]    bypassTokenMatches: true,
+2025-10-07T12:40:40.815465586Z [inf]    finalAuth: {
+2025-10-07T12:40:40.815471937Z [inf]      id: 'admin-001',
+2025-10-07T12:40:40.815478871Z [inf]      role: 'admin',
+2025-10-07T12:40:40.815485680Z [inf]      lastName: 'User',
+2025-10-07T12:40:40.815492758Z [inf]      username: 'admin',
+2025-10-07T12:40:40.815500959Z [inf]      firstName: 'Admin'
+2025-10-07T12:40:40.815507687Z [inf]    }
+2025-10-07T12:40:40.815514913Z [inf]  }
+2025-10-07T12:40:40.815521561Z [inf]  🗑️ SERVER DELETE: Processing deletion request for load ID: 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.815528146Z [inf]  🗑️ SERVER DELETE: Found load 6022337 (ID: 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c), proceeding with deletion
+2025-10-07T12:40:40.815535065Z [inf]  🗑️ DELETING LOAD: Starting deletion process for load ID: 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.815542087Z [inf]  🗑️ Step 0: Getting load details to check for attachments
+2025-10-07T12:40:40.815549056Z [inf]  🗑️ Step 0.5: Deleting object storage files for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.815555078Z [inf]  🗑️ Deleting POD file: /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83,/gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc,/gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081
+2025-10-07T12:40:40.815563374Z [err]  ⚠️ Could not delete POD file: /gs://loadtracker_documents/private/uploads/b0fce385-54e6-4478-be3e-4a583dbb6a83,/gs://loadtracker_documents/private/uploads/02e87e40-af36-44c8-8afb-e31c86f194dc,/gs://loadtracker_documents/private/uploads/94ac7768-ab59-4d36-bed0-ae284915d081 _ObjectNotFoundError: Object not found
+2025-10-07T12:40:40.815569645Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:40:40.815575728Z [err]      at DatabaseStorage.deleteLoad (file:///app/dist/index.js:1304:55)
+2025-10-07T12:40:40.815582472Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:40:40.815588859Z [err]      at async file:///app/dist/index.js:6063:7
+2025-10-07T12:40:40.815595415Z [inf]  ✅ Object storage files deleted successfully
+2025-10-07T12:40:40.815602154Z [inf]  🗑️ TRANSACTION: Starting database transaction for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.815609939Z [inf]  🗑️ Step 1: Deleting notification logs for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.815617045Z [inf]  🗑️ Step 1 completed: Deleted 1 notification log records
+2025-10-07T12:40:40.815623900Z [inf]  🗑️ Step 2: Deleting load status history for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.815630701Z [inf]  🗑️ Step 2 completed: Deleted 10 status history records
+2025-10-07T12:40:40.815638926Z [inf]  🗑️ Step 3: Deleting load stops for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.815646514Z [inf]  🗑️ Step 3 completed: Deleted 2 load stops
+2025-10-07T12:40:40.816209698Z [inf]  🗑️ Step 4: Deleting invoices for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.816221318Z [inf]  🗑️ Step 4 completed: Deleted 1 invoices
+2025-10-07T12:40:40.816228553Z [inf]  🗑️ Step 5: Deleting BOL numbers for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.816236630Z [inf]  🗑️ Step 5 completed: Deleted 1 BOL numbers
+2025-10-07T12:40:40.816243107Z [inf]  🗑️ Step 6: Deleting the main load record for 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.816249763Z [inf]  🗑️ Step 6 completed: Deleted 1 load record
+2025-10-07T12:40:40.816258323Z [inf]  🗑️ TRANSACTION: All database operations completed successfully for load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c
+2025-10-07T12:40:40.816275658Z [inf]  ✅ SUCCESS: Load 631cb8e0-c50a-43b7-95cd-6ef166bb8f5c deleted successfully with all attachments cleaned up
+2025-10-07T12:40:40.816288968Z [inf]  🗑️ SERVER DELETE: Successfully deleted load 6022337
+2025-10-07T12:40:40.816299325Z [inf]  12:40:31 PM [express] DELETE /api/loads/631cb8e0-c50a-43b7-95cd-6ef166bb8f5c 200 in 64ms :: {"message…
+2025-10-07T12:40:40.816305650Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:40:40.816310870Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:40:40.816316846Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:40:40.816322450Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:40:40.816328293Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:40:40.816335179Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:40:40.816341163Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-07T12:40:40.816464876Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-07T12:40:40.816468917Z [inf]    hasReplitAuth: false,
+2025-10-07T12:40:40.816474120Z [inf]  🔥 RETURNING: 2 loads
+2025-10-07T12:40:40.816479128Z [inf]    hasTokenBypass: true,
+2025-10-07T12:40:40.816481466Z [inf]  12:40:31 PM [express] GET /api/loads 200 in 14ms :: [{"id":"6986abbf-cf60-4761-9441-733a4f48b85b","nu…
+2025-10-07T12:40:40.816487392Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:40:40.816493934Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:40:40.816499699Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:40:40.816504652Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:40:40.816510189Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:40:40.816515570Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:40:40.816521496Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-07T12:40:40.816526229Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-07T12:40:40.816531507Z [inf]  🔥 RETURNING: 2 loads
+2025-10-07T12:40:40.816548737Z [inf]  12:40:31 PM [express] GET /api/loads 200 in 10ms :: [{"id":"6986abbf-cf60-4761-9441-733a4f48b85b","nu…
+2025-10-07T12:40:40.816556360Z [inf]  Bypass check: {
+2025-10-07T12:40:40.816563638Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:40:40.816570974Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:40:40.816574447Z [inf]    headers: [
+2025-10-07T12:40:40.816578383Z [inf]    isActive: true
+2025-10-07T12:40:40.816586471Z [inf]  }
+2025-10-07T12:40:40.816587482Z [inf]      'host',                 'user-agent',
+2025-10-07T12:40:40.816596388Z [inf]  Dashboard stats auth check: {
+2025-10-07T12:40:40.816597607Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-07T12:40:40.816599182Z [inf]      'accept',               'accept-encoding',
+2025-10-07T12:40:40.816605651Z [inf]    hasAdminAuth: true,
+2025-10-07T12:40:40.816609068Z [inf]      'accept-language',      'cookie',
+2025-10-07T12:40:40.816609455Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-07T12:40:40.816618817Z [inf]      'if-none-match',        'referer',
+2025-10-07T12:40:40.816619247Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-07T12:40:40.816627815Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-07T12:40:40.816631344Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-07T12:40:40.816636467Z [inf]      'x-request-start'
+2025-10-07T12:40:40.816949853Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:40:40.816954969Z [inf]  📋 ADMIN: Returning 2 loads
+2025-10-07T12:40:40.816960088Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 2 loads
+2025-10-07T12:40:40.816964568Z [inf]  🔥 RETURNING: 2 loads
+2025-10-07T12:40:40.816977214Z [inf]    ],
+2025-10-07T12:40:40.816988236Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-07T12:40:40.816996338Z [inf]  }
+2025-10-07T12:40:40.817004045Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:40:40.817005980Z [inf]  12:40:31 PM [express] GET /api/dashboard/stats 200 in 22ms :: {"activeLoads":"2","inTransit":"0","del…
+2025-10-07T12:40:40.817014628Z [inf]  Admin user check: {
+2025-10-07T12:40:40.817016152Z [inf]    isActive: true
+2025-10-07T12:40:40.817023989Z [inf]    hasSession: true,
+2025-10-07T12:40:40.817024338Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:40:40.817029125Z [inf]  12:40:33 PM [express] GET /api/invoices 200 in 11ms :: [{"id":"bd9f89bf-0279-4e99-8e58-7498cc38b878",…
+2025-10-07T12:40:40.817033724Z [inf]    hasAdminAuth: true,
+2025-10-07T12:40:40.817035296Z [inf]  12:40:33 PM [express] GET /api/loads 304 in 14ms :: [{"id":"6986abbf-cf60-4761-9441-733a4f48b85b","nu…
+2025-10-07T12:40:40.817041425Z [inf]  12:40:33 PM [express] GET /api/locations 304 in 7ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01",…
+2025-10-07T12:40:40.817042335Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-07T12:40:40.817046982Z [inf]  Bypass check: {
+2025-10-07T12:40:40.817050306Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-07T12:40:40.817059912Z [inf]    adminAuthData: {
+2025-10-07T12:40:40.817067704Z [inf]      id: 'admin-001',
+2025-10-07T12:40:40.817076356Z [inf]      role: 'admin',
+2025-10-07T12:40:40.817083291Z [inf]      lastName: 'User',
+2025-10-07T12:40:40.817090630Z [inf]      username: 'admin',
+2025-10-07T12:40:40.817096943Z [inf]      firstName: 'Admin'
+2025-10-07T12:40:40.817104175Z [inf]    },
+2025-10-07T12:40:40.817114773Z [inf]    hasBypassToken: false
+2025-10-07T12:40:40.817123325Z [inf]  }
+2025-10-07T12:40:40.817131405Z [inf]  Authentication failed: No user or expiration
+2025-10-07T12:40:40.817140248Z [inf]  12:40:33 PM [express] GET /api/auth/admin-user 200 in 5ms :: {"id":"admin-001","role":"admin","lastNa…
+2025-10-07T12:40:40.817145178Z [inf]  }
+2025-10-07T12:40:40.817150366Z [inf]  12:40:33 PM [express] GET /api/auth/user 401 in 5ms :: {"message":"Unauthorized"}
+2025-10-07T12:40:40.817160065Z [inf]  Dashboard stats auth check: {
+2025-10-07T12:40:40.817160858Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-07T12:40:40.817170827Z [inf]    hasAdminAuth: true,
+2025-10-07T12:40:40.817174034Z [inf]    role: 'driver',
+2025-10-07T12:40:40.817178856Z [inf]    hasReplitAuth: false,
+2025-10-07T12:40:40.817186661Z [inf]    hasTokenBypass: true,
+2025-10-07T12:40:40.817189980Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:40:40.817195337Z [inf]    headers: [
+2025-10-07T12:40:40.817201609Z [inf]    lastName: 'Owen',
+2025-10-07T12:40:40.817204289Z [inf]      'host',                 'user-agent',
+2025-10-07T12:40:40.817213674Z [inf]      'accept',               'accept-encoding',
+2025-10-07T12:40:40.817215035Z [inf]    username: 'Kowen',
+2025-10-07T12:40:40.817221266Z [inf]      'accept-language',      'cookie',
+2025-10-07T12:40:40.817227484Z [inf]    firstName: 'Kevin'
+2025-10-07T12:40:40.817233342Z [inf]      'if-none-match',        'referer',
+2025-10-07T12:40:40.817235415Z [inf]  }
+2025-10-07T12:40:40.817243112Z [inf]  12:40:33 PM [express] GET /api/auth/driver-user 200 in 17ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f4864…
+2025-10-07T12:40:40.817245531Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-07T12:40:40.817251635Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:40:40.817254668Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-07T12:40:40.817261327Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:40:40.817262675Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-07T12:40:40.817268929Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:40:40.817271869Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-07T12:40:40.817276501Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:40:40.817283721Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:40:40.817285847Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-07T12:40:40.817295070Z [inf]      'x-request-start'
+2025-10-07T12:40:40.817302121Z [inf]    ],
+2025-10-07T12:40:40.817308805Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-07T12:40:40.817315021Z [inf]  }
+2025-10-07T12:40:40.817321249Z [inf]  12:40:33 PM [express] GET /api/drivers/available 304 in 7ms :: [{"id":"f920c664-fb37-496e-af76-1f0a43…
+2025-10-07T12:40:40.817327215Z [inf]  12:40:33 PM [express] GET /api/customers 304 in 9ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-07T12:40:40.817333641Z [inf]  12:40:33 PM [express] GET /api/dashboard/stats 304 in 14ms :: {"activeLoads":"2","inTransit":"0","del…
+2025-10-07T12:41:10.826813233Z [inf]  Bypass check: {
+2025-10-07T12:41:10.826824490Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:41:10.826832300Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:10.826838171Z [inf]    isActive: true
+2025-10-07T12:41:10.826843728Z [inf]  }
+2025-10-07T12:41:10.826850457Z [inf]  Load creation auth check: {
+2025-10-07T12:41:10.826856356Z [inf]    hasAdminAuth: true,
+2025-10-07T12:41:10.826863360Z [inf]    hasReplitAuth: false,
+2025-10-07T12:41:10.826869048Z [inf]    hasDriverAuth: true,
+2025-10-07T12:41:10.826875048Z [inf]    hasTokenBypass: true,
+2025-10-07T12:41:10.826880888Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-07T12:41:10.826886677Z [inf]    requestBody: '{"number109":"6022337","stops":[{"stopType":"pickup","stopSequence":1,"locationId":"03ad71e6-c601-4825-ae99-eb4e70ad5086","companyName":"FRYTOWN DISTRIBUTION","address":"5195 FARMERS AVE","contactName',
+2025-10-07T12:41:10.826893160Z [inf]    headers: [
+2025-10-07T12:41:10.826899003Z [inf]      'host',                 'user-agent',
+2025-10-07T12:41:10.826904910Z [inf]      'content-length',       'accept',
+2025-10-07T12:41:10.826910452Z [inf]      'accept-encoding',      'accept-language',
+2025-10-07T12:41:10.826916371Z [inf]      'content-type',         'cookie',
+2025-10-07T12:41:10.826923379Z [inf]      'origin',               'referer',
+2025-10-07T12:41:10.826929339Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-07T12:41:10.826935286Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-07T12:41:10.826942235Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-07T12:41:10.826948280Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-07T12:41:10.826954036Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-07T12:41:10.826959904Z [inf]      'x-request-start'
+2025-10-07T12:41:10.826965633Z [inf]    ]
+2025-10-07T12:41:10.826976122Z [inf]  }
+2025-10-07T12:41:10.826984881Z [inf]  Load creation - validating request body: {"number109":"6022337","stops":[{"stopType":"pickup","stopSequence":1,"locationId":"03ad71e6-c601-4825-ae99-eb4e70ad5086","companyName":"FRYTOWN DISTRIBUTION","address":"5195 FARMERS AVE","contactName":"","contactPhone":"","notes":""},{"stopType":"dropoff","stopSequence":2,"locationId":"6d5161f0-92ac-4414-9d22-d5eb12bda40d","companyName":"UNFI LANCASTER","address":"2100 DANIELDALE RD","contactName":"","contactPhone":"","notes":""}],"trackingEnabled":true,"deliveryDueAt":"2025-10-05T05:00:00.000Z"}
+2025-10-07T12:41:10.826991740Z [inf]  Load creation - validation successful, creating load: {
+2025-10-07T12:41:10.826997339Z [inf]    number109: '6022337',
+2025-10-07T12:41:10.827002964Z [inf]    deliveryDueAt: 2025-10-05T05:00:00.000Z,
+2025-10-07T12:41:10.827008935Z [inf]    trackingEnabled: true
+2025-10-07T12:41:10.827014613Z [inf]  }
+2025-10-07T12:41:10.827020596Z [inf]  Load creation - stops validated: 2
+2025-10-07T12:41:10.827029598Z [inf]  Load creation - setting main locationId to LAST delivery stop for rate lookup: 6d5161f0-92ac-4414-9d22-d5eb12bda40d
+2025-10-07T12:41:10.827035235Z [inf]  ✅ Status history added: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 → created
+2025-10-07T12:41:10.827041132Z [inf]  🚛 Load created with pickup location: 03ad71e6-c601-4825-ae99-eb4e70ad5086, delivery location: 6d5161f0-92ac-4414-9d22-d5eb12bda40d
+2025-10-07T12:41:10.827046690Z [inf]  Load creation successful: 61e3c649-36ee-4384-b5e0-d1363e9f7173
+2025-10-07T12:41:10.827052911Z [inf]  12:41:09 PM [express] POST /api/loads 201 in 78ms :: {"id":"61e3c649-36ee-4384-b5e0-d1363e9f7173","nu…
+2025-10-07T12:41:10.827059078Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:41:10.827065648Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:41:10.827071893Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:41:10.827077865Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:41:10.827083683Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:41:10.827089578Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:41:10.827095876Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:41:10.827101654Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:41:10.827108055Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:41:10.827114448Z [inf]  12:41:09 PM [express] GET /api/loads 200 in 20ms :: [{"id":"61e3c649-36ee-4384-b5e0-d1363e9f7173","nu…
+2025-10-07T12:41:10.827120118Z [inf]  Bypass check: {
+2025-10-07T12:41:10.827126126Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:41:10.827131959Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:10.827137756Z [inf]    isActive: true
+2025-10-07T12:41:10.827146878Z [inf]  }
+2025-10-07T12:41:10.827152835Z [inf]  Dashboard stats auth check: {
+2025-10-07T12:41:10.827630149Z [inf]    hasAdminAuth: true,
+2025-10-07T12:41:10.827636913Z [inf]    hasReplitAuth: false,
+2025-10-07T12:41:10.827642823Z [inf]    hasTokenBypass: true,
+2025-10-07T12:41:10.827648778Z [inf]    headers: [
+2025-10-07T12:41:10.827654529Z [inf]      'host',                 'user-agent',
+2025-10-07T12:41:10.827660758Z [inf]      'accept',               'accept-encoding',
+2025-10-07T12:41:10.827666899Z [inf]      'accept-language',      'cookie',
+2025-10-07T12:41:10.827672548Z [inf]      'if-none-match',        'referer',
+2025-10-07T12:41:10.827678301Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-07T12:41:10.827684055Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-07T12:41:10.827689612Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-07T12:41:10.827695061Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-07T12:41:10.827700596Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-07T12:41:10.827706318Z [inf]      'x-request-start'
+2025-10-07T12:41:10.827711646Z [inf]    ],
+2025-10-07T12:41:10.827717385Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-07T12:41:10.827723287Z [inf]  }
+2025-10-07T12:41:10.827729112Z [inf]  12:41:09 PM [express] GET /api/dashboard/stats 304 in 10ms :: {"activeLoads":"2","inTransit":"0","del…
+2025-10-07T12:41:18.090288447Z [inf]  Bypass check: {
+2025-10-07T12:41:18.090297760Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:41:18.090311452Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:18.090324836Z [inf]    isActive: true
+2025-10-07T12:41:18.090330926Z [inf]  }
+2025-10-07T12:41:18.090336601Z [inf]  Driver assignment auth check: {
+2025-10-07T12:41:18.090347900Z [inf]    hasSession: true,
+2025-10-07T12:41:18.090353710Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-07T12:41:18.090359416Z [inf]    hasAdminAuth: true,
+2025-10-07T12:41:18.090370219Z [inf]    hasReplitAuth: false,
+2025-10-07T12:41:18.090376080Z [inf]    hasDriverAuth: true,
+2025-10-07T12:41:18.090383190Z [inf]    hasTokenBypass: true,
+2025-10-07T12:41:18.090392284Z [inf]    bypassToken: '[PROVIDED]',
+2025-10-07T12:41:18.090398911Z [inf]    adminAuthData: {
+2025-10-07T12:41:18.090404483Z [inf]      id: 'admin-001',
+2025-10-07T12:41:18.090411725Z [inf]      role: 'admin',
+2025-10-07T12:41:18.090418983Z [inf]      lastName: 'User',
+2025-10-07T12:41:18.090424875Z [inf]      username: 'admin',
+2025-10-07T12:41:18.090429916Z [inf]      firstName: 'Admin'
+2025-10-07T12:41:18.090434173Z [inf]    },
+2025-10-07T12:41:18.090439130Z [inf]    userAuth: false
+2025-10-07T12:41:18.090442703Z [inf]  }
+2025-10-07T12:41:18.109229570Z [inf]  🔔 Sending notification to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: {
+2025-10-07T12:41:18.109239016Z [inf]    driverId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:41:18.109246049Z [inf]    type: 'load_assignment',
+2025-10-07T12:41:18.109252283Z [inf]    message: '🚛 NEW LOAD: 6022337\n' +
+2025-10-07T12:41:18.109258412Z [inf]      '📍 Pickup: See load details\n' +
+2025-10-07T12:41:18.109264831Z [inf]      '📍 Dropoff: UNFI LANCASTER, Lancaster, TX\n' +
+2025-10-07T12:41:18.109272323Z [inf]      'Go to https://web-production-e5850.up.railway.app',
+2025-10-07T12:41:18.109279113Z [inf]    loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173',
+2025-10-07T12:41:18.109284999Z [inf]    urgent: true
+2025-10-07T12:41:18.109293155Z [inf]  }
+2025-10-07T12:41:18.109299473Z [inf]  🔍 SMS Service Debug Check: {
+2025-10-07T12:41:18.109305431Z [inf]    hasTelnyxClient: true,
+2025-10-07T12:41:18.109311710Z [inf]    hasFromNumber: true,
+2025-10-07T12:41:18.109317646Z [inf]    fromNumberValue: '+12148170744',
+2025-10-07T12:41:18.109325049Z [inf]    apiKeyLength: 58
+2025-10-07T12:41:18.109332037Z [inf]  }
+2025-10-07T12:41:18.109338010Z [inf]  🚀 SMS SEND ATTEMPT: {
+2025-10-07T12:41:18.109344407Z [inf]    originalNumber: '9038037500',
+2025-10-07T12:41:18.109350447Z [inf]    normalizedNumber: '+19038037500',
+2025-10-07T12:41:18.109356540Z [inf]    from: '+12148170744',
+2025-10-07T12:41:18.109362503Z [inf]    messageLength: 140,
+2025-10-07T12:41:18.109368630Z [inf]    hasClient: true,
+2025-10-07T12:41:18.109375107Z [inf]    timestamp: '2025-10-07T12:41:18.105Z'
+2025-10-07T12:41:18.109383551Z [inf]  }
+2025-10-07T12:41:18.109389174Z [inf]  📱 ATTEMPTING TO SEND SMS WITH TELNYX: {
+2025-10-07T12:41:18.109394645Z [inf]    from: '+12148170744',
+2025-10-07T12:41:18.109400777Z [inf]    to: '+19038037500',
+2025-10-07T12:41:18.109407049Z [inf]    messagePreview: '🚛 NEW LOAD: 6022337\n📍 Pickup: See load details\n\ud83d...'
+2025-10-07T12:41:18.109412699Z [inf]  }
+2025-10-07T12:41:18.599043597Z [inf]  ✅ SMS SENT WITH TELNYX: 403199be-b0bf-41fd-94b7-5412e68b44b8 {
+2025-10-07T12:41:18.599050879Z [inf]    id: '403199be-b0bf-41fd-94b7-5412e68b44b8',
+2025-10-07T12:41:18.599056040Z [inf]    to: [
+2025-10-07T12:41:18.599059962Z [inf]      {
+2025-10-07T12:41:18.599072810Z [inf]        phone_number: '+19038037500',
+2025-10-07T12:41:18.599078238Z [inf]        status: 'queued',
+2025-10-07T12:41:18.599082188Z [inf]        carrier: 'NEW CINGULAR WIRELESS PCS, LLC - IL',
+2025-10-07T12:41:18.599085934Z [inf]        line_type: 'Wireless'
+2025-10-07T12:41:18.599089633Z [inf]      }
+2025-10-07T12:41:18.599095583Z [inf]    ],
+2025-10-07T12:41:18.599099641Z [inf]    from: {
+2025-10-07T12:41:18.599103655Z [inf]      phone_number: '+12148170744',
+2025-10-07T12:41:18.599107386Z [inf]      carrier: 'Telnyx',
+2025-10-07T12:41:18.599111230Z [inf]      line_type: 'Wireless'
+2025-10-07T12:41:18.599115912Z [inf]    },
+2025-10-07T12:41:18.599119940Z [inf]    direction: 'outbound',
+2025-10-07T12:41:18.599128140Z [inf]    messaging_profile_id: '4001991c-e085-43d1-aea5-2c79e9b2b0bf',
+2025-10-07T12:41:18.599133191Z [inf]    text: '🚛 NEW LOAD: 6022337\n' +
+2025-10-07T12:41:18.599137251Z [inf]      '📍 Pickup: See load details\n' +
+2025-10-07T12:41:18.599141328Z [inf]      '📍 Dropoff: UNFI LANCASTER, Lancaster, TX\n' +
+2025-10-07T12:41:18.599145407Z [inf]      'Go to https://web-production-e5850.up.railway.app'
+2025-10-07T12:41:18.599149293Z [inf]  }
+2025-10-07T12:41:18.599153082Z [inf]  ✅ SUCCESS: SMS sent via Telnyx - LOWEST COST ($0.004/SMS) with highest performance!
+2025-10-07T12:41:18.599156935Z [inf]      - Message ID: 403199be-b0bf-41fd-94b7-5412e68b44b8
+2025-10-07T12:41:18.599160897Z [inf]      - Direction: outbound
+2025-10-07T12:41:18.599165277Z [inf]      - Messaging Profile: 4001991c-e085-43d1-aea5-2c79e9b2b0bf
+2025-10-07T12:41:18.607818221Z [inf]  🔔 In-app notifications not yet implemented for driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:41:18.607827117Z [inf]  ✅ Notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: [ { method: 'sms', success: true } ]
+2025-10-07T12:41:18.607833282Z [inf]  ✅ SMS notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35 for load 6022337
+2025-10-07T12:41:18.607838769Z [inf]  12:41:18 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/assign 200 in 523ms :: {"…
+2025-10-07T12:41:18.766720875Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:41:18.766728372Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:41:18.766733668Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:41:18.766738397Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:41:18.766742988Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:41:18.766748200Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:41:18.766753348Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:41:18.766757665Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:41:18.766762801Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:41:18.766768028Z [inf]  12:41:18 PM [express] GET /api/loads 200 in 11ms :: [{"id":"61e3c649-36ee-4384-b5e0-d1363e9f7173","nu…
+2025-10-07T12:41:18.829769984Z [inf]  Load status update auth check: {
+2025-10-07T12:41:18.829777252Z [inf]    hasAdminAuth: true,
+2025-10-07T12:41:18.829783796Z [inf]    hasReplitAuth: false,
+2025-10-07T12:41:18.829788240Z [inf]    hasDriverAuth: true,
+2025-10-07T12:41:18.829792483Z [inf]    hasTokenBypass: true,
+2025-10-07T12:41:18.829797770Z [inf]    finalAuth: true
+2025-10-07T12:41:18.829804050Z [inf]  }
+2025-10-07T12:41:18.829809547Z [inf]  MOBILE DEBUG - Status update request: {
+2025-10-07T12:41:18.829814660Z [inf]    loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173',
+2025-10-07T12:41:18.829820565Z [inf]    requestBody: { status: 'assigned' },
+2025-10-07T12:41:18.829826348Z [inf]    headers: [
+2025-10-07T12:41:18.829830880Z [inf]      'host',                 'user-agent',
+2025-10-07T12:41:18.829835003Z [inf]      'content-length',       'accept',
+2025-10-07T12:41:18.829839205Z [inf]      'accept-encoding',      'accept-language',
+2025-10-07T12:41:18.829843823Z [inf]      'content-type',         'cookie',
+2025-10-07T12:41:18.829848305Z [inf]      'origin',               'referer',
+2025-10-07T12:41:18.829851874Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-07T12:41:18.829855792Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-07T12:41:18.829860965Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-07T12:41:18.829864739Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-07T12:41:18.829869711Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-07T12:41:18.829874933Z [inf]      'x-request-start'
+2025-10-07T12:41:18.829879707Z [inf]    ],
+2025-10-07T12:41:18.829883843Z [inf]    contentType: 'application/json',
+2025-10-07T12:41:18.829887642Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-07T12:41:18.829892038Z [inf]  }
+2025-10-07T12:41:18.829896591Z [inf]  Updating load 61e3c649-36ee-4384-b5e0-d1363e9f7173 status to: assigned
+2025-10-07T12:41:18.836457354Z [inf]  ✅ Status history added: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 → assigned
+2025-10-07T12:41:18.836463183Z [inf]  Load status updated successfully: assigned
+2025-10-07T12:41:18.836467799Z [inf]  12:41:18 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/status 200 in 11ms :: {"i…
+2025-10-07T12:41:21.683421491Z [inf]  Bypass check: {
+2025-10-07T12:41:21.683430670Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:41:21.683437341Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:21.683443576Z [inf]    isActive: true
+2025-10-07T12:41:21.683449985Z [inf]  }
+2025-10-07T12:41:21.687856381Z [inf]  12:41:21 PM [express] GET /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173 200 in 9ms :: {"id":"61e3c6…
+2025-10-07T12:41:21.838091882Z [inf]  Bypass check: {
+2025-10-07T12:41:21.838098669Z [inf]    token: '[MISSING]',
+2025-10-07T12:41:21.838102983Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:21.838108051Z [inf]    isActive: false
+2025-10-07T12:41:21.838111937Z [inf]  }
+2025-10-07T12:41:21.840859254Z [inf]  12:41:21 PM [express] GET /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/stops 401 in 4ms :: {"messa…
+2025-10-07T12:41:21.889203580Z [inf]  12:41:21 PM [express] GET /api/customers 304 in 5ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-07T12:41:24.076901104Z [inf]  🚛 Backend route calculation: 5195 FARMERS AVE → 2100 DANIELDALE RD
+2025-10-07T12:41:25.008251261Z [inf]  ✅ Route calculated: 871.19 miles, 767 minutes
+2025-10-07T12:41:25.011939947Z [inf]  12:41:25 PM [express] POST /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/calculate-route 200 in 936…
+2025-10-07T12:41:25.161850115Z [inf]  12:41:25 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/financials 200 in 6ms :: …
+2025-10-07T12:41:25.316948879Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:41:25.316957543Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:41:25.316964570Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:41:25.316970096Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:41:25.316997254Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:41:25.317109578Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:41:25.323144961Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:41:25.323153023Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:41:25.323159835Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:41:25.326161096Z [inf]  12:41:25 PM [express] GET /api/loads 200 in 12ms :: [{"id":"61e3c649-36ee-4384-b5e0-d1363e9f7173","nu…
+2025-10-07T12:41:45.326158947Z [inf]  Bypass check: {
+2025-10-07T12:41:45.326168616Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:41:45.326175599Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:45.326181758Z [inf]    isActive: true
+2025-10-07T12:41:45.326188176Z [inf]  }
+2025-10-07T12:41:45.326194179Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:41:45.326201367Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:41:45.326207436Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:41:45.326213112Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:41:45.326219193Z [inf]  12:41:37 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 42ms :: [{"i…
+2025-10-07T12:41:46.962046831Z [inf]  🔒 FORCE STATUS AUTH CHECK: {
+2025-10-07T12:41:46.962053590Z [inf]    hasAdminAuth: true,
+2025-10-07T12:41:46.962057829Z [inf]    hasReplitAuth: false,
+2025-10-07T12:41:46.962061912Z [inf]    hasDriverAuth: true,
+2025-10-07T12:41:46.962065756Z [inf]    hasTokenBypass: false,
+2025-10-07T12:41:46.962069395Z [inf]    nodeEnv: 'production',
+2025-10-07T12:41:46.962073145Z [inf]    finalAuth: true
+2025-10-07T12:41:46.962076708Z [inf]  }
+2025-10-07T12:41:46.962081078Z [inf]  🚨 FORCE STATUS UPDATE REQUEST: {
+2025-10-07T12:41:46.962085059Z [inf]    loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173',
+2025-10-07T12:41:46.962089864Z [inf]    requestedStatus: 'in_progress',
+2025-10-07T12:41:46.962093597Z [inf]    authContext: {
+2025-10-07T12:41:46.962097505Z [inf]      isAdmin: true,
+2025-10-07T12:41:46.962101187Z [inf]      driverAuth: {
+2025-10-07T12:41:46.962105070Z [inf]        role: 'driver',
+2025-10-07T12:41:46.962108603Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:41:46.962112124Z [inf]        lastName: 'Owen',
+2025-10-07T12:41:46.962115902Z [inf]        username: 'Kowen',
+2025-10-07T12:41:46.962123214Z [inf]        firstName: 'Kevin'
+2025-10-07T12:41:46.962126905Z [inf]      },
+2025-10-07T12:41:46.962130761Z [inf]      userId: 'admin-001'
+2025-10-07T12:41:46.962136810Z [inf]    },
+2025-10-07T12:41:46.962141924Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-07T12:41:46.962146759Z [inf]  }
+2025-10-07T12:41:46.970503547Z [inf]  🚨 FORCE updating load 61e3c649-36ee-4384-b5e0-d1363e9f7173 status to: in_progress (bypassing business rules)
+2025-10-07T12:41:46.970510245Z [inf]  🔒 AUTHORIZED BY: Admin
+2025-10-07T12:41:46.970514599Z [inf]  🚨 FORCE STATUS UPDATE: Bypassing business rules for load 61e3c649-36ee-4384-b5e0-d1363e9f7173 -> in_progress by user admin-001
+2025-10-07T12:41:46.988878191Z [inf]  ✅ Status history added: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 → in_progress
+2025-10-07T12:41:46.988884769Z [inf]  ✅ FORCE STATUS UPDATE COMPLETE: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 -> in_progress by user admin-001
+2025-10-07T12:41:46.988889568Z [inf]  ✅ Load status FORCE updated successfully: in_progress
+2025-10-07T12:41:46.988894258Z [inf]  12:41:46 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/force-status 200 in 24ms …
+2025-10-07T12:41:47.136329633Z [inf]  Bypass check: {
+2025-10-07T12:41:47.136336167Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:41:47.136341451Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:47.136345767Z [inf]    isActive: true
+2025-10-07T12:41:47.136349802Z [inf]  }
+2025-10-07T12:41:47.136353799Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:41:47.136357971Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:41:47.136363323Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:41:47.136367542Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:41:47.139476819Z [inf]  12:41:47 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 8ms :: [{"id…
+2025-10-07T12:41:54.471132363Z [inf]  🔒 FORCE STATUS AUTH CHECK: {
+2025-10-07T12:41:54.471140621Z [inf]    hasAdminAuth: true,
+2025-10-07T12:41:54.471150717Z [inf]    hasReplitAuth: false,
+2025-10-07T12:41:54.471159830Z [inf]    hasDriverAuth: true,
+2025-10-07T12:41:54.471163946Z [inf]    hasTokenBypass: false,
+2025-10-07T12:41:54.471167885Z [inf]    nodeEnv: 'production',
+2025-10-07T12:41:54.471172065Z [inf]    finalAuth: true
+2025-10-07T12:41:54.471176086Z [inf]  }
+2025-10-07T12:41:54.471179942Z [inf]  🚨 FORCE STATUS UPDATE REQUEST: {
+2025-10-07T12:41:54.471183786Z [inf]    loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173',
+2025-10-07T12:41:54.471187488Z [inf]    requestedStatus: 'at_shipper',
+2025-10-07T12:41:54.471192607Z [inf]    authContext: {
+2025-10-07T12:41:54.471196790Z [inf]      isAdmin: true,
+2025-10-07T12:41:54.471200463Z [inf]      driverAuth: {
+2025-10-07T12:41:54.471204304Z [inf]        role: 'driver',
+2025-10-07T12:41:54.471207867Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:41:54.471211877Z [inf]        lastName: 'Owen',
+2025-10-07T12:41:54.471215557Z [inf]        username: 'Kowen',
+2025-10-07T12:41:54.471220145Z [inf]        firstName: 'Kevin'
+2025-10-07T12:41:54.471224715Z [inf]      },
+2025-10-07T12:41:54.471230580Z [inf]      userId: 'admin-001'
+2025-10-07T12:41:54.471234496Z [inf]    },
+2025-10-07T12:41:54.471239095Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-07T12:41:54.471242926Z [inf]  }
+2025-10-07T12:41:54.471246519Z [inf]  🚨 FORCE updating load 61e3c649-36ee-4384-b5e0-d1363e9f7173 status to: at_shipper (bypassing business rules)
+2025-10-07T12:41:54.471250855Z [inf]  🔒 AUTHORIZED BY: Admin
+2025-10-07T12:41:54.471254420Z [inf]  🚨 FORCE STATUS UPDATE: Bypassing business rules for load 61e3c649-36ee-4384-b5e0-d1363e9f7173 -> at_shipper by user admin-001
+2025-10-07T12:41:54.474082664Z [inf]  ✅ Status history added: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 → at_shipper
+2025-10-07T12:41:54.474093788Z [inf]  ✅ FORCE STATUS UPDATE COMPLETE: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 -> at_shipper by user admin-001
+2025-10-07T12:41:54.474103081Z [inf]  ✅ Load status FORCE updated successfully: at_shipper
+2025-10-07T12:41:54.477458395Z [inf]  12:41:54 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/force-status 200 in 14ms …
+2025-10-07T12:41:54.641603058Z [inf]  Bypass check: {
+2025-10-07T12:41:54.641616175Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:41:54.641623040Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:54.641629272Z [inf]    isActive: true
+2025-10-07T12:41:54.641659185Z [inf]  }
+2025-10-07T12:41:54.641683640Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:41:54.641689011Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:41:54.641694254Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:41:54.641699732Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:41:54.641704802Z [inf]  12:41:54 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 10ms :: [{"i…
+2025-10-07T12:41:57.314470253Z [inf]  🔒 FORCE STATUS AUTH CHECK: {
+2025-10-07T12:41:57.314479625Z [inf]    hasAdminAuth: true,
+2025-10-07T12:41:57.314484127Z [inf]    hasReplitAuth: false,
+2025-10-07T12:41:57.314488603Z [inf]    hasDriverAuth: true,
+2025-10-07T12:41:57.314493632Z [inf]    hasTokenBypass: false,
+2025-10-07T12:41:57.314498831Z [inf]    nodeEnv: 'production',
+2025-10-07T12:41:57.314505284Z [inf]    finalAuth: true
+2025-10-07T12:41:57.314510717Z [inf]  }
+2025-10-07T12:41:57.314516394Z [inf]  🚨 FORCE STATUS UPDATE REQUEST: {
+2025-10-07T12:41:57.314521606Z [inf]    loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173',
+2025-10-07T12:41:57.314527492Z [inf]    requestedStatus: 'left_shipper',
+2025-10-07T12:41:57.314533317Z [inf]    authContext: {
+2025-10-07T12:41:57.314537772Z [inf]      isAdmin: true,
+2025-10-07T12:41:57.314542422Z [inf]      driverAuth: {
+2025-10-07T12:41:57.314547678Z [inf]        role: 'driver',
+2025-10-07T12:41:57.314553448Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:41:57.314560734Z [inf]        lastName: 'Owen',
+2025-10-07T12:41:57.314567591Z [inf]        username: 'Kowen',
+2025-10-07T12:41:57.314573196Z [inf]        firstName: 'Kevin'
+2025-10-07T12:41:57.314578629Z [inf]      },
+2025-10-07T12:41:57.314584985Z [inf]      userId: 'admin-001'
+2025-10-07T12:41:57.314590383Z [inf]    },
+2025-10-07T12:41:57.314595921Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-07T12:41:57.314601124Z [inf]  }
+2025-10-07T12:41:57.317295470Z [inf]  🚨 FORCE updating load 61e3c649-36ee-4384-b5e0-d1363e9f7173 status to: left_shipper (bypassing business rules)
+2025-10-07T12:41:57.317304743Z [inf]  🔒 AUTHORIZED BY: Admin
+2025-10-07T12:41:57.317309331Z [inf]  🚨 FORCE STATUS UPDATE: Bypassing business rules for load 61e3c649-36ee-4384-b5e0-d1363e9f7173 -> left_shipper by user admin-001
+2025-10-07T12:41:57.326255933Z [inf]  ✅ Status history added: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 → left_shipper
+2025-10-07T12:41:57.326264672Z [inf]  ✅ FORCE STATUS UPDATE COMPLETE: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 -> left_shipper by user admin-001
+2025-10-07T12:41:57.326270829Z [inf]  ✅ Load status FORCE updated successfully: left_shipper
+2025-10-07T12:41:57.329493969Z [inf]  12:41:57 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/force-status 200 in 18ms …
+2025-10-07T12:41:57.473681865Z [inf]  Bypass check: {
+2025-10-07T12:41:57.473689461Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:41:57.473694796Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:41:57.473699998Z [inf]    isActive: true
+2025-10-07T12:41:57.473704415Z [inf]  }
+2025-10-07T12:41:57.473708665Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:41:57.473712891Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:41:57.476959122Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:41:57.476965563Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:41:57.480361873Z [inf]  12:41:57 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 8ms :: [{"id…
+2025-10-07T12:42:00.137602794Z [inf]  🔒 FORCE STATUS AUTH CHECK: {
+2025-10-07T12:42:00.137624069Z [inf]    hasAdminAuth: true,
+2025-10-07T12:42:00.137632340Z [inf]    hasReplitAuth: false,
+2025-10-07T12:42:00.137638569Z [inf]    hasDriverAuth: true,
+2025-10-07T12:42:00.137644309Z [inf]    hasTokenBypass: false,
+2025-10-07T12:42:00.137650545Z [inf]    nodeEnv: 'production',
+2025-10-07T12:42:00.137657229Z [inf]    finalAuth: true
+2025-10-07T12:42:00.137662537Z [inf]  }
+2025-10-07T12:42:00.137668791Z [inf]  🚨 FORCE STATUS UPDATE REQUEST: {
+2025-10-07T12:42:00.137675604Z [inf]    loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173',
+2025-10-07T12:42:00.137681212Z [inf]    requestedStatus: 'at_receiver',
+2025-10-07T12:42:00.137687507Z [inf]    authContext: {
+2025-10-07T12:42:00.137698767Z [inf]      isAdmin: true,
+2025-10-07T12:42:00.137704526Z [inf]      driverAuth: {
+2025-10-07T12:42:00.137712278Z [inf]        role: 'driver',
+2025-10-07T12:42:00.137717841Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:42:00.137723519Z [inf]        lastName: 'Owen',
+2025-10-07T12:42:00.137749631Z [inf]        username: 'Kowen',
+2025-10-07T12:42:00.137755827Z [inf]        firstName: 'Kevin'
+2025-10-07T12:42:00.137762686Z [inf]      },
+2025-10-07T12:42:00.137769630Z [inf]      userId: 'admin-001'
+2025-10-07T12:42:00.137775075Z [inf]    },
+2025-10-07T12:42:00.137780399Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-07T12:42:00.137785978Z [inf]  }
+2025-10-07T12:42:00.140968500Z [inf]  🚨 FORCE updating load 61e3c649-36ee-4384-b5e0-d1363e9f7173 status to: at_receiver (bypassing business rules)
+2025-10-07T12:42:00.140977189Z [inf]  🔒 AUTHORIZED BY: Admin
+2025-10-07T12:42:00.140983393Z [inf]  🚨 FORCE STATUS UPDATE: Bypassing business rules for load 61e3c649-36ee-4384-b5e0-d1363e9f7173 -> at_receiver by user admin-001
+2025-10-07T12:42:00.146810720Z [inf]  ✅ Status history added: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 → at_receiver
+2025-10-07T12:42:00.146818686Z [inf]  ✅ FORCE STATUS UPDATE COMPLETE: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 -> at_receiver by user admin-001
+2025-10-07T12:42:00.146824394Z [inf]  ✅ Load status FORCE updated successfully: at_receiver
+2025-10-07T12:42:00.150709247Z [inf]  12:42:00 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/force-status 200 in 17ms …
+2025-10-07T12:42:00.293342477Z [inf]  Bypass check: {
+2025-10-07T12:42:00.293347718Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:42:00.293353818Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:42:00.293359257Z [inf]    isActive: true
+2025-10-07T12:42:00.293366542Z [inf]  }
+2025-10-07T12:42:00.293372025Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:42:00.293425036Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:42:00.293432242Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:42:00.293438260Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:42:00.295421085Z [inf]  12:42:00 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 9ms :: [{"id…
+2025-10-07T12:42:20.295362057Z [inf]  Bypass check: {
+2025-10-07T12:42:20.295372773Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:42:20.295379790Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:42:20.295386464Z [inf]    isActive: true
+2025-10-07T12:42:20.295394875Z [inf]  }
+2025-10-07T12:42:20.295401855Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:42:20.295408508Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:42:20.295414487Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:42:20.295420250Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:42:20.295426101Z [inf]  12:42:16 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 36ms :: [{"i…
+2025-10-07T12:42:40.288579008Z [inf]  Bypass check: {
+2025-10-07T12:42:40.288588380Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:42:40.288596572Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:42:40.288602410Z [inf]    isActive: true
+2025-10-07T12:42:40.288609075Z [inf]  }
+2025-10-07T12:42:40.288614795Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:42:40.288620369Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:42:40.288626719Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:42:40.288632648Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:42:40.288638086Z [inf]  12:42:31 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 42ms :: [{"i…
+2025-10-07T12:42:40.288643398Z [inf]  12:42:37 PM [express] GET /api/loads/by-number/6022337 200 in 12ms :: {"id":"61e3c649-36ee-4384-b5e0-…
+2025-10-07T12:42:40.288648576Z [inf]  12:42:37 PM [express] GET /api/bol/check/78697 200 in 6ms :: {"exists":false}
+2025-10-07T12:42:40.288653786Z [inf]  12:42:37 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/bol 200 in 10ms :: {"id":…
+2025-10-07T12:42:46.522806073Z [inf]  Bypass check: {
+2025-10-07T12:42:46.522810563Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:42:46.522816252Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:42:46.522820693Z [inf]    isActive: true
+2025-10-07T12:42:46.522824523Z [inf]  }
+2025-10-07T12:42:46.522828327Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:42:46.522832422Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:42:46.525503475Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:42:46.525512645Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:42:46.529550549Z [inf]  12:42:46 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 8ms :: [{"id…
+2025-10-07T12:43:06.525521357Z [inf]  📤 Direct upload - file received: Load_Confirmation_6022337_20251002192029.pdf 63822 bytes
+2025-10-07T12:43:06.525530192Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:43:06.525538794Z [inf]  ✅ Direct upload successful: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:43:06.525545362Z [inf]  12:43:02 PM [express] POST /api/objects/direct-upload 200 in 1587ms :: {"publicPath":"/gs://loadtrack…
+2025-10-07T12:43:09.528266036Z [inf]  Bypass check: {
+2025-10-07T12:43:09.528272668Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:43:09.528277252Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:43:09.528281657Z [inf]    isActive: true
+2025-10-07T12:43:09.528286330Z [inf]  }
+2025-10-07T12:43:09.528291185Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:43:09.528295319Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:43:09.528299323Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:43:09.528304321Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:43:09.528308518Z [inf]  12:43:09 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 9ms :: [{"id…
+2025-10-07T12:43:09.805449365Z [inf]  📤 Direct upload - file received: Screenshot_6-10-2025_03043_.jpeg 373412 bytes
+2025-10-07T12:43:09.805457111Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:43:10.099268622Z [inf]  📤 Direct upload - file received: receipt_38173970.pdf 45841 bytes
+2025-10-07T12:43:10.099272633Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.482484912Z [inf]  ✅ Direct upload successful: /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.485773202Z [inf]  12:43:10 PM [express] POST /api/objects/direct-upload 200 in 9617ms :: {"publicPath":"/gs://loadtrack…
+2025-10-07T12:43:10.622613838Z [inf]  ✅ Direct upload successful: /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:43:10.622617909Z [inf]  12:43:10 PM [express] POST /api/objects/direct-upload 200 in 9713ms :: {"publicPath":"/gs://loadtrack…
+2025-10-07T12:43:10.729781302Z [inf]  📄 Starting POD update for load 61e3c649-36ee-4384-b5e0-d1363e9f7173
+2025-10-07T12:43:10.729791256Z [inf]  📄 POD URL for load 61e3c649-36ee-4384-b5e0-d1363e9f7173: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7,/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0,/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.729797509Z [inf]  📄 Calling storage.updateLoadPOD...
+2025-10-07T12:43:10.729805254Z [inf]  ✅ POD saved for load: 6022337
+2025-10-07T12:43:10.729810620Z [inf]  📄 Updating load status to delivered...
+2025-10-07T12:43:10.735994058Z [inf]  ✅ Status history added: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 → delivered
+2025-10-07T12:43:10.738806663Z [inf]  ✅ Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 marked as DELIVERED - POD uploaded successfully
+2025-10-07T12:43:10.738813157Z [inf]  📄 Getting load details for invoicing workflow...
+2025-10-07T12:43:10.747084749Z [inf]  📄 Moving to awaiting_invoicing status...
+2025-10-07T12:43:10.747093681Z [inf]  ✅ Status history added: Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 → awaiting_invoicing
+2025-10-07T12:43:10.747100182Z [inf]  📋 Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 moved to AWAITING_INVOICING - ready for invoice generation
+2025-10-07T12:43:10.755442498Z [inf]  📄 No existing invoice found - generating new invoice for load 6022337
+2025-10-07T12:43:10.759630987Z [inf]  📄 CRITICAL: Fetching POD snapshot to embed at upload time for 6022337
+2025-10-07T12:43:10.759638157Z [inf]  📄 POD URL to fetch: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7,/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0,/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.759643234Z [inf]  📄 Fetching ALL PODs from object storage: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7,/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0,/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.759648307Z [inf]  📄 Processing 3 POD document(s):
+2025-10-07T12:43:10.759792995Z [inf]    1. /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:43:10.759805137Z [inf]    2. /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:43:10.759809173Z [inf]    3. /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.759814279Z [inf]  📄 Processing POD 1/3: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:43:10.759818349Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:43:10.759822554Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:43:10.759828066Z [inf]  📄 Normalized POD path 1: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:43:10.759833230Z [err]  ❌ Failed to process POD 1 (/gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7): _ObjectNotFoundError: Object not found
+2025-10-07T12:43:10.759839007Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:43:10.760081923Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:43:10.760089961Z [err]      at fetchPodSnapshotFromStorage (file:///app/dist/index.js:3310:30)
+2025-10-07T12:43:10.760096389Z [err]      at file:///app/dist/index.js:7736:43
+2025-10-07T12:43:10.760102270Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:43:10.760107569Z [inf]  📄 Processing POD 2/3: /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:43:10.760113067Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:43:10.760118470Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:43:10.760123746Z [inf]  📄 Normalized POD path 2: /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:43:10.760130059Z [inf]  📄 Processing POD 3/3: /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.760136380Z [err]  ❌ Failed to process POD 2 (/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0): _ObjectNotFoundError: Object not found
+2025-10-07T12:43:10.760141861Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:43:10.760147695Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:43:10.760153414Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:43:10.760159420Z [err]      at async fetchPodSnapshotFromStorage (file:///app/dist/index.js:3310:24)
+2025-10-07T12:43:10.760164966Z [err]      at async file:///app/dist/index.js:7736:37
+2025-10-07T12:43:10.760170709Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.760176292Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:43:10.760182027Z [inf]  📄 Normalized POD path 3: /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.760187791Z [err]  ❌ Failed to process POD 3 (/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131): _ObjectNotFoundError: Object not found
+2025-10-07T12:43:10.760193752Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:43:10.760199194Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:43:10.760205318Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:43:10.760211169Z [err]      at async fetchPodSnapshotFromStorage (file:///app/dist/index.js:3310:24)
+2025-10-07T12:43:10.760217185Z [err]      at async file:///app/dist/index.js:7736:37
+2025-10-07T12:43:10.760222438Z [inf]  ✅ Successfully processed 0/3 POD documents
+2025-10-07T12:43:10.760228408Z [err]  ❌ CRITICAL: POD snapshot returned NULL for 6022337
+2025-10-07T12:43:10.760233925Z [err]     This means the invoice will be created WITHOUT the POD image!
+2025-10-07T12:43:10.760239890Z [err]     URL attempted: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7,/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0,/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:43:10.762730755Z [inf]  Auto-generated invoice GO5253 for load 6022337
+2025-10-07T12:43:10.762737475Z [inf]  📋 Load 61e3c649-36ee-4384-b5e0-d1363e9f7173 stays in AWAITING_INVOICING - invoice ready to be emailed
+2025-10-07T12:43:10.766108352Z [inf]  12:43:10 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/pod 200 in 40ms :: {"id":…
+2025-10-07T12:43:40.769383091Z [inf]  Authentication failed: No user or expiration
+2025-10-07T12:43:40.769386921Z [inf]  12:43:36 PM [express] GET /api/auth/user 401 in 9ms :: {"message":"Unauthorized"}
+2025-10-07T12:43:40.769390720Z [inf]  Admin user check: {
+2025-10-07T12:43:40.769406830Z [inf]    hasSession: true,
+2025-10-07T12:43:40.769412209Z [inf]    hasAdminAuth: true,
+2025-10-07T12:43:40.769416015Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-07T12:43:40.769419799Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-07T12:43:40.769423393Z [inf]    adminAuthData: {
+2025-10-07T12:43:40.769427087Z [inf]      id: 'admin-001',
+2025-10-07T12:43:40.769430638Z [inf]      role: 'admin',
+2025-10-07T12:43:40.769434725Z [inf]      lastName: 'User',
+2025-10-07T12:43:40.769438429Z [inf]      username: 'admin',
+2025-10-07T12:43:40.769442594Z [inf]      firstName: 'Admin'
+2025-10-07T12:43:40.769447360Z [inf]    },
+2025-10-07T12:43:40.769452410Z [inf]    hasBypassToken: false
+2025-10-07T12:43:40.769456424Z [inf]  }
+2025-10-07T12:43:40.769460510Z [inf]  12:43:36 PM [express] GET /api/auth/admin-user 304 in 18ms :: {"id":"admin-001","role":"admin","lastN…
+2025-10-07T12:43:40.769464205Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-07T12:43:40.769469099Z [inf]    role: 'driver',
+2025-10-07T12:43:40.769472848Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:43:40.769476869Z [inf]    lastName: 'Owen',
+2025-10-07T12:43:40.769480658Z [inf]    username: 'Kowen',
+2025-10-07T12:43:40.769485207Z [inf]    firstName: 'Kevin'
+2025-10-07T12:43:40.769488936Z [inf]  }
+2025-10-07T12:43:40.769492784Z [inf]  12:43:36 PM [express] GET /api/auth/driver-user 304 in 4ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-07T12:43:40.769496537Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:43:40.769500533Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:43:40.769504417Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:43:40.769508265Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:43:40.769511906Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:43:40.769515806Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:43:40.769519771Z [inf]  12:43:36 PM [express] GET /api/locations 304 in 6ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01",…
+2025-10-07T12:43:40.769523983Z [inf]  12:43:36 PM [express] GET /api/invoices 200 in 6ms :: [{"id":"8048d983-5c28-4c89-8b62-a158d220444e","…
+2025-10-07T12:43:40.769527522Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:43:40.769532048Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:43:40.769544125Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:43:40.769547847Z [inf]  12:43:36 PM [express] GET /api/loads 200 in 32ms :: [{"id":"61e3c649-36ee-4384-b5e0-d1363e9f7173","nu…
+2025-10-07T12:43:40.769551696Z [inf]  Bypass check: {
+2025-10-07T12:43:40.769556521Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:43:40.769563183Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:43:40.769566960Z [inf]    isActive: true
+2025-10-07T12:43:40.769570391Z [inf]  }
+2025-10-07T12:43:40.769573896Z [inf]  Dashboard stats auth check: {
+2025-10-07T12:43:40.769577349Z [inf]    hasAdminAuth: true,
+2025-10-07T12:43:40.769583018Z [inf]    hasReplitAuth: false,
+2025-10-07T12:43:40.769587069Z [inf]    hasTokenBypass: true,
+2025-10-07T12:43:40.769590746Z [inf]    headers: [
+2025-10-07T12:43:40.769594186Z [inf]      'host',                 'user-agent',
+2025-10-07T12:43:40.769597685Z [inf]      'accept',               'accept-encoding',
+2025-10-07T12:43:40.769603130Z [inf]      'accept-language',      'cookie',
+2025-10-07T12:43:40.769607088Z [inf]      'if-none-match',        'referer',
+2025-10-07T12:43:40.769610765Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-07T12:43:40.769614324Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-07T12:43:40.770231710Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-07T12:43:40.770236770Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-07T12:43:40.770242079Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-07T12:43:40.770245919Z [inf]      'x-request-start'
+2025-10-07T12:43:40.770250027Z [inf]    ],
+2025-10-07T12:43:40.770253764Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-07T12:43:40.770257261Z [inf]  }
+2025-10-07T12:43:40.770260954Z [inf]  12:43:36 PM [express] GET /api/drivers/available 304 in 7ms :: [{"id":"f920c664-fb37-496e-af76-1f0a43…
+2025-10-07T12:43:40.770264392Z [inf]  12:43:36 PM [express] GET /api/customers 304 in 7ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-07T12:43:40.770269032Z [inf]  12:43:36 PM [express] GET /api/dashboard/stats 200 in 10ms :: {"activeLoads":"3","inTransit":"0","del…
+2025-10-07T12:43:41.596029034Z [inf]  Bypass check: {
+2025-10-07T12:43:41.596038224Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:43:41.596044393Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:43:41.596051455Z [inf]    isActive: true
+2025-10-07T12:43:41.596058916Z [inf]  }
+2025-10-07T12:43:41.604797833Z [inf]  12:43:41 PM [express] GET /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173 200 in 10ms :: {"id":"61e3c…
+2025-10-07T12:43:41.754222759Z [inf]  Bypass check: {
+2025-10-07T12:43:41.754229173Z [inf]    token: '[MISSING]',
+2025-10-07T12:43:41.754233566Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:43:41.754238046Z [inf]    isActive: false
+2025-10-07T12:43:41.754242313Z [inf]  }
+2025-10-07T12:43:41.754246344Z [inf]  12:43:41 PM [express] GET /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/stops 401 in 4ms :: {"messa…
+2025-10-07T12:43:41.811859743Z [inf]  12:43:41 PM [express] GET /api/customers 304 in 5ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-07T12:44:01.838686165Z [inf]  12:43:57 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/financials 200 in 41ms ::…
+2025-10-07T12:44:01.838695554Z [inf]  Bypass check: {
+2025-10-07T12:44:01.838701211Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:44:01.838706649Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:44:01.838710878Z [inf]    isActive: true
+2025-10-07T12:44:01.838714907Z [inf]  }
+2025-10-07T12:44:01.838719999Z [inf]  Invoice update auth check: {
+2025-10-07T12:44:01.838725166Z [inf]    hasAdminAuth: true,
+2025-10-07T12:44:01.838729162Z [inf]    hasReplitAuth: false,
+2025-10-07T12:44:01.838733808Z [inf]    hasTokenBypass: true,
+2025-10-07T12:44:01.838737709Z [inf]    hasAuth: true
+2025-10-07T12:44:01.838741303Z [inf]  }
+2025-10-07T12:44:01.838745470Z [inf]  ✅ Invoice GO5253 updated with new charges: {
+2025-10-07T12:44:01.838749222Z [inf]    flatRate: '3000.00',
+2025-10-07T12:44:01.838753097Z [inf]    lumperCharge: '126.47',
+2025-10-07T12:44:01.838756791Z [inf]    extraStopsCharge: '0.00',
+2025-10-07T12:44:01.838760746Z [inf]    totalAmount: '3126.47'
+2025-10-07T12:44:01.838766918Z [inf]  }
+2025-10-07T12:44:01.838772651Z [inf]  12:43:57 PM [express] PATCH /api/loads/61e3c649-36ee-4384-b5e0-d1363e9f7173/update-invoice 200 in 19m…
+2025-10-07T12:44:01.838778242Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:44:01.838783508Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:44:01.838788677Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:44:01.838792692Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:44:01.838796857Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:44:01.838800943Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:44:01.838804991Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:44:01.838809653Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:44:01.838825151Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:44:01.838828981Z [inf]  12:43:57 PM [express] GET /api/loads 200 in 13ms :: [{"id":"61e3c649-36ee-4384-b5e0-d1363e9f7173","nu…
+2025-10-07T12:44:01.838832496Z [inf]  12:43:57 PM [express] GET /api/invoices 200 in 9ms :: [{"id":"8048d983-5c28-4c89-8b62-a158d220444e","…
+2025-10-07T12:44:01.838836877Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:44:01.838840865Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:44:01.838844500Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:44:01.838847932Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:44:01.838851492Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:44:01.838855062Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:44:01.838858784Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:44:01.838862468Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:44:01.838866243Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:44:01.838869799Z [inf]  12:43:57 PM [express] GET /api/loads 200 in 9ms :: [{"id":"61e3c649-36ee-4384-b5e0-d1363e9f7173","num…
+2025-10-07T12:44:06.281288151Z [inf]  🔥 PRINT-PREVIEW ENDPOINT HIT! Invoice ID: GO5253
+2025-10-07T12:44:06.281298987Z [inf]  🔥 Request body: { loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173' }
+2025-10-07T12:44:06.281305466Z [inf]  🔥 Headers: { auth: 'BYPASS_PROVIDED', contentType: 'application/json' }
+2025-10-07T12:44:06.281311355Z [inf]  🔥 Auth check result: { hasAuth: true }
+2025-10-07T12:44:06.281317434Z [inf]  🚀 SERVER: Print preview API called for invoice: GO5253
+2025-10-07T12:44:06.281322876Z [inf]  🚀 SERVER: Request body: { loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173' }
+2025-10-07T12:44:06.281328106Z [inf]  🚀 SERVER: Request headers: { auth: 'BYPASS' }
+2025-10-07T12:44:06.281334515Z [inf]  🔍 Looking up invoice: GO5253
+2025-10-07T12:44:06.281342317Z [inf]  🖨️ POD Status for preview: {
+2025-10-07T12:44:06.281348480Z [inf]    loadNumber: '6022337',
+2025-10-07T12:44:06.281353202Z [inf]    loadId: '61e3c649-36ee-4384-b5e0-d1363e9f7173',
+2025-10-07T12:44:06.281359089Z [inf]    podDocumentPath: '/gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7,/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0,/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131',
+2025-10-07T12:44:06.281364776Z [inf]    hasPOD: true,
+2025-10-07T12:44:06.281370417Z [inf]    createdAt: 2025-10-07T12:41:09.057Z,
+2025-10-07T12:44:06.281375553Z [inf]    updatedAt: 2025-10-07T12:43:57.524Z
+2025-10-07T12:44:06.281381668Z [inf]  }
+2025-10-07T12:44:06.281387242Z [inf]  🔍 DATABASE DEBUG: Current DATABASE_URL environment: {
+2025-10-07T12:44:06.281393364Z [inf]    hasDbUrl: true,
+2025-10-07T12:44:06.281399078Z [inf]    dbUrlPrefix: 'postgresql://postgres:bqmYaNgBsxAuTWFmYjuyEczERHPI',
+2025-10-07T12:44:06.281405202Z [inf]    nodeEnv: 'production'
+2025-10-07T12:44:06.281410238Z [inf]  }
+2025-10-07T12:44:06.281415784Z [inf]  🔍 DATABASE DEBUG: Checking all loads in current database...
+2025-10-07T12:44:06.285030065Z [inf]  🔍 DATABASE DEBUG: Found 3 total loads in database
+2025-10-07T12:44:06.285045704Z [inf]  ❌ LOAD 109-41936 NOT FOUND IN DATABASE! Available loads: [
+2025-10-07T12:44:06.285052642Z [inf]    {
+2025-10-07T12:44:06.285058603Z [inf]      id: '61e3c649-36ee-4384-b5e0-d1363e9f7173',
+2025-10-07T12:44:06.285066014Z [inf]      number109: '6022337',
+2025-10-07T12:44:06.285072305Z [inf]      podPath: '/gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7,/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0,/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131'
+2025-10-07T12:44:06.285078021Z [inf]    },
+2025-10-07T12:44:06.285083509Z [inf]    {
+2025-10-07T12:44:06.285089944Z [inf]      id: '6986abbf-cf60-4761-9441-733a4f48b85b',
+2025-10-07T12:44:06.285096455Z [inf]      number109: '109-39834',
+2025-10-07T12:44:06.285102354Z [inf]      podPath: null
+2025-10-07T12:44:06.285109989Z [inf]    },
+2025-10-07T12:44:06.285126142Z [inf]    {
+2025-10-07T12:44:06.285131798Z [inf]      id: 'ac83116e-86ee-4ab8-8761-43680b0b15e4',
+2025-10-07T12:44:06.285137372Z [inf]      number109: '6022058',
+2025-10-07T12:44:06.285143007Z [inf]      podPath: '/gs://loadtracker_documents/private/uploads/49e1c47b-a147-4bd7-b0ed-92e16c9cb9b4,/gs://loadtracker_documents/private/uploads/7658b445-8759-430b-b5d4-d3d87846a223,/gs://loadtracker_documents/private/uploads/a538019f-e046-474d-82ec-cfcd9bca0716'
+2025-10-07T12:44:06.285149236Z [inf]    }
+2025-10-07T12:44:06.285154735Z [inf]  ]
+2025-10-07T12:44:06.287905053Z [inf]  📄 Getting ALL POD snapshots - checking BOTH stored snapshots AND object storage...
+2025-10-07T12:44:06.287911896Z [inf]  🔍 Also checking object storage for additional PODs...
+2025-10-07T12:44:06.287916652Z [inf]  📄 Fetching ALL PODs from object storage: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7,/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0,/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:44:06.287921098Z [inf]  📄 Processing 3 POD document(s):
+2025-10-07T12:44:06.287925184Z [inf]    1. /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:44:06.287929331Z [inf]    2. /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:44:06.287933447Z [inf]    3. /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:44:06.287937623Z [inf]  📄 Processing POD 1/3: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:44:06.287941427Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:44:06.287945293Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:44:06.287949422Z [inf]  📄 Normalized POD path 1: /gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7
+2025-10-07T12:44:06.287953316Z [err]  ❌ Failed to process POD 1 (/gs://loadtracker_documents/private/uploads/f3a4ed8b-ca64-4a74-967d-0e8f26e527d7): _ObjectNotFoundError: Object not found
+2025-10-07T12:44:06.287957571Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:44:06.287961991Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:44:06.287966268Z [err]      at getAllPodSnapshots (file:///app/dist/index.js:3244:31)
+2025-10-07T12:44:06.287970090Z [err]      at file:///app/dist/index.js:8293:37
+2025-10-07T12:44:06.287974095Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:44:06.287978646Z [inf]  📄 Processing POD 2/3: /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:44:06.287982595Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:44:06.287987740Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:44:06.287991934Z [inf]  📄 Normalized POD path 2: /gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0
+2025-10-07T12:44:06.287996116Z [inf]  📄 Processing POD 3/3: /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:44:06.288000155Z [inf]  🔍 Normalizing object path: /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:44:06.288004242Z [err]  ❌ Failed to process POD 2 (/gs://loadtracker_documents/private/uploads/09c569aa-c8b4-40dc-b63e-d51410788fd0): _ObjectNotFoundError: Object not found
+2025-10-07T12:44:06.288008490Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:44:06.288012378Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:44:06.288016158Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:44:06.288020167Z [err]      at async getAllPodSnapshots (file:///app/dist/index.js:3244:25)
+2025-10-07T12:44:06.288024651Z [err]      at async file:///app/dist/index.js:8293:31
+2025-10-07T12:44:06.288028716Z [inf]  📄 Path is not a Google Storage URL, returning as-is
+2025-10-07T12:44:06.288032601Z [inf]  📄 Normalized POD path 3: /gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131
+2025-10-07T12:44:06.288037538Z [inf]  ✅ Successfully processed 0/3 POD documents
+2025-10-07T12:44:06.288041501Z [err]  ❌ Failed to process POD 3 (/gs://loadtracker_documents/private/uploads/74e11d59-ea3a-4b7b-a1b8-820491fb5131): _ObjectNotFoundError: Object not found
+2025-10-07T12:44:06.288045440Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:747:19)
+2025-10-07T12:44:06.288049284Z [err]      at fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:52)
+2025-10-07T12:44:06.288053517Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:44:06.288058691Z [err]      at async getAllPodSnapshots (file:///app/dist/index.js:3244:25)
+2025-10-07T12:44:06.288062767Z [err]      at async file:///app/dist/index.js:8293:31
+2025-10-07T12:44:06.288070390Z [inf]  📋 TOTAL PODs available: 0
+2025-10-07T12:44:06.288075660Z [inf]  ⚠️ No POD document uploaded for load 6022337 (ID: 61e3c649-36ee-4384-b5e0-d1363e9f7173) - preview will show invoice only
+2025-10-07T12:44:06.288079539Z [inf]  🔍 DIAGNOSIS: If POD was recently uploaded but not showing:
+2025-10-07T12:44:06.288083389Z [inf]     - Check if load was deleted and recreated (new ID breaks POD links)
+2025-10-07T12:44:06.288087408Z [inf]     - Verify POD upload completed successfully
+2025-10-07T12:44:06.288091420Z [inf]     - Check object storage for orphaned files
+2025-10-07T12:44:06.291464756Z [inf]  12:44:06 PM [express] POST /api/invoices/GO5253/print-preview 200 in 18ms :: {"success":true,"preview…
