@@ -51,9 +51,9 @@ export function getSession() {
     rolling: true, // Reset expiration on activity
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true in production (HTTPS), false in dev
+      secure: true, // Always true - Railway uses HTTPS
       maxAge: sessionTtl,
-      sameSite: process.env.NODE_ENV === 'production' ? "none" : "lax", // "none" for mobile Safari on HTTPS
+      sameSite: "none", // Required for mobile Safari to send cookies with API requests
       path: '/', // Ensure cookie is available for all paths
     },
     name: 'connect.sid',
