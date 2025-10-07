@@ -373,13 +373,45 @@ export default function LoadsTable() {
     }
   };
 
-  const { data: loads, isLoading, refetch } = useQuery({
+  const { data: loads, isLoading, refetch, error } = useQuery({
     queryKey: ["/api/loads", { excludePaid: false }],
     queryFn: () => apiRequest("/api/loads?excludePaid=false", "GET"),
     retry: false,
     refetchOnWindowFocus: false,
     staleTime: 0, // Always consider data stale to allow quick updates
   });
+
+  // Fix authentication when bypass token is missing
+  const fixAuth = async () => {
+    try {
+      const response = await fetch("/api/auth/browser-bypass", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('bypass-token', data.token);
+        toast({
+          title: "✅ Authentication Fixed",
+          description: "Your session has been restored. Refreshing data...",
+        });
+        // Refresh the loads
+        await refetch();
+      } else {
+        toast({
+          title: "Fix Failed",
+          description: "Unable to restore session. Please refresh the page manually.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Fix Failed",
+        description: "Please refresh the page to restore your session",
+        variant: "destructive"
+      });
+    }
+  };
 
   // Force clear cache and refresh loads  
   const clearCacheAndRefresh = async () => {
@@ -981,8 +1013,38 @@ export default function LoadsTable() {
           )}
         </div>
 
+        {/* Authentication Error Alert */}
+        {error && (isUnauthorizedError(error) || (error instanceof Response && error.status === 401) || ((error as any)?.status === 401)) && (
+          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-red-800 mb-1">
+                  Session Expired - Loads Cannot Load
+                </h3>
+                <p className="text-sm text-red-700 mb-3">
+                  Your authentication session was cleared. Click the button below to restore your session and reload your loads.
+                </p>
+                <Button 
+                  onClick={fixAuth}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  size="sm"
+                  data-testid="button-fix-auth"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Fix Authentication & Reload
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Trucker Tip for first-time users */}
-        {pendingLoads.length === 0 && assignedLoads.length === 0 && inTransitLoads.length === 0 && (
+        {!error && pendingLoads.length === 0 && assignedLoads.length === 0 && inTransitLoads.length === 0 && (
           <TruckerTip 
             message="Hey there! Looks like you're just getting started. Create your first load using the 'Create Load' tab above. I'll help guide you through each step!"
             mood="helpful"
