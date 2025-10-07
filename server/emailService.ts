@@ -1,38 +1,8 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import puppeteer from 'puppeteer';
 
-// Create GoDaddy SMTP transporter (was Outlook, but email is hosted by GoDaddy)
-const createTransporter = () => {
-  console.log('🔍 Creating GoDaddy SMTP transporter with:', {
-    host: 'smtpout.secureserver.net',
-    port: 587,
-    user: process.env.OUTLOOK_EMAIL,
-    hasPassword: !!process.env.OUTLOOK_PASSWORD
-  });
-  
-  return nodemailer.createTransport({
-    host: 'smtpout.secureserver.net', // GoDaddy SMTP server
-    port: 587,
-    secure: false, // Use STARTTLS
-    auth: {
-      user: process.env.OUTLOOK_EMAIL,
-      pass: process.env.OUTLOOK_PASSWORD,
-    },
-    tls: {
-      rejectUnauthorized: false
-    },
-    // Add timeout and connection settings for better reliability
-    connectionTimeout: 60000, // 60 seconds
-    greetingTimeout: 30000,   // 30 seconds  
-    socketTimeout: 60000,     // 60 seconds
-    // Add pool settings for better connection management
-    pool: true,
-    maxConnections: 1,
-    maxMessages: 3,
-    debug: true, // Enable debug logging
-    logger: true // Enable logger
-  });
-};
+// Initialize Resend client (works with Railway - no SMTP port blocking!)
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 interface EmailOptions {
   to: string;
@@ -53,42 +23,25 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
   
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      console.log(`📧 Email attempt ${attempt}/${MAX_RETRIES} to ${to}`);
-      
-      const transporter = createTransporter();
+      console.log(`📧 Resend Email attempt ${attempt}/${MAX_RETRIES} to ${to}`);
       
       // Always include both in-house email addresses in CC
       const ccList = [...cc, 'accounting@go4fc.com', 'gofarmsbills@gmail.com'];
       
       // Check total attachment size to prevent server overload
       const totalAttachmentSize = attachments.reduce((total, att) => total + att.content.length, 0);
-      const maxSizeMB = 25; // Outlook limit is usually 25MB
+      const maxSizeMB = 40; // Resend allows up to 40MB
       const maxSizeBytes = maxSizeMB * 1024 * 1024;
       
       if (totalAttachmentSize > maxSizeBytes) {
         throw new Error(`Total attachment size (${Math.round(totalAttachmentSize / 1024 / 1024)}MB) exceeds ${maxSizeMB}MB limit`);
       }
       
-      const mailOptions = {
-        from: `"GO 4 Farms & Cattle" <${process.env.OUTLOOK_EMAIL}>`,
-        to,
-        cc: ccList.join(', '),
-        bcc: bcc.length > 0 ? bcc.join(', ') : undefined,
-        subject,
-        html,
-        // Force HTML-only: Remove text property completely
-        text: '',
-        attachments: attachments.length > 0 ? attachments.map(att => ({
-          filename: att.filename,
-          content: att.content,
-          contentType: att.contentType,
-          encoding: 'base64'
-        })) : undefined,
-      };
-
       // Debug email composition before sending
       console.log(`📧 Email composition debug (attempt ${attempt}):`);
+      console.log(`  - From: kevin@go4fc.com`);
       console.log(`  - To: ${to}`);
+      console.log(`  - CC: ${ccList.join(', ')}`);
       console.log(`  - Subject: ${subject}`);
       console.log(`  - HTML length: ${html.length} characters`);
       console.log(`  - Attachments: ${attachments.length}`);
@@ -99,15 +52,27 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
         });
       }
 
-      const result = await transporter.sendMail(mailOptions);
+      // Send via Resend API (no SMTP ports blocked!)
+      const result = await resend.emails.send({
+        from: 'GO 4 Farms & Cattle <kevin@go4fc.com>',
+        to: [to],
+        cc: ccList,
+        bcc: bcc.length > 0 ? bcc : undefined,
+        subject,
+        html,
+        attachments: attachments.length > 0 ? attachments.map(att => ({
+          filename: att.filename,
+          content: att.content,
+        })) : undefined,
+      });
       
-      console.log(`✅ Email sent successfully to ${to} on attempt ${attempt}`);
-      console.log(`Message ID: ${result.messageId}`);
-      console.log(`📧 Email sent with ${mailOptions.attachments?.length || 0} attachments`);
+      console.log(`✅ Email sent successfully via Resend to ${to} on attempt ${attempt}`);
+      console.log(`Message ID: ${result.data?.id}`);
+      console.log(`📧 Email sent with ${attachments.length} attachments`);
       
       return {
         success: true,
-        messageId: result.messageId,
+        messageId: result.data?.id || 'unknown',
         recipients: {
           to,
           cc: ccList,
@@ -119,8 +84,7 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
       lastError = error;
       console.error(`❌ Email attempt ${attempt}/${MAX_RETRIES} failed:`);
       console.error('Error details:', error instanceof Error ? error.message : error);
-      console.error('Error code:', (error as any)?.code);
-      console.error('Error response:', (error as any)?.response);
+      console.error('Full error:', error);
       
       // If this is the last attempt, throw the error
       if (attempt === MAX_RETRIES) {
@@ -369,22 +333,21 @@ export async function convertImageToPDF(imageBuffer: Buffer, contentType: string
 
 export async function testEmailConnection() {
   try {
-    console.log('🔍 Testing email connection with config:', {
-      host: 'smtp-mail.outlook.com',
-      port: 587,
-      user: process.env.OUTLOOK_EMAIL,
-      hasPassword: !!process.env.OUTLOOK_PASSWORD
+    console.log('🔍 Testing Resend API connection:', {
+      hasApiKey: !!process.env.RESEND_API_KEY,
+      fromEmail: 'kevin@go4fc.com'
     });
     
-    const transporter = createTransporter();
-    await transporter.verify();
-    console.log('✅ Email server connection verified');
+    // Resend doesn't have a verify method, so we just check if API key exists
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured');
+    }
+    
+    console.log('✅ Resend API key is configured');
     return true;
   } catch (error) {
-    console.error('❌ Email server connection failed:');
+    console.error('❌ Resend API configuration failed:');
     console.error('Error details:', error instanceof Error ? error.message : error);
-    console.error('Error code:', (error as any)?.code);
-    console.error('Error response:', (error as any)?.response);
     return false;
   }
 }

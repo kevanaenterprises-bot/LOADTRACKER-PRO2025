@@ -20,7 +20,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **OCR**: Integration with Anthropic Claude 4.0 Sonnet for scanning and extracting data from rate confirmation images, including an editable interface for correction.
 - **GPS Tracking**: Automatic GPS tracking for drivers, providing real-time location updates and status changes ("at shipper," "left shipper," "at receiver") based on proximity.
 - **Load Management**: Comprehensive lifecycle tracking, including support for multiple stops per load, flexible load number formats, and automated status updates.
-- **Communication**: Twilio for SMS notifications to drivers, with planned email notifications for office staff.
+- **Communication**: Telnyx for SMS notifications to drivers, Resend for email delivery (transactional email API - works with Railway/cloud hosting without SMTP port blocking).
 
 ### Feature Specifications
 - **Load Management**: Create, track, and update loads with real-time status, driver assignment, and support for multiple pickup/delivery stops.
@@ -37,7 +37,8 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Neon Database**: PostgreSQL hosting.
 - **Google Cloud Storage**: Object storage for documents.
 - **Replit Authentication**: OAuth 2.0/OIDC identity provider.
-- **Twilio**: SMS API for driver communications.
+- **Telnyx**: SMS API for driver communications.
+- **Resend**: Transactional email API for invoice delivery (cloud-friendly, no SMTP port blocking).
 - **Anthropic Claude 4.0 Sonnet**: OCR service for rate confirmation scanning.
 
 ### Development Tools
