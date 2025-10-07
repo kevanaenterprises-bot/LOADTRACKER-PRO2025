@@ -152,7 +152,7 @@ export class NotificationService {
     await this.sendNotification({
       driverId,
       type: 'load_assignment',
-      message: `🚛 NEW LOAD: ${loadNumber}\n📍 Pickup: ${pickupLocation}\n📍 Dropoff: ${dropoffLocation}${mileageText}\nGo to https://gofarmsmobilupload.com`,
+      message: `🚛 NEW LOAD: ${loadNumber}\n📍 Pickup: ${pickupLocation}\n📍 Dropoff: ${dropoffLocation}${mileageText}\nGo to https://web-production-e5850.up.railway.app`,
       loadId,
       urgent: true, // Load assignments bypass quiet hours since they're time-sensitive
     });
