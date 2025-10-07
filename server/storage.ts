@@ -609,6 +609,7 @@ export class DatabaseStorage implements IStorage {
       .update(loads)
       .set({ 
         status: 'in_progress',
+        trackingEnabled: true,
         updatedAt: new Date(),
       })
       .where(and(eq(loads.id, id), eq(loads.driverId, driverId)))
