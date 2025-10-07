@@ -268,31 +268,39 @@ async function buildFinalInvoicePdf(
     const pdfDoc = await PDFDocument.load(invoicePdfBuffer);
     console.log(`✅ Invoice PDF loaded into pdf-lib`);
     
-    // Step 3: Process each POD document
+    // Step 3: Process each POD document with error isolation
+    const failedPods: string[] = [];
+    
     for (let i = 0; i < podDocuments.length; i++) {
       const pod = podDocuments[i];
       console.log(`📎 Processing POD ${i + 1}/${podDocuments.length} (${pod.type})`);
       
-      if (pod.type === 'application/pdf') {
-        // For PDF PODs: Load and copy all pages
-        try {
+      try {
+        if (pod.type === 'application/pdf') {
+          // For PDF PODs: Load and copy all pages
           const podPdfDoc = await PDFDocument.load(pod.content);
           const copiedPages = await pdfDoc.copyPages(podPdfDoc, podPdfDoc.getPageIndices());
           copiedPages.forEach(page => pdfDoc.addPage(page));
           console.log(`✅ PDF POD ${i + 1}: Added ${copiedPages.length} pages`);
-        } catch (pdfError) {
-          console.error(`❌ Failed to merge PDF POD ${i + 1}:`, pdfError);
-          throw new Error(`Failed to merge PDF POD: ${pdfError instanceof Error ? pdfError.message : 'Unknown error'}`);
-        }
-      } else if (pod.type.startsWith('image/')) {
-        // For image PODs: Embed as new pages
-        try {
+        } else if (pod.type.startsWith('image/')) {
+          // For image PODs: Embed as new pages
           let image;
-          if (pod.type === 'image/png') {
-            image = await pdfDoc.embedPng(pod.content);
-          } else {
-            // Convert all other images to JPEG for embedding
-            image = await pdfDoc.embedJpg(pod.content);
+          
+          // Always convert to JPEG for maximum compatibility (pdf-lib only supports PNG/JPEG)
+          // This handles WEBP, HEIC, and other formats that might come from mobile uploads
+          try {
+            const { compressImageForPDF } = await import('./emailService');
+            const jpegBuffer = await compressImageForPDF(pod.content, pod.type, 1200);
+            image = await pdfDoc.embedJpg(jpegBuffer);
+            console.log(`✅ Image POD ${i + 1}: Converted ${pod.type} to JPEG for embedding`);
+          } catch (conversionError) {
+            console.error(`⚠️ Failed to convert ${pod.type} to JPEG, trying direct embed:`, conversionError);
+            // Fallback: try direct embed if it's already PNG/JPEG
+            if (pod.type === 'image/png') {
+              image = await pdfDoc.embedPng(pod.content);
+            } else {
+              image = await pdfDoc.embedJpg(pod.content);
+            }
           }
           
           // Calculate page size to fit image while maintaining aspect ratio
@@ -317,11 +325,20 @@ async function buildFinalInvoicePdf(
           });
           
           console.log(`✅ Image POD ${i + 1}: Embedded as new page`);
-        } catch (imgError) {
-          console.error(`❌ Failed to embed image POD ${i + 1}:`, imgError);
-          throw new Error(`Failed to embed image POD: ${imgError instanceof Error ? imgError.message : 'Unknown error'}`);
         }
+      } catch (podError) {
+        // Isolate POD errors - log and continue with other PODs
+        const errorMsg = `POD ${i + 1} (${pod.type})`;
+        failedPods.push(errorMsg);
+        console.error(`❌ Failed to process ${errorMsg}:`, podError);
+        console.log(`⚠️ Continuing with remaining PODs...`);
       }
+    }
+    
+    // Log summary of failed PODs if any
+    if (failedPods.length > 0) {
+      console.warn(`⚠️ ${failedPods.length} POD(s) failed to merge: ${failedPods.join(', ')}`);
+      console.log(`📄 Invoice PDF will still be sent with ${podDocuments.length - failedPods.length} successful POD(s)`);
     }
     
     // Step 4: Save and return final combined PDF
