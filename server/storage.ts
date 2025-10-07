@@ -1062,17 +1062,18 @@ export class DatabaseStorage implements IStorage {
     deliveredToday: number;
     revenueToday: string;
   }> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    return queryWithRetry(async () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    // Active loads (assigned to drivers, not completed)
-    const [activeLoadsResult] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(loads)
-      .where(and(
-        sql`${loads.driverId} IS NOT NULL`,
-        sql`${loads.status} NOT IN ('completed', 'delivered')`
-      ));
+      // Active loads (assigned to drivers, not completed)
+      const [activeLoadsResult] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(loads)
+        .where(and(
+          sql`${loads.driverId} IS NOT NULL`,
+          sql`${loads.status} NOT IN ('completed', 'delivered')`
+        ));
 
     // In transit loads (actively moving between pickup and delivery)
     const [inTransitResult] = await db
@@ -1098,12 +1099,13 @@ export class DatabaseStorage implements IStorage {
       .from(invoices)
       .where(sql`generated_at >= ${today}`);
 
-    return {
-      activeLoads: activeLoadsResult.count,
-      inTransit: inTransitResult.count,
-      deliveredToday: deliveredTodayResult.count,
-      revenueToday: `$${revenueTodayResult.total}`,
-    };
+      return {
+        activeLoads: activeLoadsResult.count,
+        inTransit: inTransitResult.count,
+        deliveredToday: deliveredTodayResult.count,
+        revenueToday: `$${revenueTodayResult.total}`,
+      };
+    });
   }
 
   async getDrivers(): Promise<User[]> {
