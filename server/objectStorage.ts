@@ -360,9 +360,15 @@ function parseObjectPath(path: string): {
   bucketName: string;
   objectName: string;
 } {
+  // RAILWAY FIX: Handle gs:// format paths
+  if (path.startsWith("gs://")) {
+    path = path.replace("gs://", "/");
+  }
+  
   if (!path.startsWith("/")) {
     path = `/${path}`;
   }
+  
   const pathParts = path.split("/");
   if (pathParts.length < 3) {
     throw new Error("Invalid path: must contain at least a bucket name");

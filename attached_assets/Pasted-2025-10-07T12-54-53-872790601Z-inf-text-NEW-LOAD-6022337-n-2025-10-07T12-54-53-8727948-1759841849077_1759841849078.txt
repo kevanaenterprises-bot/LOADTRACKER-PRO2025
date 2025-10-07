@@ -1,0 +1,1001 @@
+2025-10-07T12:54:53.872790601Z [inf]    text: '🚛 NEW LOAD: 6022337\n' +
+2025-10-07T12:54:53.872794844Z [inf]      '📍 Pickup: See load details\n' +
+2025-10-07T12:54:53.872798858Z [inf]      '📍 Dropoff: UNFI LANCASTER, Lancaster, TX (871 miles)\n' +
+2025-10-07T12:54:53.872803221Z [inf]      'Go to https://web-production-e5850.up.railway.app'
+2025-10-07T12:54:53.872807695Z [inf]  }
+2025-10-07T12:54:53.872812440Z [inf]  ✅ SUCCESS: SMS sent via Telnyx - LOWEST COST ($0.004/SMS) with highest performance!
+2025-10-07T12:54:53.872816941Z [inf]      - Message ID: 403199be-bd2f-4bde-9d74-bb3f20a5dec1
+2025-10-07T12:54:53.872822363Z [inf]      - Direction: outbound
+2025-10-07T12:54:53.872827231Z [inf]      - Messaging Profile: 4001991c-e085-43d1-aea5-2c79e9b2b0bf
+2025-10-07T12:54:53.872831714Z [inf]  🔔 In-app notifications not yet implemented for driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:54:53.872885126Z [inf]  ✅ Notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35: [ { method: 'sms', success: true } ]
+2025-10-07T12:54:53.872889139Z [inf]  ✅ SMS notification sent to driver 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35 for load 6022337
+2025-10-07T12:54:53.872893341Z [inf]  12:54:53 PM [express] PATCH /api/loads/8461acb8-29b3-4f9c-9602-429694eec066/assign 200 in 444ms :: {"…
+2025-10-07T12:54:53.953354404Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:54:53.953363524Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:54:53.953369983Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:54:53.953375855Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:54:53.953381620Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:54:53.953389718Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:54:53.959319072Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:54:53.959328088Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:54:53.959334414Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:54:53.959340668Z [inf]  12:54:53 PM [express] GET /api/loads 200 in 12ms :: [{"id":"8461acb8-29b3-4f9c-9602-429694eec066","nu…
+2025-10-07T12:54:54.039205001Z [inf]  Load status update auth check: {
+2025-10-07T12:54:54.039211010Z [inf]    hasAdminAuth: true,
+2025-10-07T12:54:54.039217505Z [inf]    hasReplitAuth: false,
+2025-10-07T12:54:54.039223555Z [inf]    hasDriverAuth: true,
+2025-10-07T12:54:54.039229474Z [inf]    hasTokenBypass: true,
+2025-10-07T12:54:54.039234685Z [inf]    finalAuth: true
+2025-10-07T12:54:54.039240175Z [inf]  }
+2025-10-07T12:54:54.039245889Z [inf]  MOBILE DEBUG - Status update request: {
+2025-10-07T12:54:54.039251118Z [inf]    loadId: '8461acb8-29b3-4f9c-9602-429694eec066',
+2025-10-07T12:54:54.039256564Z [inf]    requestBody: { status: 'assigned' },
+2025-10-07T12:54:54.039262043Z [inf]    headers: [
+2025-10-07T12:54:54.039272817Z [inf]      'host',                 'user-agent',
+2025-10-07T12:54:54.039278507Z [inf]      'content-length',       'accept',
+2025-10-07T12:54:54.039283889Z [inf]      'accept-encoding',      'accept-language',
+2025-10-07T12:54:54.039289664Z [inf]      'content-type',         'cookie',
+2025-10-07T12:54:54.039294831Z [inf]      'origin',               'referer',
+2025-10-07T12:54:54.039300544Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-07T12:54:54.039306552Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-07T12:54:54.039312070Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-07T12:54:54.039317633Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-07T12:54:54.039322972Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-07T12:54:54.039328096Z [inf]      'x-request-start'
+2025-10-07T12:54:54.039333170Z [inf]    ],
+2025-10-07T12:54:54.039339696Z [inf]    contentType: 'application/json',
+2025-10-07T12:54:54.039346032Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-07T12:54:54.039351292Z [inf]  }
+2025-10-07T12:54:54.039356352Z [inf]  Updating load 8461acb8-29b3-4f9c-9602-429694eec066 status to: assigned
+2025-10-07T12:54:54.039361749Z [inf]  ✅ Status history added: Load 8461acb8-29b3-4f9c-9602-429694eec066 → assigned
+2025-10-07T12:54:54.039367578Z [inf]  Load status updated successfully: assigned
+2025-10-07T12:54:54.039373222Z [inf]  12:54:54 PM [express] PATCH /api/loads/8461acb8-29b3-4f9c-9602-429694eec066/status 200 in 11ms :: {"i…
+2025-10-07T12:54:56.838083489Z [inf]  Bypass check: {
+2025-10-07T12:54:56.838091545Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:54:56.838096579Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:54:56.838100825Z [inf]    isActive: true
+2025-10-07T12:54:56.838104669Z [inf]  }
+2025-10-07T12:54:56.838108507Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:54:56.838112400Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:54:56.838116341Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:54:56.838125392Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:54:56.838133868Z [inf]  12:54:56 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 8ms :: [{"id…
+2025-10-07T12:55:03.098505023Z [inf]  🔒 FORCE STATUS AUTH CHECK: {
+2025-10-07T12:55:03.098515172Z [inf]    hasAdminAuth: true,
+2025-10-07T12:55:03.098521577Z [inf]    hasReplitAuth: false,
+2025-10-07T12:55:03.098527941Z [inf]    hasDriverAuth: true,
+2025-10-07T12:55:03.098533776Z [inf]    hasTokenBypass: false,
+2025-10-07T12:55:03.098540058Z [inf]    nodeEnv: 'production',
+2025-10-07T12:55:03.098545847Z [inf]    finalAuth: true
+2025-10-07T12:55:03.098553689Z [inf]  }
+2025-10-07T12:55:03.098559099Z [inf]  🚨 FORCE STATUS UPDATE REQUEST: {
+2025-10-07T12:55:03.098566921Z [inf]    loadId: '8461acb8-29b3-4f9c-9602-429694eec066',
+2025-10-07T12:55:03.098572698Z [inf]    requestedStatus: 'in_progress',
+2025-10-07T12:55:03.098578045Z [inf]    authContext: {
+2025-10-07T12:55:03.098583796Z [inf]      isAdmin: true,
+2025-10-07T12:55:03.098589881Z [inf]      driverAuth: {
+2025-10-07T12:55:03.098596266Z [inf]        role: 'driver',
+2025-10-07T12:55:03.098602320Z [inf]        userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:55:03.098609820Z [inf]        lastName: 'Owen',
+2025-10-07T12:55:03.098616169Z [inf]        username: 'Kowen',
+2025-10-07T12:55:03.098621035Z [inf]        firstName: 'Kevin'
+2025-10-07T12:55:03.098626612Z [inf]      },
+2025-10-07T12:55:03.098632523Z [inf]      userId: 'admin-001'
+2025-10-07T12:55:03.098638103Z [inf]    },
+2025-10-07T12:55:03.098643238Z [inf]    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Ap'
+2025-10-07T12:55:03.098650537Z [inf]  }
+2025-10-07T12:55:03.098656300Z [inf]  🚨 FORCE updating load 8461acb8-29b3-4f9c-9602-429694eec066 status to: in_progress (bypassing business rules)
+2025-10-07T12:55:03.098662941Z [inf]  🔒 AUTHORIZED BY: Admin
+2025-10-07T12:55:03.098668562Z [inf]  🚨 FORCE STATUS UPDATE: Bypassing business rules for load 8461acb8-29b3-4f9c-9602-429694eec066 -> in_progress by user admin-001
+2025-10-07T12:55:03.101749777Z [inf]  ✅ Status history added: Load 8461acb8-29b3-4f9c-9602-429694eec066 → in_progress
+2025-10-07T12:55:03.101759044Z [inf]  ✅ FORCE STATUS UPDATE COMPLETE: Load 8461acb8-29b3-4f9c-9602-429694eec066 -> in_progress by user admin-001
+2025-10-07T12:55:03.101768348Z [inf]  ✅ Load status FORCE updated successfully: in_progress
+2025-10-07T12:55:03.105239382Z [inf]  12:55:03 PM [express] PATCH /api/loads/8461acb8-29b3-4f9c-9602-429694eec066/force-status 200 in 14ms …
+2025-10-07T12:55:03.262000306Z [inf]  Bypass check: {
+2025-10-07T12:55:03.262003939Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:55:03.262007532Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:55:03.262011313Z [inf]    isActive: true
+2025-10-07T12:55:03.262015106Z [inf]  }
+2025-10-07T12:55:03.262018887Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:55:03.262022850Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:55:03.262026793Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:55:03.262030873Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:55:03.262034495Z [inf]  12:55:03 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 9ms :: [{"id…
+2025-10-07T12:55:23.258670758Z [inf]  Bypass check: {
+2025-10-07T12:55:23.258677744Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:55:23.258682565Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:55:23.258686947Z [inf]    isActive: true
+2025-10-07T12:55:23.258692365Z [inf]  }
+2025-10-07T12:55:23.258696372Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:55:23.258700162Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:55:23.258704048Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:55:23.258708072Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:55:23.258712280Z [inf]  12:55:18 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 40ms :: [{"i…
+2025-10-07T12:55:43.227477225Z [inf]  Bypass check: {
+2025-10-07T12:55:43.227484884Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:55:43.227490046Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:55:43.227494353Z [inf]    isActive: true
+2025-10-07T12:55:43.227498560Z [inf]  }
+2025-10-07T12:55:43.227502993Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:55:43.227509302Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:55:43.227514213Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:55:43.227519941Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:55:43.227524432Z [inf]  12:55:35 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 40ms :: [{"i…
+2025-10-07T12:55:43.227528408Z [inf]  12:55:39 PM [express] GET /api/loads/by-number/6022337 200 in 16ms :: {"id":"8461acb8-29b3-4f9c-9602-…
+2025-10-07T12:55:43.227532655Z [inf]  12:55:39 PM [express] GET /api/bol/check/78697 200 in 5ms :: {"exists":false}
+2025-10-07T12:55:43.227536485Z [inf]  12:55:39 PM [express] PATCH /api/loads/8461acb8-29b3-4f9c-9602-429694eec066/bol 200 in 15ms :: {"id":…
+2025-10-07T12:55:50.404621234Z [inf]  Bypass check: {
+2025-10-07T12:55:50.404629699Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:55:50.404633990Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:55:50.404637790Z [inf]    isActive: true
+2025-10-07T12:55:50.404641705Z [inf]  }
+2025-10-07T12:55:50.404645455Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:55:50.404649865Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:55:50.408464967Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:55:50.408475950Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:55:50.412162368Z [inf]  12:55:50 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 200 in 40ms :: [{"i…
+2025-10-07T12:56:10.420426601Z [inf]  📤 Direct upload - file received: Load_Confirmation_6022337_20251002192029.pdf 63822 bytes
+2025-10-07T12:56:10.420433645Z [inf]  🔧 Initializing Google Cloud Storage client...
+2025-10-07T12:56:10.420438239Z [inf]  ✅ Private key formatted successfully (length: 1704 chars)
+2025-10-07T12:56:10.420442571Z [inf]  ✅ Google Cloud Storage client initialized successfully
+2025-10-07T12:56:10.420446605Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:10.420451829Z [inf]  ✅ Direct upload successful: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:10.420456104Z [inf]  12:56:05 PM [express] POST /api/objects/direct-upload 200 in 965ms :: {"publicPath":"https://storage.…
+2025-10-07T12:56:10.420460128Z [inf]  Bypass check: {
+2025-10-07T12:56:10.420464995Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:56:10.420469217Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:56:10.420472919Z [inf]    isActive: true
+2025-10-07T12:56:10.420476751Z [inf]  }
+2025-10-07T12:56:10.420481037Z [inf]  ✅ DRIVER LOADS: Bypass token authenticated
+2025-10-07T12:56:10.420485233Z [inf]  🔍 SMART DRIVER MAPPING: Looking for loads for driver ID "9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35"
+2025-10-07T12:56:10.420489497Z [inf]  📋 Direct lookup: Found 3 loads for driver ID 9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35
+2025-10-07T12:56:10.420493867Z [inf]  ✅ FINAL RESULT: Returning 3 loads for driver portal
+2025-10-07T12:56:10.420497931Z [inf]  12:56:05 PM [express] GET /api/drivers/9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35/loads 304 in 7ms :: [{"id…
+2025-10-07T12:56:10.420501889Z [inf]  📤 Direct upload - file received: Screenshot_6-10-2025_03043_.jpeg 373412 bytes
+2025-10-07T12:56:10.420506457Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:10.420510321Z [inf]  📤 Direct upload - file received: receipt_38173970.pdf 45841 bytes
+2025-10-07T12:56:10.420515213Z [inf]  📤 Uploading to GCS: loadtracker_documents private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.420519558Z [inf]  ✅ Direct upload successful: https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.420523797Z [inf]  12:56:06 PM [express] POST /api/objects/direct-upload 200 in 2168ms :: {"publicPath":"https://storage…
+2025-10-07T12:56:10.420529367Z [inf]  ✅ Direct upload successful: https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:10.420534665Z [inf]  12:56:06 PM [express] POST /api/objects/direct-upload 200 in 2193ms :: {"publicPath":"https://storage…
+2025-10-07T12:56:10.420541344Z [inf]  📄 Starting POD update for load 8461acb8-29b3-4f9c-9602-429694eec066
+2025-10-07T12:56:10.420549701Z [inf]  📄 POD URL for load 8461acb8-29b3-4f9c-9602-429694eec066: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416,https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee,https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.420555175Z [inf]  📄 Calling storage.updateLoadPOD...
+2025-10-07T12:56:10.420561038Z [inf]  ✅ POD saved for load: 6022337
+2025-10-07T12:56:10.420566569Z [inf]  📄 Updating load status to delivered...
+2025-10-07T12:56:10.420572829Z [inf]  ✅ Status history added: Load 8461acb8-29b3-4f9c-9602-429694eec066 → delivered
+2025-10-07T12:56:10.420579279Z [inf]  ✅ Load 8461acb8-29b3-4f9c-9602-429694eec066 marked as DELIVERED - POD uploaded successfully
+2025-10-07T12:56:10.420584698Z [inf]  📄 Getting load details for invoicing workflow...
+2025-10-07T12:56:10.420589088Z [inf]  📄 Moving to awaiting_invoicing status...
+2025-10-07T12:56:10.420593236Z [inf]  ✅ Status history added: Load 8461acb8-29b3-4f9c-9602-429694eec066 → awaiting_invoicing
+2025-10-07T12:56:10.420597536Z [inf]  📋 Load 8461acb8-29b3-4f9c-9602-429694eec066 moved to AWAITING_INVOICING - ready for invoice generation
+2025-10-07T12:56:10.420602319Z [inf]  📄 No existing invoice found - generating new invoice for load 6022337
+2025-10-07T12:56:10.421449485Z [inf]  }
+2025-10-07T12:56:10.421456444Z [inf]  ✅ Normalized to objects path: /objects/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:10.421461648Z [inf]  📄 Normalized POD path 1: /objects/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:10.421466180Z [err]  ⚠️ Object storage not configured or available for file access: ApiError: Invalid bucket name: 'gs:'
+2025-10-07T12:56:10.421471306Z [err]      at new ApiError (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:85:15)
+2025-10-07T12:56:10.421476606Z [inf]    1. https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:10.421488366Z [inf]    2. https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:10.421493595Z [inf]  📄 CRITICAL: Fetching POD snapshot to embed at upload time for 6022337
+2025-10-07T12:56:10.421496283Z [inf]    3. https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.421503431Z [inf]  📄 Processing POD 1/3: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:10.421504392Z [inf]  📄 POD URL to fetch: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416,https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee,https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.421511364Z [inf]  🔍 Normalizing object path: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:10.421513540Z [inf]  📄 Fetching ALL PODs from object storage: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416,https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee,https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.421519306Z [inf]  📄 Extracted pathname from URL: /loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:10.421521676Z [inf]  📄 Processing 3 POD document(s):
+2025-10-07T12:56:10.421527364Z [inf]  📄 Private object dir (raw): gs://loadtracker_documents/private
+2025-10-07T12:56:10.421534475Z [inf]  📄 Converted gs:// to / format: /loadtracker_documents/private
+2025-10-07T12:56:10.421537922Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-10-07T12:56:10.421541166Z [inf]  📄 Checking if pathname starts with dir: {
+2025-10-07T12:56:10.421548347Z [inf]    rawObjectPath: '/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416',
+2025-10-07T12:56:10.421554874Z [inf]    objectEntityDir: '/loadtracker_documents/private/'
+2025-10-07T12:56:10.421562976Z [err]      at Util.parseHttpRespBody (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:222:38)
+2025-10-07T12:56:10.421566157Z [err]    code: 400,
+2025-10-07T12:56:10.421572734Z [err]      at Util.handleResp (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:162:30)
+2025-10-07T12:56:10.421573551Z [err]        prefinish: [Function: prefinish],
+2025-10-07T12:56:10.421577345Z [err]    errors: [
+2025-10-07T12:56:10.421578690Z [err]        message: "Invalid bucket name: 'gs:'",
+2025-10-07T12:56:10.421582616Z [err]      at file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:552:22
+2025-10-07T12:56:10.421584555Z [err]        finish: undefined,
+2025-10-07T12:56:10.421585021Z [err]      {
+2025-10-07T12:56:10.421594222Z [err]      at onResponse (/app/node_modules/retry-request/index.js:259:7)
+2025-10-07T12:56:10.421596729Z [err]        drain: undefined,
+2025-10-07T12:56:10.421598322Z [err]        domain: 'global',
+2025-10-07T12:56:10.421605107Z [err]      at /app/node_modules/teeny-request/build/src/index.js:226:13
+2025-10-07T12:56:10.421613010Z [err]      _events: {
+2025-10-07T12:56:10.421617285Z [err]        reason: 'invalid'
+2025-10-07T12:56:10.421620960Z [err]        data: [Function (anonymous)],
+2025-10-07T12:56:10.421623448Z [err]        close: undefined,
+2025-10-07T12:56:10.421629417Z [err]        end: [Function (anonymous)],
+2025-10-07T12:56:10.421631597Z [err]        error: [Array],
+2025-10-07T12:56:10.421637784Z [err]        readable: undefined,
+2025-10-07T12:56:10.421644491Z [err]      }
+2025-10-07T12:56:10.421645181Z [err]        unpipe: undefined
+2025-10-07T12:56:10.421657809Z [err]    ],
+2025-10-07T12:56:10.421659856Z [err]      },
+2025-10-07T12:56:10.421665670Z [err]    response: PassThrough {
+2025-10-07T12:56:10.422413776Z [err]      _readableState: ReadableState {
+2025-10-07T12:56:10.422424016Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:10.422432075Z [err]        buffer: [],
+2025-10-07T12:56:10.422439779Z [err]        bufferIndex: 0,
+2025-10-07T12:56:10.423677701Z [err]        length: 0,
+2025-10-07T12:56:10.423687603Z [err]        pipes: [],
+2025-10-07T12:56:10.423694678Z [err]        awaitDrainWriters: null,
+2025-10-07T12:56:10.423701124Z [err]        [Symbol(kState)]: 194512764
+2025-10-07T12:56:10.423706804Z [err]      },
+2025-10-07T12:56:10.423712626Z [err]      _writableState: WritableState {
+2025-10-07T12:56:10.423718855Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:10.423725495Z [err]        length: 0,
+2025-10-07T12:56:10.423730375Z [err]        corked: 0,
+2025-10-07T12:56:10.423735518Z [err]        onwrite: [Function: bound onwrite],
+2025-10-07T12:56:10.423741672Z [err]        writelen: 0,
+2025-10-07T12:56:10.423748476Z [err]        bufferedIndex: 0,
+2025-10-07T12:56:10.423755393Z [err]        pendingcb: 0,
+2025-10-07T12:56:10.423761043Z [err]        [Symbol(kState)]: 1091466620,
+2025-10-07T12:56:10.423767752Z [err]        [Symbol(kBufferedValue)]: null,
+2025-10-07T12:56:10.423773152Z [err]        [Symbol(kWriteCbValue)]: null
+2025-10-07T12:56:10.423779571Z [err]      },
+2025-10-07T12:56:10.423785153Z [err]      allowHalfOpen: true,
+2025-10-07T12:56:10.423790792Z [err]      _maxListeners: undefined,
+2025-10-07T12:56:10.423798753Z [err]      _eventsCount: 4,
+2025-10-07T12:56:10.423801109Z [err]        length: 0,
+2025-10-07T12:56:10.423805969Z [err]      statusCode: 400,
+2025-10-07T12:56:10.423815389Z [err]      statusMessage: 'Bad Request',
+2025-10-07T12:56:10.423817019Z [err]        pipes: [],
+2025-10-07T12:56:10.423826350Z [err]      allowHalfOpen: true,
+2025-10-07T12:56:10.423827783Z [err]      request: {
+2025-10-07T12:56:10.423829093Z [err]        awaitDrainWriters: null,
+2025-10-07T12:56:10.423839878Z [err]        agent: [Agent],
+2025-10-07T12:56:10.423840416Z [err]      _maxListeners: undefined,
+2025-10-07T12:56:10.423840754Z [err]        readable: undefined,
+2025-10-07T12:56:10.423842257Z [err]        [Symbol(kState)]: 194512764
+2025-10-07T12:56:10.423851508Z [err]      _eventsCount: 4,
+2025-10-07T12:56:10.423854520Z [err]      },
+2025-10-07T12:56:10.423855750Z [err]        headers: [Object],
+2025-10-07T12:56:10.423856868Z [err]        '    "code": 400,\n' +
+2025-10-07T12:56:10.423858187Z [err]        unpipe: undefined
+2025-10-07T12:56:10.423864933Z [err]      statusCode: 400,
+2025-10-07T12:56:10.423866554Z [err]      _writableState: WritableState {
+2025-10-07T12:56:10.423867509Z [err]        href: 'https://storage.googleapis.com/storage/v1/b/gs:/o/%2Floadtracker_documents%2Fprivate%2Fuploads%2Fe2fff6ad-1219-4123-82ef-defb4684e416?'
+2025-10-07T12:56:10.423871540Z [err]      },
+2025-10-07T12:56:10.423872811Z [err]        `    "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:10.423878357Z [err]      },
+2025-10-07T12:56:10.423879925Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:10.423884348Z [err]        '    "errors": [\n' +
+2025-10-07T12:56:10.423889233Z [err]      _readableState: ReadableState {
+2025-10-07T12:56:10.423891130Z [err]        onwrite: [Function: bound onwrite],
+2025-10-07T12:56:10.423892522Z [err]      body: '{\n' +
+2025-10-07T12:56:10.423892709Z [err]        length: 0,
+2025-10-07T12:56:10.423897635Z [err]        vary: 'Origin, X-Origin',
+2025-10-07T12:56:10.423899142Z [err]        '      {\n' +
+2025-10-07T12:56:10.423902524Z [err]        writelen: 0,
+2025-10-07T12:56:10.423903078Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:10.423906052Z [err]        corked: 0,
+2025-10-07T12:56:10.423906721Z [err]        '  "error": {\n' +
+2025-10-07T12:56:10.423914515Z [err]        'x-guploader-uploadid': 'AAwnv3KQNbZu0zPmqPnGWs81io3ZMurwupl1EJI-iJ--HgPGqv1je48FdKeB409D3yj9q8XVBE1KbAI'
+2025-10-07T12:56:10.423915141Z [err]        buffer: [],
+2025-10-07T12:56:10.423915311Z [err]        bufferedIndex: 0,
+2025-10-07T12:56:10.423918747Z [err]        '    "code": 400,\n' +
+2025-10-07T12:56:10.423920695Z [err]      statusMessage: 'Bad Request',
+2025-10-07T12:56:10.423921912Z [inf]    rawObjectPath: '/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e',
+2025-10-07T12:56:10.423926265Z [err]      at async fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:25)
+2025-10-07T12:56:10.423926380Z [err]        pendingcb: 0,
+2025-10-07T12:56:10.423926658Z [err]      },
+2025-10-07T12:56:10.423927145Z [err]        bufferIndex: 0,
+2025-10-07T12:56:10.423930779Z [err]        `    "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:10.423934707Z [err]      request: {
+2025-10-07T12:56:10.423934901Z [inf]    objectEntityDir: '/loadtracker_documents/private/'
+2025-10-07T12:56:10.423939917Z [err]      toJSON: [Function: toJSON],
+2025-10-07T12:56:10.423940262Z [err]      at async fetchPodSnapshotFromStorage (file:///app/dist/index.js:3310:24)
+2025-10-07T12:56:10.423941974Z [err]        [Symbol(kState)]: 1091466620,
+2025-10-07T12:56:10.423944525Z [err]        '    "errors": [\n' +
+2025-10-07T12:56:10.423947595Z [err]        agent: [Agent],
+2025-10-07T12:56:10.423948126Z [inf]  }
+2025-10-07T12:56:10.423948846Z [err]      [Symbol(shapeMode)]: true,
+2025-10-07T12:56:10.423950996Z [err]      at async file:///app/dist/index.js:7736:37
+2025-10-07T12:56:10.423957060Z [err]        '      {\n' +
+2025-10-07T12:56:10.423957554Z [err]      at /app/node_modules/teeny-request/build/src/index.js:226:13
+2025-10-07T12:56:10.423958897Z [err]        [Symbol(kBufferedValue)]: null,
+2025-10-07T12:56:10.423960123Z [err]        headers: [Object],
+2025-10-07T12:56:10.423960261Z [inf]  ✅ Normalized to objects path: /objects/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.423960262Z [err]        message: "Invalid bucket name: 'gs:'",
+2025-10-07T12:56:10.423964867Z [err]  ⚠️ Object storage not configured or available for file access: ApiError: Invalid bucket name: 'gs:'
+2025-10-07T12:56:10.423969569Z [err]        `        "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:10.423969996Z [err]        `        "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:10.423972013Z [err]        [Symbol(kWriteCbValue)]: null
+2025-10-07T12:56:10.423972241Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-10-07T12:56:10.423977441Z [err]        domain: 'global',
+2025-10-07T12:56:10.423979736Z [inf]  📄 Normalized POD path 3: /objects/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.423980703Z [err]        href: 'https://storage.googleapis.com/storage/v1/b/gs:/o/%2Floadtracker_documents%2Fprivate%2Fuploads%2F02d86c8c-89b6-449b-91be-403fce26d8ee?'
+2025-10-07T12:56:10.423983015Z [err]        '  }\n' +
+2025-10-07T12:56:10.423984842Z [err]        '        "domain": "global",\n' +
+2025-10-07T12:56:10.423986063Z [err]        '        "domain": "global",\n' +
+2025-10-07T12:56:10.423986885Z [err]    code: 400,
+2025-10-07T12:56:10.423988490Z [err]      [Symbol(kCapture)]: false,
+2025-10-07T12:56:10.423992201Z [err]        reason: 'invalid'
+2025-10-07T12:56:10.423997332Z [err]      },
+2025-10-07T12:56:10.423997963Z [err]        '        "reason": "invalid"\n' +
+2025-10-07T12:56:10.424001150Z [err]        '        "reason": "invalid"\n' +
+2025-10-07T12:56:10.424001634Z [err]  ❌ Failed to process POD 2 (https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee): Error: Object storage service is not available. Please configure object storage or contact support.
+2025-10-07T12:56:10.424001768Z [err]      [Symbol(kCallback)]: null
+2025-10-07T12:56:10.424001868Z [err]    errors: [
+2025-10-07T12:56:10.424003395Z [err]        '}\n',
+2025-10-07T12:56:10.424006628Z [err]      }
+2025-10-07T12:56:10.424011529Z [err]      body: '{\n' +
+2025-10-07T12:56:10.424011622Z [err]        '      }\n' +
+2025-10-07T12:56:10.424016735Z [err]        '      }\n' +
+2025-10-07T12:56:10.424017151Z [err]      headers: {
+2025-10-07T12:56:10.424018563Z [err]    }
+2025-10-07T12:56:10.424018845Z [err]      {
+2025-10-07T12:56:10.424020692Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:772:17)
+2025-10-07T12:56:10.424021092Z [err]    ],
+2025-10-07T12:56:10.424024867Z [err]        '    ]\n' +
+2025-10-07T12:56:10.424027461Z [err]        '  "error": {\n' +
+2025-10-07T12:56:10.424032260Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-07T12:56:10.424032533Z [err]        '    ]\n' +
+2025-10-07T12:56:10.424033809Z [err]  }
+2025-10-07T12:56:10.424035429Z [err]    response: PassThrough {
+2025-10-07T12:56:10.424037600Z [err]        date: 'Tue, 07 Oct 2025 12:56:07 GMT',
+2025-10-07T12:56:10.424040659Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:56:10.424046420Z [err]      at new ApiError (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:85:15)
+2025-10-07T12:56:10.424046992Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-07T12:56:10.424047830Z [err]        '  }\n' +
+2025-10-07T12:56:10.424047865Z [inf]  🔍 Normalizing object path: https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.424051684Z [err]      _events: {
+2025-10-07T12:56:10.424058486Z [inf]  📄 Processing POD 3/3: https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.424061574Z [err]      at Util.parseHttpRespBody (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:222:38)
+2025-10-07T12:56:10.424062091Z [err]        '}\n',
+2025-10-07T12:56:10.424062192Z [err]        'content-length': '226',
+2025-10-07T12:56:10.424062396Z [inf]  📄 Extracted pathname from URL: /loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.424063116Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-07T12:56:10.424063479Z [err]        close: undefined,
+2025-10-07T12:56:10.424074215Z [err]      at Util.handleResp (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:162:30)
+2025-10-07T12:56:10.424074659Z [inf]  📄 Private object dir (raw): gs://loadtracker_documents/private
+2025-10-07T12:56:10.424074924Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-07T12:56:10.424075865Z [err]      headers: {
+2025-10-07T12:56:10.424082179Z [inf]  📄 Converted gs:// to / format: /loadtracker_documents/private
+2025-10-07T12:56:10.424105151Z [inf]  📄 Checking if pathname starts with dir: {
+2025-10-07T12:56:10.424118245Z [err]        pragma: 'no-cache',
+2025-10-07T12:56:10.424126840Z [err]        server: 'UploadServer',
+2025-10-07T12:56:10.424128257Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-07T12:56:10.424136894Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-07T12:56:10.424140001Z [err]      at file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:552:22
+2025-10-07T12:56:10.424150294Z [err]        'content-length': '226',
+2025-10-07T12:56:10.424153601Z [err]      at onResponse (/app/node_modules/retry-request/index.js:259:7)
+2025-10-07T12:56:10.424160636Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-07T12:56:10.424165501Z [err]        date: 'Tue, 07 Oct 2025 12:56:07 GMT',
+2025-10-07T12:56:10.424172508Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-07T12:56:10.424179114Z [err]        pragma: 'no-cache',
+2025-10-07T12:56:10.424185919Z [err]        error: [Array],
+2025-10-07T12:56:10.424189241Z [err]        server: 'UploadServer',
+2025-10-07T12:56:10.424199179Z [err]        prefinish: [Function: prefinish],
+2025-10-07T12:56:10.424204285Z [err]        vary: 'Origin, X-Origin',
+2025-10-07T12:56:10.424207170Z [err]      },
+2025-10-07T12:56:10.424214359Z [err]        finish: undefined,
+2025-10-07T12:56:10.424217956Z [err]        'x-guploader-uploadid': 'AAwnv3JmpypHXxG2sAnFJDLUe_4P8FMXUrgryWkbI4SqldSFoeb4ej2C0XW8eC8lARf3INhZ2GlZobY'
+2025-10-07T12:56:10.424222268Z [err]        drain: undefined,
+2025-10-07T12:56:10.424229613Z [err]      },
+2025-10-07T12:56:10.424230575Z [err]        data: [Function (anonymous)],
+2025-10-07T12:56:10.424238897Z [err]      toJSON: [Function: toJSON],
+2025-10-07T12:56:10.424239147Z [err]        end: [Function (anonymous)],
+2025-10-07T12:56:10.424248289Z [err]      [Symbol(shapeMode)]: true,
+2025-10-07T12:56:10.424248605Z [err]        readable: undefined,
+2025-10-07T12:56:10.424254239Z [err]        unpipe: undefined
+2025-10-07T12:56:10.424260792Z [err]      [Symbol(kCapture)]: false,
+2025-10-07T12:56:10.424263496Z [err]      },
+2025-10-07T12:56:10.424272036Z [err]      _readableState: ReadableState {
+2025-10-07T12:56:10.424274764Z [err]      [Symbol(kCallback)]: null
+2025-10-07T12:56:10.424280028Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:10.424285071Z [err]    }
+2025-10-07T12:56:10.424287953Z [err]        buffer: [],
+2025-10-07T12:56:10.424296328Z [err]        bufferIndex: 0,
+2025-10-07T12:56:10.424300201Z [err]  }
+2025-10-07T12:56:10.424305290Z [err]        length: 0,
+2025-10-07T12:56:10.424310450Z [err]  ❌ Failed to process POD 1 (https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416): Error: Object storage service is not available. Please configure object storage or contact support.
+2025-10-07T12:56:10.424313690Z [err]        pipes: [],
+2025-10-07T12:56:10.424322550Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:772:17)
+2025-10-07T12:56:10.424322709Z [err]        awaitDrainWriters: null,
+2025-10-07T12:56:10.424333813Z [err]        [Symbol(kState)]: 194512764
+2025-10-07T12:56:10.424336702Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:56:10.424346352Z [err]      },
+2025-10-07T12:56:10.424351029Z [err]      at async fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:25)
+2025-10-07T12:56:10.424358534Z [err]      _writableState: WritableState {
+2025-10-07T12:56:10.424366018Z [err]      at async fetchPodSnapshotFromStorage (file:///app/dist/index.js:3310:24)
+2025-10-07T12:56:10.424369977Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:10.424376075Z [err]      at async file:///app/dist/index.js:7736:37
+2025-10-07T12:56:10.424383861Z [err]        length: 0,
+2025-10-07T12:56:10.424390793Z [inf]  📄 Processing POD 2/3: https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:10.424394248Z [err]        corked: 0,
+2025-10-07T12:56:10.424404024Z [inf]  🔍 Normalizing object path: https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:10.424406742Z [err]        onwrite: [Function: bound onwrite],
+2025-10-07T12:56:10.424418395Z [err]        writelen: 0,
+2025-10-07T12:56:10.424420165Z [inf]  📄 Extracted pathname from URL: /loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:10.424435278Z [inf]  📄 Private object dir (raw): gs://loadtracker_documents/private
+2025-10-07T12:56:10.424435437Z [err]        bufferedIndex: 0,
+2025-10-07T12:56:10.424447752Z [err]        pendingcb: 0,
+2025-10-07T12:56:10.424450751Z [inf]  📄 Converted gs:// to / format: /loadtracker_documents/private
+2025-10-07T12:56:10.424458645Z [err]        [Symbol(kState)]: 1091466620,
+2025-10-07T12:56:10.424463588Z [inf]  📄 Checking if pathname starts with dir: {
+2025-10-07T12:56:10.424470497Z [inf]    rawObjectPath: '/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee',
+2025-10-07T12:56:10.424476971Z [inf]    objectEntityDir: '/loadtracker_documents/private/'
+2025-10-07T12:56:10.424483131Z [inf]  }
+2025-10-07T12:56:10.424489671Z [inf]  ✅ Normalized to objects path: /objects/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:10.424496087Z [inf]  📄 Normalized POD path 2: /objects/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:10.424503095Z [err]  ⚠️ Object storage not configured or available for file access: ApiError: Invalid bucket name: 'gs:'
+2025-10-07T12:56:10.424510450Z [err]      at new ApiError (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:85:15)
+2025-10-07T12:56:10.424517349Z [err]      at Util.parseHttpRespBody (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:222:38)
+2025-10-07T12:56:10.424524138Z [err]      at Util.handleResp (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:162:30)
+2025-10-07T12:56:10.424537045Z [err]      at file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:552:22
+2025-10-07T12:56:10.424544233Z [err]      at onResponse (/app/node_modules/retry-request/index.js:259:7)
+2025-10-07T12:56:10.424558346Z [err]      at /app/node_modules/teeny-request/build/src/index.js:226:13
+2025-10-07T12:56:10.424567017Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-10-07T12:56:10.424574021Z [err]    code: 400,
+2025-10-07T12:56:10.424581750Z [err]    errors: [
+2025-10-07T12:56:10.424588753Z [err]      {
+2025-10-07T12:56:10.424595261Z [err]        message: "Invalid bucket name: 'gs:'",
+2025-10-07T12:56:10.424602522Z [err]        domain: 'global',
+2025-10-07T12:56:10.424608866Z [err]        reason: 'invalid'
+2025-10-07T12:56:10.424619207Z [err]      }
+2025-10-07T12:56:10.424625522Z [err]    ],
+2025-10-07T12:56:10.424631736Z [err]    response: PassThrough {
+2025-10-07T12:56:10.424638342Z [err]      _events: {
+2025-10-07T12:56:10.424644187Z [err]        close: undefined,
+2025-10-07T12:56:10.424650283Z [err]        error: [Array],
+2025-10-07T12:56:10.424657451Z [err]        prefinish: [Function: prefinish],
+2025-10-07T12:56:10.424663662Z [err]        finish: undefined,
+2025-10-07T12:56:10.424671365Z [err]        drain: undefined,
+2025-10-07T12:56:10.424678270Z [err]        data: [Function (anonymous)],
+2025-10-07T12:56:10.424684408Z [err]        end: [Function (anonymous)],
+2025-10-07T12:56:10.426463322Z [err]        [Symbol(kBufferedValue)]: null,
+2025-10-07T12:56:10.426496731Z [err]        [Symbol(kWriteCbValue)]: null
+2025-10-07T12:56:10.426503027Z [err]      },
+2025-10-07T12:56:10.426507166Z [err]      allowHalfOpen: true,
+2025-10-07T12:56:10.426511103Z [err]      _maxListeners: undefined,
+2025-10-07T12:56:10.426515176Z [err]      _eventsCount: 4,
+2025-10-07T12:56:10.426519112Z [err]      statusCode: 400,
+2025-10-07T12:56:10.426523095Z [err]      statusMessage: 'Bad Request',
+2025-10-07T12:56:10.426527229Z [err]      request: {
+2025-10-07T12:56:10.426531028Z [err]        agent: [Agent],
+2025-10-07T12:56:10.426535030Z [err]        headers: [Object],
+2025-10-07T12:56:10.426538994Z [err]        href: 'https://storage.googleapis.com/storage/v1/b/gs:/o/%2Floadtracker_documents%2Fprivate%2Fuploads%2F822ad877-1fd8-4964-a1c2-a7d8497d716e?'
+2025-10-07T12:56:10.426543568Z [err]      },
+2025-10-07T12:56:10.426547671Z [err]      body: '{\n' +
+2025-10-07T12:56:10.426551551Z [err]        '  "error": {\n' +
+2025-10-07T12:56:10.426555403Z [err]        '    "code": 400,\n' +
+2025-10-07T12:56:10.426559319Z [err]        `    "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:10.426563210Z [err]        '    "errors": [\n' +
+2025-10-07T12:56:10.426567558Z [err]        '      {\n' +
+2025-10-07T12:56:10.426571875Z [err]        `        "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:10.426575865Z [err]        '        "domain": "global",\n' +
+2025-10-07T12:56:10.426579782Z [err]        '        "reason": "invalid"\n' +
+2025-10-07T12:56:10.426585840Z [err]        '      }\n' +
+2025-10-07T12:56:10.426589888Z [err]        '    ]\n' +
+2025-10-07T12:56:10.426593734Z [err]        '  }\n' +
+2025-10-07T12:56:10.426597538Z [err]        '}\n',
+2025-10-07T12:56:10.426601383Z [err]      headers: {
+2025-10-07T12:56:10.426606916Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-07T12:56:10.426610720Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-07T12:56:10.426614671Z [err]        'content-length': '226',
+2025-10-07T12:56:10.426618610Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-07T12:56:10.426622337Z [err]        date: 'Tue, 07 Oct 2025 12:56:07 GMT',
+2025-10-07T12:56:10.426626274Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-07T12:56:10.426630007Z [err]        pragma: 'no-cache',
+2025-10-07T12:56:10.426633638Z [err]        server: 'UploadServer',
+2025-10-07T12:56:10.426639027Z [err]        vary: 'Origin, X-Origin',
+2025-10-07T12:56:10.426644872Z [err]        'x-guploader-uploadid': 'AAwnv3LXfydBAUIRVxOA_y1GCb6IMchiY3jYzezmShVqwlOKo8Quk7XSAfmLq9yxLXsl3AxaQo8a4K0'
+2025-10-07T12:56:10.426648797Z [err]      },
+2025-10-07T12:56:10.426652242Z [err]      toJSON: [Function: toJSON],
+2025-10-07T12:56:10.426655797Z [err]      [Symbol(shapeMode)]: true,
+2025-10-07T12:56:10.426659406Z [err]      [Symbol(kCapture)]: false,
+2025-10-07T12:56:10.426663180Z [err]      [Symbol(kCallback)]: null
+2025-10-07T12:56:10.426667973Z [err]    }
+2025-10-07T12:56:10.426671986Z [err]  }
+2025-10-07T12:56:10.426676636Z [inf]  ✅ Successfully processed 0/3 POD documents
+2025-10-07T12:56:10.426680187Z [err]  ❌ Failed to process POD 3 (https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e): Error: Object storage service is not available. Please configure object storage or contact support.
+2025-10-07T12:56:10.426683941Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:772:17)
+2025-10-07T12:56:10.426687505Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:56:10.426691519Z [err]      at async fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:25)
+2025-10-07T12:56:10.426695568Z [err]      at async fetchPodSnapshotFromStorage (file:///app/dist/index.js:3310:24)
+2025-10-07T12:56:10.426699576Z [err]      at async file:///app/dist/index.js:7736:37
+2025-10-07T12:56:10.426704135Z [err]  ❌ CRITICAL: POD snapshot returned NULL for 6022337
+2025-10-07T12:56:10.426708467Z [err]     This means the invoice will be created WITHOUT the POD image!
+2025-10-07T12:56:10.426712027Z [err]     URL attempted: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416,https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee,https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:10.426715764Z [inf]  Auto-generated invoice GO5254 for load 6022337
+2025-10-07T12:56:10.426719229Z [inf]  📋 Load 8461acb8-29b3-4f9c-9602-429694eec066 stays in AWAITING_INVOICING - invoice ready to be emailed
+2025-10-07T12:56:10.426722891Z [inf]  12:56:07 PM [express] PATCH /api/loads/8461acb8-29b3-4f9c-9602-429694eec066/pod 200 in 453ms :: {"id"…
+2025-10-07T12:56:15.176324325Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-07T12:56:15.176331244Z [inf]    role: 'driver',
+2025-10-07T12:56:15.176340268Z [inf]    userId: '9a29c4bf-7ef7-4a1a-b2e0-e0f486439e35',
+2025-10-07T12:56:15.176346291Z [inf]    lastName: 'Owen',
+2025-10-07T12:56:15.176351378Z [inf]    username: 'Kowen',
+2025-10-07T12:56:15.176355587Z [inf]    firstName: 'Kevin'
+2025-10-07T12:56:15.176360400Z [inf]  }
+2025-10-07T12:56:15.176364519Z [inf]  12:56:15 PM [express] GET /api/auth/driver-user 304 in 3ms :: {"id":"9a29c4bf-7ef7-4a1a-b2e0-e0f48643…
+2025-10-07T12:56:15.184811644Z [inf]  Authentication failed: No user or expiration
+2025-10-07T12:56:15.184823166Z [inf]  12:56:15 PM [express] GET /api/auth/user 401 in 34ms :: {"message":"Unauthorized"}
+2025-10-07T12:56:15.216529391Z [inf]  Admin user check: {
+2025-10-07T12:56:15.216534379Z [inf]    hasSession: true,
+2025-10-07T12:56:15.216538986Z [inf]    hasAdminAuth: true,
+2025-10-07T12:56:15.216543665Z [inf]    sessionId: 'bX5yar6OHSvJNppg4cZ07j9fdMYpLQsH',
+2025-10-07T12:56:15.216547836Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-07T12:56:15.216552299Z [inf]    adminAuthData: {
+2025-10-07T12:56:15.216557983Z [inf]      id: 'admin-001',
+2025-10-07T12:56:15.216567497Z [inf]      role: 'admin',
+2025-10-07T12:56:15.216571774Z [inf]      lastName: 'User',
+2025-10-07T12:56:15.216575907Z [inf]      username: 'admin',
+2025-10-07T12:56:15.216580733Z [inf]      firstName: 'Admin'
+2025-10-07T12:56:15.216590217Z [inf]    },
+2025-10-07T12:56:15.216595644Z [inf]    hasBypassToken: false
+2025-10-07T12:56:15.216601388Z [inf]  }
+2025-10-07T12:56:15.219866895Z [inf]  12:56:15 PM [express] GET /api/auth/admin-user 304 in 4ms :: {"id":"admin-001","role":"admin","lastNa…
+2025-10-07T12:56:15.340802884Z [inf]  12:56:15 PM [express] GET /api/invoices 200 in 8ms :: [{"id":"7b9b955d-7f7a-48e7-8a46-f6ff49169601","…
+2025-10-07T12:56:15.349659899Z [inf]  12:56:15 PM [express] GET /api/locations 304 in 20ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01"…
+2025-10-07T12:56:15.368061324Z [inf]  12:56:15 PM [express] GET /api/drivers/available 304 in 9ms :: [{"id":"f920c664-fb37-496e-af76-1f0a43…
+2025-10-07T12:56:15.403199680Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:56:15.403206253Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:56:15.403210487Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:56:15.403214914Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:56:15.403219052Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:56:15.403223107Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:56:15.403227058Z [inf]  12:56:15 PM [express] GET /api/customers 304 in 9ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-07T12:56:15.412505090Z [inf]  Bypass check: {
+2025-10-07T12:56:15.412510987Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:56:15.412515729Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:56:15.412519693Z [inf]    isActive: true
+2025-10-07T12:56:15.412523622Z [inf]  }
+2025-10-07T12:56:15.412527477Z [inf]  Dashboard stats auth check: {
+2025-10-07T12:56:15.412531538Z [inf]    hasAdminAuth: true,
+2025-10-07T12:56:15.412536502Z [inf]    hasReplitAuth: false,
+2025-10-07T12:56:15.412540871Z [inf]    hasTokenBypass: true,
+2025-10-07T12:56:15.412544891Z [inf]    headers: [
+2025-10-07T12:56:15.412549203Z [inf]      'host',                 'user-agent',
+2025-10-07T12:56:15.412553130Z [inf]      'accept',               'accept-encoding',
+2025-10-07T12:56:15.412557297Z [inf]      'accept-language',      'cookie',
+2025-10-07T12:56:15.412561097Z [inf]      'if-none-match',        'referer',
+2025-10-07T12:56:15.412565571Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-07T12:56:15.412569366Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-07T12:56:15.412573309Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-07T12:56:15.412577188Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-07T12:56:15.412581111Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-07T12:56:15.412585678Z [inf]      'x-request-start'
+2025-10-07T12:56:15.412589577Z [inf]    ],
+2025-10-07T12:56:15.412593620Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-07T12:56:15.412597142Z [inf]  }
+2025-10-07T12:56:15.415704374Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:56:15.415711380Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:56:15.415715689Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:56:15.419483879Z [inf]  12:56:15 PM [express] GET /api/loads 200 in 24ms :: [{"id":"8461acb8-29b3-4f9c-9602-429694eec066","nu…
+2025-10-07T12:56:15.419493133Z [inf]  12:56:15 PM [express] GET /api/dashboard/stats 200 in 24ms :: {"activeLoads":"3","inTransit":"0","del…
+2025-10-07T12:56:35.450594303Z [inf]  Bypass check: {
+2025-10-07T12:56:35.450600966Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:56:35.450606437Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:56:35.450611982Z [inf]    isActive: true
+2025-10-07T12:56:35.450617509Z [inf]  }
+2025-10-07T12:56:35.450623026Z [inf]  12:56:27 PM [express] GET /api/loads/8461acb8-29b3-4f9c-9602-429694eec066 200 in 43ms :: {"id":"8461a…
+2025-10-07T12:56:35.450628318Z [inf]  Bypass check: {
+2025-10-07T12:56:35.450633690Z [inf]    token: '[MISSING]',
+2025-10-07T12:56:35.450640611Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:56:35.450646134Z [inf]    isActive: false
+2025-10-07T12:56:35.450651626Z [inf]  }
+2025-10-07T12:56:35.450657246Z [inf]  12:56:27 PM [express] GET /api/loads/8461acb8-29b3-4f9c-9602-429694eec066/stops 401 in 3ms :: {"messa…
+2025-10-07T12:56:35.450662380Z [inf]  12:56:27 PM [express] GET /api/customers 304 in 5ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-07T12:56:43.624254806Z [inf]  12:56:43 PM [express] PATCH /api/loads/8461acb8-29b3-4f9c-9602-429694eec066/financials 200 in 36ms ::…
+2025-10-07T12:56:43.696830943Z [inf]  Bypass check: {
+2025-10-07T12:56:43.696838062Z [inf]    token: '[PROVIDED]',
+2025-10-07T12:56:43.696844119Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-07T12:56:43.696850200Z [inf]    isActive: true
+2025-10-07T12:56:43.696856362Z [inf]  }
+2025-10-07T12:56:43.696864341Z [inf]  Invoice update auth check: {
+2025-10-07T12:56:43.696870975Z [inf]    hasAdminAuth: true,
+2025-10-07T12:56:43.696877094Z [inf]    hasReplitAuth: false,
+2025-10-07T12:56:43.696883145Z [inf]    hasTokenBypass: true,
+2025-10-07T12:56:43.696888924Z [inf]    hasAuth: true
+2025-10-07T12:56:43.696895098Z [inf]  }
+2025-10-07T12:56:43.696901534Z [inf]  ✅ Invoice GO5254 updated with new charges: {
+2025-10-07T12:56:43.696907697Z [inf]    flatRate: '3000.00',
+2025-10-07T12:56:43.696915420Z [inf]    lumperCharge: '126.47',
+2025-10-07T12:56:43.696921772Z [inf]    extraStopsCharge: '0.00',
+2025-10-07T12:56:43.696927740Z [inf]    totalAmount: '3126.47'
+2025-10-07T12:56:43.696933772Z [inf]  }
+2025-10-07T12:56:43.696942246Z [inf]  12:56:43 PM [express] PATCH /api/loads/8461acb8-29b3-4f9c-9602-429694eec066/update-invoice 200 in 18m…
+2025-10-07T12:56:43.770271982Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:56:43.770280837Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:56:43.770287539Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:56:43.770293652Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:56:43.770299876Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:56:43.770316965Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:56:43.770323817Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:56:43.770331363Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:56:43.770337343Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:56:43.773545919Z [inf]  12:56:43 PM [express] GET /api/loads 200 in 10ms :: [{"id":"8461acb8-29b3-4f9c-9602-429694eec066","nu…
+2025-10-07T12:56:43.846455980Z [inf]  12:56:43 PM [express] GET /api/invoices 200 in 9ms :: [{"id":"7b9b955d-7f7a-48e7-8a46-f6ff49169601","…
+2025-10-07T12:56:43.912392785Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-07T12:56:43.912401645Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-07T12:56:43.912407766Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-07T12:56:43.912413829Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-07T12:56:43.912418567Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-07T12:56:43.912422462Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-07T12:56:43.912426674Z [inf]  📋 ADMIN: Returning 3 loads
+2025-10-07T12:56:43.912430672Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 3 loads
+2025-10-07T12:56:43.912434728Z [inf]  🔥 RETURNING: 3 loads
+2025-10-07T12:56:43.912438357Z [inf]  12:56:43 PM [express] GET /api/loads 200 in 9ms :: [{"id":"8461acb8-29b3-4f9c-9602-429694eec066","num…
+2025-10-07T12:56:46.859523928Z [inf]  🔥 PRINT-PREVIEW ENDPOINT HIT! Invoice ID: GO5254
+2025-10-07T12:56:46.859528186Z [inf]  🔥 Request body: { loadId: '8461acb8-29b3-4f9c-9602-429694eec066' }
+2025-10-07T12:56:46.859532290Z [inf]  🔥 Headers: { auth: 'BYPASS_PROVIDED', contentType: 'application/json' }
+2025-10-07T12:56:46.859536170Z [inf]  🔥 Auth check result: { hasAuth: true }
+2025-10-07T12:56:46.859540091Z [inf]  🚀 SERVER: Print preview API called for invoice: GO5254
+2025-10-07T12:56:46.859544463Z [inf]  🚀 SERVER: Request body: { loadId: '8461acb8-29b3-4f9c-9602-429694eec066' }
+2025-10-07T12:56:46.859548543Z [inf]  🚀 SERVER: Request headers: { auth: 'BYPASS' }
+2025-10-07T12:56:46.859552566Z [inf]  🔍 Looking up invoice: GO5254
+2025-10-07T12:56:46.859557732Z [inf]  🖨️ POD Status for preview: {
+2025-10-07T12:56:46.859562701Z [inf]    loadNumber: '6022337',
+2025-10-07T12:56:46.859566719Z [inf]    loadId: '8461acb8-29b3-4f9c-9602-429694eec066',
+2025-10-07T12:56:46.859570860Z [inf]    podDocumentPath: 'https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416,https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee,https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e',
+2025-10-07T12:56:46.859574916Z [inf]    hasPOD: true,
+2025-10-07T12:56:46.859579182Z [inf]    createdAt: 2025-10-07T12:54:36.705Z,
+2025-10-07T12:56:46.859582984Z [inf]    updatedAt: 2025-10-07T12:56:43.582Z
+2025-10-07T12:56:46.859586926Z [inf]  }
+2025-10-07T12:56:46.859590918Z [inf]  🔍 DATABASE DEBUG: Current DATABASE_URL environment: {
+2025-10-07T12:56:46.859595214Z [inf]    hasDbUrl: true,
+2025-10-07T12:56:46.859599628Z [inf]    dbUrlPrefix: 'postgresql://postgres:bqmYaNgBsxAuTWFmYjuyEczERHPI',
+2025-10-07T12:56:46.859603646Z [inf]    nodeEnv: 'production'
+2025-10-07T12:56:46.859607734Z [inf]  }
+2025-10-07T12:56:46.859611655Z [inf]  🔍 DATABASE DEBUG: Checking all loads in current database...
+2025-10-07T12:56:46.859615744Z [inf]  🔍 DATABASE DEBUG: Found 3 total loads in database
+2025-10-07T12:56:46.859619563Z [inf]  ❌ LOAD 109-41936 NOT FOUND IN DATABASE! Available loads: [
+2025-10-07T12:56:46.859623412Z [inf]    {
+2025-10-07T12:56:46.859627437Z [inf]      id: '8461acb8-29b3-4f9c-9602-429694eec066',
+2025-10-07T12:56:46.859631108Z [inf]      number109: '6022337',
+2025-10-07T12:56:46.859638093Z [inf]      podPath: 'https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416,https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee,https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e'
+2025-10-07T12:56:46.859644293Z [inf]    },
+2025-10-07T12:56:46.859648568Z [inf]    {
+2025-10-07T12:56:46.859652479Z [inf]      id: '6986abbf-cf60-4761-9441-733a4f48b85b',
+2025-10-07T12:56:46.859656443Z [inf]      number109: '109-39834',
+2025-10-07T12:56:46.859660715Z [inf]      podPath: null
+2025-10-07T12:56:46.859664331Z [inf]    },
+2025-10-07T12:56:46.859668630Z [inf]    {
+2025-10-07T12:56:46.859672329Z [inf]      id: 'ac83116e-86ee-4ab8-8761-43680b0b15e4',
+2025-10-07T12:56:46.859675959Z [inf]      number109: '6022058',
+2025-10-07T12:56:46.859679844Z [inf]      podPath: '/gs://loadtracker_documents/private/uploads/49e1c47b-a147-4bd7-b0ed-92e16c9cb9b4,/gs://loadtracker_documents/private/uploads/7658b445-8759-430b-b5d4-d3d87846a223,/gs://loadtracker_documents/private/uploads/a538019f-e046-474d-82ec-cfcd9bca0716'
+2025-10-07T12:56:46.859683975Z [inf]    }
+2025-10-07T12:56:46.859687865Z [inf]  ]
+2025-10-07T12:56:46.859692022Z [inf]  📄 Getting ALL POD snapshots - checking BOTH stored snapshots AND object storage...
+2025-10-07T12:56:46.859695933Z [inf]  🔍 Also checking object storage for additional PODs...
+2025-10-07T12:56:46.859749721Z [inf]  📄 Fetching ALL PODs from object storage: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416,https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee,https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:46.859756075Z [inf]  📄 Processing 3 POD document(s):
+2025-10-07T12:56:46.859762677Z [inf]    1. https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:46.859768041Z [inf]    2. https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:46.859772370Z [inf]    3. https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:46.859776244Z [inf]  📄 Processing POD 1/3: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:46.859783328Z [inf]  🔍 Normalizing object path: https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:46.859787268Z [inf]  📄 Extracted pathname from URL: /loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:46.859791071Z [inf]  📄 Private object dir (raw): gs://loadtracker_documents/private
+2025-10-07T12:56:46.859794873Z [inf]  📄 Converted gs:// to / format: /loadtracker_documents/private
+2025-10-07T12:56:46.859799235Z [inf]  📄 Checking if pathname starts with dir: {
+2025-10-07T12:56:46.859803115Z [inf]    rawObjectPath: '/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416',
+2025-10-07T12:56:46.859806764Z [inf]    objectEntityDir: '/loadtracker_documents/private/'
+2025-10-07T12:56:46.859810860Z [inf]  }
+2025-10-07T12:56:46.859814905Z [inf]  ✅ Normalized to objects path: /objects/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:46.859819033Z [inf]  📄 Normalized POD path 1: /objects/uploads/e2fff6ad-1219-4123-82ef-defb4684e416
+2025-10-07T12:56:46.931987495Z [err]  ⚠️ Object storage not configured or available for file access: ApiError: Invalid bucket name: 'gs:'
+2025-10-07T12:56:46.931996577Z [err]      at new ApiError (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:85:15)
+2025-10-07T12:56:46.932003133Z [err]      at Util.parseHttpRespBody (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:222:38)
+2025-10-07T12:56:46.932008713Z [err]      at Util.handleResp (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:162:30)
+2025-10-07T12:56:46.932013991Z [err]      at file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:552:22
+2025-10-07T12:56:46.932019958Z [err]      at onResponse (/app/node_modules/retry-request/index.js:259:7)
+2025-10-07T12:56:46.932025188Z [err]      at /app/node_modules/teeny-request/build/src/index.js:226:13
+2025-10-07T12:56:46.932030630Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-10-07T12:56:46.932036145Z [err]    code: 400,
+2025-10-07T12:56:46.932044285Z [err]    errors: [
+2025-10-07T12:56:46.932050043Z [err]      {
+2025-10-07T12:56:46.932055883Z [err]        message: "Invalid bucket name: 'gs:'",
+2025-10-07T12:56:46.932061925Z [err]        domain: 'global',
+2025-10-07T12:56:46.932067483Z [err]        reason: 'invalid'
+2025-10-07T12:56:46.932072944Z [err]      }
+2025-10-07T12:56:46.932078398Z [err]    ],
+2025-10-07T12:56:46.932083131Z [err]    response: PassThrough {
+2025-10-07T12:56:46.932105346Z [err]      _events: {
+2025-10-07T12:56:46.932111361Z [err]        close: undefined,
+2025-10-07T12:56:46.932116778Z [err]        error: [Array],
+2025-10-07T12:56:46.932122603Z [err]        prefinish: [Function: prefinish],
+2025-10-07T12:56:46.932126978Z [err]        finish: undefined,
+2025-10-07T12:56:46.932130957Z [err]        drain: undefined,
+2025-10-07T12:56:46.932739455Z [err]        data: [Function (anonymous)],
+2025-10-07T12:56:46.932746145Z [err]        end: [Function (anonymous)],
+2025-10-07T12:56:46.932750364Z [err]        readable: undefined,
+2025-10-07T12:56:46.932754482Z [err]        unpipe: undefined
+2025-10-07T12:56:46.932758354Z [err]      },
+2025-10-07T12:56:46.932764234Z [err]      _readableState: ReadableState {
+2025-10-07T12:56:46.932768346Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:46.932772307Z [err]        buffer: [],
+2025-10-07T12:56:46.932776688Z [err]        bufferIndex: 0,
+2025-10-07T12:56:46.932780766Z [err]        length: 0,
+2025-10-07T12:56:46.932786575Z [err]        pipes: [],
+2025-10-07T12:56:46.932790602Z [err]        awaitDrainWriters: null,
+2025-10-07T12:56:46.932794431Z [err]        [Symbol(kState)]: 194512764
+2025-10-07T12:56:46.932798380Z [err]      },
+2025-10-07T12:56:46.932802906Z [err]      _writableState: WritableState {
+2025-10-07T12:56:46.932807104Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:46.932810939Z [err]        length: 0,
+2025-10-07T12:56:46.932814968Z [err]        corked: 0,
+2025-10-07T12:56:46.932818984Z [err]        onwrite: [Function: bound onwrite],
+2025-10-07T12:56:46.932823013Z [err]        writelen: 0,
+2025-10-07T12:56:46.932827988Z [err]        bufferedIndex: 0,
+2025-10-07T12:56:46.932832030Z [err]        pendingcb: 0,
+2025-10-07T12:56:46.932836551Z [err]        [Symbol(kState)]: 1091466620,
+2025-10-07T12:56:46.932840654Z [err]        [Symbol(kBufferedValue)]: null,
+2025-10-07T12:56:46.932844486Z [err]        [Symbol(kWriteCbValue)]: null
+2025-10-07T12:56:46.932848514Z [err]      },
+2025-10-07T12:56:46.932852293Z [err]      allowHalfOpen: true,
+2025-10-07T12:56:46.932857876Z [err]      _maxListeners: undefined,
+2025-10-07T12:56:46.932861657Z [err]      _eventsCount: 4,
+2025-10-07T12:56:46.932865609Z [err]      statusCode: 400,
+2025-10-07T12:56:46.932870053Z [err]      statusMessage: 'Bad Request',
+2025-10-07T12:56:46.932874410Z [err]      request: {
+2025-10-07T12:56:46.932878707Z [err]        agent: [Agent],
+2025-10-07T12:56:46.932883161Z [err]        headers: [Object],
+2025-10-07T12:56:46.932887317Z [err]        href: 'https://storage.googleapis.com/storage/v1/b/gs:/o/%2Floadtracker_documents%2Fprivate%2Fuploads%2Fe2fff6ad-1219-4123-82ef-defb4684e416?'
+2025-10-07T12:56:46.932891443Z [err]      },
+2025-10-07T12:56:46.932895180Z [err]      body: '{\n' +
+2025-10-07T12:56:46.932899265Z [err]        '  "error": {\n' +
+2025-10-07T12:56:46.932903732Z [err]        '    "code": 400,\n' +
+2025-10-07T12:56:46.932907573Z [err]        `    "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:46.932912067Z [err]        '    "errors": [\n' +
+2025-10-07T12:56:46.932916288Z [err]        '      {\n' +
+2025-10-07T12:56:46.933333889Z [err]        `        "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:46.933338710Z [err]        '        "domain": "global",\n' +
+2025-10-07T12:56:46.933342605Z [err]        '        "reason": "invalid"\n' +
+2025-10-07T12:56:46.933347349Z [err]        '      }\n' +
+2025-10-07T12:56:46.933350940Z [err]        '    ]\n' +
+2025-10-07T12:56:46.933354471Z [err]        '  }\n' +
+2025-10-07T12:56:46.933358038Z [err]        '}\n',
+2025-10-07T12:56:46.933361766Z [err]      headers: {
+2025-10-07T12:56:46.933365350Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-07T12:56:46.933368969Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-07T12:56:46.933373073Z [err]        'content-length': '226',
+2025-10-07T12:56:46.933376840Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-07T12:56:46.933380635Z [err]        date: 'Tue, 07 Oct 2025 12:56:46 GMT',
+2025-10-07T12:56:46.933384152Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-07T12:56:46.933387721Z [err]        pragma: 'no-cache',
+2025-10-07T12:56:46.933391584Z [err]        server: 'UploadServer',
+2025-10-07T12:56:46.933395155Z [err]        vary: 'Origin, X-Origin',
+2025-10-07T12:56:46.933398891Z [err]        'x-guploader-uploadid': 'AAwnv3LlOCCwY5XhUVgcmWC9gTwyISyreNNHykjNzbKXGdKIgufL5dkd7pdb2o2U2YAb3OQnXDRtKwo'
+2025-10-07T12:56:46.933402689Z [err]      },
+2025-10-07T12:56:46.933406523Z [err]      toJSON: [Function: toJSON],
+2025-10-07T12:56:46.933410673Z [err]      [Symbol(shapeMode)]: true,
+2025-10-07T12:56:46.933414221Z [err]      [Symbol(kCapture)]: false,
+2025-10-07T12:56:46.933417882Z [err]      [Symbol(kCallback)]: null
+2025-10-07T12:56:46.933421555Z [err]    }
+2025-10-07T12:56:46.933425315Z [err]  }
+2025-10-07T12:56:46.933428977Z [inf]  📄 Processing POD 2/3: https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:46.933432812Z [err]  ❌ Failed to process POD 1 (https://storage.googleapis.com/loadtracker_documents/private/uploads/e2fff6ad-1219-4123-82ef-defb4684e416): Error: Object storage service is not available. Please configure object storage or contact support.
+2025-10-07T12:56:46.933436561Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:772:17)
+2025-10-07T12:56:46.933441465Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:56:46.933445051Z [err]      at async fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:25)
+2025-10-07T12:56:46.933448510Z [err]      at async getAllPodSnapshots (file:///app/dist/index.js:3244:25)
+2025-10-07T12:56:46.933452110Z [err]      at async file:///app/dist/index.js:8293:31
+2025-10-07T12:56:46.933456969Z [inf]  🔍 Normalizing object path: https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:46.933460665Z [inf]  📄 Extracted pathname from URL: /loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:46.933464284Z [inf]  📄 Private object dir (raw): gs://loadtracker_documents/private
+2025-10-07T12:56:46.933467902Z [inf]  📄 Converted gs:// to / format: /loadtracker_documents/private
+2025-10-07T12:56:46.933511950Z [inf]  📄 Checking if pathname starts with dir: {
+2025-10-07T12:56:46.933518448Z [inf]    rawObjectPath: '/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee',
+2025-10-07T12:56:46.933523614Z [inf]    objectEntityDir: '/loadtracker_documents/private/'
+2025-10-07T12:56:46.933528323Z [inf]  }
+2025-10-07T12:56:46.933532734Z [inf]  ✅ Normalized to objects path: /objects/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:46.933537765Z [inf]  📄 Normalized POD path 2: /objects/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee
+2025-10-07T12:56:47.007504554Z [err]  ⚠️ Object storage not configured or available for file access: ApiError: Invalid bucket name: 'gs:'
+2025-10-07T12:56:47.007511407Z [err]      at new ApiError (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:85:15)
+2025-10-07T12:56:47.007516955Z [err]      at Util.parseHttpRespBody (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:222:38)
+2025-10-07T12:56:47.007522393Z [err]      at Util.handleResp (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:162:30)
+2025-10-07T12:56:47.007527286Z [err]      at file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:552:22
+2025-10-07T12:56:47.007532404Z [err]      at onResponse (/app/node_modules/retry-request/index.js:259:7)
+2025-10-07T12:56:47.007537240Z [err]      at /app/node_modules/teeny-request/build/src/index.js:226:13
+2025-10-07T12:56:47.007543911Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-10-07T12:56:47.007547945Z [err]    code: 400,
+2025-10-07T12:56:47.007552470Z [err]    errors: [
+2025-10-07T12:56:47.007557525Z [err]      {
+2025-10-07T12:56:47.007561670Z [err]        message: "Invalid bucket name: 'gs:'",
+2025-10-07T12:56:47.007565749Z [err]        domain: 'global',
+2025-10-07T12:56:47.007571661Z [err]        reason: 'invalid'
+2025-10-07T12:56:47.007575702Z [err]      }
+2025-10-07T12:56:47.007579841Z [err]    ],
+2025-10-07T12:56:47.007584122Z [err]    response: PassThrough {
+2025-10-07T12:56:47.007589348Z [err]      _events: {
+2025-10-07T12:56:47.007594952Z [err]        close: undefined,
+2025-10-07T12:56:47.007600070Z [err]        error: [Array],
+2025-10-07T12:56:47.007605383Z [err]        prefinish: [Function: prefinish],
+2025-10-07T12:56:47.007612122Z [err]        finish: undefined,
+2025-10-07T12:56:47.008009455Z [err]        drain: undefined,
+2025-10-07T12:56:47.008025567Z [err]        data: [Function (anonymous)],
+2025-10-07T12:56:47.008030296Z [err]        end: [Function (anonymous)],
+2025-10-07T12:56:47.008034087Z [err]        readable: undefined,
+2025-10-07T12:56:47.008038167Z [err]        unpipe: undefined
+2025-10-07T12:56:47.008041905Z [err]      },
+2025-10-07T12:56:47.008045333Z [err]      _readableState: ReadableState {
+2025-10-07T12:56:47.008049000Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:47.008052577Z [err]        buffer: [],
+2025-10-07T12:56:47.008056338Z [err]        bufferIndex: 0,
+2025-10-07T12:56:47.008059878Z [err]        length: 0,
+2025-10-07T12:56:47.008063634Z [err]        pipes: [],
+2025-10-07T12:56:47.008066981Z [err]        awaitDrainWriters: null,
+2025-10-07T12:56:47.008071242Z [err]        [Symbol(kState)]: 194512764
+2025-10-07T12:56:47.008074773Z [err]      },
+2025-10-07T12:56:47.008078736Z [err]      _writableState: WritableState {
+2025-10-07T12:56:47.008100385Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:47.008104842Z [err]        length: 0,
+2025-10-07T12:56:47.008108509Z [err]        corked: 0,
+2025-10-07T12:56:47.008112297Z [err]        onwrite: [Function: bound onwrite],
+2025-10-07T12:56:47.008115840Z [err]        writelen: 0,
+2025-10-07T12:56:47.008119576Z [err]        bufferedIndex: 0,
+2025-10-07T12:56:47.008122981Z [err]        pendingcb: 0,
+2025-10-07T12:56:47.008126682Z [err]        [Symbol(kState)]: 1091466620,
+2025-10-07T12:56:47.008130158Z [err]        [Symbol(kBufferedValue)]: null,
+2025-10-07T12:56:47.008133725Z [err]        [Symbol(kWriteCbValue)]: null
+2025-10-07T12:56:47.008137358Z [err]      },
+2025-10-07T12:56:47.008141557Z [err]      allowHalfOpen: true,
+2025-10-07T12:56:47.008146608Z [err]      _maxListeners: undefined,
+2025-10-07T12:56:47.008151847Z [err]      _eventsCount: 4,
+2025-10-07T12:56:47.008156767Z [err]      statusCode: 400,
+2025-10-07T12:56:47.008161983Z [err]      statusMessage: 'Bad Request',
+2025-10-07T12:56:47.008167516Z [err]      request: {
+2025-10-07T12:56:47.008173285Z [err]        agent: [Agent],
+2025-10-07T12:56:47.008177685Z [err]        headers: [Object],
+2025-10-07T12:56:47.008182572Z [err]        href: 'https://storage.googleapis.com/storage/v1/b/gs:/o/%2Floadtracker_documents%2Fprivate%2Fuploads%2F02d86c8c-89b6-449b-91be-403fce26d8ee?'
+2025-10-07T12:56:47.008188298Z [err]      },
+2025-10-07T12:56:47.008193293Z [err]      body: '{\n' +
+2025-10-07T12:56:47.008198073Z [err]        '  "error": {\n' +
+2025-10-07T12:56:47.008206612Z [err]        '    "code": 400,\n' +
+2025-10-07T12:56:47.008211575Z [err]        `    "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:47.008216427Z [err]        '    "errors": [\n' +
+2025-10-07T12:56:47.008221425Z [err]        '      {\n' +
+2025-10-07T12:56:47.008226507Z [err]        `        "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:47.008231748Z [err]        '        "domain": "global",\n' +
+2025-10-07T12:56:47.008237344Z [err]        '        "reason": "invalid"\n' +
+2025-10-07T12:56:47.008243150Z [err]        '      }\n' +
+2025-10-07T12:56:47.008249351Z [err]        '    ]\n' +
+2025-10-07T12:56:47.008254517Z [err]        '  }\n' +
+2025-10-07T12:56:47.008259749Z [err]        '}\n',
+2025-10-07T12:56:47.008265446Z [err]      headers: {
+2025-10-07T12:56:47.008270894Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-07T12:56:47.008276099Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-07T12:56:47.008284027Z [err]        'content-length': '226',
+2025-10-07T12:56:47.008290091Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-07T12:56:47.008295665Z [err]        date: 'Tue, 07 Oct 2025 12:56:46 GMT',
+2025-10-07T12:56:47.008305495Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-07T12:56:47.008311545Z [err]        pragma: 'no-cache',
+2025-10-07T12:56:47.008317957Z [err]        server: 'UploadServer',
+2025-10-07T12:56:47.008323900Z [err]        vary: 'Origin, X-Origin',
+2025-10-07T12:56:47.008330224Z [err]        'x-guploader-uploadid': 'AAwnv3JU-NUFmot4_MzRsjHQBrYs82jlGp2uDwdMtxMdjn1uOjXZFXcF0OSLE72qRFDcB9_s3LTNfEA'
+2025-10-07T12:56:47.008336266Z [err]      },
+2025-10-07T12:56:47.008341219Z [err]      toJSON: [Function: toJSON],
+2025-10-07T12:56:47.008347144Z [err]      [Symbol(shapeMode)]: true,
+2025-10-07T12:56:47.008353771Z [err]      [Symbol(kCapture)]: false,
+2025-10-07T12:56:47.008360642Z [err]      [Symbol(kCallback)]: null
+2025-10-07T12:56:47.008365858Z [err]    }
+2025-10-07T12:56:47.008372274Z [err]  }
+2025-10-07T12:56:47.008378369Z [inf]  📄 Processing POD 3/3: https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:47.008384039Z [inf]  🔍 Normalizing object path: https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:47.008389773Z [err]  ❌ Failed to process POD 2 (https://storage.googleapis.com/loadtracker_documents/private/uploads/02d86c8c-89b6-449b-91be-403fce26d8ee): Error: Object storage service is not available. Please configure object storage or contact support.
+2025-10-07T12:56:47.008395727Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:772:17)
+2025-10-07T12:56:47.008405371Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:56:47.008412297Z [err]      at async fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:25)
+2025-10-07T12:56:47.008418393Z [err]      at async getAllPodSnapshots (file:///app/dist/index.js:3244:25)
+2025-10-07T12:56:47.008424125Z [err]      at async file:///app/dist/index.js:8293:31
+2025-10-07T12:56:47.008431635Z [inf]  📄 Extracted pathname from URL: /loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:47.008438316Z [inf]  📄 Private object dir (raw): gs://loadtracker_documents/private
+2025-10-07T12:56:47.008444344Z [inf]  📄 Converted gs:// to / format: /loadtracker_documents/private
+2025-10-07T12:56:47.008450822Z [inf]  📄 Checking if pathname starts with dir: {
+2025-10-07T12:56:47.008457041Z [inf]    rawObjectPath: '/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e',
+2025-10-07T12:56:47.008465216Z [inf]    objectEntityDir: '/loadtracker_documents/private/'
+2025-10-07T12:56:47.008471767Z [inf]  }
+2025-10-07T12:56:47.008478501Z [inf]  ✅ Normalized to objects path: /objects/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:47.008484369Z [inf]  📄 Normalized POD path 3: /objects/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e
+2025-10-07T12:56:47.103696870Z [err]  ⚠️ Object storage not configured or available for file access: ApiError: Invalid bucket name: 'gs:'
+2025-10-07T12:56:47.103701893Z [err]      at new ApiError (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:85:15)
+2025-10-07T12:56:47.103706419Z [err]      at Util.parseHttpRespBody (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:222:38)
+2025-10-07T12:56:47.103710773Z [err]      at Util.handleResp (file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:162:30)
+2025-10-07T12:56:47.103717074Z [err]      at file:///app/node_modules/@google-cloud/storage/build/esm/src/nodejs-common/util.js:552:22
+2025-10-07T12:56:47.103721607Z [err]      at onResponse (/app/node_modules/retry-request/index.js:259:7)
+2025-10-07T12:56:47.103725685Z [err]      at /app/node_modules/teeny-request/build/src/index.js:226:13
+2025-10-07T12:56:47.103729642Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-10-07T12:56:47.103734252Z [err]    code: 400,
+2025-10-07T12:56:47.103738631Z [err]    errors: [
+2025-10-07T12:56:47.103742413Z [err]      {
+2025-10-07T12:56:47.103747863Z [err]        message: "Invalid bucket name: 'gs:'",
+2025-10-07T12:56:47.103755210Z [err]        domain: 'global',
+2025-10-07T12:56:47.103760467Z [err]        reason: 'invalid'
+2025-10-07T12:56:47.103765862Z [err]      }
+2025-10-07T12:56:47.103771093Z [err]    ],
+2025-10-07T12:56:47.103777720Z [err]    response: PassThrough {
+2025-10-07T12:56:47.103782980Z [err]      _events: {
+2025-10-07T12:56:47.103789637Z [err]        close: undefined,
+2025-10-07T12:56:47.103797295Z [err]        error: [Array],
+2025-10-07T12:56:47.103803597Z [err]        prefinish: [Function: prefinish],
+2025-10-07T12:56:47.103809051Z [err]        finish: undefined,
+2025-10-07T12:56:47.103814238Z [err]        drain: undefined,
+2025-10-07T12:56:47.103819724Z [err]        data: [Function (anonymous)],
+2025-10-07T12:56:47.103826814Z [err]        end: [Function (anonymous)],
+2025-10-07T12:56:47.104467747Z [err]        readable: undefined,
+2025-10-07T12:56:47.104475262Z [err]        unpipe: undefined
+2025-10-07T12:56:47.104480306Z [err]      },
+2025-10-07T12:56:47.104484640Z [err]      _readableState: ReadableState {
+2025-10-07T12:56:47.104488870Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:47.104493739Z [err]        buffer: [],
+2025-10-07T12:56:47.104498312Z [err]        bufferIndex: 0,
+2025-10-07T12:56:47.104503974Z [err]        length: 0,
+2025-10-07T12:56:47.104508716Z [err]        pipes: [],
+2025-10-07T12:56:47.104513854Z [err]        awaitDrainWriters: null,
+2025-10-07T12:56:47.104518348Z [err]        [Symbol(kState)]: 194512764
+2025-10-07T12:56:47.104523072Z [err]      },
+2025-10-07T12:56:47.104527278Z [err]      _writableState: WritableState {
+2025-10-07T12:56:47.104532035Z [err]        highWaterMark: 65536,
+2025-10-07T12:56:47.104538339Z [err]        length: 0,
+2025-10-07T12:56:47.104543235Z [err]        corked: 0,
+2025-10-07T12:56:47.104548595Z [err]        onwrite: [Function: bound onwrite],
+2025-10-07T12:56:47.104555546Z [err]        writelen: 0,
+2025-10-07T12:56:47.104559868Z [err]        bufferedIndex: 0,
+2025-10-07T12:56:47.104564905Z [err]        pendingcb: 0,
+2025-10-07T12:56:47.104569202Z [err]        [Symbol(kState)]: 1091466620,
+2025-10-07T12:56:47.104574961Z [err]        [Symbol(kBufferedValue)]: null,
+2025-10-07T12:56:47.104580592Z [err]        [Symbol(kWriteCbValue)]: null
+2025-10-07T12:56:47.104585325Z [err]      },
+2025-10-07T12:56:47.104592354Z [err]      allowHalfOpen: true,
+2025-10-07T12:56:47.104597673Z [err]      _maxListeners: undefined,
+2025-10-07T12:56:47.104602622Z [err]      _eventsCount: 4,
+2025-10-07T12:56:47.104607502Z [err]      statusCode: 400,
+2025-10-07T12:56:47.104613287Z [err]      statusMessage: 'Bad Request',
+2025-10-07T12:56:47.104618343Z [err]      request: {
+2025-10-07T12:56:47.104623393Z [err]        agent: [Agent],
+2025-10-07T12:56:47.104629518Z [err]        headers: [Object],
+2025-10-07T12:56:47.104634820Z [err]        href: 'https://storage.googleapis.com/storage/v1/b/gs:/o/%2Floadtracker_documents%2Fprivate%2Fuploads%2F822ad877-1fd8-4964-a1c2-a7d8497d716e?'
+2025-10-07T12:56:47.104641404Z [err]      },
+2025-10-07T12:56:47.104648237Z [err]      body: '{\n' +
+2025-10-07T12:56:47.104654048Z [err]        '  "error": {\n' +
+2025-10-07T12:56:47.104658472Z [err]        '    "code": 400,\n' +
+2025-10-07T12:56:47.104667739Z [err]        `    "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:47.104672089Z [err]        '    "errors": [\n' +
+2025-10-07T12:56:47.104676123Z [err]        '      {\n' +
+2025-10-07T12:56:47.104680164Z [err]        `        "message": "Invalid bucket name: 'gs:'",\n` +
+2025-10-07T12:56:47.104684510Z [err]        '        "domain": "global",\n' +
+2025-10-07T12:56:47.104688624Z [err]        '        "reason": "invalid"\n' +
+2025-10-07T12:56:47.104692522Z [err]        '      }\n' +
+2025-10-07T12:56:47.104696224Z [err]        '    ]\n' +
+2025-10-07T12:56:47.104699935Z [err]        '  }\n' +
+2025-10-07T12:56:47.104703799Z [err]        '}\n',
+2025-10-07T12:56:47.104707847Z [err]      headers: {
+2025-10-07T12:56:47.104711751Z [err]        'alt-svc': 'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000',
+2025-10-07T12:56:47.104715923Z [err]        'cache-control': 'no-cache, no-store, max-age=0, must-revalidate',
+2025-10-07T12:56:47.104721345Z [err]        'content-length': '226',
+2025-10-07T12:56:47.104725267Z [err]        'content-type': 'application/json; charset=UTF-8',
+2025-10-07T12:56:47.104728971Z [err]        date: 'Tue, 07 Oct 2025 12:56:47 GMT',
+2025-10-07T12:56:47.104733208Z [err]        expires: 'Mon, 01 Jan 1990 00:00:00 GMT',
+2025-10-07T12:56:47.104738495Z [err]        pragma: 'no-cache',
+2025-10-07T12:56:47.104744127Z [err]        server: 'UploadServer',
+2025-10-07T12:56:47.104750282Z [err]        vary: 'Origin, X-Origin',
+2025-10-07T12:56:47.104758221Z [err]        'x-guploader-uploadid': 'AAwnv3Ikm2s8yhigJ0tTsiUJysY9IDH7WSNB8wTIJZzOWVIosKGz3avBNRdoEai0A_bPxkwBtPypyVU'
+2025-10-07T12:56:47.104764333Z [err]      },
+2025-10-07T12:56:47.104770404Z [err]      toJSON: [Function: toJSON],
+2025-10-07T12:56:47.104776951Z [err]      [Symbol(shapeMode)]: true,
+2025-10-07T12:56:47.104782906Z [err]      [Symbol(kCapture)]: false,
+2025-10-07T12:56:47.104789372Z [err]      [Symbol(kCallback)]: null
+2025-10-07T12:56:47.104795668Z [err]    }
+2025-10-07T12:56:47.104801797Z [err]  }
+2025-10-07T12:56:47.104806597Z [err]  ❌ Failed to process POD 3 (https://storage.googleapis.com/loadtracker_documents/private/uploads/822ad877-1fd8-4964-a1c2-a7d8497d716e): Error: Object storage service is not available. Please configure object storage or contact support.
+2025-10-07T12:56:47.104811299Z [err]      at ObjectStorageService.getObjectEntityFile (file:///app/dist/index.js:772:17)
+2025-10-07T12:56:47.104816657Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-07T12:56:47.104821690Z [err]      at async fetchAllPodSnapshotsFromStorage (file:///app/dist/index.js:3278:25)
+2025-10-07T12:56:47.104825789Z [err]      at async getAllPodSnapshots (file:///app/dist/index.js:3244:25)
+2025-10-07T12:56:47.104830856Z [err]      at async file:///app/dist/index.js:8293:31
+2025-10-07T12:56:47.104836453Z [inf]  ✅ Successfully processed 0/3 POD documents
+2025-10-07T12:56:47.104851936Z [inf]  📋 TOTAL PODs available: 0
+2025-10-07T12:56:47.104858487Z [inf]  ⚠️ No POD document uploaded for load 6022337 (ID: 8461acb8-29b3-4f9c-9602-429694eec066) - preview will show invoice only
+2025-10-07T12:56:47.104866675Z [inf]  🔍 DIAGNOSIS: If POD was recently uploaded but not showing:
+2025-10-07T12:56:47.104873583Z [inf]     - Check if load was deleted and recreated (new ID breaks POD links)
+2025-10-07T12:56:47.104880680Z [inf]     - Verify POD upload completed successfully
+2025-10-07T12:56:47.104888194Z [inf]     - Check object storage for orphaned files
+2025-10-07T12:56:47.104894456Z [inf]  12:56:47 PM [express] POST /api/invoices/GO5254/print-preview 200 in 274ms :: {"success":true,"previe…
