@@ -5,15 +5,15 @@ import puppeteer from 'puppeteer';
 const createTransporter = () => {
   console.log('🔍 Creating GoDaddy SMTP transporter with:', {
     host: 'smtpout.secureserver.net',
-    port: 465,
+    port: 587,
     user: process.env.OUTLOOK_EMAIL,
     hasPassword: !!process.env.OUTLOOK_PASSWORD
   });
   
   return nodemailer.createTransport({
     host: 'smtpout.secureserver.net', // GoDaddy SMTP server
-    port: 465,
-    secure: true, // SSL
+    port: 587,
+    secure: false, // Use STARTTLS
     auth: {
       user: process.env.OUTLOOK_EMAIL,
       pass: process.env.OUTLOOK_PASSWORD,
