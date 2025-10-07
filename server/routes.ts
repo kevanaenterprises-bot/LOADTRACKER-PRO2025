@@ -4038,116 +4038,84 @@ Reply YES to confirm acceptance or NO to decline.`
         throw new Error("Email server connection failed - please check credentials");
       }
       
-      // Generate PDF attachments
-      console.log("🔍 Generating combined invoice+POD PDF...");
-      const attachments = [];
+      // Generate PDF attachments - NEW APPROACH: ONE combined PDF
+      console.log("🔍 Generating combined invoice+POD PDF using PDF merge utility...");
       
-      // Generate INVOICE ONLY (no rate con) with POD embedded  
+      // Step 1: Generate clean invoice HTML (no POD embedding needed)
       const invoiceContext = await computeInvoiceContext(load);
-      let combinedHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
-      let podImages: Array<{content: Buffer, type: string}> = [];
+      const invoiceHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       
-      // Handle POD documents - PRIORITIZE STORED SNAPSHOTS
+      // Step 2: Collect ALL POD documents (both images and PDFs)
       console.log(`🔍 EMAIL DEBUG: Checking POD for load ${primaryLoadNumber}`);
       console.log(`🔍 Invoice podSnapshot available: ${!!invoice.podSnapshot}`);
       console.log(`🔍 Load podDocumentPath: "${load.podDocumentPath}"`);
       
-      // FIXED: Get ALL POD snapshots for multi-POD loads (email complete package)
+      const podDocuments: Array<{content: Buffer, type: string}> = [];
       const allPodSnapshots = await getAllPodSnapshots(invoice, load.podDocumentPath || undefined);
+      
       if (allPodSnapshots.length > 0) {
-        console.log(`📧 Using ${allPodSnapshots.length} POD(s) for email: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
-        allPodSnapshots.forEach((snapshot, index) => {
+        console.log(`📧 Using ${allPodSnapshots.length} POD(s) for email merge`);
+        
+        // Collect ALL PODs (images and PDFs) - they'll all be merged into ONE PDF
+        for (let i = 0; i < allPodSnapshots.length; i++) {
+          const snapshot = allPodSnapshots[i];
           const podBuffer = convertPodSnapshotToBuffer(snapshot);
           
-          // Check if POD is a PDF - if so, attach separately instead of embedding
-          if (podBuffer.type === 'application/pdf') {
-            console.log(`📎 POD ${index + 1} is a PDF - attaching separately (cannot embed as image)`);
-            attachments.push({
-              filename: `POD-${primaryLoadNumber}-Page${index + 1}.pdf`,
-              content: podBuffer.content,
-              contentType: 'application/pdf'
-            });
-          } else {
-            // Only add image PODs to the embedding list
-            podImages.push(podBuffer);
-            console.log(`📧 POD ${index + 1}: ${snapshot.sourcePath} (${snapshot.size} bytes) - will embed as image`);
-          }
-        });
-        
-        console.log(`✅ PODs processed: ${podImages.length} images to embed, ${attachments.length} PDFs attached separately`);
-      } else {
-        console.log(`⚠️ No POD available for load ${primaryLoadNumber} - email will contain invoice only`);
-      }
-      
-      // Embed COMPRESSED POD images into the invoice HTML if available
-      if (podImages.length > 0) {
-        console.log(`🔗 Compressing and embedding ${podImages.length} POD image(s) into invoice...`);
-        try {
-          const { compressImageForPDF } = await import('./emailService');
-          
-          // Compress each POD image before embedding
-          const compressedPodImages = [];
-          for (let i = 0; i < podImages.length; i++) {
-            const originalPod = podImages[i];
-            console.log(`🗜️ Compressing POD ${i + 1}/${podImages.length} (${Math.round(originalPod.content.length / 1024)}KB)`);
-            
+          // Optionally compress images before merging
+          if (podBuffer.type.startsWith('image/')) {
             try {
-              const compressedBuffer = await compressImageForPDF(originalPod.content, originalPod.type, 600); // Smaller size for email
-              compressedPodImages.push({
+              const { compressImageForPDF } = await import('./emailService');
+              const compressedBuffer = await compressImageForPDF(podBuffer.content, podBuffer.type, 800);
+              podDocuments.push({
                 content: compressedBuffer,
-                type: 'image/jpeg' // Always convert to JPEG for better compression
+                type: 'image/jpeg'
               });
-              console.log(`✅ POD ${i + 1} compressed: ${Math.round(originalPod.content.length / 1024)}KB -> ${Math.round(compressedBuffer.length / 1024)}KB`);
+              console.log(`📧 POD ${i + 1}: Compressed ${podBuffer.type} (${Math.round(podBuffer.content.length / 1024)}KB -> ${Math.round(compressedBuffer.length / 1024)}KB)`);
             } catch (compressionError) {
-              console.error(`❌ Failed to compress POD ${i + 1}, using original:`, compressionError);
-              compressedPodImages.push(originalPod); // Fallback to original
+              console.error(`⚠️ Compression failed for POD ${i + 1}, using original`);
+              podDocuments.push(podBuffer);
             }
+          } else {
+            // PDF PODs go in as-is
+            podDocuments.push(podBuffer);
+            console.log(`📧 POD ${i + 1}: ${podBuffer.type} (${Math.round(podBuffer.content.length / 1024)}KB) - will merge`);
           }
-          
-          const podSectionHTML = generatePODSectionHTML(compressedPodImages, primaryLoadNumber);
-          combinedHTML = combinedHTML.replace('</body>', `${podSectionHTML}</body>`);
-          console.log(`✅ ${compressedPodImages.length} compressed POD images embedded into combined invoice`);
-        } catch (embedError) {
-          console.error(`❌ Failed to embed POD images:`, embedError);
-          console.log(`⚠️ Falling back to invoice-only PDF due to POD embedding error`);
-          // Keep original invoice HTML without POD if embedding fails
         }
+        
+        console.log(`✅ Collected ${podDocuments.length} POD document(s) for merging`);
+      } else {
+        console.log(`⚠️ No POD available for load ${primaryLoadNumber} - invoice only`);
       }
       
-      // Generate single combined PDF
-      console.log(`📄 Generating combined PDF with invoice + ${podImages.length} POD image(s)...`);
-      console.log(`📄 Combined HTML length: ${combinedHTML.length} characters`);
-      
+      // Step 3: Use PDF merge utility to create ONE combined PDF
       let combinedPDF;
       try {
-        combinedPDF = await generatePDF(combinedHTML);
-        console.log(`✅ PDF generation successful`);
+        combinedPDF = await buildFinalInvoicePdf(invoiceHTML, podDocuments, primaryLoadNumber);
+        console.log(`✅ Combined PDF created successfully: ${combinedPDF.length} bytes`);
       } catch (pdfError) {
-        console.error(`❌ PDF generation failed:`, pdfError);
-        console.log(`⚠️ Attempting fallback with simpler HTML...`);
+        console.error(`❌ PDF merge failed:`, pdfError);
+        console.log(`⚠️ Falling back to invoice-only PDF...`);
         
-        // Fallback: Generate simple invoice-only PDF without POD embedding
-        const invoiceContext = await computeInvoiceContext(load);
-        const fallbackHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
-        combinedPDF = await generatePDF(fallbackHTML);
-        console.log(`✅ Fallback PDF generation successful`);
+        // Fallback: Generate invoice-only PDF without PODs
+        const { generatePDF } = await import('./emailService');
+        combinedPDF = await generatePDF(invoiceHTML);
+        console.log(`✅ Fallback invoice-only PDF generated: ${combinedPDF.length} bytes`);
       }
       
       // PDF integrity checks
-      console.log(`📄 Generated PDF size: ${combinedPDF.length} bytes`);
+      console.log(`📄 Final PDF size: ${combinedPDF.length} bytes`);
       console.log(`📄 PDF header check: ${combinedPDF.slice(0, 8).toString()}`);
-      console.log(`📄 PDF footer check: ${combinedPDF.slice(-10).toString()}`);
       
       if (combinedPDF.length === 0) {
         throw new Error('PDF generation resulted in empty file');
       }
       
-      // Add the combined PDF as primary attachment
-      attachments.push({
+      // Step 4: Create ONE attachment as required by payment processor
+      const attachments = [{
         filename: `Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf`,
         content: combinedPDF,
         contentType: 'application/pdf'
-      });
+      }];
       
       console.log(`📧 Final email summary for load ${primaryLoadNumber}:`);
       console.log(`  - To: ${emailAddress}`);
