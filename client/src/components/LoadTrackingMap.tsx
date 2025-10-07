@@ -234,7 +234,7 @@ export default function LoadTrackingMap() {
           markers.set(`dest-${load.id}`, destMarker);
 
           // Draw line between truck and destination for active loads
-          if (['confirmed', 'en_route_pickup', 'at_shipper', 'left_shipper', 'en_route_receiver'].includes(load.status)) {
+          if (['in_progress', 'in_transit', 'confirmed', 'en_route_pickup', 'at_shipper', 'left_shipper', 'en_route_receiver'].includes(load.status)) {
             const polyline = L.polyline([[lat, lng], [destLat, destLng]], {
               color: getStatusColor(load.status),
               weight: 2,
@@ -261,7 +261,7 @@ export default function LoadTrackingMap() {
     load.trackingEnabled && 
     load.currentLatitude && 
     load.currentLongitude &&
-    ['confirmed', 'en_route_pickup', 'at_shipper', 'left_shipper', 'en_route_receiver', 'at_receiver'].includes(load.status)
+    ['in_progress', 'in_transit', 'confirmed', 'en_route_pickup', 'at_shipper', 'left_shipper', 'en_route_receiver', 'at_receiver'].includes(load.status)
   ) || [];
 
   return (
