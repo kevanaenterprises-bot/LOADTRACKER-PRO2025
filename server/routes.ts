@@ -5570,7 +5570,7 @@ Reply YES to confirm acceptance or NO to decline.`
   }, async (req, res) => {
     try {
       console.log(`📄 Starting POD update for load ${req.params.id}`);
-      const { podDocumentURL, iftaTruckNumber, iftaMiles, fuelGallons, fuelAmount } = req.body;
+      const { podDocumentURL, iftaTruckNumber, odometerReading, fuelGallons, fuelAmount } = req.body;
       
       if (!podDocumentURL) {
         console.error("❌ No POD document URL provided");
@@ -5578,9 +5578,9 @@ Reply YES to confirm acceptance or NO to decline.`
       }
 
       // Validate required IFTA fields
-      if (!iftaTruckNumber || !iftaMiles) {
+      if (!iftaTruckNumber || !odometerReading) {
         console.error("❌ Missing required IFTA fields");
-        return res.status(400).json({ message: "Truck # and Total Miles are required for IFTA reporting" });
+        return res.status(400).json({ message: "Truck # and Odometer Reading are required for IFTA reporting" });
       }
 
       // Strict numeric validation helper
@@ -5592,10 +5592,10 @@ Reply YES to confirm acceptance or NO to decline.`
         return /^[0-9]+(\.[0-9]+)?$/.test(str);
       };
 
-      // Validate IFTA numeric fields with strict validation
-      if (!isValidNumber(iftaMiles) || parseFloat(iftaMiles) <= 0) {
-        console.error("❌ Invalid IFTA miles value:", iftaMiles);
-        return res.status(400).json({ message: "Total Miles must be a valid positive number (no commas or letters)" });
+      // Validate odometer reading
+      if (!isValidNumber(odometerReading) || parseFloat(odometerReading) <= 0) {
+        console.error("❌ Invalid odometer reading value:", odometerReading);
+        return res.status(400).json({ message: "Odometer Reading must be a valid positive number (no commas or letters)" });
       }
 
       // Validate optional fuel fields if provided
@@ -5613,23 +5613,51 @@ Reply YES to confirm acceptance or NO to decline.`
         }
       }
 
-      // SIMPLIFIED: Just save the POD URL directly
       console.log(`📄 POD URL for load ${req.params.id}: ${podDocumentURL}`);
-      console.log(`🚛 IFTA Data - Truck: ${iftaTruckNumber}, Miles: ${iftaMiles}, Fuel: ${fuelGallons || 'N/A'}gal, Amount: $${fuelAmount || 'N/A'}`);
+      console.log(`🚛 IFTA Data - Truck: ${iftaTruckNumber}, Odometer: ${odometerReading}, Fuel: ${fuelGallons || 'N/A'}gal, Amount: $${fuelAmount || 'N/A'}`);
       
       // Update load with POD document path
       console.log(`📄 Calling storage.updateLoadPOD...`);
       const load = await storage.updateLoadPOD(req.params.id, podDocumentURL);
       console.log(`✅ POD saved for load: ${load.number109}`);
 
+      // Get previous odometer reading for this truck
+      console.log(`🚛 Looking up previous odometer reading for truck ${iftaTruckNumber}...`);
+      const previousLoads = await storage.getLoads();
+      const previousTruckLoads = previousLoads
+        .filter((l: any) => 
+          l.iftaTruckNumber === iftaTruckNumber && 
+          l.odometerReading && 
+          l.id !== req.params.id &&
+          l.deliveredAt // Only completed loads
+        )
+        .sort((a: any, b: any) => {
+          const dateA = a.deliveredAt ? new Date(a.deliveredAt).getTime() : 0;
+          const dateB = b.deliveredAt ? new Date(b.deliveredAt).getTime() : 0;
+          return dateB - dateA; // Most recent first
+        });
+      
+      const previousLoad = previousTruckLoads[0];
+      const previousOdometer = previousLoad?.odometerReading ? parseFloat(previousLoad.odometerReading) : null;
+      const currentOdometer = parseFloat(odometerReading);
+      const calculatedMiles = previousOdometer ? currentOdometer - previousOdometer : null;
+
+      console.log(`🚛 Previous odometer: ${previousOdometer || 'N/A'}, Current: ${currentOdometer}, Miles this trip: ${calculatedMiles || 'N/A (first load)'}`);
+
       // Update load with IFTA data
       console.log(`🚛 Saving IFTA data for load ${req.params.id}...`);
-      await storage.updateLoad(req.params.id, {
+      const iftaData: any = {
         iftaTruckNumber: iftaTruckNumber.trim(),
-        iftaMiles: iftaMiles.toString(),
+        odometerReading: odometerReading.toString(),
+        previousOdometerReading: previousOdometer ? previousOdometer.toString() : null,
+        milesThisTrip: calculatedMiles ? calculatedMiles.toString() : null,
         fuelGallons: fuelGallons ? fuelGallons.toString() : null,
         fuelAmount: fuelAmount ? fuelAmount.toString() : null,
-      });
+      };
+
+      // TODO: Add HERE Maps state-by-state mileage breakdown
+      // For now, just save the calculated miles
+      await storage.updateLoad(req.params.id, iftaData);
       console.log(`✅ IFTA data saved for load: ${load.number109}`);
       
       // First set status to delivered when POD is uploaded

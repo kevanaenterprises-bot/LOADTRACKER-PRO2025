@@ -108,7 +108,10 @@ export const loads = pgTable("loads", {
   lastLocationUpdate: timestamp("last_location_update"),
   // IFTA reporting fields (captured at POD upload)
   iftaTruckNumber: varchar("ifta_truck_number"), // Truck # for this trip (mandatory at POD upload)
-  iftaMiles: decimal("ifta_miles", { precision: 8, scale: 2 }), // Total miles including deadhead (mandatory at POD upload)
+  odometerReading: decimal("odometer_reading", { precision: 10, scale: 1 }), // Current odometer at delivery (mandatory at POD upload)
+  previousOdometerReading: decimal("previous_odometer_reading", { precision: 10, scale: 1 }), // Previous odometer (auto-filled from last load)
+  milesThisTrip: decimal("miles_this_trip", { precision: 8, scale: 1 }), // Calculated: current - previous odometer
+  milesByState: jsonb("miles_by_state").$type<Record<string, number>>(), // State-by-state mileage from HERE Maps
   fuelGallons: decimal("fuel_gallons", { precision: 8, scale: 2 }), // Fuel purchased on trip (optional)
   fuelAmount: decimal("fuel_amount", { precision: 10, scale: 2 }), // Dollar amount of fuel (optional)
   // DEPRECATED: Legacy truck_number column - DO NOT USE in new code

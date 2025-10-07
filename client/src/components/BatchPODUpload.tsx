@@ -31,7 +31,7 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
   
   // IFTA reporting fields
   const [iftaTruckNumber, setIftaTruckNumber] = useState('');
-  const [iftaMiles, setIftaMiles] = useState('');
+  const [odometerReading, setOdometerReading] = useState('');
   const [fuelGallons, setFuelGallons] = useState('');
   const [fuelAmount, setFuelAmount] = useState('');
 
@@ -179,10 +179,10 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
       return;
     }
 
-    if (!isValidNumber(iftaMiles) || parseFloat(iftaMiles) <= 0) {
+    if (!isValidNumber(odometerReading) || parseFloat(odometerReading) <= 0) {
       toast({
-        title: "Valid Total Miles Required",
-        description: "Please enter a valid number for total miles (no commas or letters)",
+        title: "Valid Odometer Reading Required",
+        description: "Please enter your current odometer reading (no commas or letters)",
         variant: "destructive",
       });
       return;
@@ -228,7 +228,7 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
         body: JSON.stringify({ 
           podDocumentURL: podDocumentPath,
           iftaTruckNumber: iftaTruckNumber.trim(),
-          iftaMiles: parseFloat(iftaMiles),
+          odometerReading: parseFloat(odometerReading),
           fuelGallons: fuelGallons.trim() ? parseFloat(fuelGallons) : null,
           fuelAmount: fuelAmount.trim() ? parseFloat(fuelAmount) : null,
         }),
@@ -401,24 +401,24 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
                   />
                 </div>
 
-                {/* Total Miles - MANDATORY */}
+                {/* Odometer Reading - MANDATORY */}
                 <div className="space-y-2">
-                  <Label htmlFor="iftaMiles" className="text-sm font-medium">
-                    Total Miles <span className="text-red-500">*</span>
+                  <Label htmlFor="odometerReading" className="text-sm font-medium">
+                    Odometer Reading <span className="text-red-500">*</span>
                   </Label>
                   <Input
-                    id="iftaMiles"
-                    data-testid="input-ifta-miles"
+                    id="odometerReading"
+                    data-testid="input-odometer-reading"
                     type="number"
-                    step="0.01"
-                    placeholder="Include deadhead miles"
-                    value={iftaMiles}
-                    onChange={(e) => setIftaMiles(e.target.value)}
+                    step="0.1"
+                    placeholder="e.g., 123456.7"
+                    value={odometerReading}
+                    onChange={(e) => setOdometerReading(e.target.value)}
                     disabled={isUploading}
                     required
                   />
                   <p className="text-xs text-gray-500">
-                    Total miles for complete trip (loaded + deadhead)
+                    Current odometer reading at delivery
                   </p>
                 </div>
 
