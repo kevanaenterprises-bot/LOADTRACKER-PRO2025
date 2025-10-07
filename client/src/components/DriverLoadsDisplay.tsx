@@ -195,6 +195,15 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
         <CardContent className="p-6 text-center">
           <h3 className="font-semibold text-gray-700">No Loads Assigned</h3>
           <p className="text-gray-600 mt-2">You don't have any loads assigned yet.</p>
+          {/* Debug info for troubleshooting */}
+          <div className="mt-4 text-xs text-left bg-gray-100 p-3 rounded">
+            <p><strong>Debug Info:</strong></p>
+            <p>Driver ID: {driverId}</p>
+            <p>API Response: {allLoads?.length || 0} loads</p>
+            <p>After Filter: {loads?.length || 0} loads</p>
+            <p>Error: {error ? String(error) : 'None'}</p>
+            <p>Raw Data: {JSON.stringify(allLoads).substring(0, 200)}...</p>
+          </div>
         </CardContent>
       </Card>
     );
