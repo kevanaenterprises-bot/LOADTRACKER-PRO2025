@@ -1,8 +1,24 @@
 import { Resend } from 'resend';
 import puppeteer from 'puppeteer';
+import { existsSync } from 'fs';
 
 // Initialize Resend client (works with Railway - no SMTP port blocking!)
 const resend = new Resend(process.env.RESEND_API_KEY);
+
+// Helper function to get Chrome executable path based on platform
+function getChromeExecutablePath(): string | undefined {
+  // Replit-specific path
+  const replitChromePath = '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium';
+  
+  if (existsSync(replitChromePath)) {
+    console.log('🔍 Using Replit Chromium path');
+    return replitChromePath;
+  }
+  
+  // Railway/other platforms - let Puppeteer use bundled Chrome
+  console.log('🔍 Using Puppeteer bundled Chrome (Railway/cloud)');
+  return undefined; // Let Puppeteer auto-detect
+}
 
 interface EmailOptions {
   to: string;
@@ -108,7 +124,7 @@ export async function generatePDF(html: string): Promise<Buffer> {
   
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
+    executablePath: getChromeExecutablePath(),
     args: [
       '--no-sandbox', 
       '--disable-setuid-sandbox',
