@@ -1,0 +1,97 @@
+2025-10-08T00:25:26.000000000Z [inf]  Starting Container
+2025-10-08T00:25:26.794275879Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-08T00:25:27.136485002Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-08T00:25:27.136495851Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-08T00:25:27.649155168Z [inf]  Using 'pg' driver for database querying
+2025-10-08T00:25:27.798324941Z [inf]  [⣷] Pulling schema from database...
+2025-10-08T00:25:27.914759382Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-08T00:25:28.043187891Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-08T00:25:28.173872292Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-08T00:25:28.299564555Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-08T00:25:28.407393663Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-08T00:25:28.425828123Z [inf]  [?25l
+2025-10-08T00:25:28.425835269Z [inf]  Is odometer_reading column in loads table created or renamed from another column?
+2025-10-08T00:25:28.425840903Z [inf]  ❯ + odometer_reading              create column
+2025-10-08T00:25:48.421007441Z [inf]    ~ ifta_miles › odometer_reading rename columnnpm warn config production Use `--omit=dev` instead.
+2025-10-08T00:25:48.421015657Z [inf]  
+2025-10-08T00:25:48.421020600Z [inf]  > rest-express@1.0.0 start
+2025-10-08T00:25:48.421026452Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-08T00:25:48.421031419Z [inf]  
+2025-10-08T00:25:48.421035627Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-08T00:25:48.421047240Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-08T00:25:48.421052506Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-08T00:25:39.443Z
+2025-10-08T00:25:48.421056649Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-08T00:25:48.421060678Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-08T00:25:48.421064636Z [inf]  🔧 Process ID: 49
+2025-10-08T00:25:48.421068608Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-08T00:25:48.421072410Z [inf]  🔧 Platform: linux
+2025-10-08T00:25:48.421076982Z [inf]  🔧 Architecture: x64
+2025-10-08T00:25:48.421080792Z [inf]  🔧 Memory usage: {
+2025-10-08T00:25:48.421085668Z [inf]    "rss": 137539584,
+2025-10-08T00:25:48.421089626Z [inf]    "heapTotal": 62951424,
+2025-10-08T00:25:48.421093304Z [inf]    "heapUsed": 36915776,
+2025-10-08T00:25:48.421097400Z [inf]    "external": 4360646,
+2025-10-08T00:25:48.421101747Z [inf]    "arrayBuffers": 778573
+2025-10-08T00:25:48.421105924Z [inf]  }
+2025-10-08T00:25:48.421109779Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-08T00:25:48.421113832Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-08T00:25:39.446Z
+2025-10-08T00:25:48.421119524Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-08T00:25:48.421125557Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-08T00:25:39.447Z
+2025-10-08T00:25:48.421130986Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-08T00:25:48.421136455Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-08T00:25:48.421142040Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-08T00:25:48.421147757Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-08T00:25:48.421152979Z [inf]  🔧 Validating environment configuration...
+2025-10-08T00:25:48.421158517Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-08T00:25:48.421163430Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-08T00:25:48.421168686Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-08T00:25:48.421173402Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-08T00:25:48.421178257Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-08T00:25:48.421184668Z [inf]  ✅ Database URL configured
+2025-10-08T00:25:48.421190633Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-10-08T00:25:48.421195214Z [inf]  ✅ SMS service (Telnyx) configured
+2025-10-08T00:25:48.421199349Z [inf]  ✅ Session authentication configured
+2025-10-08T00:25:48.421203297Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-08T00:25:48.421207580Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-08T00:25:48.421211625Z [inf]  🔧 Testing database connection...
+2025-10-08T00:25:48.421215669Z [err]  (node:49) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-08T00:25:48.421551674Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-08T00:25:48.421556626Z [err]  ⚠️ Database connection failed during startup (non-fatal): error: column loads.odometer_reading does not exist
+2025-10-08T00:25:48.421561369Z [err]      at /app/node_modules/pg-pool/index.js:45:11
+2025-10-08T00:25:48.421567209Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-08T00:25:48.421571961Z [err]      at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+2025-10-08T00:25:48.421576535Z [err]      at async DatabaseStorage.getLoads (file:///app/dist/index.js:1016:24)
+2025-10-08T00:25:48.421586234Z [err]      at async startServer (file:///app/dist/index.js:9275:7) {
+2025-10-08T00:25:48.421594088Z [err]    length: 122,
+2025-10-08T00:25:48.421599303Z [err]    severity: 'ERROR',
+2025-10-08T00:25:48.421604545Z [err]    code: '42703',
+2025-10-08T00:25:48.421609615Z [err]    detail: undefined,
+2025-10-08T00:25:48.421616139Z [err]    hint: undefined,
+2025-10-08T00:25:48.421620759Z [err]    position: '1146',
+2025-10-08T00:25:48.421625655Z [err]    internalPosition: undefined,
+2025-10-08T00:25:48.421629219Z [err]    internalQuery: undefined,
+2025-10-08T00:25:48.421632615Z [err]    where: undefined,
+2025-10-08T00:25:48.421636448Z [err]    schema: undefined,
+2025-10-08T00:25:48.421639979Z [err]    table: undefined,
+2025-10-08T00:25:48.421643659Z [err]    column: undefined,
+2025-10-08T00:25:48.421647116Z [err]    dataType: undefined,
+2025-10-08T00:25:48.421652886Z [err]    constraint: undefined,
+2025-10-08T00:25:48.421657642Z [err]    file: 'parse_relation.c',
+2025-10-08T00:25:48.421661255Z [err]    line: '3716',
+2025-10-08T00:25:48.421664834Z [err]    routine: 'errorMissingColumn'
+2025-10-08T00:25:48.421668476Z [err]  }
+2025-10-08T00:25:48.421671967Z [inf]  🔧 Server will continue starting - database will be retried on first request
+2025-10-08T00:25:48.421675390Z [inf]  📝 Registering application routes...
+2025-10-08T00:25:48.421679749Z [inf]  ✅ Routes registered successfully
+2025-10-08T00:25:48.421683654Z [inf]  📁 Setting up static file serving for production...
+2025-10-08T00:25:48.421687427Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-08T00:25:48.421691004Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-08T00:25:48.421694549Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-08T00:25:48.421698279Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-08T00:25:48.421701668Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-08T00:25:48.421706697Z [inf]  📍 Health check endpoints available:
+2025-10-08T00:25:48.421711582Z [inf]     - GET /api/status (basic status)
+2025-10-08T00:25:48.421716548Z [inf]     - GET /api/health (health check)
+2025-10-08T00:25:48.421722268Z [inf]     - GET /api/ready (readiness check)
+2025-10-08T00:25:48.421731276Z [inf]  12:25:39 AM [express] serving on port 8080
+2025-10-08T00:25:48.421736181Z [inf]  12:25:40 AM [express] GET /api/health 200 in 4ms :: {"status":"ok","timestamp":"2025-10-08T00:25:40.2…
