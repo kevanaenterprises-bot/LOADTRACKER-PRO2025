@@ -130,7 +130,7 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
 
   // Auto-start tracking if load is already confirmed
   useEffect(() => {
-    if ((load.status === 'confirmed' || load.status === 'assigned') && load.trackingEnabled && watchId === null) {
+    if ((load.status === 'confirmed' || load.status === 'assigned' || load.status === 'in_transit') && load.trackingEnabled && watchId === null) {
       startTracking();
     }
 
