@@ -683,12 +683,29 @@ export class DatabaseStorage implements IStorage {
         .where(eq(loads.driverId, driverId))
         .orderBy(desc(loads.createdAt));
       
-      return result.map(row => ({
-        ...row.load,
-        driver: row.driver || undefined,
-        location: row.location || undefined,
-        invoice: row.invoice || undefined,
-      }));
+      // Fetch pickup locations and stops for each load
+      const loadsWithDetails = await Promise.all(
+        result.map(async (row) => {
+          let pickupLocation: Location | undefined = undefined;
+          if (row.load.pickupLocationId) {
+            const [pickup] = await db.select().from(locations).where(eq(locations.id, row.load.pickupLocationId));
+            pickupLocation = pickup;
+          }
+          
+          const stops = await this.getLoadStops(row.load.id);
+          
+          return {
+            ...row.load,
+            driver: row.driver || undefined,
+            location: row.location || undefined,
+            pickupLocation: pickupLocation,
+            invoice: row.invoice || undefined,
+            stops: stops || [],
+          };
+        })
+      );
+      
+      return loadsWithDetails;
     } catch (error) {
       console.error("Error in getLoadsByDriver:", error);
       return [];
