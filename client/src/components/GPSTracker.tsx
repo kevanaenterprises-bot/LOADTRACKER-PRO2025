@@ -19,6 +19,7 @@ interface GeolocationPosition {
 }
 
 export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
+  // v2.0 - Fixed GPS tracking POST endpoint and in_transit auto-start
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [watchId, setWatchId] = useState<number | null>(null);
