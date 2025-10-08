@@ -1,0 +1,179 @@
+2025-10-08T22:57:46.666090523Z [inf]  
+2025-10-08T22:57:58.450720152Z [inf]  [35m[Region: us-west1][0m
+2025-10-08T22:57:58.454594664Z [inf]  [35m==============
+2025-10-08T22:57:58.454614813Z [inf]  Using Nixpacks
+2025-10-08T22:57:58.454618353Z [inf]  ==============
+2025-10-08T22:57:58.454621662Z [inf]  [0m
+2025-10-08T22:57:58.454703202Z [inf]  context: jfvd-tzO_
+2025-10-08T22:57:58.602180795Z [inf]  ╔══════════════════════════════ Nixpacks v1.38.0 ══════════════════════════════╗
+2025-10-08T22:57:58.602206262Z [inf]  ║ setup      │ nodejs, python3, libnss3, libatk1.0-0, libatk-bridge2.0-0,      ║
+2025-10-08T22:57:58.602210781Z [inf]  ║            │ libcups2, libgbm1, libasound2t64, libpangocairo-1.0-0, libxss1, ║
+2025-10-08T22:57:58.602214390Z [inf]  ║            │ libgtk-3-0, libxshmfence1, libglu1, chromium                    ║
+2025-10-08T22:57:58.602220389Z [inf]  ║──────────────────────────────────────────────────────────────────────────────║
+2025-10-08T22:57:58.602223912Z [inf]  ║ caddy      │ pkgs: caddy                                                     ║
+2025-10-08T22:57:58.602227733Z [inf]  ║            │ cmds: caddy fmt --overwrite /assets/Caddyfile                   ║
+2025-10-08T22:57:58.602231108Z [inf]  ║──────────────────────────────────────────────────────────────────────────────║
+2025-10-08T22:57:58.602234160Z [inf]  ║ install    │ npm ci                                                          ║
+2025-10-08T22:57:58.602237541Z [inf]  ║──────────────────────────────────────────────────────────────────────────────║
+2025-10-08T22:57:58.602240884Z [inf]  ║ build      │ npx puppeteer browsers install chrome && npm run build          ║
+2025-10-08T22:57:58.602243776Z [inf]  ║──────────────────────────────────────────────────────────────────────────────║
+2025-10-08T22:57:58.602246733Z [inf]  ║ start      │ npx drizzle-kit push --force && npm start                       ║
+2025-10-08T22:57:58.602249932Z [inf]  ╚══════════════════════════════════════════════════════════════════════════════╝
+2025-10-08T22:57:59.342768391Z [inf]  [internal] load build definition from Dockerfile
+2025-10-08T22:57:59.342830140Z [inf]  [internal] load build definition from Dockerfile
+2025-10-08T22:57:59.342855803Z [inf]  [internal] load build definition from Dockerfile
+2025-10-08T22:57:59.342874061Z [inf]  [internal] load build definition from Dockerfile
+2025-10-08T22:57:59.352221162Z [inf]  [internal] load build definition from Dockerfile
+2025-10-08T22:57:59.354338690Z [inf]  [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2025-10-08T22:57:59.589498958Z [inf]  [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+2025-10-08T22:57:59.589837961Z [inf]  [internal] load .dockerignore
+2025-10-08T22:57:59.589878287Z [inf]  [internal] load .dockerignore
+2025-10-08T22:57:59.589920095Z [inf]  [internal] load .dockerignore
+2025-10-08T22:57:59.599082754Z [inf]  [internal] load .dockerignore
+2025-10-08T22:57:59.605197425Z [inf]  [stage-0  4/16] RUN nix-env -if .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix && nix-collect-garbage -d
+2025-10-08T22:57:59.605218355Z [inf]  [stage-0  3/16] COPY .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix
+2025-10-08T22:57:59.605228258Z [inf]  [internal] load build context
+2025-10-08T22:57:59.605234655Z [inf]  [stage-0  2/16] WORKDIR /app/
+2025-10-08T22:57:59.605240688Z [inf]  [stage-0  1/16] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2025-10-08T22:57:59.605344165Z [inf]  [stage-0 16/16] COPY . /app
+2025-10-08T22:57:59.605352400Z [inf]  [stage-0 15/16] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2025-10-08T22:57:59.605359398Z [inf]  [stage-0 14/16] RUN --mount=type=cache,id=s/4145902e-a8a2-44df-b55e-fd0a0fecb415-node_modules/cache,target=/app/node_modules/.cache npx puppeteer browsers install chrome && npm run build
+2025-10-08T22:57:59.605369282Z [inf]  [stage-0 13/16] COPY . /app/.
+2025-10-08T22:57:59.605375955Z [inf]  [stage-0 12/16] RUN --mount=type=cache,id=s/4145902e-a8a2-44df-b55e-fd0a0fecb415-/root/npm,target=/root/.npm npm ci
+2025-10-08T22:57:59.605381566Z [inf]  [stage-0 11/16] COPY . /app/.
+2025-10-08T22:57:59.605387165Z [inf]  [stage-0 10/16] RUN  caddy fmt --overwrite /assets/Caddyfile
+2025-10-08T22:57:59.605392572Z [inf]  [stage-0  9/16] COPY . /app/.
+2025-10-08T22:57:59.605400596Z [inf]  [stage-0  8/16] COPY .nixpacks/assets /assets/
+2025-10-08T22:57:59.605407157Z [inf]  [stage-0  7/16] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgbm1 libasound2t64 libpangocairo-1.0-0 libxss1 libgtk-3-0 libxshmfence1 libglu1 chromium
+2025-10-08T22:57:59.605413054Z [inf]  [stage-0  6/16] RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
+2025-10-08T22:57:59.605421930Z [inf]  [stage-0  5/16] COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
+2025-10-08T22:57:59.605432947Z [inf]  [stage-0  1/16] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2025-10-08T22:57:59.605619811Z [inf]  [internal] load build context
+2025-10-08T22:57:59.605948993Z [inf]  [internal] load build context
+2025-10-08T22:57:59.613263678Z [inf]  [stage-0  1/16] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+2025-10-08T22:58:03.081681593Z [inf]  [internal] load build context
+2025-10-08T22:58:03.087525539Z [inf]  [stage-0  2/16] WORKDIR /app/
+2025-10-08T22:58:03.087562554Z [inf]  [stage-0  3/16] COPY .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix
+2025-10-08T22:58:03.087577764Z [inf]  [stage-0  4/16] RUN nix-env -if .nixpacks/nixpkgs-ba913eda2df8eb72147259189d55932012df6301.nix && nix-collect-garbage -d
+2025-10-08T22:58:03.087585164Z [inf]  [stage-0  5/16] COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
+2025-10-08T22:58:03.087591697Z [inf]  [stage-0  6/16] RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
+2025-10-08T22:58:03.087604817Z [inf]  [stage-0  7/16] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgbm1 libasound2t64 libpangocairo-1.0-0 libxss1 libgtk-3-0 libxshmfence1 libglu1 chromium
+2025-10-08T22:58:03.087611384Z [inf]  [stage-0  8/16] COPY .nixpacks/assets /assets/
+2025-10-08T22:58:03.087627212Z [inf]  [stage-0  9/16] COPY . /app/.
+2025-10-08T22:58:03.882349558Z [inf]  [stage-0  9/16] COPY . /app/.
+2025-10-08T22:58:03.883584345Z [inf]  [stage-0 10/16] RUN  caddy fmt --overwrite /assets/Caddyfile
+2025-10-08T22:58:04.076215948Z [inf]  [stage-0 10/16] RUN  caddy fmt --overwrite /assets/Caddyfile
+2025-10-08T22:58:04.077295293Z [inf]  [stage-0 11/16] COPY . /app/.
+2025-10-08T22:58:04.818675509Z [inf]  [stage-0 11/16] COPY . /app/.
+2025-10-08T22:58:04.820266476Z [inf]  [stage-0 12/16] RUN --mount=type=cache,id=s/4145902e-a8a2-44df-b55e-fd0a0fecb415-/root/npm,target=/root/.npm npm ci
+2025-10-08T22:58:04.974976397Z [inf]  npm warn config production Use `--omit=dev` instead.
+
+2025-10-08T22:58:10.547485799Z [inf]  npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+
+2025-10-08T22:58:10.661458521Z [inf]  npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+
+2025-10-08T22:58:10.688312275Z [inf]  npm warn deprecated querystring@0.2.1: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
+
+2025-10-08T22:58:10.746877802Z [inf]  npm warn deprecated build-url@1.3.3: This package is no longer maintained
+
+2025-10-08T22:58:11.050408875Z [inf]  npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+
+2025-10-08T22:58:17.670794047Z [inf]  
+added 870 packages, and audited 871 packages in 13s
+
+2025-10-08T22:58:17.670808259Z [inf]  
+
+2025-10-08T22:58:17.670811654Z [inf]  93 packages are looking for funding
+
+2025-10-08T22:58:17.670846596Z [inf]    run `npm fund` for details
+
+2025-10-08T22:58:17.698885653Z [inf]  
+11 vulnerabilities (1 low, 8 moderate, 2 high)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.
+
+Run `npm audit` for details.
+
+2025-10-08T22:58:18.164293955Z [inf]  [stage-0 12/16] RUN --mount=type=cache,id=s/4145902e-a8a2-44df-b55e-fd0a0fecb415-/root/npm,target=/root/.npm npm ci
+2025-10-08T22:58:18.165940461Z [inf]  [stage-0 13/16] COPY . /app/.
+2025-10-08T22:58:19.049998577Z [inf]  [stage-0 13/16] COPY . /app/.
+2025-10-08T22:58:19.051781564Z [inf]  [stage-0 14/16] RUN --mount=type=cache,id=s/4145902e-a8a2-44df-b55e-fd0a0fecb415-node_modules/cache,target=/app/node_modules/.cache npx puppeteer browsers install chrome && npm run build
+2025-10-08T22:58:19.20732007Z [inf]  npm warn config production Use `--omit=dev` instead.
+
+2025-10-08T22:58:19.646573356Z [inf]  chrome@139.0.7258.138 /root/.cache/puppeteer/chrome/linux-139.0.7258.138/chrome-linux64/chrome
+
+2025-10-08T22:58:19.749487996Z [inf]  npm warn config production Use `--omit=dev` instead.
+
+2025-10-08T22:58:19.773249854Z [inf]  
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+
+2025-10-08T22:58:19.963535032Z [inf]  [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+
+2025-10-08T22:58:20.013549619Z [inf]  transforming...
+
+2025-10-08T22:58:20.279963394Z [inf]  Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+2025-10-08T22:58:24.475508487Z [inf]  [32m✓[39m 2714 modules transformed.
+
+2025-10-08T22:58:24.860937003Z [inf]  rendering chunks...
+
+2025-10-08T22:58:24.872808992Z [inf]  computing gzip size...
+
+2025-10-08T22:58:24.907621037Z [inf]  [2m../dist/public/[22m[32mindex.html                         [39m[1m[2m  2.20 kB[22m[1m[22m[2m │ gzip:   0.86 kB[22m
+
+2025-10-08T22:58:24.90763631Z [inf]  [2m../dist/public/[22m[2massets/[22m[32mgo-farms-logo-xXNzNoZw.png  [39m[1m[2m355.52 kB[22m[1m[22m
+
+2025-10-08T22:58:24.907741696Z [inf]  [2m../dist/public/[22m[2massets/[22m[35mindex-BfuvD7Mw.css          [39m[1m[2m 91.76 kB[22m[1m[22m[2m │ gzip:  19.76 kB[22m
+
+2025-10-08T22:58:24.907828328Z [inf]  [2m../dist/public/[22m[2massets/[22m[36mindex-OfiiQ4wb.js           [39m[1m[33m965.82 kB[39m[22m[2m │ gzip: 275.27 kB[22m
+
+2025-10-08T22:58:24.907919147Z [inf]  [33m
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+
+2025-10-08T22:58:24.908210211Z [inf]  [32m✓ built in 4.92s[39m
+
+2025-10-08T22:58:24.962636562Z [inf]  
+  dist/index.js  388.3kb
+
+⚡ Done in 19ms
+
+2025-10-08T22:58:25.062510295Z [inf]  [stage-0 14/16] RUN --mount=type=cache,id=s/4145902e-a8a2-44df-b55e-fd0a0fecb415-node_modules/cache,target=/app/node_modules/.cache npx puppeteer browsers install chrome && npm run build
+2025-10-08T22:58:25.063723242Z [inf]  [stage-0 15/16] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2025-10-08T22:58:25.163563075Z [inf]  [stage-0 15/16] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+2025-10-08T22:58:25.164676926Z [inf]  [stage-0 16/16] COPY . /app
+2025-10-08T22:58:25.866146670Z [inf]  [stage-0 16/16] COPY . /app
+2025-10-08T22:58:25.868215414Z [inf]  exporting to docker image format
+2025-10-08T22:58:25.868231948Z [inf]  exporting to image
+2025-10-08T22:58:47.736518443Z [inf]  [auth] sharing credentials for production-us-west2.railway-registry.com
+2025-10-08T22:58:47.736583508Z [inf]  [auth] sharing credentials for production-us-west2.railway-registry.com
+2025-10-08T22:58:50.851142555Z [inf]  importing to docker
+2025-10-08T22:59:17.067842276Z [inf]  importing to docker
+2025-10-08T22:59:22.997973971Z [inf]  [stage-0  2/16] WORKDIR /app/
+2025-10-08T22:59:22.997989976Z [inf]  [stage-0  2/16] WORKDIR /app/
+2025-10-08T22:59:56.537281476Z [inf]  === Successfully Built! ===
+2025-10-08T22:59:56.537322321Z [inf]  Run:
+2025-10-08T22:59:56.537327809Z [inf]  docker run -it production-us-west2.railway-registry.com/4145902e-a8a2-44df-b55e-fd0a0fecb415:ecd6357f-246b-4a2b-ad06-a210f780fb11
+2025-10-08T22:59:56.578964987Z [inf]  [92mBuild time: 118.12 seconds[0m
+2025-10-08T23:00:41.899765901Z [inf]  
+2025-10-08T23:00:41.899992415Z [inf]  [35m====================
+Starting Healthcheck
+====================
+[0m
+2025-10-08T23:00:41.899999641Z [inf]  [37mPath: /api/health[0m
+2025-10-08T23:00:41.900003102Z [inf]  [37mRetry window: 5m0s[0m
+2025-10-08T23:00:41.900005387Z [inf]  
+2025-10-08T23:00:44.130636462Z [inf]  [92m[1/1] Healthcheck succeeded![0m
