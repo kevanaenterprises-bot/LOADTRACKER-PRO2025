@@ -53,7 +53,7 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
   // Mutation to update location
   const updateLocationMutation = useMutation({
     mutationFn: async (position: GeolocationPosition) => {
-      return await apiRequest(`/api/loads/${load.id}/location`, 'PUT', {
+      return await apiRequest(`/api/loads/${load.id}/location`, 'POST', {
         latitude: position.latitude,
         longitude: position.longitude,
         accuracy: position.accuracy,
