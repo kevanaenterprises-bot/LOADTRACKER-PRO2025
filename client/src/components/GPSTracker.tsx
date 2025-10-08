@@ -244,31 +244,7 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Pickup:</span>
             <span className="font-medium text-right">
-              {(() => {
-                if (load.pickupAddress) return load.pickupAddress;
-                
-                if (load.pickupLocation) {
-                  const parts = [load.pickupLocation.name];
-                  if (load.pickupLocation.address) parts.push(load.pickupLocation.address);
-                  if (load.pickupLocation.city && load.pickupLocation.state) {
-                    parts.push(`${load.pickupLocation.city}, ${load.pickupLocation.state}`);
-                  } else if (load.pickupLocation.city) {
-                    parts.push(load.pickupLocation.city);
-                  } else if (load.pickupLocation.state) {
-                    parts.push(load.pickupLocation.state);
-                  }
-                  const result = parts.filter(Boolean).join(' - ');
-                  if (result) return result;
-                }
-                
-                if (load.stops && load.stops.length > 0 && load.stops[0].stopType === 'pickup') {
-                  const stop = load.stops[0];
-                  const parts = [stop.companyName, stop.address].filter(Boolean);
-                  if (parts.length > 0) return parts.join(' - ');
-                }
-                
-                return load.companyName || 'Not specified';
-              })()}
+              {load.pickupAddress || load.companyName || 'Not specified'}
             </span>
           </div>
           <div className="flex justify-between text-sm">
