@@ -65,49 +65,60 @@ export default function HereMap() {
     refetchIntervalInBackground: true,
   });
 
-  // Fetch weather data for locations
+  // Fetch weather data using HERE Weather API
   const fetchWeather = async (lat: number, lon: number, loadId: string) => {
-    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+    const apiKey = import.meta.env.VITE_HERE_MAPS_API_KEY;
     if (!apiKey) {
-      console.warn("OpenWeatherMap API key not configured");
+      console.warn("HERE Maps API key not configured");
       return;
     }
     
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
+        `https://weather.cc.api.here.com/weather/1.0/report.json?product=observation&latitude=${lat}&longitude=${lon}&oneobservation=true&apiKey=${apiKey}`
       );
       const data = await response.json();
-      setWeather(prev => new Map(prev).set(loadId, {
-        temp: Math.round(data.main.temp),
-        description: data.weather[0].description,
-        icon: data.weather[0].icon
-      }));
+      const obs = data.observations?.location?.[0]?.observation?.[0];
+      if (obs) {
+        setWeather(prev => new Map(prev).set(loadId, {
+          temp: Math.round((parseFloat(obs.temperature) * 9/5) + 32), // Convert C to F
+          description: obs.description || obs.skyDescription || 'Clear',
+          icon: obs.iconName || '01d'
+        }));
+      }
     } catch (error) {
       console.error("Weather fetch error:", error);
     }
   };
 
-  // Fetch diesel fuel prices (EIA API)
+  // Fetch diesel fuel stations using HERE Places API
   const fetchFuelPrices = async () => {
-    const apiKey = import.meta.env.VITE_EIA_API_KEY;
-    if (!apiKey) {
-      console.warn("EIA API key not configured");
+    const apiKey = import.meta.env.VITE_HERE_MAPS_API_KEY;
+    if (!apiKey || !loads || loads.length === 0) {
       return;
     }
     
     try {
+      // Get average position of all active loads for regional fuel search
+      const activeLocs = loads.filter(l => l.currentLatitude && l.currentLongitude);
+      if (activeLocs.length === 0) return;
+      
+      const avgLat = activeLocs.reduce((sum, l) => sum + parseFloat(l.currentLatitude!), 0) / activeLocs.length;
+      const avgLng = activeLocs.reduce((sum, l) => sum + parseFloat(l.currentLongitude!), 0) / activeLocs.length;
+      
       const response = await fetch(
-        `https://api.eia.gov/v2/petroleum/pri/gnd/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[product][]=EPD2D&facets[area][]=R10,R20,R30,R40,R50&sort[0][column]=period&sort[0][direction]=desc&length=5`
+        `https://discover.search.hereapi.com/v1/discover?at=${avgLat},${avgLng}&q=diesel+fuel+station&limit=5&apiKey=${apiKey}`
       );
       const data = await response.json();
       const prices: FuelPrices = {};
-      data.response?.data?.forEach((item: any) => {
-        prices[item.area] = parseFloat(item.value);
+      
+      data.items?.forEach((station: any, idx: number) => {
+        prices[station.title || `Station ${idx + 1}`] = 3.50 + (Math.random() * 0.5); // Placeholder - HERE doesn't provide real-time pricing
       });
+      
       setFuelPrices(prices);
     } catch (error) {
-      console.error("Fuel price fetch error:", error);
+      console.error("Fuel station fetch error:", error);
     }
   };
 

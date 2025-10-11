@@ -26,24 +26,27 @@ export default function DriverRouteMap({ load, currentLat, currentLng }: DriverR
   const mapInstanceRef = useRef<any>(null);
   const [weather, setWeather] = useState<WeatherData | null>(null);
 
-  // Fetch weather for current location
+  // Fetch weather using HERE Weather API
   const fetchWeather = async (lat: number, lon: number) => {
-    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+    const apiKey = import.meta.env.VITE_HERE_MAPS_API_KEY;
     if (!apiKey) {
-      console.warn("OpenWeatherMap API key not configured");
+      console.warn("HERE Maps API key not configured");
       return;
     }
     
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
+        `https://weather.cc.api.here.com/weather/1.0/report.json?product=observation&latitude=${lat}&longitude=${lon}&oneobservation=true&apiKey=${apiKey}`
       );
       const data = await response.json();
-      setWeather({
-        temp: Math.round(data.main.temp),
-        description: data.weather[0].description,
-        icon: data.weather[0].icon
-      });
+      const obs = data.observations?.location?.[0]?.observation?.[0];
+      if (obs) {
+        setWeather({
+          temp: Math.round((parseFloat(obs.temperature) * 9/5) + 32), // Convert C to F
+          description: obs.description || obs.skyDescription || 'Clear',
+          icon: obs.iconName || '01d'
+        });
+      }
     } catch (error) {
       console.error("Weather fetch error:", error);
     }
