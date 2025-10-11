@@ -3,15 +3,16 @@ const { Pool } = pkg;
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
+// Use LOADTRACKER_DB_URL if available (prevents Railway auto-override),
+// otherwise fall back to DATABASE_URL
+const connectionString = process.env.LOADTRACKER_DB_URL || process.env.DATABASE_URL;
+
+if (!connectionString) {
   throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
+    "Database URL must be set. Set either LOADTRACKER_DB_URL or DATABASE_URL.",
   );
 }
-
-// Configure connection for Railway or other PostgreSQL services
-const connectionString = process.env.DATABASE_URL;
-const isRailway = connectionString.includes('yamabiko.proxy.rlwy.net');
+const isRailway = connectionString.includes('proxy.rlwy.net');
 
 export const pool = new Pool({
   connectionString,
