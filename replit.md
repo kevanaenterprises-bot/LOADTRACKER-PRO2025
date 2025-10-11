@@ -21,6 +21,9 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **GPS Tracking**: Automatic GPS tracking for drivers, providing real-time location updates and status changes ("at shipper," "left shipper," "at receiver") based on proximity.
 - **Load Management**: Comprehensive lifecycle tracking, including support for multiple stops per load, flexible load number formats, and automated status updates.
 - **Communication**: Telnyx for SMS notifications to drivers, Resend for email delivery (transactional email API - works with Railway/cloud hosting without SMTP port blocking).
+- **Interactive Mapping**: HERE Maps JavaScript SDK v3.1 for real-time fleet tracking with weather overlays and fuel station finder. Replaced Leaflet with native HERE Maps integration.
+- **Weather Integration**: HERE Weather API providing real-time temperature, sky conditions, and weather descriptions along routes (converted from Celsius to Fahrenheit).
+- **Fuel Station Finder**: HERE Places API for locating nearby diesel fuel stations with names and addresses along routes.
 - **IFTA Reporting**: Odometer-based mileage tracking with automatic state-by-state breakdown using HERE Maps API v8 for International Fuel Tax Agreement compliance. System captures odometer readings at POD upload, calculates trip miles, and uses truck-specific routing to determine jurisdiction-specific mileage.
 
 ### Feature Specifications
@@ -31,6 +34,8 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **OCR Wright Con Scanner**: Tool to upload rate confirmation images, extract key data (load numbers, PO numbers, appointment times, addresses), and allow for editing before load creation.
 - **Automatic GPS Tracking**: Drivers can opt-in for automatic location tracking, which updates load statuses based on geographical proximity to pickup/delivery points.
 - **Universal Load Numbers**: System flexibly handles any load number format as the primary identifier.
+- **Real-Time Fleet Map**: Interactive HERE Maps dashboard showing all active loads with truck markers, destination pins, route polylines, weather overlays, and nearby diesel fuel station locations. Auto-refreshes every 30 seconds.
+- **Driver Route Map**: Individual route visualization for drivers showing current position, destination, and route line with weather conditions.
 
 ## External Dependencies
 
@@ -41,7 +46,10 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Telnyx**: SMS API for driver communications.
 - **Resend**: Transactional email API for invoice delivery (cloud-friendly, no SMTP port blocking).
 - **Anthropic Claude 4.0 Sonnet**: OCR service for rate confirmation scanning.
+- **HERE Weather API**: Real-time weather observations including temperature, sky conditions, and descriptions.
+- **HERE Places API**: Fuel station search and location finder.
 - **HERE Maps API v8**: Truck routing and state-by-state mileage breakdown for IFTA reporting.
+- **HERE Maps JavaScript SDK v3.1**: Interactive mapping, fleet tracking, and route visualization.
 
 ### Development Tools
 - **Vite**: Frontend build tool.

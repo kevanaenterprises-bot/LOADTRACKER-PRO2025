@@ -37,7 +37,7 @@ interface WeatherData {
 }
 
 interface FuelPrices {
-  [state: string]: number;
+  [stationName: string]: string; // Station name -> address
 }
 
 declare global {
@@ -75,7 +75,7 @@ export default function HereMap() {
     
     try {
       const response = await fetch(
-        `https://weather.cc.api.here.com/weather/1.0/report.json?product=observation&latitude=${lat}&longitude=${lon}&oneobservation=true&apiKey=${apiKey}`
+        `https://weather.ls.hereapi.com/weather/1.0/report.json?product=observation&latitude=${lat}&longitude=${lon}&oneobservation=true&apiKey=${apiKey}`
       );
       const data = await response.json();
       const obs = data.observations?.location?.[0]?.observation?.[0];
@@ -110,13 +110,16 @@ export default function HereMap() {
         `https://discover.search.hereapi.com/v1/discover?at=${avgLat},${avgLng}&q=diesel+fuel+station&limit=5&apiKey=${apiKey}`
       );
       const data = await response.json();
-      const prices: FuelPrices = {};
+      const stations: FuelPrices = {};
       
-      data.items?.forEach((station: any, idx: number) => {
-        prices[station.title || `Station ${idx + 1}`] = 3.50 + (Math.random() * 0.5); // Placeholder - HERE doesn't provide real-time pricing
+      // Display station names and addresses instead of prices (HERE doesn't provide real-time fuel pricing)
+      data.items?.forEach((station: any) => {
+        const name = station.title || 'Unknown Station';
+        const address = station.address?.label || 'Address not available';
+        stations[name] = address;
       });
       
-      setFuelPrices(prices);
+      setFuelPrices(stations);
     } catch (error) {
       console.error("Fuel station fetch error:", error);
     }
@@ -493,14 +496,14 @@ export default function HereMap() {
               {showFuelPrices && Object.keys(fuelPrices).length > 0 && (
                 <div className="mt-6 p-3 bg-blue-50 rounded-lg">
                   <h4 className="font-medium mb-2 text-sm flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
-                    Diesel Prices
+                    <MapPin className="w-4 h-4" />
+                    Nearby Diesel Stations
                   </h4>
-                  <div className="space-y-1 text-xs">
-                    {Object.entries(fuelPrices).slice(0, 5).map(([region, price]) => (
-                      <div key={region} className="flex justify-between">
-                        <span>{region}</span>
-                        <span className="font-medium">${price.toFixed(2)}/gal</span>
+                  <div className="space-y-2 text-xs">
+                    {Object.entries(fuelPrices).slice(0, 5).map(([station, address]) => (
+                      <div key={station} className="border-b pb-1 last:border-0">
+                        <div className="font-medium">{station}</div>
+                        <div className="text-gray-600">{address}</div>
                       </div>
                     ))}
                   </div>

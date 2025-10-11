@@ -36,7 +36,7 @@ export default function DriverRouteMap({ load, currentLat, currentLng }: DriverR
     
     try {
       const response = await fetch(
-        `https://weather.cc.api.here.com/weather/1.0/report.json?product=observation&latitude=${lat}&longitude=${lon}&oneobservation=true&apiKey=${apiKey}`
+        `https://weather.ls.hereapi.com/weather/1.0/report.json?product=observation&latitude=${lat}&longitude=${lon}&oneobservation=true&apiKey=${apiKey}`
       );
       const data = await response.json();
       const obs = data.observations?.location?.[0]?.observation?.[0];
