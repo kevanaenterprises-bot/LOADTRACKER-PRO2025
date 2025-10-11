@@ -67,9 +67,15 @@ export default function HereMap() {
 
   // Fetch weather data for locations
   const fetchWeather = async (lat: number, lon: number, loadId: string) => {
+    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+    if (!apiKey) {
+      console.warn("OpenWeatherMap API key not configured");
+      return;
+    }
+    
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=YOUR_OPENWEATHER_KEY`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
       );
       const data = await response.json();
       setWeather(prev => new Map(prev).set(loadId, {
@@ -84,9 +90,15 @@ export default function HereMap() {
 
   // Fetch diesel fuel prices (EIA API)
   const fetchFuelPrices = async () => {
+    const apiKey = import.meta.env.VITE_EIA_API_KEY;
+    if (!apiKey) {
+      console.warn("EIA API key not configured");
+      return;
+    }
+    
     try {
       const response = await fetch(
-        `https://api.eia.gov/v2/petroleum/pri/gnd/data/?api_key=YOUR_EIA_KEY&frequency=weekly&data[0]=value&facets[product][]=EPD2D&facets[area][]=R10,R20,R30,R40,R50&sort[0][column]=period&sort[0][direction]=desc&length=5`
+        `https://api.eia.gov/v2/petroleum/pri/gnd/data/?api_key=${apiKey}&frequency=weekly&data[0]=value&facets[product][]=EPD2D&facets[area][]=R10,R20,R30,R40,R50&sort[0][column]=period&sort[0][direction]=desc&length=5`
       );
       const data = await response.json();
       const prices: FuelPrices = {};

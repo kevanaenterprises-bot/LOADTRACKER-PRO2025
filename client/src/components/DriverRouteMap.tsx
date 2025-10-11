@@ -28,9 +28,15 @@ export default function DriverRouteMap({ load, currentLat, currentLng }: DriverR
 
   // Fetch weather for current location
   const fetchWeather = async (lat: number, lon: number) => {
+    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+    if (!apiKey) {
+      console.warn("OpenWeatherMap API key not configured");
+      return;
+    }
+    
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=YOUR_OPENWEATHER_KEY`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=imperial&appid=${apiKey}`
       );
       const data = await response.json();
       setWeather({
