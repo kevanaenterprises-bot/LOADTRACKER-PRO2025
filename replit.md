@@ -4,6 +4,24 @@
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies. It handles load dispatch, driver coordination, and automated invoicing. The application offers separate interfaces for office staff and drivers, featuring real-time status tracking, document management, and automated invoicing capabilities. The system aims to streamline logistics operations and improve efficiency.
 
 ## Recent Changes
+### October 12, 2025 - Historical Marker Road Tour Feature
+- **GPS-Triggered Audio Tours**: Implemented a Road to Hana-style audio tour system for truck drivers featuring GPS-triggered narration of historical markers
+- **222,969+ Marker Database Ready**: System designed to support importing from The Historical Marker Database (HMDB.org) with 8 sample markers across the US
+- **Web Speech API Integration**: Free, browser-native text-to-speech automatically reads historical marker inscriptions when drivers are within 500 meters
+- **Proximity Detection**: Haversine formula calculates distances with bounding box optimization for efficient queries
+- **Driver-Friendly UI**: Simple toggle in driver portal, shows nearby markers, prevents repeats, displays "heard" status
+- **Sample Markers Included**:
+  - Route 66 (Flagstaff, AZ)
+  - Gettysburg Address Site (PA)
+  - Golden Gate Bridge (San Francisco, CA)
+  - Oregon Trail (Wyoming)
+  - Freedom Trail (Boston, MA)
+  - Mount Rushmore (South Dakota)
+  - Transcontinental Railroad (Utah)
+  - Alamo Mission (San Antonio, TX)
+- **Database Schema**: New `historical_markers` and `marker_history` tables track markers and driver listening history
+- **API Routes**: Complete CRUD operations for markers, proximity search, toggle control, and history tracking
+
 ### October 12, 2025 - Google Cloud Document AI Integration
 - **OCR Engine Upgrade**: Migrated from Anthropic Claude to Google Cloud Document AI for superior document processing capabilities
 - **PDF Support Added**: Scanner now fully supports PDF files in addition to images (PNG, JPEG, GIF, WebP)
@@ -74,6 +92,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
   - Individual load details with truck number, delivery date, and mileage breakdowns
   - Separate visualization of loaded vs deadhead miles for compliance reporting
 - **Error Handling**: React ErrorBoundary prevents white-page crashes, displaying user-friendly error messages with reload/home options instead of blank screens.
+- **Historical Marker Road Tour**: GPS-triggered audio tour system for drivers featuring automatic narration of historical markers as they drive past them. Uses Web Speech API for free, browser-native text-to-speech. Drivers can toggle on/off, see nearby markers within 500 meters, and system prevents repeating the same marker. Includes tracking of which markers have been heard and supports importing 222,969+ markers from The Historical Marker Database.
 
 ## External Dependencies
 

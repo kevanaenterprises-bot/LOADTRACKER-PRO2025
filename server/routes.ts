@@ -7590,6 +7590,33 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+  // Seed sample historical markers (admin only - use bypass secret)
+  app.post("/api/road-tour/seed-markers", async (req, res) => {
+    try {
+      const bypassToken = req.headers['x-bypass-secret'];
+      if (bypassToken !== BYPASS_SECRET) {
+        return res.status(401).json({ message: "Unauthorized - invalid bypass secret" });
+      }
+
+      const { sampleMarkers } = await import('./sampleMarkers');
+      const createdMarkers = [];
+      
+      for (const marker of sampleMarkers) {
+        const created = await storage.createHistoricalMarker(marker);
+        createdMarkers.push(created);
+      }
+
+      res.json({ 
+        success: true, 
+        message: `Successfully created ${createdMarkers.length} sample historical markers`,
+        markers: createdMarkers 
+      });
+    } catch (error: any) {
+      console.error("Error seeding markers:", error);
+      res.status(500).json({ message: "Failed to seed markers", error: error.message });
+    }
+  });
+
   // Simple health check endpoint for Railway deployment
   app.get("/api/health", (req, res) => {
     res.json({ 
