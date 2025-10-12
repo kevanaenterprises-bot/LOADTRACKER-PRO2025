@@ -100,7 +100,13 @@ export default function HereMap() {
     
     try {
       // Get average position of all active loads for regional fuel search
-      const activeLocs = loads.filter(l => l.currentLatitude && l.currentLongitude);
+      const activeLocs = loads.filter(l => {
+        if (!l.currentLatitude || !l.currentLongitude) return false;
+        const lat = parseFloat(l.currentLatitude);
+        const lng = parseFloat(l.currentLongitude);
+        // Skip invalid or null island (0, 0) coordinates
+        return !isNaN(lat) && !isNaN(lng) && !(lat === 0 && lng === 0);
+      });
       if (activeLocs.length === 0) return;
       
       const avgLat = activeLocs.reduce((sum, l) => sum + parseFloat(l.currentLatitude!), 0) / activeLocs.length;
@@ -253,7 +259,8 @@ export default function HereMap() {
       const lat = parseFloat(load.currentLatitude);
       const lng = parseFloat(load.currentLongitude);
 
-      if (isNaN(lat) || isNaN(lng)) return;
+      // Skip invalid or null island (0, 0) coordinates
+      if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) return;
 
       // Fetch weather if enabled
       if (showWeather) {
