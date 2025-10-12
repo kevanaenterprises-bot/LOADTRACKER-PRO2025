@@ -246,8 +246,12 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
               {/* Show more load details if available */}
               {(load.pickupLocation || load.deliveryLocation) && (
                 <div className="mt-2 text-sm text-gray-600">
-                  {load.pickupLocation && <p>📍 Pickup: {load.pickupLocation}</p>}
-                  {load.deliveryLocation && <p>🏁 Delivery: {load.deliveryLocation}</p>}
+                  {load.pickupLocation && (
+                    <p>📍 Pickup: {load.pickupLocation.name || load.pickupLocation.address || 'Pickup Location'}</p>
+                  )}
+                  {load.deliveryLocation && (
+                    <p>🏁 Delivery: {load.deliveryLocation.name || load.deliveryLocation.address || 'Delivery Location'}</p>
+                  )}
                 </div>
               )}
             </div>
