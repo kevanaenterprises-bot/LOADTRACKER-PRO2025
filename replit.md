@@ -4,13 +4,20 @@
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies. It handles load dispatch, driver coordination, and automated invoicing. The application offers separate interfaces for office staff and drivers, featuring real-time status tracking, document management, and automated invoicing capabilities. The system aims to streamline logistics operations and improve efficiency.
 
 ## Recent Changes
-### October 12, 2025 - OCR File Type Support and PDF Handling
-- **OCR File Type Validation**: Fixed Rate Con Scanner to properly handle different file formats. Scanner now explicitly supports PNG, JPEG, GIF, and WebP image formats.
-- **PDF File Handling**: PDF files are NOT supported by the OCR scanner (Anthropic Claude's vision API only accepts image formats). System now:
-  - Rejects PDFs at upload with clear error message instructing users to convert PDFs to images or take screenshots
-  - Updated UI text to clarify supported formats (removed PDF references)
-  - Added backend validation to prevent PDF processing attempts
-- **MIME Type Detection**: Enhanced OCR service with automatic MIME type detection for uploaded files to ensure correct format handling.
+### October 12, 2025 - Google Cloud Document AI Integration
+- **OCR Engine Upgrade**: Migrated from Anthropic Claude to Google Cloud Document AI for superior document processing capabilities
+- **PDF Support Added**: Scanner now fully supports PDF files in addition to images (PNG, JPEG, GIF, WebP)
+- **Enhanced Extraction**: Google Document AI provides:
+  - Native PDF text extraction without conversion
+  - Better accuracy on logistics documents
+  - Pattern-based field extraction for load numbers, PO numbers, dates, addresses, and company names
+  - Confidence scoring based on fields detected
+- **Implementation Details**:
+  - New service: `server/googleDocumentAI.ts` using `@google-cloud/documentai` SDK
+  - Credentials stored securely in environment variables (GOOGLE_CLOUD_PROJECT_ID, GOOGLE_APPLICATION_CREDENTIALS_JSON, GOOGLE_DOCUMENT_AI_PROCESSOR_ID)
+  - Updated API route: POST /api/ocr/extract now accepts both PDFs and images
+  - Frontend updated to accept PDF uploads with proper validation
+  - Production build deployed with updated UI messaging
 
 ### October 12, 2025 - Customer Dropdown, Driver Records, and Truck Service Management
 - **Customer Selection in Load Creation**: Added optional customer dropdown to load creation form (Step 1b). Loads can now be associated with a specific customer for better tracking and organization. Database schema updated with `customerId` foreign key in loads table.
@@ -37,7 +44,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Authentication**: Replit Auth (OpenID Connect), PostgreSQL-based session management, Passport.js, and a two-tier role-based access system ("office" and "driver"). The system supports admin, driver, Replit, and bypass token authentication.
 - **Database**: PostgreSQL with Drizzle ORM for type-safe operations, hosted on Neon Database. Drizzle Kit is used for schema migrations.
 - **File Storage**: Google Cloud Storage for documents (e.g., POD files), with ACLs and Uppy for uploads.
-- **OCR**: Integration with Anthropic Claude 4.0 Sonnet for scanning and extracting data from rate confirmation images, including an editable interface for correction.
+- **OCR**: Integration with Google Cloud Document AI for scanning and extracting data from rate confirmation PDFs and images, including an editable interface for correction. Supports PDF, PNG, JPEG, GIF, and WebP formats.
 - **GPS Tracking**: Automatic GPS tracking for drivers, providing real-time location updates and status changes ("at shipper," "left shipper," "at receiver") based on proximity.
 - **Load Management**: Comprehensive lifecycle tracking, including support for multiple stops per load, flexible load number formats, and automated status updates.
 - **Communication**: Telnyx for SMS notifications to drivers, Resend for email delivery (transactional email API - works with Railway/cloud hosting without SMTP port blocking).
@@ -56,7 +63,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Driver Portal**: Mobile-optimized interface for drivers to update load status, upload documents (BOL, POD), and utilize GPS tracking.
 - **Automated Invoicing**: Generation of invoices based on completed loads, with detailed line item breakdowns and pickup/delivery in/out timestamps.
 - **Document Management**: BOL validation, POD collection, and secure storage in Google Cloud Storage.
-- **OCR Wright Con Scanner**: Tool to upload rate confirmation images, extract key data (load numbers, PO numbers, appointment times, addresses), and allow for editing before load creation.
+- **OCR Wright Con Scanner**: Tool to upload rate confirmation PDFs or images, extract key data (load numbers, PO numbers, appointment times, addresses), and allow for editing before load creation. Powered by Google Cloud Document AI.
 - **Automatic GPS Tracking**: Drivers can opt-in for automatic location tracking, which updates load statuses based on geographical proximity to pickup/delivery points.
 - **Universal Load Numbers**: System flexibly handles any load number format as the primary identifier.
 - **Real-Time Fleet Map**: Interactive HERE Maps dashboard showing all active loads with truck markers, destination pins, route polylines, weather overlays, and nearby diesel fuel station locations. Auto-refreshes every 30 seconds. Displays loads with status: in_progress, in_transit, confirmed, en_route_pickup, at_shipper, left_shipper, en_route_receiver, at_receiver, or delivered when tracking is enabled.
@@ -76,7 +83,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Replit Authentication**: OAuth 2.0/OIDC identity provider.
 - **Telnyx**: SMS API for driver communications.
 - **Resend**: Transactional email API for invoice delivery (cloud-friendly, no SMTP port blocking).
-- **Anthropic Claude 4.0 Sonnet**: OCR service for rate confirmation scanning.
+- **Google Cloud Document AI**: OCR service for rate confirmation scanning with PDF and image support.
 - **HERE Weather API**: Real-time weather observations including temperature, sky conditions, and descriptions.
 - **HERE Places API**: Fuel station search and location finder.
 - **HERE Maps API v8**: Truck routing and state-by-state mileage breakdown for IFTA reporting.
