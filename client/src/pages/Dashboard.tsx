@@ -385,7 +385,7 @@ export default function Dashboard() {
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="mt-4 sm:mt-8">
           {/* Mobile: Show horizontal scrolling tabs, Desktop: Grid layout */}
           <div className="overflow-x-auto scrollbar-hide">
-            <TabsList className="hidden md:grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-9 h-auto gap-1">
+            <TabsList className="hidden md:grid w-full grid-cols-2 md:grid-cols-5 lg:grid-cols-10 h-auto gap-1">
               <TabsTrigger value="loads" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-blue-700 hover:text-blue-900 font-semibold min-h-[60px] touch-target">
                 <i className="fas fa-truck text-lg md:text-base text-blue-600"></i>
                 <span className="text-center leading-tight">Load Management</span>
