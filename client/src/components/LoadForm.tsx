@@ -68,6 +68,7 @@ export default function LoadForm() {
   
   // Simplified state for the new workflow
   const [loadNumber, setLoadNumber] = useState("109-");
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
   const [currentLocationId, setCurrentLocationId] = useState("");
   const [currentStopType, setCurrentStopType] = useState<"pickup" | "dropoff">("pickup");
   const [deliveryDueDate, setDeliveryDueDate] = useState<Date | undefined>(undefined);
@@ -86,8 +87,14 @@ export default function LoadForm() {
     refetchOnWindowFocus: false,
   });
 
+  const { data: customers = [] } = useQuery<any[]>({
+    queryKey: ["/api/customers"],
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
   const createLoadMutation = useMutation({
-    mutationFn: async (data: { number109: string; stops: LoadStop[]; deliveryDueAt?: Date; trackingEnabled?: boolean; overridePassword?: string }) => {
+    mutationFn: async (data: { number109: string; customerId?: string; stops: LoadStop[]; deliveryDueAt?: string; trackingEnabled?: boolean; overridePassword?: string }) => {
       console.log("Load creation data being sent:", data);
       if (data.stops.length === 0) {
         throw new Error("Please add at least one stop");
@@ -100,6 +107,7 @@ export default function LoadForm() {
         description: "Load created successfully! You can now assign a driver from the loads table.",
       });
       setLoadNumber("109-");
+      setSelectedCustomerId("");
       setCurrentLocationId("");
       setCurrentStopType("pickup");
       setDeliveryDueDate(undefined);
@@ -199,6 +207,7 @@ export default function LoadForm() {
 
     const submitData = {
       number109: loadNumber,
+      ...(selectedCustomerId ? { customerId: selectedCustomerId } : {}),
       stops,
       trackingEnabled,
       ...(deliveryDueDate ? { deliveryDueAt: deliveryDueDate.toISOString() } : {}),
@@ -269,6 +278,7 @@ export default function LoadForm() {
             onChange={(e) => setLoadNumber(e.target.value)}
             placeholder="109-2024-001"
             className="text-lg"
+            data-testid="input-load-number"
           />
         </div>
 
@@ -288,6 +298,26 @@ export default function LoadForm() {
             </p>
           </div>
         )}
+
+        {/* Step 1b: Customer Selection */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Step 1b: Select Customer (Optional)</Label>
+          <Select
+            value={selectedCustomerId}
+            onValueChange={setSelectedCustomerId}
+          >
+            <SelectTrigger data-testid="select-customer">
+              <SelectValue placeholder="Select a customer (optional)" />
+            </SelectTrigger>
+            <SelectContent>
+              {customers.map((customer: any) => (
+                <SelectItem key={customer.id} value={customer.id}>
+                  {customer.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Step 2: Delivery Due Date */}
         <div className="space-y-2">

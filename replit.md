@@ -4,6 +4,12 @@
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies. It handles load dispatch, driver coordination, and automated invoicing. The application offers separate interfaces for office staff and drivers, featuring real-time status tracking, document management, and automated invoicing capabilities. The system aims to streamline logistics operations and improve efficiency.
 
 ## Recent Changes
+### October 12, 2025 - Customer Dropdown, Driver Records, and Truck Service Management
+- **Customer Selection in Load Creation**: Added optional customer dropdown to load creation form (Step 1b). Loads can now be associated with a specific customer for better tracking and organization. Database schema updated with `customerId` foreign key in loads table.
+- **Enhanced Driver Records**: Extended driver management with direct deposit banking fields (bank name, routing number, account number), employment dates (hire/fire), and license/medical expiration tracking. ⚠️ **Security Note**: Banking data currently stored in plain text - encryption recommended for production use.
+- **Truck Service Management**: Implemented comprehensive truck service tracking with odometer readings, service history, and automated maintenance alerts (warns when service due within 1000 miles). Current odometer auto-updates when service records are added.
+- **Bug Fixes**: Fixed date conversion in driver update endpoint (PATCH /api/drivers/:driverId) to properly handle ISO date strings. Fixed SelectItem empty value error in customer dropdown.
+
 ### October 12, 2025 - Database and Deployment Fixes
 - **Session Store Database Fix**: Updated session store in `server/replitAuth.ts` to use `LOADTRACKER_DB_URL` with fallback to `DATABASE_URL`, fixing admin login after database migration from Railway to Replit/Neon.
 - **Frontend Production Build**: Rebuilt and deployed frontend to include IFTA report route that was missing from previous static build. Production assets now served from `server/public/` with latest code.
