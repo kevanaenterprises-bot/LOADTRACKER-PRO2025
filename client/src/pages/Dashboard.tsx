@@ -485,15 +485,26 @@ export default function Dashboard() {
               <div className="lg:col-span-2 order-1 lg:order-2">
                 <div className="mb-4 flex justify-between items-center">
                   <h2 className="text-xl font-semibold">Active Loads</h2>
-                  <Button
-                    variant="outline"
-                    onClick={() => setLocation("/paid-loads")}
-                    className="flex items-center gap-2 bg-green-50 border-green-200 text-green-800 hover:bg-green-100"
-                    data-testid="button-view-paid-loads"
-                  >
-                    <i className="fas fa-archive text-green-600"></i>
-                    View Paid Loads
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setLocation("/ifta-report")}
+                      className="flex items-center gap-2 bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100"
+                      data-testid="button-view-ifta-report"
+                    >
+                      <i className="fas fa-gas-pump text-blue-600"></i>
+                      IFTA Report
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setLocation("/paid-loads")}
+                      className="flex items-center gap-2 bg-green-50 border-green-200 text-green-800 hover:bg-green-100"
+                      data-testid="button-view-paid-loads"
+                    >
+                      <i className="fas fa-archive text-green-600"></i>
+                      View Paid Loads
+                    </Button>
+                  </div>
                 </div>
                 <LoadsTable />
               </div>

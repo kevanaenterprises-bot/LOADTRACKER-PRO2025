@@ -11,6 +11,7 @@ import DriverPortal from "@/pages/DriverPortal";
 import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
 import Chat from "@/pages/Chat";
+import IFTAReport from "@/pages/IFTAReport";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -23,6 +24,7 @@ function Router() {
       {/* Main Application Pages */}
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/paid-loads" component={PaidLoads} />
+      <Route path="/ifta-report" component={IFTAReport} />
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
       <Route path="/chat" component={Chat} />

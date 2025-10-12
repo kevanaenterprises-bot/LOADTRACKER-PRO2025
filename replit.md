@@ -24,7 +24,12 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Interactive Mapping**: HERE Maps JavaScript SDK v3.1 for real-time fleet tracking with weather overlays and fuel station finder. Replaced Leaflet with native HERE Maps integration.
 - **Weather Integration**: HERE Weather API providing real-time temperature, sky conditions, and weather descriptions along routes (converted from Celsius to Fahrenheit).
 - **Fuel Station Finder**: HERE Places API for locating nearby diesel fuel stations with names and addresses along routes.
-- **IFTA Reporting**: Odometer-based mileage tracking with automatic state-by-state breakdown using HERE Maps API v8 for International Fuel Tax Agreement compliance. System captures odometer readings at POD upload, calculates trip miles, and uses truck-specific routing to determine jurisdiction-specific mileage.
+- **IFTA Reporting**: Advanced odometer-based mileage tracking with automatic state-by-state breakdown using HERE Maps API v8 for International Fuel Tax Agreement compliance. System captures:
+  - **Starting odometer** when driver accepts load and enables GPS tracking
+  - **Ending odometer** at POD upload
+  - **Route miles by state** from HERE Maps truck routing API
+  - **Deadhead miles** (empty/without load): calculated as (ending odometer - starting odometer) - route miles, clamped to zero minimum, assigned to pickup state
+  - Separate tracking of loaded vs deadhead miles for accurate IFTA compliance
 
 ### Feature Specifications
 - **Load Management**: Create, track, and update loads with real-time status, driver assignment, and support for multiple pickup/delivery stops. **Auto-calculates mileage** using HERE Maps API during load creation (geocodes addresses → calculates truck route distance).
@@ -36,6 +41,11 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Universal Load Numbers**: System flexibly handles any load number format as the primary identifier.
 - **Real-Time Fleet Map**: Interactive HERE Maps dashboard showing all active loads with truck markers, destination pins, route polylines, weather overlays, and nearby diesel fuel station locations. Auto-refreshes every 30 seconds. Displays loads with status: in_progress, in_transit, confirmed, en_route_pickup, at_shipper, left_shipper, en_route_receiver, at_receiver, or delivered when tracking is enabled.
 - **Driver Route Map**: Individual route visualization for drivers showing current position, destination, and route line with weather conditions.
+- **IFTA Reporting Dashboard**: Dedicated reporting page (`/ifta-report`) displaying:
+  - Summary metrics: total tracked loads, states traveled, total miles
+  - State-by-state mileage breakdown showing route miles, deadhead miles, and totals
+  - Individual load details with truck number, delivery date, and mileage breakdowns
+  - Separate visualization of loaded vs deadhead miles for compliance reporting
 - **Error Handling**: React ErrorBoundary prevents white-page crashes, displaying user-friendly error messages with reload/home options instead of blank screens.
 
 ## External Dependencies
