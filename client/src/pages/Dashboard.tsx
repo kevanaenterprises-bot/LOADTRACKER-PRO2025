@@ -15,6 +15,8 @@ import InvoiceInbox from "@/components/InvoiceInbox";
 import { OCRUploader } from "@/components/OCRUploader";
 import HereMap from "@/components/HereMap";
 import { DriverList } from "@/components/DriverList";
+import { OfficeStaffForm } from "@/components/OfficeStaffForm";
+import { OfficeStaffList } from "@/components/OfficeStaffList";
 import { Header } from "@/components/Header";
 import CustomerForm from "@/components/CustomerForm";
 import LocationManagement from "@/components/LocationManagement";
@@ -646,6 +648,35 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <DriverList />
+                </CardContent>
+              </Card>
+
+              {/* Office Staff Management Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-user-tie text-primary"></i>
+                    Office Staff
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 mb-4">
+                    Create office staff accounts with username and password for dashboard access.
+                  </p>
+                  <OfficeStaffForm />
+                </CardContent>
+              </Card>
+
+              {/* Office Staff List Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <i className="fas fa-users-cog text-primary"></i>
+                    Current Office Staff
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <OfficeStaffList />
                 </CardContent>
               </Card>
 

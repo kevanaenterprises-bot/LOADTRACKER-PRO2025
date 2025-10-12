@@ -1751,7 +1751,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hasSession: !!req.session
       });
       
-      // Check for admin credentials (case insensitive, trim whitespace)
+      // First, check database for office staff user
+      const officeUser = await storage.getUserByUsername(username.trim());
+      
+      if (officeUser && officeUser.role === "office" && officeUser.password) {
+        // Compare hashed password
+        const bcrypt = await import('bcrypt');
+        const passwordMatch = await bcrypt.compare(password.trim(), officeUser.password);
+        
+        if (passwordMatch) {
+          console.log("Office staff credentials matched successfully:", officeUser.username);
+        
+          // Ensure session exists
+          if (!req.session) {
+            console.error("No session available for office staff login");
+            return res.status(500).json({ message: "Session error" });
+          }
+          
+          // Create office staff user session
+          (req.session as any).adminAuth = {
+            id: officeUser.id,
+            username: officeUser.username,
+            role: "office",
+            firstName: officeUser.firstName,
+            lastName: officeUser.lastName
+          };
+
+          // Force session save with explicit reload to ensure persistence
+          req.session.save((err) => {
+            if (err) {
+              console.error("Session save error:", err);
+              return res.status(500).json({ message: "Session save failed" });
+            }
+            
+            // Reload session to verify save
+            req.session.reload((reloadErr) => {
+              if (reloadErr) {
+                console.error("Session reload error:", reloadErr);
+                return res.status(500).json({ message: "Session verification failed" });
+              }
+              
+              console.log("Session saved and verified, adminAuth:", (req.session as any).adminAuth);
+              res.json({ 
+                message: "Login successful", 
+                user: (req.session as any).adminAuth 
+              });
+            });
+          });
+          return;
+        }
+      }
+      
+      // Check for hardcoded admin credentials (case insensitive, trim whitespace)
       if (username.toLowerCase().trim() === "admin" && password.trim() === "go4fc2024") {
         console.log("Admin credentials matched successfully");
         
@@ -2014,6 +2065,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching available drivers:", error);
       res.status(500).json({ message: "Failed to fetch available drivers" });
+    }
+  });
+
+  // Office Staff management endpoints
+  app.post("/api/office-staff", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { firstName, lastName, username, password } = req.body;
+      
+      if (!firstName || !lastName || !username || !password) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+
+      // Hash password before storing
+      const bcrypt = await import('bcrypt');
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create office staff user
+      const officeStaff = await storage.upsertUser({
+        firstName,
+        lastName,
+        username,
+        password: hashedPassword, // Store hashed password
+        role: "office"
+      });
+
+      // Remove password from response
+      const { password: _, ...safeOfficeStaff } = officeStaff;
+      res.status(201).json(safeOfficeStaff);
+    } catch (error: any) {
+      console.error("Error creating office staff:", error);
+      res.status(400).json({ message: error?.message || "Failed to create office staff" });
+    }
+  });
+
+  app.get("/api/office-staff", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const officeStaff = await storage.getOfficeStaff();
+      // Remove passwords from response
+      const safeOfficeStaff = officeStaff.map(({ password, ...staff }) => staff);
+      res.json(safeOfficeStaff);
+    } catch (error) {
+      console.error("Error fetching office staff:", error);
+      res.status(500).json({ message: "Failed to fetch office staff" });
+    }
+  });
+
+  app.delete("/api/office-staff/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      await storage.deleteUser(req.params.id);
+      res.json({ message: "Office staff deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting office staff:", error);
+      res.status(500).json({ message: "Failed to delete office staff" });
     }
   });
 

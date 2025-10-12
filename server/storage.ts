@@ -50,6 +50,8 @@ export interface IStorage {
   getUserByPhoneNumber(phoneNumber: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
   getDriverByUsername(username: string): Promise<User | undefined>;
+  getOfficeStaff(): Promise<User[]>;
+  deleteUser(id: string): Promise<void>;
 
   // Location operations
   getLocations(): Promise<Location[]>;
@@ -228,6 +230,18 @@ export class DatabaseStorage implements IStorage {
       console.error("Database error in getDriverByUsername:", error);
       throw new Error(`Database connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  async getOfficeStaff(): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(eq(users.role, "office"))
+      .orderBy(users.firstName, users.lastName);
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, userId));
   }
 
   async getLocations(): Promise<Location[]> {
