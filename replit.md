@@ -11,10 +11,18 @@ LoadTracker Pro is a comprehensive logistics management system designed for tran
   - Responsive design: stacks vertically on mobile, side-by-side on desktop (lg breakpoint)
   - Wider viewport: Changed from max-w-lg (512px) to max-w-7xl (80rem) for full-screen desktop view
 
+### October 12, 2025 - Premium AI Voice Integration for Road Tour
+- **Revoicer AI Voices**: Upgraded from browser speech to professional AI narration using Revoicer premium voices
+- **Voice Selection**: Drivers can choose between Colman (male) or Sophie (female) narrator with localStorage persistence
+- **16 Premium Audio Files**: 8 historical markers × 2 voices (male/female), each professionally narrated
+- **HTML5 Audio API**: Replaced Web Speech API with audio file playback for superior quality and consistency
+- **Production Deployment**: All audio files organized in `/audio-markers/` directory and deployed to production
+- **TikTok-Ready**: Professional-quality narration designed to impress potential customers in social media demos
+- **Cost Efficiency**: $67/year lifetime Revoicer plan vs $22-330/month alternatives (ElevenLabs, Google Cloud TTS)
+
 ### October 12, 2025 - Historical Marker Road Tour Feature
 - **GPS-Triggered Audio Tours**: Implemented a Road to Hana-style audio tour system for truck drivers featuring GPS-triggered narration of historical markers
 - **222,969+ Marker Database Ready**: System designed to support importing from The Historical Marker Database (HMDB.org) with 8 sample markers across the US
-- **Web Speech API Integration**: Free, browser-native text-to-speech automatically reads historical marker inscriptions when drivers are within 500 meters
 - **Proximity Detection**: Haversine formula calculates distances with bounding box optimization for efficient queries
 - **Driver-Friendly UI**: Simple toggle in driver portal, shows nearby markers, prevents repeats, displays "heard" status
 - **Sample Markers Included**:
@@ -99,7 +107,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
   - Individual load details with truck number, delivery date, and mileage breakdowns
   - Separate visualization of loaded vs deadhead miles for compliance reporting
 - **Error Handling**: React ErrorBoundary prevents white-page crashes, displaying user-friendly error messages with reload/home options instead of blank screens.
-- **Historical Marker Road Tour**: GPS-triggered audio tour system for drivers featuring automatic narration of historical markers as they drive past them. Uses Web Speech API for free, browser-native text-to-speech. Drivers can toggle on/off, see nearby markers within 500 meters, and system prevents repeating the same marker. Includes tracking of which markers have been heard and supports importing 222,969+ markers from The Historical Marker Database.
+- **Historical Marker Road Tour**: GPS-triggered audio tour system for drivers featuring automatic narration of historical markers as they drive past them. **Premium AI voices powered by Revoicer** with choice between Colman (male) and Sophie (female) narrators. Drivers can toggle on/off, select voice preference (persisted in localStorage), see nearby markers within 500 meters, and system prevents repeating the same marker. Includes tracking of which markers have been heard and supports importing 222,969+ markers from The Historical Marker Database.
 
 ## External Dependencies
 
