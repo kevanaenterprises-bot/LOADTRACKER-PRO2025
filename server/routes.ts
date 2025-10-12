@@ -7618,6 +7618,53 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+  // Generate on-demand TTS audio for a historical marker
+  app.post("/api/road-tour/generate-audio", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { markerId, voice } = req.body;
+      
+      if (!markerId || !voice) {
+        return res.status(400).json({ message: "markerId and voice are required" });
+      }
+
+      if (voice !== 'male' && voice !== 'female') {
+        return res.status(400).json({ message: "voice must be 'male' or 'female'" });
+      }
+
+      // Get marker details
+      const marker = await storage.getHistoricalMarker(parseInt(markerId));
+      if (!marker) {
+        return res.status(404).json({ message: "Marker not found" });
+      }
+
+      // Generate speech using ElevenLabs
+      const { generateSpeech, formatMarkerTextForTTS } = await import('./services/elevenlabs');
+      const text = formatMarkerTextForTTS(marker.title, marker.inscription);
+      
+      const audioBuffer = await generateSpeech({
+        text,
+        voice: voice as 'male' | 'female',
+        markerId: parseInt(markerId),
+      });
+
+      // Return audio as MP3
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.setHeader('Content-Length', audioBuffer.length);
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+      res.send(audioBuffer);
+    } catch (error: any) {
+      console.error("Error generating audio:", error);
+      res.status(500).json({ message: "Failed to generate audio", error: error.message });
+    }
+  });
+
   // Seed sample historical markers (admin only - use bypass secret)
   app.post("/api/road-tour/seed-markers", async (req, res) => {
     try {

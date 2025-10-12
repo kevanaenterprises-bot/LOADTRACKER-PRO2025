@@ -172,6 +172,7 @@ export interface IStorage {
   getUpcomingServiceAlerts(milesThreshold?: number): Promise<Array<Truck & { nextServiceDue?: number; milesUntilService?: number }>>;
 
   // Historical marker operations (GPS-triggered audio tours)
+  getHistoricalMarker(id: number): Promise<any | undefined>;
   getHistoricalMarkers(latitude: number, longitude: number, radiusMeters: number): Promise<any[]>;
   createHistoricalMarker(marker: any): Promise<any>;
   markAsHeard(driverId: string, markerId: number, loadId?: string): Promise<void>;
@@ -1561,6 +1562,15 @@ export class DatabaseStorage implements IStorage {
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c; // Distance in meters
+  }
+
+  async getHistoricalMarker(id: number): Promise<HistoricalMarker | undefined> {
+    const [marker] = await db
+      .select()
+      .from(historicalMarkers)
+      .where(eq(historicalMarkers.id, id))
+      .limit(1);
+    return marker;
   }
 
   async createHistoricalMarker(marker: InsertHistoricalMarker): Promise<HistoricalMarker> {

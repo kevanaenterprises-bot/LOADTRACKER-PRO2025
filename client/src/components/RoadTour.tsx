@@ -96,8 +96,8 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
     },
   });
 
-  // Play marker audio using premium AI voices
-  const speakMarker = (marker: HistoricalMarker) => {
+  // Play marker audio using on-demand ElevenLabs generation
+  const speakMarker = async (marker: HistoricalMarker) => {
     if (isSpeaking) return;
 
     // Stop any ongoing audio
@@ -106,39 +106,67 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
       audioRef.current = null;
     }
 
-    // Construct path to premium audio file
-    const audioPath = `/audio-markers/marker-${marker.id}-${selectedVoice}.mp3`;
-    
-    const audio = new Audio(audioPath);
-    audioRef.current = audio;
-
-    audio.onplay = () => {
+    try {
       setIsSpeaking(true);
-    };
 
-    audio.onended = () => {
-      setIsSpeaking(false);
-      setLastSpokenMarkerId(marker.id);
-      markHeardMutation.mutate(marker.id);
-      audioRef.current = null;
-    };
+      // Generate audio on-demand from ElevenLabs API
+      const response = await fetch('/api/road-tour/generate-audio', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          markerId: marker.id,
+          voice: selectedVoice,
+        }),
+      });
 
-    audio.onerror = (e) => {
-      console.error('Audio playback error:', e);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // Create audio from response blob
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onplay = () => {
+        setIsSpeaking(true);
+      };
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        setLastSpokenMarkerId(marker.id);
+        markHeardMutation.mutate(marker.id);
+        audioRef.current = null;
+        URL.revokeObjectURL(audioUrl); // Clean up blob URL
+      };
+
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e);
+        setIsSpeaking(false);
+        audioRef.current = null;
+        URL.revokeObjectURL(audioUrl);
+        toast({
+          title: "Audio Error",
+          description: "Unable to play marker audio. Please try again.",
+          variant: "destructive",
+        });
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('Failed to generate/play audio:', error);
       setIsSpeaking(false);
       audioRef.current = null;
       toast({
-        title: "Audio Error",
-        description: "Unable to play marker audio. Please try again.",
+        title: "Generation Failed",
+        description: "Could not generate audio. Please check your connection.",
         variant: "destructive",
       });
-    };
-
-    audio.play().catch(err => {
-      console.error('Failed to play audio:', err);
-      setIsSpeaking(false);
-      audioRef.current = null;
-    });
+    }
   };
 
   // Check for nearby markers
@@ -264,7 +292,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
               data-testid="button-voice-male"
             >
               <UserRound className="h-4 w-4 mr-2" />
-              Colman (Male)
+              Adam (Male)
             </Button>
             <Button
               type="button"
@@ -275,7 +303,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
               data-testid="button-voice-female"
             >
               <User className="h-4 w-4 mr-2" />
-              Sophie (Female)
+              Rachel (Female)
             </Button>
           </div>
         </div>
@@ -284,7 +312,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
           <>
             <div className="p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                🎧 Premium AI voices active! You'll hear professional narration of historical markers as you drive past them.
+                🎧 ElevenLabs AI voices active! On-demand generation of professional narration for any historical marker.
               </p>
             </div>
 
@@ -340,7 +368,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
 
         {!isEnabled && (
           <p className="text-sm text-gray-500">
-            Toggle on to hear premium AI narration of historical markers as you drive
+            Toggle on to hear ElevenLabs AI narration of historical markers as you drive - generated on-demand for all 226,000+ markers!
           </p>
         )}
       </CardContent>
