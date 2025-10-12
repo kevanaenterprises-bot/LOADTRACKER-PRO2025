@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
+    "@google-cloud/documentai": "^9.4.0",
     "@google-cloud/storage": "^7.17.0",
     "@here/tracking-js": "^2.0.40",
     "@hookform/resolvers": "^3.10.0",
