@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DigitalSignaturePad } from "@/components/DigitalSignaturePad";
 import { apiRequest } from "@/lib/queryClient";
 import GPSTracker from "@/components/GPSTracker";
+import DriverRouteMap from "@/components/DriverRouteMap";
 
 interface DriverLoadsDisplayProps {
   driverId: string;
@@ -352,11 +353,22 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
 
       {/* Load Details Dialog */}
       <Dialog open={showLoadDetails} onOpenChange={setShowLoadDetails}>
-        <DialogContent className="max-w-md mx-auto">
+        <DialogContent className="max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Load Details - {selectedLoad?.number109}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Interactive Map with Weather and Fuel Stations */}
+            {selectedLoad && selectedLoad.trackingEnabled && (
+              <div className="mb-4">
+                <DriverRouteMap 
+                  load={selectedLoad}
+                  currentLat={selectedLoad.lastKnownLat}
+                  currentLng={selectedLoad.lastKnownLng}
+                />
+              </div>
+            )}
+            
             <div>
               <p className="font-medium">Destination:</p>
               <p>{selectedLoad?.location?.name}</p>
