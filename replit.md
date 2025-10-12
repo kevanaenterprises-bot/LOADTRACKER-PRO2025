@@ -27,7 +27,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **IFTA Reporting**: Odometer-based mileage tracking with automatic state-by-state breakdown using HERE Maps API v8 for International Fuel Tax Agreement compliance. System captures odometer readings at POD upload, calculates trip miles, and uses truck-specific routing to determine jurisdiction-specific mileage.
 
 ### Feature Specifications
-- **Load Management**: Create, track, and update loads with real-time status, driver assignment, and support for multiple pickup/delivery stops.
+- **Load Management**: Create, track, and update loads with real-time status, driver assignment, and support for multiple pickup/delivery stops. **Auto-calculates mileage** using HERE Maps API during load creation (geocodes addresses → calculates truck route distance).
 - **Driver Portal**: Mobile-optimized interface for drivers to update load status, upload documents (BOL, POD), and utilize GPS tracking.
 - **Automated Invoicing**: Generation of invoices based on completed loads, with detailed line item breakdowns.
 - **Document Management**: BOL validation, POD collection, and secure storage in Google Cloud Storage.
@@ -36,6 +36,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **Universal Load Numbers**: System flexibly handles any load number format as the primary identifier.
 - **Real-Time Fleet Map**: Interactive HERE Maps dashboard showing all active loads with truck markers, destination pins, route polylines, weather overlays, and nearby diesel fuel station locations. Auto-refreshes every 30 seconds.
 - **Driver Route Map**: Individual route visualization for drivers showing current position, destination, and route line with weather conditions.
+- **Error Handling**: React ErrorBoundary prevents white-page crashes, displaying user-friendly error messages with reload/home options instead of blank screens.
 
 ## External Dependencies
 
