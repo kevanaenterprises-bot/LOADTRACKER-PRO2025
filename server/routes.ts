@@ -6589,9 +6589,9 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(400).json({ message: 'No image file provided' });
       }
 
-      console.log("Processing image for OCR:", req.file.originalname, req.file.size);
+      console.log("Processing image for OCR:", req.file.originalname, req.file.mimetype, req.file.size);
       
-      const extractedData = await processRateConfirmationImage(req.file.buffer);
+      const extractedData = await processRateConfirmationImage(req.file.buffer, req.file.mimetype);
       
       res.json(extractedData);
     } catch (error) {

@@ -27,8 +27,24 @@ export interface ExtractedLoadData {
   rawText?: string;
 }
 
-export async function extractLoadDataFromImage(base64Image: string): Promise<ExtractedLoadData> {
+function detectMimeType(base64String: string): string | null {
+  // Check for common magic bytes at start of base64
+  const header = base64String.substring(0, 30);
+  
+  if (header.startsWith('iVBORw0KGgo')) return 'image/png';
+  if (header.startsWith('/9j/')) return 'image/jpeg';
+  if (header.startsWith('R0lGOD')) return 'image/gif';
+  if (header.startsWith('UklGR')) return 'image/webp';
+  if (header.startsWith('JVBERi0')) return 'application/pdf';
+  
+  return null;
+}
+
+export async function extractLoadDataFromImage(base64Image: string, mimeType?: string): Promise<ExtractedLoadData> {
   try {
+    // Detect MIME type from base64 or use provided mimeType
+    const detectedMimeType = mimeType || detectMimeType(base64Image) || 'image/jpeg';
+    
     const response = await anthropic.messages.create({
       // "claude-sonnet-4-20250514"
       model: DEFAULT_MODEL_STR,
@@ -87,7 +103,7 @@ IMPORTANT: Even a 0.3 confidence extraction is valuable! Users can verify and co
             type: "image",
             source: {
               type: "base64",
-              media_type: "image/jpeg",
+              media_type: detectedMimeType as any,
               data: base64Image
             }
           }
@@ -184,7 +200,8 @@ IMPORTANT: Even a 0.3 confidence extraction is valuable! Users can verify and co
   }
 }
 
-export async function processRateConfirmationImage(imageBuffer: Buffer): Promise<ExtractedLoadData> {
-  const base64Image = imageBuffer.toString('base64');
-  return await extractLoadDataFromImage(base64Image);
+export async function processRateConfirmationImage(imageInput: Buffer | string, mimeType?: string): Promise<ExtractedLoadData> {
+  // Handle both Buffer (from file upload) and string (from base64 in request body)
+  const base64Image = typeof imageInput === 'string' ? imageInput : imageInput.toString('base64');
+  return await extractLoadDataFromImage(base64Image, mimeType);
 }
