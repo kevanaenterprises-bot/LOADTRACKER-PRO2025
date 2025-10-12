@@ -11,14 +11,26 @@ LoadTracker Pro is a comprehensive logistics management system designed for tran
   - Responsive design: stacks vertically on mobile, side-by-side on desktop (lg breakpoint)
   - Wider viewport: Changed from max-w-lg (512px) to max-w-7xl (80rem) for full-screen desktop view
 
-### October 12, 2025 - Premium AI Voice Integration for Road Tour
-- **Revoicer AI Voices**: Upgraded from browser speech to professional AI narration using Revoicer premium voices
-- **Voice Selection**: Drivers can choose between Colman (male) or Sophie (female) narrator with localStorage persistence
-- **16 Premium Audio Files**: 8 historical markers × 2 voices (male/female), each professionally narrated
-- **HTML5 Audio API**: Replaced Web Speech API with audio file playback for superior quality and consistency
-- **Production Deployment**: All audio files organized in `/audio-markers/` directory and deployed to production
-- **TikTok-Ready**: Professional-quality narration designed to impress potential customers in social media demos
-- **Cost Efficiency**: $67/year lifetime Revoicer plan vs $22-330/month alternatives (ElevenLabs, Google Cloud TTS)
+### October 12, 2025 - ElevenLabs On-Demand TTS with GCS Caching
+- **Scalable Voice System**: Integrated ElevenLabs API for on-demand text-to-speech generation to handle 226k+ historical markers
+- **Hybrid Voice Strategy**: 
+  - 8 premium Revoicer voices (Colman male, Sophie female) for featured demo markers
+  - ElevenLabs API on-demand generation for 226k database expansion
+  - Voice selection UI with localStorage persistence (male: Adam, female: Rachel)
+- **Google Cloud Storage Caching**: Intelligent caching system prevents repeated API calls
+  - Cache key format: `tts-audio/marker-{id}-{voice}.mp3`
+  - Cache-first strategy with 1-year TTL
+  - Cost optimization: Max 452k one-time generations (226k markers × 2 voices), subsequent replays = $0
+- **Graceful Degradation**: System works perfectly without GCS credentials
+  - `isGCSAvailable()` checks configuration before cache operations
+  - Skips caching when unavailable, generates fresh audio every time
+  - No errors, no crashes - seamless fallback to direct API generation
+- **Implementation**:
+  - Service: `server/services/elevenlabs.ts` with `generateSpeechWithCache()`
+  - Model: Eleven Flash v2.5 (low-latency, real-time)
+  - Endpoint: POST /api/road-tour/generate-audio with X-Cache-Status header
+  - Response: audio/mpeg with Cache-Control: public, max-age=31536000
+- **Cost Efficiency**: ElevenLabs $99/year (100k characters/month) vs $22-330/month alternatives
 
 ### October 12, 2025 - Historical Marker Road Tour Feature
 - **GPS-Triggered Audio Tours**: Implemented a Road to Hana-style audio tour system for truck drivers featuring GPS-triggered narration of historical markers
@@ -107,7 +119,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
   - Individual load details with truck number, delivery date, and mileage breakdowns
   - Separate visualization of loaded vs deadhead miles for compliance reporting
 - **Error Handling**: React ErrorBoundary prevents white-page crashes, displaying user-friendly error messages with reload/home options instead of blank screens.
-- **Historical Marker Road Tour**: GPS-triggered audio tour system for drivers featuring automatic narration of historical markers as they drive past them. **Premium AI voices powered by Revoicer** with choice between Colman (male) and Sophie (female) narrators. Drivers can toggle on/off, select voice preference (persisted in localStorage), see nearby markers within 500 meters, and system prevents repeating the same marker. Includes tracking of which markers have been heard and supports importing 222,969+ markers from The Historical Marker Database.
+- **Historical Marker Road Tour**: GPS-triggered audio tour system for drivers featuring automatic narration of historical markers as they drive past them. **Hybrid voice system** combining 8 premium Revoicer demo markers with ElevenLabs on-demand generation for 226k+ database expansion. Drivers can toggle on/off, select voice preference (persisted in localStorage), see nearby markers within 500 meters, and system prevents repeating the same marker. Google Cloud Storage caching prevents repeated API costs. Includes tracking of which markers have been heard and supports importing 222,969+ markers from The Historical Marker Database.
 
 ## External Dependencies
 
