@@ -37,7 +37,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
   const queryClient = useQueryClient();
 
   // Check if Web Speech API is supported
-  const isSpeechSupported = 'speechSynthesis' in window;
+  const isSpeechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
   // Get road tour status
   const { data: tourStatus } = useQuery<{ enabled: boolean; lastHeardMarkerId: string | null }>({
@@ -140,7 +140,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
   useEffect(() => {
     if (!isEnabled) {
       // Stop tracking when disabled
-      if (watchIdRef.current !== null) {
+      if (watchIdRef.current !== null && typeof navigator !== 'undefined') {
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
@@ -149,7 +149,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
     }
 
     // Start GPS tracking
-    if ('geolocation' in navigator) {
+    if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
       watchIdRef.current = navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
@@ -179,7 +179,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
     }
 
     return () => {
-      if (watchIdRef.current !== null) {
+      if (watchIdRef.current !== null && typeof navigator !== 'undefined') {
         navigator.geolocation.clearWatch(watchIdRef.current);
       }
     };
