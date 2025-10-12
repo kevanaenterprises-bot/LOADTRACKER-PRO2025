@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { DriverRecordForm } from "@/components/DriverRecordForm";
 
 interface Driver {
   id: string;
@@ -12,11 +13,20 @@ interface Driver {
   phoneNumber: string;
   username: string;
   role: string;
+  bankAccountNumber?: string;
+  bankRoutingNumber?: string;
+  bankName?: string;
+  hireDate?: string;
+  fireDate?: string;
+  medicalCardExpiration?: string;
+  driverLicenseExpiration?: string;
 }
 
 export function DriverList() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [recordFormOpen, setRecordFormOpen] = useState(false);
 
   // Fetch all drivers
   const { data: drivers = [], isLoading } = useQuery<Driver[]>({
@@ -80,7 +90,21 @@ export function DriverList() {
             </div>
           </div>
           
-          <AlertDialog>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedDriver(driver);
+                setRecordFormOpen(true);
+              }}
+              data-testid={`button-edit-driver-${driver.id}`}
+            >
+              <i className="fas fa-edit mr-1"></i>
+              Edit Record
+            </Button>
+            
+            <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
                 variant="destructive"
@@ -114,8 +138,17 @@ export function DriverList() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </div>
         </div>
       ))}
+      
+      {selectedDriver && (
+        <DriverRecordForm
+          driver={selectedDriver}
+          open={recordFormOpen}
+          onOpenChange={setRecordFormOpen}
+        />
+      )}
     </div>
   );
 }
