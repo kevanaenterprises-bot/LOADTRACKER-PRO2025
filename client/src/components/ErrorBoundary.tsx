@@ -26,6 +26,14 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const errorMessage = this.state.error?.message 
+        ? String(this.state.error.message) 
+        : 'An unexpected error occurred';
+      
+      const errorStack = this.state.error?.stack 
+        ? String(this.state.error.stack).split('\n').slice(0, 3).join('\n')
+        : 'No stack trace available';
+
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
@@ -35,11 +43,11 @@ export class ErrorBoundary extends Component<Props, State> {
                 Something Went Wrong
               </h1>
               <p className="text-gray-600 mb-4">
-                {this.state.error?.message || 'An unexpected error occurred'}
+                {errorMessage}
               </p>
               <div className="bg-gray-100 rounded p-3 mb-4 text-left">
-                <p className="text-xs text-gray-700 font-mono">
-                  {this.state.error?.stack?.split('\n').slice(0, 3).join('\n')}
+                <p className="text-xs text-gray-700 font-mono whitespace-pre-wrap">
+                  {errorStack}
                 </p>
               </div>
               <div className="space-y-2">
