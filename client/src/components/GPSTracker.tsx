@@ -147,6 +147,10 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
       case 'created':
       case 'assigned':
         return { color: 'bg-gray-500', text: 'Awaiting Confirmation', icon: Clock };
+      case 'in_transit':
+        return { color: 'bg-blue-500', text: 'In Transit - GPS Active', icon: Navigation };
+      case 'in_progress':
+        return { color: 'bg-blue-500', text: 'In Progress - GPS Active', icon: Navigation };
       case 'confirmed':
         return { color: 'bg-blue-500', text: 'Confirmed - Tracking Active', icon: Navigation };
       case 'en_route_pickup':
