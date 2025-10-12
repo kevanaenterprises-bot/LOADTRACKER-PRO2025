@@ -6582,22 +6582,25 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
-  // OCR Routes for Rate Con processing
+  // OCR Routes for Rate Con processing using Google Document AI
   app.post('/api/ocr/extract', upload.single('image'), async (req, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ message: 'No image file provided' });
+        return res.status(400).json({ message: 'No file provided' });
       }
 
-      console.log("Processing image for OCR:", req.file.originalname, req.file.mimetype, req.file.size);
+      console.log("Processing document for OCR:", req.file.originalname, req.file.mimetype, req.file.size);
       
-      const extractedData = await processRateConfirmationImage(req.file.buffer, req.file.mimetype);
+      // Import Google Document AI service
+      const { extractLoadDataFromDocument } = await import('./googleDocumentAI');
+      
+      const extractedData = await extractLoadDataFromDocument(req.file.buffer, req.file.mimetype);
       
       res.json(extractedData);
     } catch (error) {
       console.error('OCR extraction error:', error);
       res.status(500).json({ 
-        message: 'Failed to extract data from image',
+        message: 'Failed to extract data from document',
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }

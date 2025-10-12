@@ -532,8 +532,8 @@ export default function Dashboard() {
               <div className="mb-6">
                 <h2 className="text-2xl font-bold mb-2">Rate Con Scanner</h2>
                 <p className="text-gray-600">
-                  Upload rate confirmation images (PNG, JPEG, GIF, WebP) to automatically extract load details and generate new loads.
-                  The system will read load numbers, PO numbers, appointment times, company names, and addresses. Note: PDF files are not supported - please convert PDFs to images or take screenshots.
+                  Upload rate confirmation documents (PDF, PNG, JPEG, GIF, WebP) to automatically extract load details and generate new loads.
+                  Powered by Google Cloud Document AI, the system will read load numbers, PO numbers, appointment times, company names, and addresses from any document format.
                 </p>
               </div>
               <OCRUploader />
