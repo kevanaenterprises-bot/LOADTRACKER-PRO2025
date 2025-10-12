@@ -11,6 +11,8 @@ import {
   loadStatusHistory,
   notificationPreferences,
   notificationLog,
+  historicalMarkers,
+  markerHistory,
   type User,
   type UpsertUser,
   type Location,
@@ -42,6 +44,10 @@ import {
   truckServiceRecords,
   type TruckServiceRecord,
   type InsertTruckServiceRecord,
+  type HistoricalMarker,
+  type InsertHistoricalMarker,
+  type MarkerHistory,
+  type InsertMarkerHistory,
 } from "@shared/schema";
 import { db, queryWithRetry } from "./db";
 import { eq, desc, and, sql, not } from "drizzle-orm";
@@ -164,6 +170,13 @@ export interface IStorage {
   getTruckServiceRecords(truckId: string): Promise<TruckServiceRecord[]>;
   createTruckServiceRecord(record: InsertTruckServiceRecord): Promise<TruckServiceRecord>;
   getUpcomingServiceAlerts(milesThreshold?: number): Promise<Array<Truck & { nextServiceDue?: number; milesUntilService?: number }>>;
+
+  // Historical marker operations (GPS-triggered audio tours)
+  getHistoricalMarkers(latitude: number, longitude: number, radiusMeters: number): Promise<any[]>;
+  createHistoricalMarker(marker: any): Promise<any>;
+  markAsHeard(driverId: string, markerId: number, loadId?: string): Promise<void>;
+  toggleRoadTour(driverId: string, enabled: boolean): Promise<User | undefined>;
+  getRoadTourStatus(driverId: string): Promise<{ enabled: boolean; lastHeardMarkerId: string | null }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1507,6 +1520,86 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return updatedDriver;
+  }
+
+  // Historical marker operations (GPS-triggered audio tours)
+  async getHistoricalMarkers(latitude: number, longitude: number, radiusMeters: number): Promise<HistoricalMarker[]> {
+    // Calculate bounding box for approximate filtering
+    // 1 degree latitude ≈ 111km, 1 degree longitude varies by latitude
+    const latDelta = radiusMeters / 111000; // Convert meters to degrees
+    const lonDelta = radiusMeters / (111000 * Math.cos(latitude * Math.PI / 180));
+    
+    const markers = await db
+      .select()
+      .from(historicalMarkers)
+      .where(
+        and(
+          sql`${historicalMarkers.latitude} BETWEEN ${latitude - latDelta} AND ${latitude + latDelta}`,
+          sql`${historicalMarkers.longitude} BETWEEN ${longitude - lonDelta} AND ${longitude + lonDelta}`
+        )
+      );
+    
+    // Calculate actual distance and filter
+    const markersWithDistance = markers.map(marker => {
+      const markerLat = parseFloat(marker.latitude?.toString() || '0');
+      const markerLon = parseFloat(marker.longitude?.toString() || '0');
+      const distance = this.calculateDistance(latitude, longitude, markerLat, markerLon);
+      return { ...marker, distance };
+    }).filter(m => m.distance <= radiusMeters);
+    
+    return markersWithDistance.sort((a, b) => a.distance - b.distance);
+  }
+
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    // Haversine formula for distance calculation
+    const R = 6371000; // Earth's radius in meters
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in meters
+  }
+
+  async createHistoricalMarker(marker: InsertHistoricalMarker): Promise<HistoricalMarker> {
+    const [newMarker] = await db
+      .insert(historicalMarkers)
+      .values(marker)
+      .returning();
+    return newMarker;
+  }
+
+  async markAsHeard(driverId: string, markerId: number, loadId?: string): Promise<void> {
+    await db.insert(markerHistory).values({
+      driverId,
+      markerId,
+      loadId: loadId || null,
+    });
+    
+    // Update user's last heard marker
+    await db
+      .update(users)
+      .set({ roadTourLastHeardMarkerId: markerId.toString() })
+      .where(eq(users.id, driverId));
+  }
+
+  async toggleRoadTour(driverId: string, enabled: boolean): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ roadTourEnabled: enabled })
+      .where(eq(users.id, driverId))
+      .returning();
+    return updatedUser;
+  }
+
+  async getRoadTourStatus(driverId: string): Promise<{ enabled: boolean; lastHeardMarkerId: string | null }> {
+    const user = await this.getUser(driverId);
+    return {
+      enabled: user?.roadTourEnabled || false,
+      lastHeardMarkerId: user?.roadTourLastHeardMarkerId || null,
+    };
   }
 }
 
