@@ -2792,6 +2792,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const load = await storage.createLoad(validatedData, validatedStops);
       console.log("Load creation successful:", load.id);
 
+      // AUTO-CALCULATE MILES: Calculate route distance using HERE Maps if stops exist
+      if (validatedStops && validatedStops.length >= 2) {
+        try {
+          const pickupStop = validatedStops.find((s: any) => s.stopType === 'pickup');
+          const deliveryStop = validatedStops.filter((s: any) => s.stopType === 'dropoff').pop(); // Last delivery
+          
+          if (pickupStop && deliveryStop) {
+            const pickupLoc = await storage.getLocation(pickupStop.locationId);
+            const deliveryLoc = await storage.getLocation(deliveryStop.locationId);
+            
+            if (pickupLoc && deliveryLoc) {
+              const pickupAddr = pickupLoc.address || `${pickupLoc.city}, ${pickupLoc.state}`;
+              const deliveryAddr = deliveryLoc.address || `${deliveryLoc.city}, ${deliveryLoc.state}`;
+              
+              console.log(`🗺️ AUTO-CALCULATING miles: ${pickupAddr} → ${deliveryAddr}`);
+              
+              // Call HERE Maps API to calculate distance
+              const hereApiKey = process.env.HERE_MAPS_API_KEY || process.env.VITE_HERE_MAPS_API_KEY;
+              if (hereApiKey) {
+                // Step 1: Geocode addresses to get lat/lon coordinates
+                const geocodeUrl = (address: string) => 
+                  `https://geocode.search.hereapi.com/v1/geocode?q=${encodeURIComponent(address)}&apiKey=${hereApiKey}`;
+                
+                const [pickupGeoResponse, deliveryGeoResponse] = await Promise.all([
+                  fetch(geocodeUrl(pickupAddr)),
+                  fetch(geocodeUrl(deliveryAddr))
+                ]);
+                
+                if (!pickupGeoResponse.ok || !deliveryGeoResponse.ok) {
+                  console.error(`❌ Geocoding failed: pickup=${pickupGeoResponse.status}, delivery=${deliveryGeoResponse.status}`);
+                  throw new Error('Geocoding failed');
+                }
+                
+                const pickupGeoData = await pickupGeoResponse.json();
+                const deliveryGeoData = await deliveryGeoResponse.json();
+                
+                if (!pickupGeoData.items?.[0] || !deliveryGeoData.items?.[0]) {
+                  console.error('❌ No geocoding results found');
+                  throw new Error('Location not found');
+                }
+                
+                const pickupCoords = pickupGeoData.items[0].position;
+                const deliveryCoords = deliveryGeoData.items[0].position;
+                
+                console.log(`📍 Geocoded: pickup=${pickupCoords.lat},${pickupCoords.lng} delivery=${deliveryCoords.lat},${deliveryCoords.lng}`);
+                
+                // Step 2: Calculate route using coordinates
+                const routeParams = new URLSearchParams({
+                  apikey: hereApiKey,
+                  transportMode: 'truck',
+                  origin: `${pickupCoords.lat},${pickupCoords.lng}`,
+                  destination: `${deliveryCoords.lat},${deliveryCoords.lng}`,
+                  return: 'summary',
+                  routingMode: 'fast',
+                });
+                
+                const routeResponse = await fetch(`https://router.hereapi.com/v8/routes?${routeParams}`);
+                
+                if (!routeResponse.ok) {
+                  const errorText = await routeResponse.text();
+                  console.error(`❌ Route calculation failed (${routeResponse.status}):`, errorText);
+                  throw new Error(`Route API error: ${routeResponse.status}`);
+                }
+                
+                const routeData = await routeResponse.json();
+                if (routeData.routes && routeData.routes[0]) {
+                  const distanceMeters = routeData.routes[0].sections[0].summary.length;
+                  const miles = Math.round((distanceMeters * 0.000621371) * 100) / 100;
+                  
+                  // Update load with calculated miles
+                  await storage.updateLoad(load.id, { estimatedMiles: miles.toString() });
+                  console.log(`✅ AUTO-CALCULATED ${miles} miles for load ${load.number109}`);
+                  load.estimatedMiles = miles.toString(); // Update return value
+                } else {
+                  console.error('❌ No routes found in response');
+                }
+              }
+            }
+          }
+        } catch (mileageError) {
+          console.error("Failed to auto-calculate miles:", mileageError);
+          // Don't fail load creation if mileage calculation fails
+        }
+      }
+
       // Send SMS to driver if assigned
       if (validatedData.driverId) {
         try {
@@ -3277,10 +3362,24 @@ Reply YES to confirm acceptance or NO to decline.`
       }
 
       // Update the load with driver assignment
-      await storage.updateLoad(loadId, { driverId });
+      const updatedLoad = await storage.updateLoad(loadId, { driverId });
+      
+      console.log("✅ Load updated with driver assignment:", { loadId, driverId, updated: !!updatedLoad });
 
       // Get complete load data with driver, location, and invoice details for UI
       const completeLoad = await storage.getLoad(loadId);
+      
+      if (!completeLoad) {
+        throw new Error("Failed to retrieve updated load data");
+      }
+      
+      console.log("✅ Complete load data retrieved with driver:", {
+        loadId: completeLoad.id,
+        loadNumber: completeLoad.number109,
+        driverId: completeLoad.driverId,
+        hasDriver: !!completeLoad.driver,
+        driverName: completeLoad.driver ? `${completeLoad.driver.firstName} ${completeLoad.driver.lastName}` : 'none'
+      });
 
       // Send SMS notification via notification service (respects driver preferences)
       try {
