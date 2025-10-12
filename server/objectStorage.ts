@@ -13,11 +13,12 @@ const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
 // Lazy initialization of object storage client to prevent startup crashes
 let objectStorageClient: Storage | null = null;
-let objectStorageError: Error | null = null;
+let gcsAvailable: boolean | null = null; // Track if GCS is configured
 
 function getObjectStorageClient(): Storage {
-  if (objectStorageError) {
-    throw objectStorageError;
+  // If we already checked and GCS is not available, throw immediately
+  if (gcsAvailable === false) {
+    throw new Error('GCS is not configured');
   }
   
   if (!objectStorageClient) {
@@ -29,6 +30,7 @@ function getObjectStorageClient(): Storage {
       let privateKey = process.env.GCS_PRIVATE_KEY;
       
       if (!projectId || !clientEmail || !privateKey) {
+        gcsAvailable = false; // Mark as unavailable
         throw new Error('Missing GCS credentials. Required: GCS_PROJECT_ID, GCS_CLIENT_EMAIL, GCS_PRIVATE_KEY');
       }
       
@@ -38,9 +40,11 @@ function getObjectStorageClient(): Storage {
       
       // 2. Validate PEM format
       if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+        gcsAvailable = false; // Mark as unavailable
         throw new Error('GCS_PRIVATE_KEY must include -----BEGIN PRIVATE KEY----- header');
       }
       if (!privateKey.includes('-----END PRIVATE KEY-----')) {
+        gcsAvailable = false; // Mark as unavailable
         throw new Error('GCS_PRIVATE_KEY must include -----END PRIVATE KEY----- footer');
       }
       
@@ -48,6 +52,7 @@ function getObjectStorageClient(): Storage {
       // Extract just the key content between headers
       const keyMatch = privateKey.match(/-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/);
       if (!keyMatch) {
+        gcsAvailable = false; // Mark as unavailable
         throw new Error('Could not parse GCS_PRIVATE_KEY - invalid PEM format');
       }
       
@@ -69,15 +74,30 @@ function getObjectStorageClient(): Storage {
           private_key: formattedPrivateKey,
         },
       });
+      gcsAvailable = true; // Mark as available
       console.log('✅ Google Cloud Storage client initialized successfully');
     } catch (error) {
       console.error('❌ Failed to initialize Google Cloud Storage client:', error);
-      objectStorageError = error instanceof Error ? error : new Error('Unknown object storage initialization error');
-      throw objectStorageError;
+      gcsAvailable = false; // Mark as unavailable
+      throw error;
     }
   }
   
   return objectStorageClient;
+}
+
+// Check if GCS is configured/available
+export function isGCSAvailable(): boolean {
+  if (gcsAvailable === null) {
+    // Try to initialize to check availability
+    try {
+      getObjectStorageClient();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  return gcsAvailable;
 }
 
 // Export the function to get the object storage client
@@ -265,6 +285,47 @@ export class ObjectStorageService {
       }
       console.error('⚠️ Object storage not configured or available for file access:', error);
       throw new Error('Object storage service is not available. Please configure object storage or contact support.');
+    }
+  }
+
+  // Get a file from object storage by path
+  async getFile(filePath: string): Promise<Buffer | null> {
+    try {
+      const fullPath = `${this.getPrivateObjectDir()}/${filePath}`;
+      const { bucketName, objectName } = parseObjectPath(fullPath);
+      const bucket = getObjectStorageClient().bucket(bucketName);
+      const file = bucket.file(objectName);
+      
+      const [exists] = await file.exists();
+      if (!exists) {
+        return null;
+      }
+      
+      const [buffer] = await file.download();
+      return buffer;
+    } catch (error) {
+      console.error('Error getting file from object storage:', error);
+      return null;
+    }
+  }
+
+  // Upload a file to object storage
+  async uploadFile(filePath: string, buffer: Buffer, contentType: string): Promise<void> {
+    try {
+      const fullPath = `${this.getPrivateObjectDir()}/${filePath}`;
+      const { bucketName, objectName } = parseObjectPath(fullPath);
+      const bucket = getObjectStorageClient().bucket(bucketName);
+      const file = bucket.file(objectName);
+      
+      await file.save(buffer, {
+        contentType,
+        metadata: {
+          cacheControl: 'public, max-age=31536000', // Cache for 1 year
+        },
+      });
+    } catch (error) {
+      console.error('Error uploading file to object storage:', error);
+      throw error;
     }
   }
 

@@ -7644,20 +7644,24 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
         return res.status(404).json({ message: "Marker not found" });
       }
 
-      // Generate speech using ElevenLabs
-      const { generateSpeech, formatMarkerTextForTTS } = await import('./services/elevenlabs');
+      // Generate speech using ElevenLabs with GCS caching
+      const { generateSpeechWithCache, formatMarkerTextForTTS } = await import('./services/elevenlabs');
       const text = formatMarkerTextForTTS(marker.title, marker.inscription);
       
-      const audioBuffer = await generateSpeech({
+      const { buffer: audioBuffer, fromCache } = await generateSpeechWithCache({
         text,
         voice: voice as 'male' | 'female',
         markerId: parseInt(markerId),
       });
 
+      // Log cache status for monitoring
+      console.log(`📊 Audio ${fromCache ? 'served from cache' : 'freshly generated'} for marker ${markerId} (${voice})`);
+
       // Return audio as MP3
       res.setHeader('Content-Type', 'audio/mpeg');
       res.setHeader('Content-Length', audioBuffer.length);
       res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+      res.setHeader('X-Cache-Status', fromCache ? 'HIT' : 'MISS'); // Debug header
       res.send(audioBuffer);
     } catch (error: any) {
       console.error("Error generating audio:", error);
