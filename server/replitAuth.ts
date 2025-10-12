@@ -27,8 +27,11 @@ export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
   
+  // Use LOADTRACKER_DB_URL if available (same as main app pool), otherwise fall back to DATABASE_URL
+  const connectionString = process.env.LOADTRACKER_DB_URL || process.env.DATABASE_URL;
+  
   const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
+    conString: connectionString,
     createTableIfMissing: true,
     ttl: sessionTtl / 1000, // TTL in seconds
     tableName: "sessions",

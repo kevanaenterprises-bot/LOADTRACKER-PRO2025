@@ -3,6 +3,12 @@
 ## Overview
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies. It handles load dispatch, driver coordination, and automated invoicing. The application offers separate interfaces for office staff and drivers, featuring real-time status tracking, document management, and automated invoicing capabilities. The system aims to streamline logistics operations and improve efficiency.
 
+## Recent Changes
+### October 12, 2025 - Database and Deployment Fixes
+- **Session Store Database Fix**: Updated session store in `server/replitAuth.ts` to use `LOADTRACKER_DB_URL` with fallback to `DATABASE_URL`, fixing admin login after database migration from Railway to Replit/Neon.
+- **Frontend Production Build**: Rebuilt and deployed frontend to include IFTA report route that was missing from previous static build. Production assets now served from `server/public/` with latest code.
+- **Database Migration**: System successfully migrated from offline Railway database to Replit/Neon database. Connection string priority: `LOADTRACKER_DB_URL` → `DATABASE_URL`.
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
