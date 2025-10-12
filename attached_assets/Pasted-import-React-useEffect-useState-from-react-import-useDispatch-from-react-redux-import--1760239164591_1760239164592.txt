@@ -1,0 +1,150 @@
+import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import moment from 'moment'
+
+// Utils and API
+import timer from '../../../utils/timer'
+import updateChallenge from '../../../API/challenges/update-challenge'
+import updateState from '../../../API/states/update-state'
+import { isChallengeDay, isChallengePeriod } from '../../../utils/is-challenge-visible'
+
+// Style
+import './style.scss'
+
+// Images
+import breakfastImage from '../../../assets/images/challenges/breakfast.gif'
+import brushingImage from '../../../assets/images/challenges/brushing.gif'
+import candydayImage from '../../../assets/images/challenges/candyday.gif'
+import lunchImage from '../../../assets/images/challenges/lunch.gif'
+import milkImage from '../../../assets/images/challenges/milk.gif'
+import sleepingImage from '../../../assets/images/challenges/sleeping.png'
+import wakeupImage from '../../../assets/images/challenges/wakeup.gif'
+
+const images = {
+  breakfast: breakfastImage,
+  brushing: brushingImage,
+  candyday: candydayImage,
+  lunch: lunchImage,
+  milk: milkImage,
+  sleeping: sleepingImage,
+  wakeup: wakeupImage
+}
+
+const Challenge = props => {
+  // Auth Token
+  const token = localStorage.getItem('x-auth-token')
+
+  // Dispatch function to set challenges
+  const dispatch = useDispatch()
+
+  // Declare a variable to keep visibility of component
+  let visible = true
+
+  /* State */
+  const [day, setDay] = useState(moment().format('dddd'))
+  const [time, setTime] = useState(moment().format('HH:mm:ss'))
+  const [leftTime, setLeftTime] = useState('00:00:00')
+
+  /* Thumbnail Image */  
+  const image = images[props.image.toLowerCase().split('.')[0]]
+
+  /* Sets current day, current time and left time to catch the challenge */
+  const timeHandler = () => {
+    // Set current time and day
+    const _day = moment().format('dddd')
+    const _time = moment().format('HH:mm:ss')
+
+    setDay(_day)
+    setTime(_time)
+
+    // If period exist, calculate left time
+    if (props.period) {
+      const timerOutput = timer(props.period[0], props.period[1])
+      setLeftTime(timerOutput)
+    }
+  }
+
+  const challengeCompleted = () => {
+    const today = moment().format('YYYY-MM-DD')
+    const body = { completedDate: today }
+
+    updateChallenge(props._id, body, token, (err, challenge) => {
+      if (err) return console.log(err)
+
+      dispatch({
+        type: 'ADD_HIDDEN_CHALLENGE', id: challenge.data._id
+      })
+
+      const payload = { name: 'total', state: challenge.data.pointAmount, action: 'increase' }
+
+      updateState(payload, token, (err, doc) => {
+        if (err) return console.log(err)
+        dispatch({ type: 'SET_TOTAL_POINT', point: doc.state })
+      })
+    })
+  }
+
+  // componentDidMount
+  useEffect(() => {
+    const intervalTimer = setInterval(timeHandler, 1000)
+
+    // before componentDidUnmount, reset the timer
+    return () => {
+      clearInterval(intervalTimer)
+    }
+  }, [])
+
+  // componentDidUpdate : day has changed
+  // Update the challenges whether challenge is on day or not
+  useEffect(() => {
+    if (visible && props.day && !isChallengeDay(props.day, day)) {
+      dispatch({ type: 'ADD_HIDDEN_CHALLENGE', id: props._id })
+    }
+    else if (!visible && props.day && isChallengeDay(props.day, day)) {
+      dispatch({ type: 'ADD_VISIBLE_CHALLENGE', id: props._id })
+    }
+  }, [day])
+
+  // componentDidUpdate : time has changed
+  // Update the challenges whether challenge is on period or not
+  useEffect(() => {
+    if (visible && props.period && !isChallengePeriod(props.period, time)) {
+      dispatch({ type: 'ADD_HIDDEN_CHALLENGE', id: props._id })
+    }
+    else if (!visible && props.period && isChallengePeriod(props.period, time)) {
+      dispatch({ type: 'ADD_VISIBLE_CHALLENGE', id: props._id })
+    }
+  }, [time])
+
+  // componentDidUpdate (time or points is changed)
+  useEffect(() => {
+
+  }, [leftTime])  
+
+  return visible === true 
+    ? <div className='challenge'>
+        {/* Image */}
+        <div className='challenge__image'>
+          <img src={image} alt={props.info} />
+        </div>
+
+        {/* Footer */}
+        <div className='challenge__footer'>
+          {/* Timer */}
+          <div> { props.period.length > 0 && leftTime } </div>
+
+          {/* Point Amount */}
+          <div className='challenge__pointAmount'>          
+            {props.pointAmount} <i className='fa fa-heart' />
+          </div>
+
+          {/* Button */}
+          <div className='challenge__button' onClick={challengeCompleted}>
+            <i className='fa fa-check' />
+          </div>
+        </div>
+      </div>    
+    : null
+}
+
+export default React.memo(Challenge)

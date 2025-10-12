@@ -1,0 +1,79 @@
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+
+// Utils and API
+import periodConverter from '../../../utils/period-converter'
+import fetchChallenges from '../../../API/challenges/fetch-challenges'
+import isVisible from '../../../utils/is-challenge-visible'
+
+// Components
+import Challenge from '../Challenge'
+import Grid from '../../../hoc/Grid'
+
+const ChallengeList = props => {
+  // Auth token
+  const token = localStorage.getItem('x-auth-token')
+
+  // Store
+  const dispatch = useDispatch()  
+  const challenges = useSelector(state => state.challenges.all)
+  const visibleChallenges = useSelector(state => state.challenges.visible)
+
+  const provideChallenges = () => {
+    return fetchChallenges(token, (err, challenges) => {
+      if (err) return console.log(err)      
+      dispatch({ type: 'SET_CHALLENGES', challenges })
+    })
+  }
+
+  const filterChallenges = () => {
+    let _visibleChallenges = []
+    let _hiddenChallenges = []
+
+    if (challenges.length) {
+      challenges.map(challenge => {
+        if (isVisible(challenge)) _visibleChallenges.push(challenge)
+        else _hiddenChallenges.push(challenge)        
+      })
+      dispatch({ type: 'SET_VISIBLE_CHALLENGES', challenges: _visibleChallenges })
+      dispatch({ type: 'SET_HIDDEN_CHALLENGES', challenges: _hiddenChallenges })
+    }
+  } 
+
+  // Component did mount
+  useEffect(() => {
+    if ( token ) {
+      provideChallenges()    
+    }    
+  }, [])
+
+  // Challenges updated. Filter them as visible and hidden
+  useEffect(() => {
+    filterChallenges()    
+  }, [challenges])  
+
+  return (
+    <Grid>
+      {
+        visibleChallenges.length
+        ? visibleChallenges.map(challenge => {
+            const period = periodConverter(challenge.period)
+
+            return <Challenge
+                    key={challenge._id}
+                    _id={challenge._id}
+                    name={challenge.name}
+                    image={challenge.image}
+                    info={challenge.imageInfo}
+                    period={period}
+                    pointAmount={challenge.pointAmount}
+                    day={challenge.day}
+                  />      
+        })
+        : <p>There is no any todo!</p>
+      }
+    </Grid>
+  )
+}
+
+export default React.memo(ChallengeList)
