@@ -26,6 +26,7 @@ import { PaidInvoices } from "@/components/PaidInvoices";
 import GhostLoadCleanup from "@/components/GhostLoadCleanup";
 import TruckForm from "@/components/TruckForm";
 import TruckTable from "@/components/TruckTable";
+import { TruckServiceManagement } from "@/components/TruckServiceManagement";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -792,7 +793,7 @@ export default function Dashboard() {
 
           {/* Truck Management Tab */}
           <TabsContent value="trucks" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* Add New Truck Form */}
               <div className="lg:col-span-1">
                 <TruckForm />
@@ -802,6 +803,12 @@ export default function Dashboard() {
               <div className="lg:col-span-2">
                 <TruckTable />
               </div>
+            </div>
+
+            {/* Truck Service Management */}
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold mb-4">Service Management & Maintenance History</h3>
+              <TruckServiceManagement />
             </div>
           </TabsContent>
 
