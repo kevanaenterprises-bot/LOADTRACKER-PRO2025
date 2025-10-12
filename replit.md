@@ -4,6 +4,14 @@
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies. It handles load dispatch, driver coordination, and automated invoicing. The application offers separate interfaces for office staff and drivers, featuring real-time status tracking, document management, and automated invoicing capabilities. The system aims to streamline logistics operations and improve efficiency.
 
 ## Recent Changes
+### October 12, 2025 - OCR File Type Support and PDF Handling
+- **OCR File Type Validation**: Fixed Rate Con Scanner to properly handle different file formats. Scanner now explicitly supports PNG, JPEG, GIF, and WebP image formats.
+- **PDF File Handling**: PDF files are NOT supported by the OCR scanner (Anthropic Claude's vision API only accepts image formats). System now:
+  - Rejects PDFs at upload with clear error message instructing users to convert PDFs to images or take screenshots
+  - Updated UI text to clarify supported formats (removed PDF references)
+  - Added backend validation to prevent PDF processing attempts
+- **MIME Type Detection**: Enhanced OCR service with automatic MIME type detection for uploaded files to ensure correct format handling.
+
 ### October 12, 2025 - Customer Dropdown, Driver Records, and Truck Service Management
 - **Customer Selection in Load Creation**: Added optional customer dropdown to load creation form (Step 1b). Loads can now be associated with a specific customer for better tracking and organization. Database schema updated with `customerId` foreign key in loads table.
 - **Enhanced Driver Records**: Extended driver management with direct deposit banking fields (bank name, routing number, account number), employment dates (hire/fire), and license/medical expiration tracking. ⚠️ **Security Note**: Banking data currently stored in plain text - encryption recommended for production use.

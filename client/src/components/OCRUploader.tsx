@@ -132,13 +132,24 @@ export function OCRUploader() {
   });
 
   const handleFileSelect = (file: File) => {
-    if (file && (file.type.startsWith('image/') || file.type === 'application/pdf')) {
+    // Check for PDF files first
+    if (file.type === 'application/pdf') {
+      toast({
+        title: "PDF Not Supported",
+        description: "PDF files are not supported by the OCR scanner. Please convert your PDF to an image (PNG or JPEG) or take a screenshot.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Accept image files
+    if (file && file.type.startsWith('image/')) {
       setSelectedFile(file);
       setExtractedData(null);
     } else {
       toast({
         title: "Invalid File",
-        description: "Please select an image file (JPG, PNG, etc.) or PDF.",
+        description: "Please select an image file (JPG, PNG, GIF, or WebP).",
         variant: "destructive",
       });
     }
@@ -190,11 +201,11 @@ export function OCRUploader() {
           <div className="space-y-2">
             <p className="text-lg font-medium">Upload Rate Con Document</p>
             <p className="text-sm text-gray-500">
-              Drag and drop or click to select a rate confirmation image or PDF
+              Drag and drop or click to select a rate confirmation image (PNG, JPEG, GIF, WebP)
             </p>
             <input
               type="file"
-              accept="image/*,.pdf,.heic,.heif"
+              accept="image/*"
               onChange={handleFileInput}
               className="hidden"
               id="ocr-file-input"

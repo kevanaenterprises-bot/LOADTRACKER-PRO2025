@@ -45,6 +45,17 @@ export async function extractLoadDataFromImage(base64Image: string, mimeType?: s
     // Detect MIME type from base64 or use provided mimeType
     const detectedMimeType = mimeType || detectMimeType(base64Image) || 'image/jpeg';
     
+    // Anthropic's Claude API only supports image formats, not PDFs
+    if (detectedMimeType === 'application/pdf') {
+      throw new Error('PDF files are not supported. Please convert your PDF to an image (PNG, JPEG) first, or take a screenshot of the PDF.');
+    }
+    
+    // Validate supported image types
+    const supportedTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+    if (!supportedTypes.includes(detectedMimeType)) {
+      throw new Error(`Unsupported file type: ${detectedMimeType}. Please use PNG, JPEG, GIF, or WebP images.`);
+    }
+    
     const response = await anthropic.messages.create({
       // "claude-sonnet-4-20250514"
       model: DEFAULT_MODEL_STR,
