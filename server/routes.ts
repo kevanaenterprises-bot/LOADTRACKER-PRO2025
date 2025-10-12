@@ -7511,6 +7511,85 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   app.post("/api/tracking/eta", isAuthenticated, calculateETA);
   app.get("/api/tracking/status/:loadId", isAuthenticated, getLoadTrackingStatus);
 
+  // Historical Marker Road Tour API Routes
+  // Get nearby historical markers based on GPS coordinates
+  app.get("/api/road-tour/nearby", isAuthenticated, async (req, res) => {
+    try {
+      const { latitude, longitude, radiusMeters = 500 } = req.query;
+      
+      if (!latitude || !longitude) {
+        return res.status(400).json({ message: "Latitude and longitude are required" });
+      }
+
+      const lat = parseFloat(latitude as string);
+      const lon = parseFloat(longitude as string);
+      const radius = parseInt(radiusMeters as string);
+
+      const markers = await storage.getHistoricalMarkers(lat, lon, radius);
+      res.json(markers);
+    } catch (error: any) {
+      console.error("Error fetching nearby markers:", error);
+      res.status(500).json({ message: "Failed to fetch nearby markers", error: error.message });
+    }
+  });
+
+  // Toggle road tour on/off for a driver
+  app.post("/api/road-tour/toggle", isAuthenticated, async (req, res) => {
+    try {
+      const { driverId, enabled } = req.body;
+      
+      if (!driverId || typeof enabled !== 'boolean') {
+        return res.status(400).json({ message: "driverId and enabled (boolean) are required" });
+      }
+
+      const updatedUser = await storage.toggleRoadTour(driverId, enabled);
+      res.json({ success: true, roadTourEnabled: updatedUser?.roadTourEnabled });
+    } catch (error: any) {
+      console.error("Error toggling road tour:", error);
+      res.status(500).json({ message: "Failed to toggle road tour", error: error.message });
+    }
+  });
+
+  // Mark a historical marker as heard by a driver
+  app.post("/api/road-tour/mark-heard", isAuthenticated, async (req, res) => {
+    try {
+      const { driverId, markerId, loadId } = req.body;
+      
+      if (!driverId || !markerId) {
+        return res.status(400).json({ message: "driverId and markerId are required" });
+      }
+
+      await storage.markAsHeard(driverId, parseInt(markerId), loadId);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error marking marker as heard:", error);
+      res.status(500).json({ message: "Failed to mark marker as heard", error: error.message });
+    }
+  });
+
+  // Get road tour status for a driver
+  app.get("/api/road-tour/status/:driverId", isAuthenticated, async (req, res) => {
+    try {
+      const { driverId } = req.params;
+      const status = await storage.getRoadTourStatus(driverId);
+      res.json(status);
+    } catch (error: any) {
+      console.error("Error fetching road tour status:", error);
+      res.status(500).json({ message: "Failed to fetch road tour status", error: error.message });
+    }
+  });
+
+  // Create a new historical marker (admin only)
+  app.post("/api/road-tour/markers", isAuthenticated, async (req, res) => {
+    try {
+      const marker = await storage.createHistoricalMarker(req.body);
+      res.json(marker);
+    } catch (error: any) {
+      console.error("Error creating historical marker:", error);
+      res.status(500).json({ message: "Failed to create marker", error: error.message });
+    }
+  });
+
   // Simple health check endpoint for Railway deployment
   app.get("/api/health", (req, res) => {
     res.json({ 

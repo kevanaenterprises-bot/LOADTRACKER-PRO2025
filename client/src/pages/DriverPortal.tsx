@@ -13,6 +13,7 @@ import DriverLoadCard from "@/components/DriverLoadCard";
 import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
+import { RoadTour } from "@/components/RoadTour";
 
 export default function DriverPortal() {
   console.log("🚨 DEBUG: DriverPortal loading...");
@@ -111,6 +112,9 @@ export default function DriverPortal() {
 
       {/* BOL Upload Section */}
       <StandaloneBOLUpload />
+
+      {/* Road Tour - Historical Markers Audio Tours */}
+      <RoadTour driverId={user.id} />
     </div>
   );
 }
