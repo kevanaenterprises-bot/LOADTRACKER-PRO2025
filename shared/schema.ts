@@ -38,6 +38,14 @@ export const users = pgTable("users", {
   password: varchar("password"), // For driver login (phone number)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // Driver record management fields
+  bankAccountNumber: varchar("bank_account_number"),
+  bankRoutingNumber: varchar("bank_routing_number"),
+  bankName: varchar("bank_name"),
+  hireDate: timestamp("hire_date"),
+  fireDate: timestamp("fire_date"),
+  medicalCardExpiration: timestamp("medical_card_expiration"),
+  driverLicenseExpiration: timestamp("driver_license_expiration"),
   // DEPRECATED: Legacy truck_number column - DO NOT USE in new code
   truckNumber: varchar("truck_number"), // Temporarily kept to avoid data loss
 });
@@ -302,9 +310,24 @@ export const trucks = pgTable("trucks", {
   year: integer("year").notNull(),
   vinNumber: varchar("vin_number").notNull().unique(),
   mileage: integer("mileage").default(0),
+  currentOdometer: integer("current_odometer").default(0), // Current odometer reading for service tracking
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Truck service records table for maintenance tracking
+export const truckServiceRecords = pgTable("truck_service_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  truckId: varchar("truck_id").references(() => trucks.id).notNull(),
+  serviceDate: timestamp("service_date").notNull(),
+  serviceType: varchar("service_type").notNull(), // "oil_change", "tire_rotation", "inspection", "repair", etc.
+  odometerAtService: integer("odometer_at_service").notNull(),
+  nextServiceOdometer: integer("next_service_odometer"), // When next service is due (odometer)
+  serviceDescription: text("service_description"), // Detailed description of work done
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_service_truck_date").on(table.truckId, table.serviceDate.desc()),
+]);
 
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -387,6 +410,13 @@ export const insertTruckSchema = createInsertSchema(trucks).omit({
   updatedAt: true,
 });
 
+export const insertTruckServiceRecordSchema = createInsertSchema(truckServiceRecords).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  serviceDate: z.string().datetime().transform(val => new Date(val)).or(z.date()),
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -415,6 +445,8 @@ export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertTruck = z.infer<typeof insertTruckSchema>;
 export type Truck = typeof trucks.$inferSelect;
+export type InsertTruckServiceRecord = z.infer<typeof insertTruckServiceRecordSchema>;
+export type TruckServiceRecord = typeof truckServiceRecords.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {
