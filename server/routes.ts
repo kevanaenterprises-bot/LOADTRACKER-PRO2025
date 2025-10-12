@@ -2079,13 +2079,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }, async (req, res) => {
     try {
       const { driverId } = req.params;
-      const updates = req.body;
+      const body = req.body;
       
       // Convert date strings to Date objects if present
-      if (updates.hireDate) updates.hireDate = new Date(updates.hireDate);
-      if (updates.fireDate) updates.fireDate = new Date(updates.fireDate);
-      if (updates.medicalCardExpiration) updates.medicalCardExpiration = new Date(updates.medicalCardExpiration);
-      if (updates.driverLicenseExpiration) updates.driverLicenseExpiration = new Date(updates.driverLicenseExpiration);
+      const updates: any = { ...body };
+      if (body.hireDate) updates.hireDate = new Date(body.hireDate);
+      if (body.fireDate) updates.fireDate = new Date(body.fireDate);
+      if (body.medicalCardExpiration) updates.medicalCardExpiration = new Date(body.medicalCardExpiration);
+      if (body.driverLicenseExpiration) updates.driverLicenseExpiration = new Date(body.driverLicenseExpiration);
       
       const updatedDriver = await storage.updateDriver(driverId, updates);
       if (!updatedDriver) {
