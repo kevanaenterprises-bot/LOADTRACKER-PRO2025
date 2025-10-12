@@ -3197,7 +3197,7 @@ Reply YES to confirm acceptance or NO to decline.`
         userAgent: req.headers['user-agent']?.substring(0, 50)
       });
       
-      const { status } = req.body;
+      const { status, startingOdometerReading, iftaTruckNumber } = req.body;
       
       if (!status) {
         console.log("MOBILE DEBUG - Missing status in request body");
@@ -3205,6 +3205,17 @@ Reply YES to confirm acceptance or NO to decline.`
       }
       
       console.log(`Updating load ${req.params.id} status to: ${status}`);
+      
+      // If transitioning to in_transit with IFTA data, capture it
+      if (status === "in_transit" && startingOdometerReading && iftaTruckNumber) {
+        console.log(`🚛 Capturing IFTA starting data - Truck: ${iftaTruckNumber}, Odometer: ${startingOdometerReading}`);
+        await storage.updateLoad(req.params.id, {
+          trackingEnabled: true,
+          startingOdometerReading: startingOdometerReading.toString(),
+          iftaTruckNumber: iftaTruckNumber
+        });
+      }
+      
       const load = await storage.updateLoadStatus(req.params.id, status);
       console.log(`Load status updated successfully: ${load.status}`);
       res.json(load);
@@ -5759,16 +5770,66 @@ Reply YES to confirm acceptance or NO to decline.`
       const { getLoadStateMileage } = await import("./hereRoutingService");
       const loadWithCoordinates = await storage.getLoad(req.params.id);
       
+      let routeMiles = 0;
+      let pickupState: string | null = null;
+      
       if (loadWithCoordinates) {
         const routeAnalysis = await getLoadStateMileage(loadWithCoordinates);
         
         if (routeAnalysis && routeAnalysis.milesByState) {
           iftaData.milesByState = routeAnalysis.milesByState;
+          routeMiles = routeAnalysis.totalMiles || 0;
           console.log(`✅ State-by-state mileage calculated:`, routeAnalysis.milesByState);
           console.log(`   HERE Maps total: ${routeAnalysis.totalMiles} miles vs Odometer: ${calculatedMiles || 'N/A'} miles`);
         } else {
           console.log(`⚠️  Could not calculate state-by-state mileage (missing coordinates or API error)`);
         }
+        
+        // Get pickup state for deadhead assignment from first pickup stop
+        const pickupStops = await storage.getLoadStops(req.params.id);
+        const firstPickup = pickupStops.find(stop => stop.stopType === 'pickup');
+        if (firstPickup) {
+          // Get location details from stop or fall back to pickupLocation
+          if (firstPickup.locationId) {
+            const stopLocation = await storage.getLocation(firstPickup.locationId);
+            pickupState = stopLocation?.state || null;
+          }
+          console.log(`📦 Pickup state identified from stop: ${pickupState || 'N/A'}`);
+        }
+      }
+
+      // Calculate deadhead miles if we have starting odometer
+      if (loadWithCoordinates?.startingOdometerReading) {
+        const startingOdometer = parseFloat(loadWithCoordinates.startingOdometerReading);
+        const endingOdometer = currentOdometer;
+        const totalTripMiles = endingOdometer - startingOdometer;
+        const rawDeadheadMiles = totalTripMiles - routeMiles;
+        
+        // Clamp deadhead miles to zero minimum (can't have negative deadhead)
+        const deadheadMiles = Math.max(0, rawDeadheadMiles);
+        
+        console.log(`🚛 IFTA Deadhead Calculation:`);
+        console.log(`   Starting Odometer: ${startingOdometer}`);
+        console.log(`   Ending Odometer: ${endingOdometer}`);
+        console.log(`   Total Trip Miles: ${totalTripMiles}`);
+        console.log(`   Route Miles (HERE Maps): ${routeMiles}`);
+        console.log(`   Raw Deadhead Miles: ${rawDeadheadMiles}`);
+        console.log(`   Deadhead Miles (clamped): ${deadheadMiles}`);
+        
+        // Only save deadhead data if positive and we have a pickup state
+        if (deadheadMiles > 0 && pickupState) {
+          iftaData.deadheadMiles = deadheadMiles.toFixed(1);
+          iftaData.deadheadMilesByState = {
+            [pickupState]: parseFloat(deadheadMiles.toFixed(1))
+          };
+          console.log(`   ✅ Deadhead assigned to ${pickupState}: ${deadheadMiles.toFixed(1)} miles`);
+        } else if (rawDeadheadMiles < 0) {
+          console.log(`   ⚠️  Deadhead would be negative (${rawDeadheadMiles.toFixed(1)}) - skipping deadhead assignment`);
+        } else if (!pickupState) {
+          console.log(`   ⚠️  No pickup state found - cannot assign deadhead miles`);
+        }
+      } else {
+        console.log(`⚠️  No starting odometer - cannot calculate deadhead miles`);
       }
 
       await storage.updateLoad(req.params.id, iftaData);

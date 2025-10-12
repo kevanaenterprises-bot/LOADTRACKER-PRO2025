@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -6,6 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import GPSTracker from "@/components/GPSTracker";
 
 interface DriverLoadCardProps {
@@ -108,6 +112,11 @@ const getProgressSteps = (currentStatus: string) => {
 export default function DriverLoadCard({ load }: DriverLoadCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // IFTA tracking dialog state
+  const [iftaDialogOpen, setIftaDialogOpen] = useState(false);
+  const [startingOdometer, setStartingOdometer] = useState("");
+  const [truckNumber, setTruckNumber] = useState("");
 
   // Driver unassign mutation
   const unassignMutation = useMutation({
@@ -190,18 +199,43 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
     },
   });
 
+  // Open IFTA dialog to capture starting odometer
+  const handleOpenIftaDialog = () => {
+    setIftaDialogOpen(true);
+  };
+
   // Combined function to accept tracking and move to in-transit
   const handleAcceptTracking = async () => {
+    if (!startingOdometer || !truckNumber) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter starting odometer and truck number",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      // First, update status to in_transit to show load is active
-      await updateStatusMutation.mutateAsync("in_transit");
+      // Update status to in_transit with IFTA data using existing status endpoint
+      await apiRequest(`/api/loads/${load.id}/status`, "PATCH", {
+        status: "in_transit",
+        startingOdometerReading: parseFloat(startingOdometer),
+        iftaTruckNumber: truckNumber
+      });
       
-      // Then start GPS tracking
-      // The GPSTracker component will handle the actual GPS initialization
       toast({
         title: "Load Accepted & Tracking Started! 🚛",
         description: "You're now tracking this load. GPS updates will be sent automatically.",
       });
+      
+      // Close dialog and reset fields
+      setIftaDialogOpen(false);
+      setStartingOdometer("");
+      setTruckNumber("");
+      
+      // Refresh data
+      queryClient.invalidateQueries({ queryKey: ["/api/driver/loads"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
     } catch (error) {
       console.error("Failed to accept tracking:", error);
       toast({
@@ -300,20 +334,11 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
                 {(load.status === "assigned" || load.status === "created") ? (
                   <Button 
                     className="flex-1 bg-green-600 hover:bg-green-700"
-                    onClick={handleAcceptTracking}
-                    disabled={updateStatusMutation.isPending}
+                    onClick={handleOpenIftaDialog}
+                    data-testid="button-accept-tracking"
                   >
-                    {updateStatusMutation.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Starting Tracking...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-location-arrow mr-2"></i>
-                        Accept Tracking
-                      </>
-                    )}
+                    <i className="fas fa-location-arrow mr-2"></i>
+                    Accept Tracking
                   </Button>
                 ) : (
                   /* Show Update Status for loads already in transit */
@@ -375,6 +400,61 @@ export default function DriverLoadCard({ load }: DriverLoadCardProps) {
           </AlertDialog>
         </div>
       </CardContent>
+      
+      {/* IFTA Starting Odometer Dialog */}
+      <Dialog open={iftaDialogOpen} onOpenChange={setIftaDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Start Load - IFTA Tracking</DialogTitle>
+            <DialogDescription>
+              Enter your current odometer reading and truck number to begin tracking this load for IFTA reporting.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="truck-number">Truck Number</Label>
+              <Input
+                id="truck-number"
+                placeholder="e.g., T-123"
+                value={truckNumber}
+                onChange={(e) => setTruckNumber(e.target.value)}
+                data-testid="input-truck-number"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="starting-odometer">Starting Odometer</Label>
+              <Input
+                id="starting-odometer"
+                type="number"
+                step="0.1"
+                placeholder="e.g., 123456.7"
+                value={startingOdometer}
+                onChange={(e) => setStartingOdometer(e.target.value)}
+                data-testid="input-starting-odometer"
+              />
+              <p className="text-sm text-gray-500">
+                This is your odometer reading before leaving the yard
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIftaDialogOpen(false)}
+              data-testid="button-cancel-ifta"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAcceptTracking}
+              className="bg-green-600 hover:bg-green-700"
+              data-testid="button-confirm-start-tracking"
+            >
+              Start Tracking
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

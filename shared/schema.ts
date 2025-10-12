@@ -106,12 +106,15 @@ export const loads = pgTable("loads", {
   receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
   receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
   lastLocationUpdate: timestamp("last_location_update"),
-  // IFTA reporting fields (captured at POD upload)
+  // IFTA reporting fields
   iftaTruckNumber: varchar("ifta_truck_number"), // Truck # for this trip (mandatory at POD upload)
+  startingOdometerReading: decimal("starting_odometer_reading", { precision: 10, scale: 1 }), // Odometer when leaving yard/starting load
   odometerReading: decimal("odometer_reading", { precision: 10, scale: 1 }), // Current odometer at delivery (mandatory at POD upload)
   previousOdometerReading: decimal("previous_odometer_reading", { precision: 10, scale: 1 }), // Previous odometer (auto-filled from last load)
   milesThisTrip: decimal("miles_this_trip", { precision: 8, scale: 1 }), // Calculated: current - previous odometer
-  milesByState: jsonb("miles_by_state").$type<Record<string, number>>(), // State-by-state mileage from HERE Maps
+  milesByState: jsonb("miles_by_state").$type<Record<string, number>>(), // State-by-state mileage from HERE Maps (route miles only)
+  deadheadMiles: decimal("deadhead_miles", { precision: 8, scale: 1 }), // Deadhead miles: (ending - starting) - route miles
+  deadheadMilesByState: jsonb("deadhead_miles_by_state").$type<Record<string, number>>(), // Deadhead miles assigned to pickup state
   fuelGallons: decimal("fuel_gallons", { precision: 8, scale: 2 }), // Fuel purchased on trip (optional)
   fuelAmount: decimal("fuel_amount", { precision: 10, scale: 2 }), // Dollar amount of fuel (optional)
   // DEPRECATED: Legacy truck_number column - DO NOT USE in new code
