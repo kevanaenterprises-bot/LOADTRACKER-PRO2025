@@ -25,6 +25,10 @@ LoadTracker Pro is a comprehensive logistics management system designed for tran
   - `isGCSAvailable()` checks configuration before cache operations
   - Skips caching when unavailable, generates fresh audio every time
   - No errors, no crashes - seamless fallback to direct API generation
+- **Notification Chime**: Pleasant two-tone audio alert (E5→A5 notes) plays before each marker narration
+  - Web Audio API implementation for browser compatibility
+  - ~450ms duration with smooth volume envelope
+  - Alerts driver that historical marker narration is about to begin
 - **Implementation**:
   - Service: `server/services/elevenlabs.ts` with `generateSpeechWithCache()`
   - Model: Eleven Flash v2.5 (low-latency, real-time)
