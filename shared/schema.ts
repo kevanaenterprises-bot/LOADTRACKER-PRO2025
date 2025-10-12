@@ -48,6 +48,9 @@ export const users = pgTable("users", {
   driverLicenseExpiration: timestamp("driver_license_expiration"),
   // DEPRECATED: Legacy truck_number column - DO NOT USE in new code
   truckNumber: varchar("truck_number"), // Temporarily kept to avoid data loss
+  // Historical marker audio tour preferences
+  roadTourEnabled: boolean("road_tour_enabled").default(false), // Toggle for historical marker audio tours
+  roadTourLastHeardMarkerId: varchar("road_tour_last_heard_marker_id"), // Last marker played to prevent repeats
 });
 
 // Locations table for receivers
@@ -418,6 +421,40 @@ export const insertTruckServiceRecordSchema = createInsertSchema(truckServiceRec
   serviceDate: z.string().datetime().transform(val => new Date(val)).or(z.date()),
 });
 
+// Historical Markers table for GPS-triggered audio tours
+export const historicalMarkers = pgTable("historical_markers", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  inscription: text("inscription").notNull(), // Full text to be read aloud
+  latitude: decimal("latitude", { precision: 10, scale: 8 }).notNull(),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }).notNull(),
+  state: varchar("state", { length: 2 }), // Two-letter state code
+  city: varchar("city"),
+  category: varchar("category"), // war memorial, historic site, etc.
+  source: varchar("source").default("HMDB"), // HMDB, state marker program, etc.
+  sourceId: varchar("source_id"), // External ID from source database
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Driver historical marker history - tracks which markers a driver has heard
+export const markerHistory = pgTable("marker_history", {
+  id: serial("id").primaryKey(),
+  driverId: varchar("driver_id").references(() => users.id).notNull(),
+  markerId: integer("marker_id").references(() => historicalMarkers.id).notNull(),
+  loadId: varchar("load_id").references(() => loads.id), // Optional - which load they were on
+  heardAt: timestamp("heard_at").defaultNow().notNull(),
+});
+
+export const insertHistoricalMarkerSchema = createInsertSchema(historicalMarkers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMarkerHistorySchema = createInsertSchema(markerHistory).omit({
+  id: true,
+  heardAt: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -448,6 +485,10 @@ export type InsertTruck = z.infer<typeof insertTruckSchema>;
 export type Truck = typeof trucks.$inferSelect;
 export type InsertTruckServiceRecord = z.infer<typeof insertTruckServiceRecordSchema>;
 export type TruckServiceRecord = typeof truckServiceRecords.$inferSelect;
+export type InsertHistoricalMarker = z.infer<typeof insertHistoricalMarkerSchema>;
+export type HistoricalMarker = typeof historicalMarkers.$inferSelect;
+export type InsertMarkerHistory = z.infer<typeof insertMarkerHistorySchema>;
+export type MarkerHistory = typeof markerHistory.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {
