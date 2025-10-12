@@ -29,7 +29,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 ### Feature Specifications
 - **Load Management**: Create, track, and update loads with real-time status, driver assignment, and support for multiple pickup/delivery stops. **Auto-calculates mileage** using HERE Maps API during load creation (geocodes addresses → calculates truck route distance).
 - **Driver Portal**: Mobile-optimized interface for drivers to update load status, upload documents (BOL, POD), and utilize GPS tracking.
-- **Automated Invoicing**: Generation of invoices based on completed loads, with detailed line item breakdowns.
+- **Automated Invoicing**: Generation of invoices based on completed loads, with detailed line item breakdowns and pickup/delivery in/out timestamps.
 - **Document Management**: BOL validation, POD collection, and secure storage in Google Cloud Storage.
 - **OCR Wright Con Scanner**: Tool to upload rate confirmation images, extract key data (load numbers, PO numbers, appointment times, addresses), and allow for editing before load creation.
 - **Automatic GPS Tracking**: Drivers can opt-in for automatic location tracking, which updates load statuses based on geographical proximity to pickup/delivery points.

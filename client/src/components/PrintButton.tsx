@@ -741,6 +741,46 @@ function generateInvoiceHTML(invoice: any, load: any): string {
         </tbody>
       </table>
 
+      ${load?.stops && load.stops.length > 0 ? `
+      <div style="margin-bottom: 30px; padding: 15px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px;">
+        <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #374151;">Pickup & Delivery Times</h3>
+        ${load.stops.map((stop: any) => `
+          <div style="margin-bottom: 12px; padding-bottom: 12px; ${stop !== load.stops[load.stops.length - 1] ? 'border-bottom: 1px solid #e5e7eb;' : ''}">
+            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">
+              ${stop.stopType === 'pickup' ? '📦 Pickup' : '📍 Delivery'}: ${stop.companyName || stop.address || 'N/A'}
+            </div>
+            ${stop.arrivedAt ? `
+              <div style="font-size: 14px; color: #4b5563;">
+                <strong>In:</strong> ${new Date(stop.arrivedAt).toLocaleString('en-US', { 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  year: 'numeric', 
+                  hour: '2-digit', 
+                  minute: '2-digit',
+                  hour12: true 
+                })}
+              </div>
+            ` : ''}
+            ${stop.departedAt ? `
+              <div style="font-size: 14px; color: #4b5563;">
+                <strong>Out:</strong> ${new Date(stop.departedAt).toLocaleString('en-US', { 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  year: 'numeric', 
+                  hour: '2-digit', 
+                  minute: '2-digit',
+                  hour12: true 
+                })}
+              </div>
+            ` : ''}
+            ${!stop.arrivedAt && !stop.departedAt ? `
+              <div style="font-size: 14px; color: #9ca3af;">Times not recorded</div>
+            ` : ''}
+          </div>
+        `).join('')}
+      </div>
+      ` : ''}
+
       <div class="total-section">
         <div style="font-size: 16px; margin-bottom: 10px;">
           <strong>Total Amount: <span class="total-amount">$${invoice?.totalAmount || '0.00'}</span></strong>
