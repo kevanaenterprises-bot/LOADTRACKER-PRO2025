@@ -34,7 +34,7 @@ The frontend uses React with TypeScript, leveraging `shadcn/ui` components built
 - **OCR Wright Con Scanner**: Tool to upload rate confirmation images, extract key data (load numbers, PO numbers, appointment times, addresses), and allow for editing before load creation.
 - **Automatic GPS Tracking**: Drivers can opt-in for automatic location tracking, which updates load statuses based on geographical proximity to pickup/delivery points.
 - **Universal Load Numbers**: System flexibly handles any load number format as the primary identifier.
-- **Real-Time Fleet Map**: Interactive HERE Maps dashboard showing all active loads with truck markers, destination pins, route polylines, weather overlays, and nearby diesel fuel station locations. Auto-refreshes every 30 seconds.
+- **Real-Time Fleet Map**: Interactive HERE Maps dashboard showing all active loads with truck markers, destination pins, route polylines, weather overlays, and nearby diesel fuel station locations. Auto-refreshes every 30 seconds. Displays loads with status: in_progress, in_transit, confirmed, en_route_pickup, at_shipper, left_shipper, en_route_receiver, at_receiver, or delivered when tracking is enabled.
 - **Driver Route Map**: Individual route visualization for drivers showing current position, destination, and route line with weather conditions.
 - **Error Handling**: React ErrorBoundary prevents white-page crashes, displaying user-friendly error messages with reload/home options instead of blank screens.
 
