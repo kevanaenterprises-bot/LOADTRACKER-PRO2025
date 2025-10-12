@@ -35,6 +35,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
   const [selectedVoice, setSelectedVoice] = useState<'male' | 'female'>('male');
   const watchIdRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const notificationAudioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -96,6 +97,43 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
     },
   });
 
+  // Play notification chime before marker audio
+  const playNotificationChime = (): Promise<void> => {
+    return new Promise((resolve) => {
+      try {
+        // Create a pleasant notification chime using Web Audio API
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        // Pleasant chime: two notes (E5 and A5)
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime + 0.15); // A5
+
+        // Envelope for smooth sound
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.4);
+
+        // Resolve after chime completes
+        setTimeout(() => {
+          audioContext.close();
+          resolve();
+        }, 450);
+      } catch (error) {
+        console.error('Failed to play notification chime:', error);
+        resolve(); // Continue even if chime fails
+      }
+    });
+  };
+
   // Play marker audio using on-demand ElevenLabs generation
   const speakMarker = async (marker: HistoricalMarker) => {
     if (isSpeaking) return;
@@ -108,6 +146,9 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
 
     try {
       setIsSpeaking(true);
+
+      // Play notification chime before marker narration
+      await playNotificationChime();
 
       // Generate audio on-demand from ElevenLabs API
       const response = await fetch('/api/road-tour/generate-audio', {
