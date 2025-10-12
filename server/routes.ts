@@ -7513,7 +7513,14 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
 
   // Historical Marker Road Tour API Routes
   // Get nearby historical markers based on GPS coordinates
-  app.get("/api/road-tour/nearby", isAuthenticated, async (req, res) => {
+  app.get("/api/road-tour/nearby", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const { latitude, longitude, radiusMeters = 500 } = req.query;
       
@@ -7534,7 +7541,14 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   });
 
   // Toggle road tour on/off for a driver
-  app.post("/api/road-tour/toggle", isAuthenticated, async (req, res) => {
+  app.post("/api/road-tour/toggle", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const { driverId, enabled } = req.body;
       
@@ -7551,7 +7565,14 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   });
 
   // Mark a historical marker as heard by a driver
-  app.post("/api/road-tour/mark-heard", isAuthenticated, async (req, res) => {
+  app.post("/api/road-tour/mark-heard", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const { driverId, markerId, loadId } = req.body;
       
@@ -7568,7 +7589,14 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   });
 
   // Get road tour status for a driver
-  app.get("/api/road-tour/status/:driverId", isAuthenticated, async (req, res) => {
+  app.get("/api/road-tour/status/:driverId", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
     try {
       const { driverId } = req.params;
       const status = await storage.getRoadTourStatus(driverId);
