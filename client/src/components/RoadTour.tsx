@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Radio, MapPin, Volume2, VolumeX } from "lucide-react";
+import { Radio, MapPin, Volume2, VolumeX, User, UserRound } from "lucide-react";
 
 interface HistoricalMarker {
   id: number;
@@ -31,13 +32,14 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
   const [nearbyMarkers, setNearbyMarkers] = useState<HistoricalMarker[]>([]);
   const [lastSpokenMarkerId, setLastSpokenMarkerId] = useState<number | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<'male' | 'female'>('male');
   const watchIdRef = useRef<number | null>(null);
-  const speechSynthRef = useRef<SpeechSynthesis | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Check if Web Speech API is supported
-  const isSpeechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  // Audio is always supported in modern browsers
+  const isAudioSupported = typeof window !== 'undefined';
 
   // Get road tour status
   const { data: tourStatus } = useQuery<{ enabled: boolean; lastHeardMarkerId: string | null }>({
@@ -45,19 +47,30 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
     enabled: !!driverId,
   });
 
+  // Load voice preference from localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedVoice = localStorage.getItem('roadTourVoice');
+      if (savedVoice === 'male' || savedVoice === 'female') {
+        setSelectedVoice(savedVoice);
+      }
+    }
+  }, []);
+
+  // Save voice preference to localStorage
+  const handleVoiceChange = (voice: 'male' | 'female') => {
+    setSelectedVoice(voice);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('roadTourVoice', voice);
+    }
+  };
+
   useEffect(() => {
     if (tourStatus) {
       setIsEnabled(tourStatus.enabled);
       setLastSpokenMarkerId(tourStatus.lastHeardMarkerId ? parseInt(tourStatus.lastHeardMarkerId) : null);
     }
   }, [tourStatus]);
-
-  // Initialize speech synthesis
-  useEffect(() => {
-    if (isSpeechSupported) {
-      speechSynthRef.current = window.speechSynthesis;
-    }
-  }, [isSpeechSupported]);
 
   // Toggle road tour
   const toggleMutation = useMutation({
@@ -83,36 +96,49 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
     },
   });
 
-  // Speak marker inscription using Web Speech API
+  // Play marker audio using premium AI voices
   const speakMarker = (marker: HistoricalMarker) => {
-    if (!isSpeechSupported || !speechSynthRef.current || isSpeaking) return;
+    if (isSpeaking) return;
 
-    // Stop any ongoing speech
-    speechSynthRef.current.cancel();
+    // Stop any ongoing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
 
-    const utterance = new SpeechSynthesisUtterance();
-    utterance.text = `Historical Marker. ${marker.title}. ${marker.inscription}`;
-    utterance.rate = 0.9; // Slightly slower for clarity
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-    utterance.lang = 'en-US';
+    // Construct path to premium audio file
+    const audioPath = `/audio-markers/marker-${marker.id}-${selectedVoice}.mp3`;
+    
+    const audio = new Audio(audioPath);
+    audioRef.current = audio;
 
-    utterance.onstart = () => {
+    audio.onplay = () => {
       setIsSpeaking(true);
     };
 
-    utterance.onend = () => {
+    audio.onended = () => {
       setIsSpeaking(false);
       setLastSpokenMarkerId(marker.id);
       markHeardMutation.mutate(marker.id);
+      audioRef.current = null;
     };
 
-    utterance.onerror = (e) => {
-      console.error('Speech synthesis error:', e);
+    audio.onerror = (e) => {
+      console.error('Audio playback error:', e);
       setIsSpeaking(false);
+      audioRef.current = null;
+      toast({
+        title: "Audio Error",
+        description: "Unable to play marker audio. Please try again.",
+        variant: "destructive",
+      });
     };
 
-    speechSynthRef.current.speak(utterance);
+    audio.play().catch(err => {
+      console.error('Failed to play audio:', err);
+      setIsSpeaking(false);
+      audioRef.current = null;
+    });
   };
 
   // Check for nearby markers
@@ -185,31 +211,18 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
     };
   }, [isEnabled, lastSpokenMarkerId, driverId, loadId]);
 
-  // Cleanup speech on unmount
+  // Cleanup audio on unmount
   useEffect(() => {
     return () => {
-      if (speechSynthRef.current) {
-        speechSynthRef.current.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
       }
     };
   }, []);
 
-  if (!isSpeechSupported) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Radio className="h-5 w-5" />
-            Road Tour
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-600">
-            Historical marker audio tours are not supported on this device.
-          </p>
-        </CardContent>
-      </Card>
-    );
+  if (!isAudioSupported) {
+    return null;
   }
 
   return (
@@ -239,11 +252,39 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
           />
         </div>
 
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Narrator Voice</Label>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={selectedVoice === 'male' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleVoiceChange('male')}
+              className="flex-1"
+              data-testid="button-voice-male"
+            >
+              <UserRound className="h-4 w-4 mr-2" />
+              Colman (Male)
+            </Button>
+            <Button
+              type="button"
+              variant={selectedVoice === 'female' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleVoiceChange('female')}
+              className="flex-1"
+              data-testid="button-voice-female"
+            >
+              <User className="h-4 w-4 mr-2" />
+              Sophie (Female)
+            </Button>
+          </div>
+        </div>
+
         {isEnabled && (
           <>
             <div className="p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                🎧 Audio tour active! You'll hear about historical markers as you drive past them.
+                🎧 Premium AI voices active! You'll hear professional narration of historical markers as you drive past them.
               </p>
             </div>
 
@@ -299,7 +340,7 @@ export function RoadTour({ driverId, loadId }: RoadTourProps) {
 
         {!isEnabled && (
           <p className="text-sm text-gray-500">
-            Toggle on to hear historical markers automatically as you drive
+            Toggle on to hear premium AI narration of historical markers as you drive
           </p>
         )}
       </CardContent>
