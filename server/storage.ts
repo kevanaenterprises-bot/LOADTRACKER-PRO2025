@@ -39,6 +39,9 @@ import {
   trucks,
   type Truck,
   type InsertTruck,
+  truckServiceRecords,
+  type TruckServiceRecord,
+  type InsertTruckServiceRecord,
 } from "@shared/schema";
 import { db, queryWithRetry } from "./db";
 import { eq, desc, and, sql, not } from "drizzle-orm";
@@ -138,6 +141,7 @@ export interface IStorage {
   getDrivers(): Promise<User[]>;
   getAvailableDrivers(): Promise<User[]>;
   createDriver(driver: any): Promise<User>;
+  updateDriver(id: string, updates: Partial<User>): Promise<User | undefined>;
   deleteDriver(driverId: string): Promise<void>;
 
   // Status history
@@ -155,6 +159,11 @@ export interface IStorage {
   createTruck(truck: InsertTruck): Promise<Truck>;
   updateTruck(id: string, updates: Partial<InsertTruck>): Promise<Truck>;
   deleteTruck(id: string): Promise<void>;
+  
+  // Truck service operations
+  getTruckServiceRecords(truckId: string): Promise<TruckServiceRecord[]>;
+  createTruckServiceRecord(record: InsertTruckServiceRecord): Promise<TruckServiceRecord>;
+  getUpcomingServiceAlerts(milesThreshold?: number): Promise<Array<Truck & { nextServiceDue?: number; milesUntilService?: number }>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1421,6 +1430,83 @@ export class DatabaseStorage implements IStorage {
 
   async deleteTruck(id: string): Promise<void> {
     await db.delete(trucks).where(eq(trucks.id, id));
+  }
+
+  // Truck service record operations
+  async getTruckServiceRecords(truckId: string): Promise<TruckServiceRecord[]> {
+    return await db
+      .select()
+      .from(truckServiceRecords)
+      .where(eq(truckServiceRecords.truckId, truckId))
+      .orderBy(desc(truckServiceRecords.serviceDate));
+  }
+
+  async createTruckServiceRecord(record: InsertTruckServiceRecord): Promise<TruckServiceRecord> {
+    const [newRecord] = await db
+      .insert(truckServiceRecords)
+      .values(record)
+      .returning();
+    
+    // Update truck's current odometer if this service record has a higher odometer
+    if (record.odometerAtService) {
+      await db
+        .update(trucks)
+        .set({ 
+          currentOdometer: record.odometerAtService,
+          updatedAt: new Date() 
+        })
+        .where(eq(trucks.id, record.truckId));
+    }
+    
+    return newRecord;
+  }
+
+  async getUpcomingServiceAlerts(milesThreshold = 1000): Promise<Array<Truck & { nextServiceDue?: number; milesUntilService?: number }>> {
+    // Get all trucks
+    const allTrucks = await db.select().from(trucks);
+    
+    const alerts: Array<Truck & { nextServiceDue?: number; milesUntilService?: number }> = [];
+    
+    for (const truck of allTrucks) {
+      // Get the most recent service record with next service odometer
+      const [latestService] = await db
+        .select()
+        .from(truckServiceRecords)
+        .where(
+          and(
+            eq(truckServiceRecords.truckId, truck.id),
+            not(sql`${truckServiceRecords.nextServiceOdometer} IS NULL`)
+          )
+        )
+        .orderBy(desc(truckServiceRecords.serviceDate))
+        .limit(1);
+      
+      if (latestService && latestService.nextServiceOdometer) {
+        const currentOdometer = truck.currentOdometer || 0;
+        const milesUntilService = latestService.nextServiceOdometer - currentOdometer;
+        
+        // Alert if service is due within threshold miles
+        if (milesUntilService <= milesThreshold && milesUntilService >= 0) {
+          alerts.push({
+            ...truck,
+            nextServiceDue: latestService.nextServiceOdometer,
+            milesUntilService
+          });
+        }
+      }
+    }
+    
+    return alerts;
+  }
+
+  // Driver record update
+  async updateDriver(id: string, updates: Partial<User>): Promise<User | undefined> {
+    const [updatedDriver] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return updatedDriver;
   }
 }
 
