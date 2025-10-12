@@ -26,6 +26,7 @@ import {
   insertUserSchema,
   insertCustomerSchema,
   insertTruckSchema,
+  insertTruckServiceRecordSchema,
   insertChatMessageSchema,
   insertInvoiceSchema,
   type Load,
@@ -2068,6 +2069,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/drivers/:driverId", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { driverId } = req.params;
+      const updates = req.body;
+      
+      // Convert date strings to Date objects if present
+      if (updates.hireDate) updates.hireDate = new Date(updates.hireDate);
+      if (updates.fireDate) updates.fireDate = new Date(updates.fireDate);
+      if (updates.medicalCardExpiration) updates.medicalCardExpiration = new Date(updates.medicalCardExpiration);
+      if (updates.driverLicenseExpiration) updates.driverLicenseExpiration = new Date(updates.driverLicenseExpiration);
+      
+      const updatedDriver = await storage.updateDriver(driverId, updates);
+      if (!updatedDriver) {
+        return res.status(404).json({ message: "Driver not found" });
+      }
+      res.json(updatedDriver);
+    } catch (error) {
+      console.error("Error updating driver:", error);
+      res.status(500).json({ message: "Failed to update driver" });
+    }
+  });
+
   // Office Staff management endpoints
   app.post("/api/office-staff", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
@@ -2291,6 +2321,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting truck:", error);
       res.status(500).json({ message: "Failed to delete truck" });
+    }
+  });
+
+  // Truck service record endpoints
+  app.get("/api/trucks/:truckId/service-records", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const records = await storage.getTruckServiceRecords(req.params.truckId);
+      res.json(records);
+    } catch (error) {
+      console.error("Error fetching truck service records:", error);
+      res.status(500).json({ message: "Failed to fetch service records" });
+    }
+  });
+
+  app.post("/api/trucks/:truckId/service-records", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { truckId } = req.params;
+      const serviceData = {
+        ...req.body,
+        truckId,
+        serviceDate: new Date(req.body.serviceDate)
+      };
+      
+      const validatedData = insertTruckServiceRecordSchema.parse(serviceData);
+      const record = await storage.createTruckServiceRecord(validatedData);
+      res.status(201).json(record);
+    } catch (error: any) {
+      console.error("Error creating service record:", error);
+      if (error?.name === 'ZodError') {
+        res.status(400).json({ message: "Invalid service record data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create service record" });
+      }
+    }
+  });
+
+  app.get("/api/trucks/service-alerts", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const threshold = req.query.threshold ? parseInt(req.query.threshold as string) : 1000;
+      const alerts = await storage.getUpcomingServiceAlerts(threshold);
+      res.json(alerts);
+    } catch (error) {
+      console.error("Error fetching service alerts:", error);
+      res.status(500).json({ message: "Failed to fetch service alerts" });
     }
   });
 
