@@ -78,43 +78,52 @@ export default function DriverPortal() {
     fullUserObject: JSON.stringify(user, null, 2)
   });
 
-  // SUCCESS: Show authenticated driver portal - MINIMAL VERSION FOR DEBUGGING
+  // SUCCESS: Show authenticated driver portal - TWO-COLUMN LAYOUT
   return (
-    <div className="max-w-lg mx-auto min-h-screen bg-gray-50 p-4">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow p-6 mb-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-xl font-bold text-green-600">Driver Portal</h1>
-            <p className="mt-1">Welcome, {user.firstName} {user.lastName}!</p>
-            <p className="text-sm text-gray-600">Username: {user.username}</p>
-            <p className="text-sm text-gray-600">Driver ID: {user.id}</p>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-2xl font-bold text-green-600">Driver Portal</h1>
+              <p className="mt-1">Welcome, {user.firstName} {user.lastName}!</p>
+              <p className="text-sm text-gray-600">Username: {user.username}</p>
+            </div>
+            <Button onClick={logout} variant="outline" size="sm" data-testid="button-logout">
+              Logout
+            </Button>
           </div>
-          <Button onClick={logout} variant="outline" size="sm">
-            Logout
-          </Button>
+        </div>
+
+        {/* Two-Column Layout: Loads on Left, Tools on Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* LEFT COLUMN - Driver Loads */}
+          <div className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Assigned Loads</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {user && user.id ? (
+                  <DriverLoadsDisplay driverId={user.id} />
+                ) : (
+                  <p className="text-red-600">Error: Driver ID not found</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* RIGHT COLUMN - POD Uploader & Road Tour */}
+          <div className="space-y-4">
+            {/* BOL Upload Section */}
+            <StandaloneBOLUpload />
+
+            {/* Road Tour - Historical Markers Audio Tours */}
+            <RoadTour driverId={user.id} />
+          </div>
         </div>
       </div>
-
-      {/* Driver Loads Section - RESTORED WITH CRASH PROTECTION */}
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>Your Assigned Loads</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {user && user.id ? (
-            <DriverLoadsDisplay driverId={user.id} />
-          ) : (
-            <p className="text-red-600">Error: Driver ID not found</p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* BOL Upload Section */}
-      <StandaloneBOLUpload />
-
-      {/* Road Tour - Historical Markers Audio Tours */}
-      <RoadTour driverId={user.id} />
     </div>
   );
 }

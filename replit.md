@@ -4,6 +4,13 @@
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies. It handles load dispatch, driver coordination, and automated invoicing. The application offers separate interfaces for office staff and drivers, featuring real-time status tracking, document management, and automated invoicing capabilities. The system aims to streamline logistics operations and improve efficiency.
 
 ## Recent Changes
+### October 12, 2025 - Driver Portal UI Redesign
+- **Two-Column Layout**: Reorganized Driver Portal for better desktop experience
+  - Left Column: Assigned loads display
+  - Right Column: POD uploader and Road Tour feature
+  - Responsive design: stacks vertically on mobile, side-by-side on desktop (lg breakpoint)
+  - Wider viewport: Changed from max-w-lg (512px) to max-w-7xl (80rem) for full-screen desktop view
+
 ### October 12, 2025 - Historical Marker Road Tour Feature
 - **GPS-Triggered Audio Tours**: Implemented a Road to Hana-style audio tour system for truck drivers featuring GPS-triggered narration of historical markers
 - **222,969+ Marker Database Ready**: System designed to support importing from The Historical Marker Database (HMDB.org) with 8 sample markers across the US
