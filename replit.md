@@ -4,6 +4,24 @@
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies. It handles load dispatch, driver coordination, and automated invoicing. The application offers separate interfaces for office staff and drivers, featuring real-time status tracking, document management, and automated invoicing capabilities. The system aims to streamline logistics operations and improve efficiency.
 
 ## Recent Changes
+### October 13, 2025 - Fuel Receipt Tracking System
+- **Company Driver Designation**: Added `isCompanyDriver` boolean field to driver management for distinguishing company drivers from owner-operators
+- **Fuel Receipt Tracking**: Comprehensive fuel expense tracking system for company drivers:
+  - Track gallons purchased and total cost per fuel stop
+  - Automatic price-per-gallon calculation in UI
+  - Optional location and notes fields for each receipt
+  - Tied to specific loads for accurate trip expense tracking
+  - Summary statistics showing total gallons, total cost, and average $/gallon per load
+  - Driver can add/delete receipts only for their active loads
+- **Database Schema**: New `fuelReceipts` table with foreign keys to loads and drivers
+- **API Endpoints**: 
+  - `GET /api/loads/:loadId/fuel-receipts` - Get all receipts for a load
+  - `POST /api/loads/:loadId/fuel-receipts` - Add new fuel receipt
+  - `GET /api/drivers/:driverId/fuel-receipts` - Get driver receipts with optional date filters
+  - `DELETE /api/fuel-receipts/:id` - Remove fuel receipt
+- **Driver Portal Integration**: Fuel tracker automatically shows for company drivers with active loads, hidden for owner-operators
+- **Security**: All operations use authenticated API requests with session validation
+
 ### October 12, 2025 - Driver Portal UI Redesign
 - **Two-Column Layout**: Reorganized Driver Portal for better desktop experience
   - Left Column: Assigned loads display
