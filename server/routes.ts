@@ -27,6 +27,7 @@ import {
   insertCustomerSchema,
   insertTruckSchema,
   insertTruckServiceRecordSchema,
+  insertFuelReceiptSchema,
   insertChatMessageSchema,
   insertInvoiceSchema,
   type Load,
@@ -2387,6 +2388,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching service alerts:", error);
       res.status(500).json({ message: "Failed to fetch service alerts" });
+    }
+  });
+
+  // Fuel receipt endpoints (company drivers only)
+  app.get("/api/loads/:loadId/fuel-receipts", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const receipts = await storage.getFuelReceipts(req.params.loadId);
+      res.json(receipts);
+    } catch (error) {
+      console.error("Error fetching fuel receipts:", error);
+      res.status(500).json({ message: "Failed to fetch fuel receipts" });
+    }
+  });
+
+  app.post("/api/loads/:loadId/fuel-receipts", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { loadId } = req.params;
+      const receiptData = {
+        ...req.body,
+        loadId,
+        receiptDate: req.body.receiptDate ? new Date(req.body.receiptDate) : new Date()
+      };
+      
+      const validatedData = insertFuelReceiptSchema.parse(receiptData);
+      const receipt = await storage.createFuelReceipt(validatedData);
+      res.status(201).json(receipt);
+    } catch (error: any) {
+      console.error("Error creating fuel receipt:", error);
+      if (error?.name === 'ZodError') {
+        res.status(400).json({ message: "Invalid fuel receipt data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to create fuel receipt" });
+      }
+    }
+  });
+
+  app.get("/api/drivers/:driverId/fuel-receipts", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { driverId } = req.params;
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : undefined;
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : undefined;
+      
+      const receipts = await storage.getFuelReceiptsByDriver(driverId, startDate, endDate);
+      res.json(receipts);
+    } catch (error) {
+      console.error("Error fetching driver fuel receipts:", error);
+      res.status(500).json({ message: "Failed to fetch fuel receipts" });
+    }
+  });
+
+  app.delete("/api/fuel-receipts/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      await storage.deleteFuelReceipt(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting fuel receipt:", error);
+      res.status(500).json({ message: "Failed to delete fuel receipt" });
     }
   });
 
