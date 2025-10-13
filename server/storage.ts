@@ -14,6 +14,7 @@ import {
   notificationLog,
   historicalMarkers,
   markerHistory,
+  fuelReceipts,
   type User,
   type UpsertUser,
   type Location,
@@ -45,6 +46,8 @@ import {
   truckServiceRecords,
   type TruckServiceRecord,
   type InsertTruckServiceRecord,
+  type FuelReceipt,
+  type InsertFuelReceipt,
   type HistoricalMarker,
   type InsertHistoricalMarker,
   type MarkerHistory,
@@ -171,6 +174,12 @@ export interface IStorage {
   getTruckServiceRecords(truckId: string): Promise<TruckServiceRecord[]>;
   createTruckServiceRecord(record: InsertTruckServiceRecord): Promise<TruckServiceRecord>;
   getUpcomingServiceAlerts(milesThreshold?: number): Promise<Array<Truck & { nextServiceDue?: number; milesUntilService?: number }>>;
+
+  // Fuel receipt operations (company drivers only)
+  getFuelReceipts(loadId: string): Promise<any[]>;
+  getFuelReceiptsByDriver(driverId: string, startDate?: Date, endDate?: Date): Promise<any[]>;
+  createFuelReceipt(receipt: any): Promise<any>;
+  deleteFuelReceipt(id: string): Promise<void>;
 
   // Historical marker operations (GPS-triggered audio tours)
   getHistoricalMarker(id: number): Promise<any | undefined>;
@@ -1532,6 +1541,44 @@ export class DatabaseStorage implements IStorage {
     }
     
     return alerts;
+  }
+
+  // Fuel receipt operations (company drivers only)
+  async getFuelReceipts(loadId: string): Promise<FuelReceipt[]> {
+    return await db
+      .select()
+      .from(fuelReceipts)
+      .where(eq(fuelReceipts.loadId, loadId))
+      .orderBy(desc(fuelReceipts.receiptDate));
+  }
+
+  async getFuelReceiptsByDriver(driverId: string, startDate?: Date, endDate?: Date): Promise<FuelReceipt[]> {
+    const conditions = [eq(fuelReceipts.driverId, driverId)];
+    
+    if (startDate) {
+      conditions.push(sql`${fuelReceipts.receiptDate} >= ${startDate}`);
+    }
+    if (endDate) {
+      conditions.push(sql`${fuelReceipts.receiptDate} <= ${endDate}`);
+    }
+    
+    return await db
+      .select()
+      .from(fuelReceipts)
+      .where(and(...conditions))
+      .orderBy(desc(fuelReceipts.receiptDate));
+  }
+
+  async createFuelReceipt(receipt: InsertFuelReceipt): Promise<FuelReceipt> {
+    const [newReceipt] = await db
+      .insert(fuelReceipts)
+      .values(receipt)
+      .returning();
+    return newReceipt;
+  }
+
+  async deleteFuelReceipt(id: string): Promise<void> {
+    await db.delete(fuelReceipts).where(eq(fuelReceipts.id, id));
   }
 
   // Driver record update

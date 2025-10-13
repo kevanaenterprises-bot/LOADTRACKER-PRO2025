@@ -51,6 +51,8 @@ export const users = pgTable("users", {
   // Historical marker audio tour preferences
   roadTourEnabled: boolean("road_tour_enabled").default(false), // Toggle for historical marker audio tours
   roadTourLastHeardMarkerId: varchar("road_tour_last_heard_marker_id"), // Last marker played to prevent repeats
+  // Company driver designation for IFTA and fuel tracking
+  isCompanyDriver: boolean("is_company_driver").default(false), // Company drivers = IFTA tracked + fuel receipts
 });
 
 // Locations table for receivers
@@ -333,6 +335,22 @@ export const truckServiceRecords = pgTable("truck_service_records", {
   index("IDX_service_truck_date").on(table.truckId, table.serviceDate.desc()),
 ]);
 
+// Fuel receipts table for company driver fuel tracking
+export const fuelReceipts = pgTable("fuel_receipts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  loadId: varchar("load_id").references(() => loads.id).notNull(),
+  driverId: varchar("driver_id").references(() => users.id).notNull(),
+  gallons: decimal("gallons", { precision: 8, scale: 2 }).notNull(), // Fuel gallons purchased
+  totalCost: decimal("total_cost", { precision: 10, scale: 2 }).notNull(), // Total cost of fuel
+  receiptDate: timestamp("receipt_date").defaultNow(),
+  location: varchar("location"), // Optional: where fuel was purchased
+  notes: text("notes"), // Optional: receipt notes
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_fuel_load_date").on(table.loadId, table.receiptDate.desc()),
+  index("IDX_fuel_driver_date").on(table.driverId, table.receiptDate.desc()),
+]);
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -421,6 +439,13 @@ export const insertTruckServiceRecordSchema = createInsertSchema(truckServiceRec
   serviceDate: z.string().datetime().transform(val => new Date(val)).or(z.date()),
 });
 
+export const insertFuelReceiptSchema = createInsertSchema(fuelReceipts).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  receiptDate: z.string().datetime().transform(val => new Date(val)).optional().or(z.date().optional()),
+});
+
 // Historical Markers table for GPS-triggered audio tours
 export const historicalMarkers = pgTable("historical_markers", {
   id: serial("id").primaryKey(),
@@ -485,6 +510,8 @@ export type InsertTruck = z.infer<typeof insertTruckSchema>;
 export type Truck = typeof trucks.$inferSelect;
 export type InsertTruckServiceRecord = z.infer<typeof insertTruckServiceRecordSchema>;
 export type TruckServiceRecord = typeof truckServiceRecords.$inferSelect;
+export type InsertFuelReceipt = z.infer<typeof insertFuelReceiptSchema>;
+export type FuelReceipt = typeof fuelReceipts.$inferSelect;
 export type InsertHistoricalMarker = z.infer<typeof insertHistoricalMarkerSchema>;
 export type HistoricalMarker = typeof historicalMarkers.$inferSelect;
 export type InsertMarkerHistory = z.infer<typeof insertMarkerHistorySchema>;
