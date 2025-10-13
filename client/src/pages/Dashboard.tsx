@@ -41,6 +41,7 @@ const driverSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   username: z.string().min(1, "Username is required"),
+  isCompanyDriver: z.boolean().default(false),
 });
 
 const locationSchema = z.object({
@@ -120,6 +121,7 @@ export default function Dashboard() {
       lastName: "",
       phoneNumber: "",
       username: "",
+      isCompanyDriver: false,
     },
   });
 
@@ -620,7 +622,32 @@ export default function Dashboard() {
                               </FormItem>
                             )}
                           />
-                          <Button type="submit" disabled={createDriverMutation.isPending}>
+                          <FormField
+                            control={driverForm.control}
+                            name="isCompanyDriver"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                <FormControl>
+                                  <input
+                                    type="checkbox"
+                                    checked={field.value}
+                                    onChange={field.onChange}
+                                    className="h-4 w-4 rounded border-gray-300"
+                                    data-testid="checkbox-company-driver"
+                                  />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                  <FormLabel className="font-medium">
+                                    Company Driver
+                                  </FormLabel>
+                                  <p className="text-sm text-muted-foreground">
+                                    Check this if driver is a company driver (IFTA tracking & fuel receipts enabled)
+                                  </p>
+                                </div>
+                              </FormItem>
+                            )}
+                          />
+                          <Button type="submit" disabled={createDriverMutation.isPending} data-testid="button-submit-driver">
                             {createDriverMutation.isPending ? "Adding..." : "Add Driver"}
                           </Button>
                         </form>

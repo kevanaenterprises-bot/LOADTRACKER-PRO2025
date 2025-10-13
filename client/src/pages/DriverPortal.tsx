@@ -14,6 +14,26 @@ import { useDriverAuth } from "@/hooks/useDriverAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 import { RoadTour } from "@/components/RoadTour";
+import { FuelReceiptTracker } from "@/components/FuelReceiptTracker";
+
+// Component to show fuel tracker for driver's active load
+function ActiveLoadFuelTracker({ driverId, isCompanyDriver }: { driverId: string; isCompanyDriver: boolean }) {
+  const { data: loads = [] } = useQuery<any[]>({
+    queryKey: [`/api/loads/driver/${driverId}`],
+    enabled: !!driverId && isCompanyDriver,
+  });
+
+  // Find the first active load (in_progress, in_transit, etc)
+  const activeLoad = loads.find((load) => 
+    ["in_progress", "in_transit", "en_route_pickup", "at_shipper", "left_shipper", "en_route_receiver", "at_receiver"].includes(load.status)
+  );
+
+  if (!isCompanyDriver || !activeLoad) {
+    return null;
+  }
+
+  return <FuelReceiptTracker loadId={activeLoad.id} driverId={driverId} isCompanyDriver={isCompanyDriver} />;
+}
 
 export default function DriverPortal() {
   console.log("🚨 DEBUG: DriverPortal loading...");
@@ -118,6 +138,9 @@ export default function DriverPortal() {
           <div className="space-y-4">
             {/* BOL Upload Section */}
             <StandaloneBOLUpload />
+
+            {/* Fuel Receipt Tracker (Company Drivers Only) */}
+            <ActiveLoadFuelTracker driverId={user.id} isCompanyDriver={user.isCompanyDriver || false} />
 
             {/* Road Tour - Historical Markers Audio Tours */}
             <RoadTour driverId={user.id} />
