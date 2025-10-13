@@ -9,6 +9,7 @@ import {
   invoiceCounter,
   invoices,
   loadStatusHistory,
+  trackingPings,
   notificationPreferences,
   notificationLog,
   historicalMarkers,
@@ -1191,18 +1192,38 @@ export class DatabaseStorage implements IStorage {
     console.log("🗑️ Deleting driver:", driverId);
     
     try {
-      // First check if driver has any assigned loads
-      const assignedLoads = await db.select().from(loads).where(eq(loads.driverId, driverId));
+      // Delete all related records before deleting the driver
       
+      // 1. Unassign driver from loads
+      const assignedLoads = await db.select().from(loads).where(eq(loads.driverId, driverId));
       if (assignedLoads.length > 0) {
-        // Unassign the driver from all loads before deletion
         await db.update(loads)
           .set({ driverId: null })
           .where(eq(loads.driverId, driverId));
-        console.log(`🗑️ Unassigned driver from ${assignedLoads.length} loads before deletion`);
+        console.log(`🗑️ Unassigned driver from ${assignedLoads.length} loads`);
       }
       
-      // Delete the driver
+      // 2. Delete tracking pings
+      await db.delete(trackingPings).where(eq(trackingPings.driverId, driverId));
+      console.log(`🗑️ Deleted tracking pings`);
+      
+      // 3. Delete notification preferences
+      await db.delete(notificationPreferences).where(eq(notificationPreferences.driverId, driverId));
+      console.log(`🗑️ Deleted notification preferences`);
+      
+      // 4. Delete notification log
+      await db.delete(notificationLog).where(eq(notificationLog.driverId, driverId));
+      console.log(`🗑️ Deleted notification logs`);
+      
+      // 5. Delete marker history (Road Tour)
+      await db.delete(markerHistory).where(eq(markerHistory.driverId, driverId));
+      console.log(`🗑️ Deleted marker history`);
+      
+      // 6. Delete chat messages (if userId references the driver)
+      await db.delete(chatMessages).where(eq(chatMessages.userId, driverId));
+      console.log(`🗑️ Deleted chat messages`);
+      
+      // 7. Finally, delete the driver
       await db.delete(users).where(eq(users.id, driverId));
       console.log("🗑️ ✅ Driver deleted successfully");
     } catch (error: any) {
