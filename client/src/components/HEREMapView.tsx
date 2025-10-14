@@ -49,6 +49,8 @@ export function HEREMapView({
 
   // Initialize HERE Map using official pattern
   useEffect(() => {
+    let resizeHandler: (() => void) | null = null;
+
     const initMap = async () => {
       if (!hereApiKey || !mapRef.current) return;
 
@@ -77,7 +79,8 @@ export function HEREMapView({
         );
 
         // Add resize listener (HERE official pattern)
-        window.addEventListener('resize', () => map.getViewPort().resize());
+        resizeHandler = () => map.getViewPort().resize();
+        window.addEventListener('resize', resizeHandler);
 
         // Enable map interactions (official pattern with MapEvents)
         const mapEvents = new (window as any).H.mapevents.MapEvents(map);
@@ -103,8 +106,18 @@ export function HEREMapView({
 
     initMap();
 
+    // Cleanup function
     return () => {
-      window.removeEventListener('resize', () => {});
+      if (resizeHandler) {
+        window.removeEventListener('resize', resizeHandler);
+      }
+      // Dispose map objects
+      if (mapInstanceRef.current) {
+        const { map, ui } = mapInstanceRef.current;
+        if (ui) ui.dispose();
+        if (map) map.dispose();
+        mapInstanceRef.current = null;
+      }
     };
   }, [hereApiKey]);
 

@@ -3,6 +3,19 @@
 ## Overview
 LoadTracker Pro is a comprehensive logistics management system for transportation companies, streamlining load dispatch, driver coordination, and automated invoicing. It features real-time status tracking, document management, and separate interfaces for office staff and drivers, aiming to significantly improve operational efficiency. The system includes advanced capabilities like GPS-triggered audio tours for drivers, powered by a database of over 222,969 historical markers.
 
+## Recent Changes
+### October 14, 2025 - HERE Maps Official Implementation
+- **Official SDK Pattern**: Migrated HEREMapView component to use HERE's official JavaScript SDK initialization pattern as recommended by HERE Maps support
+- **Key Improvements**:
+  - Added official mapsjs-ui.css stylesheet for proper UI styling matching HERE's demos
+  - Implemented correct MapEvents initialization: `new H.mapevents.Behavior(new H.mapevents.MapEvents(map))`
+  - Added pixelRatio support for better display quality: `pixelRatio: window.devicePixelRatio`
+  - Upgraded to v8 Routing API: `platform.getRoutingService(null, 8)` for latest features
+  - Added resize listener for responsive map behavior
+  - Proper flexible polyline decoding: `H.geo.LineString.fromFlexiblePolyline()`
+- **Benefits**: Improved routing reliability (fixes Dallas to Pueblo routing issues), better visual appearance matching HERE's official demos, future-proof implementation using latest API versions
+- **Component**: client/src/components/HEREMapView.tsx now follows HERE's official React integration pattern
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
