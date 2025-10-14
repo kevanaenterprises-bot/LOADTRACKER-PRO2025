@@ -4,6 +4,13 @@
 LoadTracker Pro is a comprehensive logistics management system designed for transportation companies. It handles load dispatch, driver coordination, and automated invoicing. The application offers separate interfaces for office staff and drivers, featuring real-time status tracking, document management, and automated invoicing capabilities. The system aims to streamline logistics operations and improve efficiency.
 
 ## Recent Changes
+### October 14, 2025 - Database Migration to Replit Neon
+- **Fresh Database Provisioned**: Migrated to new Replit-managed Neon PostgreSQL database after old Railway database became inaccessible
+- **Connection Priority Updated**: Modified `server/db.ts` and `server/replitAuth.ts` to prioritize `RAILWAY_DATABASE_URL` environment variable (which contains the Neon connection string) over legacy `DATABASE_URL`
+- **Schema Successfully Deployed**: All tables including fuel receipts feature deployed to new database using `npm run db:push`
+- **Application Fully Operational**: Server confirmed successful database connection with SSL support for Neon external connections
+- **Environment Variables**: System uses Replit-provisioned PG* variables (PGHOST, PGUSER, PGPASSWORD, PGDATABASE, PGPORT) which are automatically set during database creation
+
 ### October 13, 2025 - Fuel Receipt Tracking System
 - **Company Driver Designation**: Added `isCompanyDriver` boolean field to driver management for distinguishing company drivers from owner-operators
 - **Fuel Receipt Tracking**: Comprehensive fuel expense tracking system for company drivers:

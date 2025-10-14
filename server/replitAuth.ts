@@ -29,8 +29,8 @@ export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   const pgStore = connectPg(session);
   
-  // Use LOADTRACKER_DB_URL if available (same as main app pool), otherwise fall back to DATABASE_URL
-  const connectionString = process.env.LOADTRACKER_DB_URL || process.env.DATABASE_URL;
+  // Priority order: RAILWAY_DATABASE_URL (Neon) > LOADTRACKER_DB_URL > DATABASE_URL
+  const connectionString = process.env.RAILWAY_DATABASE_URL || process.env.LOADTRACKER_DB_URL || process.env.DATABASE_URL;
   const isNeon = connectionString?.includes('neon.tech');
   
   // Create pool with SSL support for Neon

@@ -3,9 +3,9 @@ const { Pool } = pkg;
 import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 
-// Use LOADTRACKER_DB_URL if available (prevents Railway auto-override),
-// otherwise fall back to DATABASE_URL
-const connectionString = process.env.LOADTRACKER_DB_URL || process.env.DATABASE_URL;
+// Priority order: RAILWAY_DATABASE_URL (Neon) > LOADTRACKER_DB_URL > DATABASE_URL
+// RAILWAY_DATABASE_URL contains the correct Neon connection string
+const connectionString = process.env.RAILWAY_DATABASE_URL || process.env.LOADTRACKER_DB_URL || process.env.DATABASE_URL;
 
 if (!connectionString) {
   throw new Error(
