@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import express from "express";
 import { createServer, type Server } from "http";
+import crypto from "crypto";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated, getSession } from "./replitAuth";
 import { ObjectStorageService } from "./objectStorage";
@@ -38,7 +39,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
-import { loads, locations, loadStops, rates, invoiceCounter } from "@shared/schema";
+import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users } from "@shared/schema";
 import { PDFDocument } from 'pdf-lib';
 
 // Bypass secret for testing and mobile auth
@@ -7822,6 +7823,152 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
         success: false, 
         error: error instanceof Error ? error.message : "Migration failed" 
       });
+    }
+  });
+
+  // ===== DEMO SYSTEM ROUTES =====
+  
+  // Start a demo session
+  app.post("/api/demo/start", async (req, res) => {
+    try {
+      const { fullName, email, companyName, phoneNumber } = req.body;
+
+      if (!email || !fullName || !companyName) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // Generate unique session token
+      const sessionToken = crypto.randomUUID();
+      
+      // Create demo user account
+      const demoUsername = `demo_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      const demoUser = await storage.upsertUser({
+        username: demoUsername,
+        email: `demo_${sessionToken}@loadtracker.demo`,
+        firstName: fullName.split(' ')[0] || fullName,
+        lastName: fullName.split(' ').slice(1).join(' ') || '',
+        role: "office",
+        password: crypto.randomUUID(), // Random password they'll never need
+      });
+
+      // Create demo session record
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24); // 24-hour demo
+
+      const demoSession = await db.insert(demoSessions).values({
+        email,
+        fullName,
+        companyName,
+        phoneNumber: phoneNumber || null,
+        demoUserId: demoUser.id,
+        sessionToken,
+        ipAddress: req.ip || null,
+        userAgent: req.headers['user-agent'] || null,
+        expiresAt,
+      }).returning();
+
+      // Track visitor conversion
+      const sessionId = req.cookies?.sessionId || crypto.randomUUID();
+      await db.insert(visitorTracking).values({
+        sessionId,
+        pageUrl: '/demo/start',
+        referrer: req.headers.referer || null,
+        ipAddress: req.ip || null,
+        userAgent: req.headers['user-agent'] || null,
+        demoSessionId: demoSession[0].id,
+      });
+
+      res.json({
+        success: true,
+        sessionToken,
+        demoUserId: demoUser.id,
+        expiresAt,
+      });
+    } catch (error: any) {
+      console.error("Error starting demo:", error);
+      res.status(500).json({ message: "Failed to start demo session" });
+    }
+  });
+
+  // Clean up demo data (called on logout)
+  app.post("/api/demo/cleanup", async (req, res) => {
+    try {
+      const { sessionToken } = req.body;
+
+      if (!sessionToken) {
+        return res.status(400).json({ message: "Missing session token" });
+      }
+
+      // Find demo session
+      const demoSession = await db
+        .select()
+        .from(demoSessions)
+        .where(eq(demoSessions.sessionToken, sessionToken))
+        .limit(1);
+
+      if (!demoSession || demoSession.length === 0) {
+        return res.status(404).json({ message: "Demo session not found" });
+      }
+
+      const session = demoSession[0];
+      const demoUserId = session.demoUserId;
+
+      if (!demoUserId) {
+        return res.status(400).json({ message: "No demo user associated with session" });
+      }
+
+      // Delete all data created by demo user
+      await db.delete(loads).where(eq(loads.driverId, demoUserId));
+      await db.delete(customers).where(eq(customers.id, demoUserId)); // If they created customers
+      await db.delete(users).where(eq(users.id, demoUserId));
+
+      // Mark demo session as completed
+      await db
+        .update(demoSessions)
+        .set({ completedAt: new Date() })
+        .where(eq(demoSessions.id, session.id));
+
+      res.json({ success: true, message: "Demo data cleaned up successfully" });
+    } catch (error: any) {
+      console.error("Error cleaning up demo:", error);
+      res.status(500).json({ message: "Failed to cleanup demo data" });
+    }
+  });
+
+  // Get visitor analytics (admin only)
+  app.get("/api/analytics/visitors", isAuthenticated, async (req, res) => {
+    try {
+      // Check if user is admin
+      const user = req.user as any;
+      if (user?.role !== "office") {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      const stats = await db.execute(sql`
+        SELECT 
+          COUNT(DISTINCT session_id) as unique_visitors,
+          COUNT(*) as total_page_views,
+          COUNT(DISTINCT demo_session_id) as demo_conversions
+        FROM visitor_tracking
+        WHERE visited_at >= NOW() - INTERVAL '30 days'
+      `);
+
+      const demoStats = await db.execute(sql`
+        SELECT 
+          COUNT(*) as total_demos,
+          COUNT(CASE WHEN converted_to_customer THEN 1 END) as conversions,
+          AVG(EXTRACT(EPOCH FROM (completed_at - created_at))/60) as avg_session_minutes
+        FROM demo_sessions
+        WHERE created_at >= NOW() - INTERVAL '30 days'
+      `);
+
+      res.json({
+        visitors: stats.rows[0],
+        demos: demoStats.rows[0],
+      });
+    } catch (error: any) {
+      console.error("Error fetching analytics:", error);
+      res.status(500).json({ message: "Failed to fetch analytics" });
     }
   });
 
