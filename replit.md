@@ -4,6 +4,25 @@
 LoadTracker Pro is a comprehensive logistics management system for transportation companies, streamlining load dispatch, driver coordination, and automated invoicing. It features real-time status tracking, document management, and separate interfaces for office staff and drivers, aiming to significantly improve operational efficiency. The system includes advanced capabilities like GPS-triggered audio tours for drivers, powered by a database of over 222,969 historical markers.
 
 ## Recent Changes
+### October 14, 2025 - Driver Pay & Aging Report Features
+- **Driver Pay Structure**: 
+  - Added flexible pay options for drivers (percentage-based or per-mile rates)
+  - Database schema: `payType`, `percentageRate`, `mileageRate` fields on users table
+  - UI form with conditional validation - requires appropriate rate based on selected pay type
+  - Data type conversion ensures backend receives numeric values
+- **Automatic Driver Pay Calculation**:
+  - Integrated into invoice generation (`ensureAutoInvoice` function)
+  - Percentage: `pay = totalRevenue * (percentageRate / 100)`
+  - Mileage: `pay = tripMiles * mileageRate`
+  - Tracks driverId, payType, payRate, payAmount, and tripMiles on each invoice
+- **Aging Report System**:
+  - Categorizes unpaid invoices by age (0-30, 31-60, 61-90, 90+ days)
+  - Groups by customer with totals for each age bucket
+  - Color-coded severity indicators (green → yellow → orange → red)
+  - Full-featured page with summary cards, customer breakdown table, and detail views
+  - Endpoint: `/api/reports/aging`, Page: `/aging-report`
+- **Files**: shared/schema.ts, server/routes.ts, client/src/pages/Dashboard.tsx, client/src/pages/AgingReport.tsx, client/src/App.tsx
+
 ### October 14, 2025 - Usage-Based Billing & Trial System
 - **Tiered Pricing Model**: Implemented 3-tier subscription system (Starter $149, Professional $249, Enterprise $349+) to compete against $700/month competitors while maintaining profitability
 - **Usage Tracking Infrastructure**:
@@ -65,6 +84,8 @@ The frontend utilizes React with TypeScript, `shadcn/ui` (built on Radix UI), an
 - **Truck Service Management**: Comprehensive tracking with odometer readings, service history, and maintenance alerts.
 - **IFTA Reporting Dashboard**: Dedicated page displaying summary metrics, state-by-state mileage breakdown (loaded vs. deadhead), and individual load details.
 - **Historical Marker Road Tour**: GPS-triggered audio narration of historical markers, with voice selection, caching, and proximity detection, preventing repeats.
+- **Driver Pay Management**: Flexible pay structures supporting both percentage-based (% of revenue) and per-mile rates. Automatic calculation during invoice generation tracks driver earnings with full transparency.
+- **Aging Report**: Accounts receivable aging analysis categorizing unpaid invoices by time periods (0-30, 31-60, 61-90, 90+ days). Provides customer-level breakdown with color-coded severity indicators for collections management.
 - **Usage-Based Billing**: Tiered subscription pricing (Starter $149, Professional $249, Enterprise $349+) with metered billing for API usage overages. Real-time usage dashboard shows current consumption vs tier limits, overage costs, and billing projections.
 - **Demo/Trial System**: Instant trial access for prospects with automatic data cleanup, visitor tracking, and conversion analytics.
 
