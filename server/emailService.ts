@@ -155,6 +155,7 @@ export async function generatePDF(html: string): Promise<Buffer> {
     console.log(`📄 Generating PDF...`);
     const pdf = await page.pdf({
       format: 'A4',
+      landscape: false, // Force portrait orientation
       printBackground: true,
       margin: {
         top: '0.5in',
@@ -330,6 +331,7 @@ export async function convertImageToPDF(imageBuffer: Buffer, contentType: string
     
     const pdf = await page.pdf({
       format: 'A4',
+      landscape: false, // Force portrait orientation
       printBackground: true,
       margin: {
         top: '0.5in',
