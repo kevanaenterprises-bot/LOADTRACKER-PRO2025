@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Truck, MapPin, FileText, DollarSign, BarChart3, Headphones, CheckCircle2 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import turtleMascot from "@assets/image_1760414014599.png";
 
 export default function DemoLanding() {
   const [, setLocation] = useLocation();
@@ -55,9 +56,17 @@ export default function DemoLanding() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
+          <div className="mb-6 flex justify-center">
+            <img 
+              src={turtleMascot} 
+              alt="Turtle Logistics Mascot" 
+              className="w-40 h-40 object-contain"
+              data-testid="img-turtle-mascot"
+            />
+          </div>
           <div className="mb-4">
-            <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-2" data-testid="text-company-name">
-              🐢 Turtle Logistics
+            <p className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2" data-testid="text-company-name">
+              Turtle Logistics
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">Melissa, Texas</p>
           </div>
@@ -237,6 +246,211 @@ export default function DemoLanding() {
               </ul>
             </div>
           </div>
+        </div>
+
+        {/* Transparent Pricing Section */}
+        <div className="max-w-6xl mx-auto mt-16">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4" data-testid="heading-pricing-main">
+              100% Transparent Pricing
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300" data-testid="text-pricing-subtitle">
+              No hidden fees. No surprises. No "call for pricing" BS. Here's exactly what you'll pay.
+            </p>
+          </div>
+
+          {/* Pricing Tiers */}
+          <div className="grid md:grid-cols-3 gap-6 mb-12">
+            {/* Starter Tier */}
+            <Card className="border-2 border-gray-200 dark:border-gray-700" data-testid="card-tier-starter">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl mb-2">Starter</CardTitle>
+                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">$149<span className="text-lg text-gray-600 dark:text-gray-400">/mo</span></div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Perfect for small fleets</p>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Up to 5 trucks</strong></span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>50 rate con scans/month</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>500 SMS notifications/month</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>Unlimited GPS tracking</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>Unlimited invoices</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>Road tour feature included</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Professional Tier */}
+            <Card className="border-2 border-blue-500 dark:border-blue-600 shadow-lg relative" data-testid="card-tier-professional">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                Most Popular
+              </div>
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl mb-2">Professional</CardTitle>
+                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">$249<span className="text-lg text-gray-600 dark:text-gray-400">/mo</span></div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Best for growing companies</p>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>Up to 15 trucks</strong></span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>200 rate con scans/month</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>2,000 SMS notifications/month</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>Unlimited GPS tracking</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>Priority support</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>All Starter features</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Enterprise Tier */}
+            <Card className="border-2 border-gray-200 dark:border-gray-700" data-testid="card-tier-enterprise">
+              <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl mb-2">Enterprise</CardTitle>
+                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">$349<span className="text-lg text-gray-600 dark:text-gray-400">+</span></div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Large fleets with high volume</p>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span><strong>25+ trucks</strong></span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>500 rate con scans/month</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>5,000 SMS notifications/month</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>Overage billing at cost + $25</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>24/7 priority support</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span>All Professional features</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Overage Pricing - The Part Everyone Hides */}
+          <Card className="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 mb-12" data-testid="card-overage-pricing">
+            <CardHeader>
+              <CardTitle className="text-xl text-green-800 dark:text-green-200">
+                Overage Pricing - We Don't Hide This Like Others Do!
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                If you go over your monthly limits, here's EXACTLY what you'll pay (no surprise bills):
+              </p>
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-900 dark:text-white mb-2">Rate Con Scans (OCR)</p>
+                  <p className="text-gray-600 dark:text-gray-400">$1.00 per additional scan</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Our cost: $0.10. We add $25 admin fee total per month (not per scan)</p>
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-900 dark:text-white mb-2">SMS Notifications</p>
+                  <p className="text-gray-600 dark:text-gray-400">$0.04 per additional SMS</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Our cost: $0.004. We add $25 admin fee total per month</p>
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-900 dark:text-white mb-2">Email Invoices</p>
+                  <p className="text-gray-600 dark:text-gray-400">$0.09 per additional email</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Unlimited included - just here for transparency</p>
+                </div>
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                  <p className="font-semibold text-gray-900 dark:text-white mb-2">GPS/Maps Calls</p>
+                  <p className="text-gray-600 dark:text-gray-400">Unlimited - Always Free</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">We eat this cost. Track all you want!</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Competitor Comparison */}
+          <Card className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800" data-testid="card-competitor-comparison">
+            <CardHeader>
+              <CardTitle className="text-2xl text-blue-800 dark:text-blue-200">
+                Why We're 30-50% Cheaper Than $700/Month Competitors
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">1</div>
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white">Usage-Based = Fair Pricing</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">You only pay for what you actually use. Competitors charge flat fees whether you use it or not.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">2</div>
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white">No Sales Team Overhead</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Try it yourself, no sales calls required. We pass those savings to you.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">3</div>
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white">Modern Cloud Infrastructure</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Built on efficient cloud tech, not legacy systems that cost more to maintain.</p>
+                  </div>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg p-4 mt-4">
+                  <p className="font-bold text-green-800 dark:text-green-200 text-lg">Real Savings Example:</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
+                    15-truck fleet: <strong>LoadTracker Pro $249/mo</strong> vs. Competitor $700/mo = <strong>Save $5,412/year</strong>
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
