@@ -1,6 +1,6 @@
 # ⚡ QUICK START - 5 Minute Deploy
 
-## You Already Own: turtlelogistics.com ✅
+## You Already Own: turtlelogisticsllc.com ✅
 
 Let's get your demo site live!
 
@@ -44,18 +44,18 @@ In Railway dashboard:
 
 **In Railway:**
 1. Click **"Settings"** → **"Domains"**
-2. Add custom domain: `www.turtlelogistics.com`
+2. Add custom domain: `www.turtlelogisticsllc.com`
 3. Railway shows DNS records → **COPY THESE!**
 
 **In GoDaddy:**
-1. Go to turtlelogistics.com DNS settings
+1. Go to turtlelogisticsllc.com DNS settings
 2. Add CNAME record:
    - Type: CNAME
    - Host: `www`
    - Points to: `<from-railway>.up.railway.app`
    - TTL: 1 hour
 3. Set up forwarding (optional):
-   - Forward `turtlelogistics.com` → `www.turtlelogistics.com`
+   - Forward `turtlelogisticsllc.com` → `www.turtlelogisticsllc.com`
 4. Save
 
 ---
@@ -63,7 +63,7 @@ In Railway dashboard:
 ## ✅ You're Done!
 
 Wait 10-30 minutes for DNS, then visit:
-- ✨ **https://www.turtlelogistics.com**
+- ✨ **https://www.turtlelogisticsllc.com**
 
 Your demo site will show:
 - 🐢 Turtle mascot

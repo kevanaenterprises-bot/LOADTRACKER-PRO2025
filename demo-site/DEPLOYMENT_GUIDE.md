@@ -43,13 +43,13 @@ In Railway dashboard:
 
 1. In Railway, click **"Settings"** → **"Domains"**
 2. Click **"Custom Domain"**
-3. Enter: `www.turtlelogistics.com`
+3. Enter: `www.turtlelogisticsllc.com`
 4. Railway shows DNS records (copy these!)
 
 ### 5️⃣ Update GoDaddy DNS
 
 1. Login to GoDaddy
-2. Find `turtlelogistics.com` domain
+2. Find `turtlelogisticsllc.com` domain
 3. Click **"DNS"** or **"Manage DNS"**
 4. Add these records (from Railway):
 
@@ -60,7 +60,7 @@ In Railway dashboard:
 - **TTL**: 1 hour
 
 **For root domain (@):**
-- **Option 1** (Recommended): Set up domain forwarding in GoDaddy to redirect `turtlelogistics.com` → `www.turtlelogistics.com`
+- **Option 1** (Recommended): Set up domain forwarding in GoDaddy to redirect `turtlelogisticsllc.com` → `www.turtlelogisticsllc.com`
 - **Option 2**: If GoDaddy supports ALIAS/ANAME records, point `@` to `<railway-domain>.up.railway.app`
 - **Note**: Railway requires CNAME/ALIAS records, not A records with IPs
 
@@ -68,7 +68,7 @@ In Railway dashboard:
 
 ### 6️⃣ Test Your Site
 
-1. Visit: `https://www.turtlelogistics.com`
+1. Visit: `https://www.turtlelogisticsllc.com`
 2. Should see the Turtle mascot and pricing page!
 3. Submit demo form to test the flow
 

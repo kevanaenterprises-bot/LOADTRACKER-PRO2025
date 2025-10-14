@@ -32,13 +32,13 @@ Railway will automatically:
 1. In Railway dashboard, go to your demo site deployment
 2. Click **Settings** → **Domains**
 3. Click **Custom Domain**
-4. Enter `www.turtlelogistics.com` (or your preferred subdomain)
+4. Enter `www.turtlelogisticsllc.com` (or your preferred subdomain)
 5. Railway will provide DNS records
 
 ### Step 5: Configure DNS (In GoDaddy)
 
 1. Log into GoDaddy
-2. Go to your `turtlelogistics.com` domain
+2. Go to your `turtlelogisticsllc.com` domain
 3. Click **DNS Management**
 4. Add CNAME record for www subdomain:
    - **Type**: CNAME
@@ -46,7 +46,7 @@ Railway will automatically:
    - **Points to**: Railway's provided domain (e.g., `yourapp-xxxxx.up.railway.app`)
    - **TTL**: 1 hour
 5. (Optional) Set up forwarding for root domain:
-   - In GoDaddy settings, forward `turtlelogistics.com` → `www.turtlelogistics.com`
+   - In GoDaddy settings, forward `turtlelogisticsllc.com` → `www.turtlelogisticsllc.com`
    - This ensures both URLs work
 
 **Note**: Railway uses CNAME records, not A records. DNS propagation takes 10-60 minutes.
@@ -83,7 +83,7 @@ Visit http://localhost:3000
 
 ## 🌐 Production URLs
 
-- **Demo Site**: https://www.turtlelogistics.com (or your custom domain)
+- **Demo Site**: https://www.turtlelogisticsllc.com (or your custom domain)
 - **Main App**: https://your-main-app.up.railway.app
 
 ## 💡 Tips
