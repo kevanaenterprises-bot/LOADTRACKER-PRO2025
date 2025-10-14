@@ -53,6 +53,10 @@ export const users = pgTable("users", {
   roadTourLastHeardMarkerId: varchar("road_tour_last_heard_marker_id"), // Last marker played to prevent repeats
   // Company driver designation for IFTA and fuel tracking
   isCompanyDriver: boolean("is_company_driver").default(false), // Company drivers = IFTA tracked + fuel receipts
+  // Driver pay structure fields
+  payType: varchar("pay_type").default("percentage"), // "percentage" or "mileage"
+  percentageRate: decimal("percentage_rate", { precision: 5, scale: 2 }), // e.g., 70.00 for 70%
+  mileageRate: decimal("mileage_rate", { precision: 6, scale: 2 }), // e.g., 1.50 for $1.50/mile
 });
 
 // Locations table for receivers
@@ -246,6 +250,12 @@ export const invoices = pgTable("invoices", {
   finalizedAt: timestamp("finalized_at"), // When invoice was finalized with POD
   generatedAt: timestamp("generated_at").defaultNow(),
   printedAt: timestamp("printed_at"),
+  // Driver pay tracking fields
+  driverId: varchar("driver_id").references(() => users.id), // Driver assigned to this load
+  driverPayType: varchar("driver_pay_type"), // "percentage" or "mileage" (snapshot at invoice time)
+  driverPayRate: decimal("driver_pay_rate", { precision: 6, scale: 2 }), // Rate used (% or $/mile)
+  driverPayAmount: decimal("driver_pay_amount", { precision: 10, scale: 2 }), // Calculated driver pay
+  tripMiles: decimal("trip_miles", { precision: 8, scale: 2 }), // Miles for mileage-based pay
 });
 
 // Load status history for tracking
