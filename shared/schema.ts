@@ -517,6 +517,136 @@ export type HistoricalMarker = typeof historicalMarkers.$inferSelect;
 export type InsertMarkerHistory = z.infer<typeof insertMarkerHistorySchema>;
 export type MarkerHistory = typeof markerHistory.$inferSelect;
 
+// Pricing tiers table
+export const pricingTiers = pgTable("pricing_tiers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(), // "Starter", "Professional", "Enterprise"
+  displayName: varchar("display_name").notNull(),
+  monthlyPrice: decimal("monthly_price", { precision: 10, scale: 2 }).notNull(),
+  maxTrucks: integer("max_trucks"), // null = unlimited
+  includedHereMapsTransactions: integer("included_here_maps_transactions").default(0),
+  includedDocumentAiScans: integer("included_document_ai_scans").default(0),
+  includedSmsMessages: integer("included_sms_messages").default(0),
+  includedEmails: integer("included_emails").default(0),
+  includedStorageGB: integer("included_storage_gb").default(5),
+  includedElevenlabsCharacters: integer("included_elevenlabs_characters").default(0),
+  isActive: boolean("is_active").default(true),
+  sortOrder: integer("sort_order").default(0), // For display ordering
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Customer subscriptions table
+export const customerSubscriptions = pgTable("customer_subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  tierId: varchar("tier_id").references(() => pricingTiers.id).notNull(),
+  stripeCustomerId: varchar("stripe_customer_id"),
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  status: varchar("status").notNull().default("active"), // "active", "canceled", "past_due", "trial"
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  trialEndsAt: timestamp("trial_ends_at"),
+  canceledAt: timestamp("canceled_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// API usage logs table for tracking all API calls
+export const apiUsageLogs = pgTable("api_usage_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  subscriptionId: varchar("subscription_id").references(() => customerSubscriptions.id),
+  apiService: varchar("api_service").notNull(), // "here_maps", "document_ai", "sms", "email", "elevenlabs", "storage"
+  apiEndpoint: varchar("api_endpoint"), // Specific endpoint called
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1"), // For storage GB, characters, etc.
+  costCents: integer("cost_cents"), // Cost in cents (for accurate billing)
+  requestMetadata: jsonb("request_metadata").$type<Record<string, any>>(), // Additional details
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_usage_user_created").on(table.userId, table.createdAt.desc()),
+  index("IDX_usage_subscription_service").on(table.subscriptionId, table.apiService, table.createdAt.desc()),
+]);
+
+// Demo sessions table for trial accounts
+export const demoSessions = pgTable("demo_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").notNull(),
+  fullName: varchar("full_name"),
+  companyName: varchar("company_name"),
+  phoneNumber: varchar("phone_number"),
+  demoUserId: varchar("demo_user_id").references(() => users.id), // Temporary demo account
+  sessionToken: varchar("session_token").notNull().unique(),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  expiresAt: timestamp("expires_at").notNull(), // Auto-expire after 24 hours
+  completedAt: timestamp("completed_at"), // When they finished the demo
+  convertedToCustomer: boolean("converted_to_customer").default(false),
+  convertedAt: timestamp("converted_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_demo_expires").on(table.expiresAt),
+  index("IDX_demo_created").on(table.createdAt.desc()),
+]);
+
+// Visitor tracking table for analytics
+export const visitorTracking = pgTable("visitor_tracking", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id").notNull(), // Anonymous session ID
+  pageUrl: varchar("page_url").notNull(),
+  referrer: varchar("referrer"),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  deviceType: varchar("device_type"), // "mobile", "tablet", "desktop"
+  browserName: varchar("browser_name"),
+  country: varchar("country"),
+  demoSessionId: varchar("demo_session_id").references(() => demoSessions.id), // Link to demo if converted
+  visitedAt: timestamp("visited_at").defaultNow(),
+}, (table) => [
+  index("IDX_visitor_session").on(table.sessionId, table.visitedAt.desc()),
+  index("IDX_visitor_visited").on(table.visitedAt.desc()),
+]);
+
+// Insert schemas for new tables
+export const insertPricingTierSchema = createInsertSchema(pricingTiers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCustomerSubscriptionSchema = createInsertSchema(customerSubscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertApiUsageLogSchema = createInsertSchema(apiUsageLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertDemoSessionSchema = createInsertSchema(demoSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertVisitorTrackingSchema = createInsertSchema(visitorTracking).omit({
+  id: true,
+  visitedAt: true,
+});
+
+// New types
+export type InsertPricingTier = z.infer<typeof insertPricingTierSchema>;
+export type PricingTier = typeof pricingTiers.$inferSelect;
+export type InsertCustomerSubscription = z.infer<typeof insertCustomerSubscriptionSchema>;
+export type CustomerSubscription = typeof customerSubscriptions.$inferSelect;
+export type InsertApiUsageLog = z.infer<typeof insertApiUsageLogSchema>;
+export type ApiUsageLog = typeof apiUsageLogs.$inferSelect;
+export type InsertDemoSession = z.infer<typeof insertDemoSessionSchema>;
+export type DemoSession = typeof demoSessions.$inferSelect;
+export type InsertVisitorTracking = z.infer<typeof insertVisitorTrackingSchema>;
+export type VisitorTracking = typeof visitorTracking.$inferSelect;
+
 // Extended types with relations
 export type LoadWithDetails = Load & {
   driver?: User;
