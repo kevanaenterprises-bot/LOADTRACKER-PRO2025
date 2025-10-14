@@ -13,6 +13,7 @@ import AdminLogin from "@/pages/AdminLogin";
 import Chat from "@/pages/Chat";
 import IFTAReport from "@/pages/IFTAReport";
 import DemoLanding from "@/pages/DemoLanding";
+import AgingReport from "@/pages/AgingReport";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/paid-loads" component={PaidLoads} />
       <Route path="/ifta-report" component={IFTAReport} />
+      <Route path="/aging-report" component={AgingReport} />
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
       <Route path="/chat" component={Chat} />
