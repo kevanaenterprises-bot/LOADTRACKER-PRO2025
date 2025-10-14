@@ -5019,6 +5019,37 @@ Reply YES to confirm acceptance or NO to decline.`
         totalAmount: load.flatRate || '0.00', // Use flat rate as default
         printedAt: null
       };
+
+      // Calculate driver pay based on pay structure
+      if (load.driverId) {
+        const allDrivers = await storage.getDrivers();
+        const driver = allDrivers.find((d: any) => d.id === load.driverId);
+        
+        if (driver) {
+          invoiceData.driverId = driver.id;
+          invoiceData.driverPayType = driver.payType || 'percentage';
+          
+          const totalRevenue = parseFloat(invoiceData.totalAmount || '0');
+          const tripMiles = parseFloat(load.estimatedMiles || load.milesThisTrip || '0');
+          
+          let driverPayAmount = 0;
+          
+          if (driver.payType === 'percentage' && driver.percentageRate) {
+            const rate = parseFloat(driver.percentageRate);
+            driverPayAmount = totalRevenue * (rate / 100);
+            invoiceData.driverPayRate = rate;
+            console.log(`💵 Driver pay (${driver.firstName} ${driver.lastName}): ${rate}% of $${totalRevenue} = $${driverPayAmount}`);
+          } else if (driver.payType === 'mileage' && driver.mileageRate) {
+            const rate = parseFloat(driver.mileageRate);
+            driverPayAmount = tripMiles * rate;
+            invoiceData.driverPayRate = rate;
+            invoiceData.tripMiles = tripMiles;
+            console.log(`💵 Driver pay (${driver.firstName} ${driver.lastName}): ${tripMiles} miles × $${rate}/mile = $${driverPayAmount}`);
+          }
+          
+          invoiceData.driverPayAmount = driverPayAmount.toFixed(2);
+        }
+      }
       
       // FIXED: Embed ALL PODs if available on the load (not just first one)
       if (load.podDocumentPath) {

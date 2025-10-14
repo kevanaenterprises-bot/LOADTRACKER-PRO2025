@@ -45,7 +45,29 @@ const driverSchema = z.object({
   payType: z.enum(["percentage", "mileage"]).default("percentage"),
   percentageRate: z.string().optional(),
   mileageRate: z.string().optional(),
-});
+}).refine(
+  (data) => {
+    if (data.payType === "percentage") {
+      return data.percentageRate && parseFloat(data.percentageRate) > 0;
+    }
+    return true;
+  },
+  {
+    message: "Percentage rate is required for percentage-based pay",
+    path: ["percentageRate"],
+  }
+).refine(
+  (data) => {
+    if (data.payType === "mileage") {
+      return data.mileageRate && parseFloat(data.mileageRate) > 0;
+    }
+    return true;
+  },
+  {
+    message: "Mileage rate is required for mileage-based pay",
+    path: ["mileageRate"],
+  }
+);
 
 const locationSchema = z.object({
   name: z.string().min(1, "Location name is required"),
@@ -159,7 +181,14 @@ export default function Dashboard() {
       setDebugLog(prev => [...prev, `🔑 Bypass token: ${!!localStorage.getItem('bypass-token')}`]);
       
       try {
-        const result = await apiRequest("/api/drivers", "POST", data);
+        // Convert rate strings to numbers before submission
+        const transformedData = {
+          ...data,
+          percentageRate: data.percentageRate ? parseFloat(data.percentageRate) : undefined,
+          mileageRate: data.mileageRate ? parseFloat(data.mileageRate) : undefined,
+        };
+        
+        const result = await apiRequest("/api/drivers", "POST", transformedData);
         setDebugLog(prev => [...prev, "✅ SUCCESS! Driver created"]);
         return result;
       } catch (error: any) {
