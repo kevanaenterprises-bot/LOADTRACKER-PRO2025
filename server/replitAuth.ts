@@ -7,6 +7,8 @@ import type { Express, RequestHandler } from "express";
 import memoize from "memoizee";
 import connectPg from "connect-pg-simple";
 import { storage } from "./storage";
+import pkg from 'pg';
+const { Pool } = pkg;
 
 if (!process.env.REPLIT_DOMAINS) {
   console.warn("⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.");
@@ -29,9 +31,18 @@ export function getSession() {
   
   // Use LOADTRACKER_DB_URL if available (same as main app pool), otherwise fall back to DATABASE_URL
   const connectionString = process.env.LOADTRACKER_DB_URL || process.env.DATABASE_URL;
+  const isNeon = connectionString?.includes('neon.tech');
+  
+  // Create pool with SSL support for Neon
+  const sessionPool = new Pool({
+    connectionString,
+    ssl: isNeon ? { rejectUnauthorized: false } : undefined,
+    connectionTimeoutMillis: 30000,
+    max: 10,
+  });
   
   const sessionStore = new pgStore({
-    conString: connectionString,
+    pool: sessionPool,
     createTableIfMissing: true,
     ttl: sessionTtl / 1000, // TTL in seconds
     tableName: "sessions",

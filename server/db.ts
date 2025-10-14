@@ -13,14 +13,15 @@ if (!connectionString) {
   );
 }
 const isRailway = connectionString.includes('proxy.rlwy.net');
+const isNeon = connectionString.includes('neon.tech');
 
 export const pool = new Pool({
   connectionString,
-  // Use standard SSL for Railway external connections
-  ssl: isRailway ? { rejectUnauthorized: false } : undefined,
+  // Use SSL for Railway and Neon external connections
+  ssl: (isRailway || isNeon) ? { rejectUnauthorized: false } : undefined,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 15000, // Increased to allow for Neon wake-up time
+  connectionTimeoutMillis: 30000, // Increased timeout for Neon wake-up
 });
 
 // Automatic retry wrapper for database queries to handle Neon hibernation
