@@ -4,34 +4,42 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { MapPin, Route, Clock, DollarSign, Navigation, Truck, AlertTriangle } from 'lucide-react';
-import { HERERouteOptimizer, type Location, type OptimizedRoute, type TruckSpecs } from '@/services/HERERouteOptimizer';
+
+interface Location {
+  lat?: number;
+  lng?: number;
+  address: string;
+  type: 'pickup' | 'dropoff';
+  name?: string;
+}
 
 interface HEREMapViewProps {
   locations: Location[];
-  onRouteOptimized?: (route: OptimizedRoute) => void;
+  onRouteCalculated?: (route: any) => void;
   showOptimization?: boolean;
   height?: string;
-  truckSpecs?: TruckSpecs;
 }
 
 export function HEREMapView({ 
   locations, 
-  onRouteOptimized, 
+  onRouteCalculated, 
   showOptimization = true,
-  height = '400px',
-  truckSpecs
+  height = '400px'
 }: HEREMapViewProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [isOptimizing, setIsOptimizing] = useState(false);
-  const [optimizedRoute, setOptimizedRoute] = useState<OptimizedRoute | null>(null);
+  const [isRouting, setIsRouting] = useState(false);
+  const [routeData, setRouteData] = useState<any>(null);
   const [mapError, setMapError] = useState<string | null>(null);
   const [hereApiKey, setHereApiKey] = useState<string | null>(null);
 
   // Get HERE API key from environment
   useEffect(() => {
-    const key = import.meta.env.VITE_HERE_MAPS_API_KEY || import.meta.env.HERE_MAPS_API_KEY || import.meta.env.VITE_HERE_API_KEY || import.meta.env.HERE_API_KEY;
+    const key = import.meta.env.VITE_HERE_MAPS_API_KEY || 
+                import.meta.env.HERE_MAPS_API_KEY || 
+                import.meta.env.VITE_HERE_API_KEY || 
+                import.meta.env.HERE_API_KEY;
     if (key) {
       setHereApiKey(key);
     } else {
@@ -39,40 +47,53 @@ export function HEREMapView({
     }
   }, []);
 
-  // Initialize HERE Map
+  // Initialize HERE Map using official pattern
   useEffect(() => {
     const initMap = async () => {
       if (!hereApiKey || !mapRef.current) return;
 
       try {
-        // Load HERE Maps API dynamically
-        await loadHEREMapsAPI(hereApiKey);
+        // Load HERE Maps API and CSS (official pattern)
+        await loadHEREMapsAPI();
+        loadHEREMapsCSS();
         
-        // Create map instance
+        // Official HERE Maps initialization pattern
         const platform = new (window as any).H.service.Platform({
-          'apikey': hereApiKey
+          apikey: hereApiKey
         });
 
-        const defaultMapTypes = platform.createDefaultMapTypes();
+        // Get default layers (official method)
+        const defaultLayers = platform.createDefaultLayers();
         
+        // Create map with pixelRatio for better display
         const map = new (window as any).H.Map(
           mapRef.current,
-          defaultMapTypes.vector.normal.map,
+          defaultLayers.vector.normal.map,
           {
+            pixelRatio: window.devicePixelRatio || 1,
             zoom: 6,
             center: { lat: 32.7767, lng: -96.7970 } // Default to Dallas, TX
           }
         );
 
-        // Enable interaction
-        const behavior = new (window as any).H.mapevents.Behavior();
-        const ui = new (window as any).H.ui.UI.createDefault(map);
+        // Add resize listener (HERE official pattern)
+        window.addEventListener('resize', () => map.getViewPort().resize());
 
-        mapInstanceRef.current = { map, platform, ui };
+        // Enable map interactions (official pattern with MapEvents)
+        const mapEvents = new (window as any).H.mapevents.MapEvents(map);
+        const behavior = new (window as any).H.mapevents.Behavior(mapEvents);
+
+        // Create default UI components (official pattern)
+        const ui = (window as any).H.ui.UI.createDefault(map, defaultLayers);
+
+        // Get v8 routing service (latest API)
+        const router = platform.getRoutingService(null, 8);
+
+        mapInstanceRef.current = { map, platform, ui, router, defaultLayers };
         setIsMapLoaded(true);
         setMapError(null);
 
-        console.log('✅ HERE Map initialized successfully');
+        console.log('✅ HERE Map initialized successfully (official pattern)');
 
       } catch (error) {
         console.error('HERE Map initialization failed:', error);
@@ -81,22 +102,26 @@ export function HEREMapView({
     };
 
     initMap();
+
+    return () => {
+      window.removeEventListener('resize', () => {});
+    };
   }, [hereApiKey]);
 
   // Update map when locations change
   useEffect(() => {
-    if (isMapLoaded && locations.length > 0 && !showOptimization) {
-      displayBasicMarkers();
+    if (isMapLoaded && locations.length > 0) {
+      displayLocationsOnMap();
     }
-  }, [locations, isMapLoaded, showOptimization]);
+  }, [locations, isMapLoaded]);
 
-  // Display basic markers without route optimization
-  const displayBasicMarkers = () => {
+  // Display locations on map
+  const displayLocationsOnMap = () => {
     if (!mapInstanceRef.current || locations.length === 0) return;
 
     const { map } = mapInstanceRef.current;
     
-    // Clear existing markers
+    // Clear existing objects
     map.removeObjects(map.getObjects());
 
     const group = new (window as any).H.map.Group();
@@ -104,7 +129,6 @@ export function HEREMapView({
     // Add markers for each location
     locations.forEach((location, index) => {
       if (location.lat && location.lng) {
-        // Create custom icon based on type
         const icon = new (window as any).H.map.Icon(
           createMarkerSVG(location.type === 'pickup' ? '#10B981' : '#EF4444', index + 1),
           { size: { w: 32, h: 32 } }
@@ -126,90 +150,134 @@ export function HEREMapView({
 
     // Fit map to show all markers
     if (group.getBoundingBox()) {
-      map.getViewPort().setBounds(group.getBoundingBox());
+      map.getViewModel().setLookAtData({
+        bounds: group.getBoundingBox()
+      });
     }
   };
 
-  // Optimize route and display
-  const handleOptimizeRoute = async () => {
-    if (!isMapLoaded || locations.length < 2) return;
+  // Calculate route using HERE v8 Routing API (official pattern)
+  const handleCalculateRoute = async () => {
+    if (!isMapLoaded || !mapInstanceRef.current || locations.length < 2) return;
 
-    setIsOptimizing(true);
+    const { map, router } = mapInstanceRef.current;
+    
+    // Filter locations with coordinates
+    const validLocations = locations.filter(loc => loc.lat && loc.lng);
+    if (validLocations.length < 2) {
+      setMapError('Need at least 2 locations with coordinates for routing');
+      return;
+    }
+
+    setIsRouting(true);
+    setMapError(null);
+
     try {
-      const route = await HERERouteOptimizer.optimizeRoute(locations, {
-        avoidTolls: false,
-        avoidHighways: false,
-        optimizeForTime: true,
-        fuelCostPerGallon: 3.50,
-        milesPerGallon: 6.5, // Truck MPG
-        truckSpecs
-      });
+      const origin = `${validLocations[0].lat},${validLocations[0].lng}`;
+      const destination = `${validLocations[validLocations.length - 1].lat},${validLocations[validLocations.length - 1].lng}`;
 
-      setOptimizedRoute(route);
-      
-      // Display route on map
-      if (mapInstanceRef.current && route.routeDetails) {
-        displayRouteOnMap(route);
+      // Build via points for middle locations
+      const via = validLocations.slice(1, -1).map(loc => `${loc.lat},${loc.lng}`);
+
+      // HERE v8 Routing API parameters (official pattern)
+      const routingParameters: any = {
+        routingMode: 'fast',
+        transportMode: 'truck',
+        origin: origin,
+        destination: destination,
+        return: 'polyline,summary,actions'
+      };
+
+      // Add via points if any
+      if (via.length > 0) {
+        routingParameters.via = new (window as any).H.service.Url.MultiValueQueryParameter(via);
       }
 
-      // Notify parent component
-      if (onRouteOptimized) {
-        onRouteOptimized(route);
-      }
+      // Calculate route (official v8 API callback pattern)
+      router.calculateRoute(
+        routingParameters,
+        (result: any) => {
+          // Success callback
+          if (result.routes && result.routes.length > 0) {
+            const route = result.routes[0];
+            
+            // Clear map
+            map.removeObjects(map.getObjects());
+            const group = new (window as any).H.map.Group();
+
+            // Add route polyline (official pattern with flexible polyline)
+            route.sections.forEach((section: any) => {
+              const linestring = (window as any).H.geo.LineString.fromFlexiblePolyline(section.polyline);
+              
+              const routeLine = new (window as any).H.map.Polyline(linestring, {
+                style: { strokeColor: '#0088ff', lineWidth: 5 }
+              });
+              
+              group.addObject(routeLine);
+            });
+
+            // Add location markers
+            validLocations.forEach((location, index) => {
+              const icon = new (window as any).H.map.Icon(
+                createMarkerSVG(location.type === 'pickup' ? '#10B981' : '#EF4444', index + 1),
+                { size: { w: 32, h: 32 } }
+              );
+
+              const marker = new (window as any).H.map.Marker(
+                { lat: location.lat!, lng: location.lng! },
+                { icon }
+              );
+
+              group.addObject(marker);
+            });
+
+            map.addObject(group);
+
+            // Fit map to route bounds
+            map.getViewModel().setLookAtData({
+              bounds: group.getBoundingBox()
+            });
+
+            // Calculate route stats
+            let totalDistance = 0;
+            let totalDuration = 0;
+
+            route.sections.forEach((section: any) => {
+              totalDistance += section.summary.length || 0;
+              totalDuration += section.summary.duration || 0;
+            });
+
+            // Convert to miles and minutes
+            const totalMiles = Math.round((totalDistance * 0.000621371) * 100) / 100;
+            const totalMinutes = Math.round(totalDuration / 60);
+
+            const routeInfo = {
+              totalMiles,
+              totalDuration: totalMinutes,
+              route: route
+            };
+
+            setRouteData(routeInfo);
+            
+            if (onRouteCalculated) {
+              onRouteCalculated(routeInfo);
+            }
+
+            console.log('✅ Route calculated successfully:', routeInfo);
+          }
+        },
+        (error: any) => {
+          // Error callback
+          console.error('❌ Routing error:', error);
+          setMapError(`Routing failed: ${error.message || 'Unknown error'}`);
+        }
+      );
 
     } catch (error) {
-      console.error('Route optimization failed:', error);
-      setMapError(error instanceof Error ? error.message : 'Route optimization failed');
+      console.error('Route calculation failed:', error);
+      setMapError(error instanceof Error ? error.message : 'Route calculation failed');
     } finally {
-      setIsOptimizing(false);
-    }
-  };
-
-  // Display optimized route on HERE Map
-  const displayRouteOnMap = (route: OptimizedRoute) => {
-    if (!mapInstanceRef.current) return;
-
-    const { map } = mapInstanceRef.current;
-    
-    // Clear existing objects
-    map.removeObjects(map.getObjects());
-
-    const group = new (window as any).H.map.Group();
-
-    // Add route polyline
-    if (route.routeDetails && route.routeDetails.routes[0]) {
-      const routeShape = route.routeDetails.routes[0].sections[0].polyline;
-      const polyline = (window as any).H.geo.LineString.fromFlexiblePolyline(routeShape);
-      
-      const routeLine = new (window as any).H.map.Polyline(polyline, {
-        style: { strokeColor: '#2563EB', lineWidth: 4 }
-      });
-      
-      group.addObject(routeLine);
-    }
-
-    // Add optimized waypoint markers
-    route.optimizedOrder.forEach((location, index) => {
-      if (location.lat && location.lng) {
-        const icon = new (window as any).H.map.Icon(
-          createMarkerSVG(location.type === 'pickup' ? '#10B981' : '#EF4444', index + 1),
-          { size: { w: 32, h: 32 } }
-        );
-
-        const marker = new (window as any).H.map.Marker(
-          { lat: location.lat, lng: location.lng },
-          { icon }
-        );
-
-        group.addObject(marker);
-      }
-    });
-
-    map.addObject(group);
-
-    // Fit map to show route
-    if (group.getBoundingBox()) {
-      map.getViewPort().setBounds(group.getBoundingBox());
+      setIsRouting(false);
     }
   };
 
@@ -247,16 +315,17 @@ export function HEREMapView({
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center">
               <Truck className="h-5 w-5 mr-2" />
-              Truck Route Map (HERE Maps)
+              Truck Route Map (HERE Maps v8)
             </div>
             {showOptimization && locations.length >= 2 && (
               <Button 
-                onClick={handleOptimizeRoute}
-                disabled={isOptimizing || !isMapLoaded}
+                onClick={handleCalculateRoute}
+                disabled={isRouting || !isMapLoaded}
                 size="sm"
+                data-testid="button-calculate-route"
               >
                 <Navigation className="h-4 w-4 mr-2" />
-                {isOptimizing ? 'Optimizing...' : 'Optimize Route'}
+                {isRouting ? 'Calculating...' : 'Calculate Route'}
               </Button>
             )}
           </CardTitle>
@@ -266,6 +335,7 @@ export function HEREMapView({
             ref={mapRef} 
             style={{ height }} 
             className="w-full rounded-b-lg"
+            data-testid="here-map-container"
           />
           {!isMapLoaded && (
             <div className="flex items-center justify-center h-full">
@@ -275,24 +345,23 @@ export function HEREMapView({
         </CardContent>
       </Card>
 
-      {/* Route Optimization Results */}
-      {optimizedRoute && (
+      {/* Route Results */}
+      {routeData && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Route className="h-5 w-5 mr-2" />
-              Truck Route Details
+              Route Details (HERE v8 API)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Route Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                 <div className="flex items-center">
                   <Route className="h-5 w-5 text-blue-600 mr-2" />
                   <span className="font-medium">Total Distance</span>
                 </div>
-                <Badge variant="secondary">{optimizedRoute.totalMiles} miles</Badge>
+                <Badge variant="secondary" data-testid="badge-total-miles">{routeData.totalMiles} miles</Badge>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
@@ -300,42 +369,19 @@ export function HEREMapView({
                   <Clock className="h-5 w-5 text-green-600 mr-2" />
                   <span className="font-medium">Est. Time</span>
                 </div>
-                <Badge variant="secondary">
-                  {Math.floor(optimizedRoute.totalDuration / 60)}h {optimizedRoute.totalDuration % 60}m
+                <Badge variant="secondary" data-testid="badge-total-duration">
+                  {Math.floor(routeData.totalDuration / 60)}h {routeData.totalDuration % 60}m
                 </Badge>
-              </div>
-
-              <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                <div className="flex items-center">
-                  <DollarSign className="h-5 w-5 text-orange-600 mr-2" />
-                  <span className="font-medium">Est. Fuel Cost</span>
-                </div>
-                <Badge variant="secondary">${optimizedRoute.estimatedFuelCost}</Badge>
               </div>
             </div>
 
-            {/* Truck Warnings */}
-            {optimizedRoute.truckSpecificWarnings && optimizedRoute.truckSpecificWarnings.length > 0 && (
-              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <div className="flex items-center mb-2">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600 mr-2" />
-                  <span className="font-semibold text-yellow-800">Truck Route Warnings</span>
-                </div>
-                <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
-                  {optimizedRoute.truckSpecificWarnings.map((warning, index) => (
-                    <li key={index}>{warning}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
             <Separator />
 
-            {/* Optimized Stop Order */}
+            {/* Location List */}
             <div>
-              <h4 className="font-semibold mb-3">Optimized Stop Order</h4>
+              <h4 className="font-semibold mb-3">Route Stops</h4>
               <div className="space-y-2">
-                {optimizedRoute.optimizedOrder.map((location, index) => (
+                {locations.filter(loc => loc.lat && loc.lng).map((location, index) => (
                   <div key={index} className="flex items-center p-2 bg-gray-50 rounded">
                     <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold mr-3 ${
                       location.type === 'pickup' ? 'bg-green-500' : 'bg-red-500'
@@ -362,8 +408,22 @@ export function HEREMapView({
   );
 }
 
-// Load HERE Maps API dynamically
-async function loadHEREMapsAPI(apiKey: string): Promise<void> {
+// Load HERE Maps CSS (official pattern)
+function loadHEREMapsCSS() {
+  if (document.querySelector('link[href*="mapsjs-ui.css"]')) {
+    return; // Already loaded
+  }
+
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.type = 'text/css';
+  link.href = 'https://js.api.here.com/v3/3.1/mapsjs-ui.css';
+  document.head.appendChild(link);
+  console.log('✅ HERE Maps CSS loaded');
+}
+
+// Load HERE Maps API scripts (official pattern)
+async function loadHEREMapsAPI(): Promise<void> {
   return new Promise((resolve, reject) => {
     // Check if already loaded
     if ((window as any).H) {
@@ -371,28 +431,28 @@ async function loadHEREMapsAPI(apiKey: string): Promise<void> {
       return;
     }
 
-    // Create script element
-    const script = document.createElement('script');
-    script.src = 'https://js.api.here.com/v3/3.1/mapsjs-core.js';
-    script.async = true;
+    // Load core library first
+    const coreScript = document.createElement('script');
+    coreScript.src = 'https://js.api.here.com/v3/3.1/mapsjs-core.js';
+    coreScript.async = true;
 
-    script.onload = () => {
-      // Load additional HERE Maps modules
+    coreScript.onload = () => {
+      // Load additional modules in parallel (official pattern)
       Promise.all([
         loadScript('https://js.api.here.com/v3/3.1/mapsjs-service.js'),
         loadScript('https://js.api.here.com/v3/3.1/mapsjs-ui.js'),
         loadScript('https://js.api.here.com/v3/3.1/mapsjs-mapevents.js'),
       ]).then(() => {
-        console.log('✅ HERE Maps API loaded successfully');
+        console.log('✅ HERE Maps API loaded successfully (official scripts)');
         resolve();
       }).catch(reject);
     };
 
-    script.onerror = () => {
-      reject(new Error('Failed to load HERE Maps API'));
+    coreScript.onerror = () => {
+      reject(new Error('Failed to load HERE Maps core library'));
     };
 
-    document.head.appendChild(script);
+    document.head.appendChild(coreScript);
   });
 }
 
