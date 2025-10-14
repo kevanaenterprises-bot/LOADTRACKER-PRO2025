@@ -70,7 +70,7 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
 
       // Send via Resend API (no SMTP ports blocked!)
       const result = await resend.emails.send({
-        from: 'Turtle Logistics <kevin@go4fc.com>',
+        from: 'GO 4 Farms & Cattle <kevin@go4fc.com>',
         to: [to],
         cc: ccList,
         bcc: bcc.length > 0 ? bcc : undefined,

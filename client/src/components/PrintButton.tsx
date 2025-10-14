@@ -682,7 +682,7 @@ function generateInvoiceHTML(invoice: any, load: any): string {
     <body>
       <div class="header">
         <div class="company-info-section">
-          <div class="company-name">Turtle Logistics</div>
+          <div class="company-name">GO 4 Farms & Cattle</div>
           <div class="company-info">
             1510 Crystal Valley Way<br>
             Melissa, TX 75454<br>
@@ -1119,7 +1119,7 @@ function generateCombinedRateConInvoiceHTML_OLD_DEPRECATED(invoice: any, load: a
       <!-- RATE CONFIRMATION SECTION -->
       <div class="header">
         <div class="company-info-section">
-          <div class="company-name">Turtle Logistics</div>
+          <div class="company-name">GO 4 Farms & Cattle</div>
           <div class="company-info">
             1510 Crystal Valley Way<br>
             Melissa, TX 75454<br>
@@ -1191,7 +1191,7 @@ function generateCombinedRateConInvoiceHTML_OLD_DEPRECATED(invoice: any, load: a
           <div>Signature & Date</div>
         </div>
         <div class="signature-box">
-          <div><strong>Turtle Logistics</strong></div>
+          <div><strong>GO 4 Farms & Cattle</strong></div>
           <div style="margin-top: 40px;">_________________________</div>
           <div>Authorized Signature & Date</div>
         </div>
@@ -1202,7 +1202,7 @@ function generateCombinedRateConInvoiceHTML_OLD_DEPRECATED(invoice: any, load: a
       
       <div class="header">
         <div class="company-info-section">
-          <div class="company-name">Turtle Logistics</div>
+          <div class="company-name">GO 4 Farms & Cattle</div>
           <div class="company-info">
             1510 Crystal Valley Way<br>
             Melissa, TX 75454<br>

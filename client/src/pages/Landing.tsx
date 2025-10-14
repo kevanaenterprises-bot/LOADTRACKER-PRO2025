@@ -13,14 +13,14 @@ export default function Landing() {
   
   useEffect(() => {
     if (showTelnyxInfo) {
-      document.title = "Turtle Logistics - LoadTracker Pro | Transportation & Logistics";
+      document.title = "Turtle Logistics - LoadTracker Pro | Professional Transportation Management Software";
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription) {
-        metaDescription.setAttribute('content', 'Turtle Logistics transportation and logistics services. Professional load management and dispatch solutions based in Melissa, Texas.');
+        metaDescription.setAttribute('content', 'Turtle Logistics LoadTracker Pro - Professional transportation management software for trucking companies. Real-time GPS tracking, automated invoicing, IFTA reporting, and more.');
       } else {
         const meta = document.createElement('meta');
         meta.name = 'description';
-        meta.content = 'Turtle Logistics transportation and logistics services. Professional load management and dispatch solutions based in Melissa, Texas.';
+        meta.content = 'Turtle Logistics LoadTracker Pro - Professional transportation management software for trucking companies. Real-time GPS tracking, automated invoicing, IFTA reporting, and more.';
         document.head.appendChild(meta);
       }
     }
@@ -38,12 +38,12 @@ export default function Landing() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center px-4">
       {/* Company Logo */}
       <div className="mb-12 text-center">
-        <img 
-          src={logoUrl} 
-          alt="Turtle Logistics Logo" 
-          className="w-48 h-48 mx-auto mb-6 object-contain"
-        />
-        <h1 className="text-4xl font-bold text-primary">LoadTracker Pro</h1>
+        <div className="mb-4">
+          <p className="text-3xl font-bold text-blue-600 mb-2">🐢 Turtle Logistics</p>
+          <p className="text-sm text-gray-600">Melissa, Texas</p>
+        </div>
+        <h1 className="text-4xl font-bold text-primary mb-2">LoadTracker Pro</h1>
+        <p className="text-gray-600">Professional Transportation Management System</p>
       </div>
 
       {/* Login Buttons */}

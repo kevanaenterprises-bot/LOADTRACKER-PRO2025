@@ -55,6 +55,12 @@ export default function DemoLanding() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
+          <div className="mb-4">
+            <p className="text-2xl font-semibold text-blue-600 dark:text-blue-400 mb-2" data-testid="text-company-name">
+              🐢 Turtle Logistics
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Melissa, Texas</p>
+          </div>
           <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4" data-testid="heading-demo-title">
             LoadTracker Pro
           </h1>

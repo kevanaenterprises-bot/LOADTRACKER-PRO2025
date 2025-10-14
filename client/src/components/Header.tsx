@@ -12,13 +12,13 @@ export function Header({ title = "LoadTracker Pro", showLogo = true }: HeaderPro
         {showLogo && (
           <img 
             src={logoImage} 
-            alt="Turtle Logistics" 
+            alt="Go Farms & Cattle" 
             className="h-12 w-12 object-contain"
           />
         )}
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-          <p className="text-sm text-gray-600">🐢 Turtle Logistics - Melissa, Texas 🚛</p>
+          <p className="text-sm text-gray-600">🐄 Go 4 Farms & Cattle - Melissa, Texas 🌾</p>
         </div>
       </div>
     </header>
