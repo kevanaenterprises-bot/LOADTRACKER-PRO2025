@@ -1,0 +1,20 @@
+# Exclude large asset directories
+attached_assets/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.mov
+*.pdf
+
+# Exclude other heavy directories
+node_modules/
+.git/
+dist/
+build/
+
+# Exclude development files
+.env.local
+.env.development
+*.log
