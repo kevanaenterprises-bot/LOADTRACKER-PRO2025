@@ -6481,6 +6481,116 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Aging Report - shows unpaid invoices grouped by age
+  app.get("/api/reports/aging", isAdminAuthenticated, async (req, res) => {
+    try {
+      // Get all unpaid loads with their invoices
+      const unpaidLoads = await db
+        .select({
+          loadId: loads.id,
+          loadNumber: loads.number109,
+          customerId: loads.customerId,
+          customerName: customers.name,
+          invoiceId: invoices.id,
+          invoiceNumber: invoices.invoiceNumber,
+          totalAmount: invoices.totalAmount,
+          generatedAt: invoices.generatedAt,
+          paidAt: loads.paidAt,
+        })
+        .from(loads)
+        .leftJoin(invoices, eq(loads.id, invoices.loadId))
+        .leftJoin(customers, eq(loads.customerId, customers.id))
+        .where(sql`${loads.paidAt} IS NULL AND ${invoices.id} IS NOT NULL`)
+        .orderBy(desc(invoices.generatedAt));
+
+      // Calculate days old and group by age buckets
+      const now = new Date();
+      const agingData: {
+        current: any[];
+        days30: any[];
+        days60: any[];
+        days90plus: any[];
+        totals: {
+          current: number;
+          days30: number;
+          days60: number;
+          days90plus: number;
+          total: number;
+        };
+        byCustomer: Record<string, {
+          customerName: string;
+          current: number;
+          days30: number;
+          days60: number;
+          days90plus: number;
+          total: number;
+        }>;
+      } = {
+        current: [],
+        days30: [],
+        days60: [],
+        days90plus: [],
+        totals: {
+          current: 0,
+          days30: 0,
+          days60: 0,
+          days90plus: 0,
+          total: 0,
+        },
+        byCustomer: {},
+      };
+
+      unpaidLoads.forEach((load) => {
+        const daysOld = load.generatedAt 
+          ? Math.floor((now.getTime() - new Date(load.generatedAt).getTime()) / (1000 * 60 * 60 * 24))
+          : 0;
+        
+        const amount = parseFloat(load.totalAmount || "0");
+        const customerKey = load.customerId || "unknown";
+        const customerName = load.customerName || "Unknown Customer";
+
+        // Initialize customer totals if needed
+        if (!agingData.byCustomer[customerKey]) {
+          agingData.byCustomer[customerKey] = {
+            customerName,
+            current: 0,
+            days30: 0,
+            days60: 0,
+            days90plus: 0,
+            total: 0,
+          };
+        }
+
+        // Categorize by age
+        if (daysOld <= 30) {
+          agingData.current.push({ ...load, daysOld, amount });
+          agingData.totals.current += amount;
+          agingData.byCustomer[customerKey].current += amount;
+        } else if (daysOld <= 60) {
+          agingData.days30.push({ ...load, daysOld, amount });
+          agingData.totals.days30 += amount;
+          agingData.byCustomer[customerKey].days30 += amount;
+        } else if (daysOld <= 90) {
+          agingData.days60.push({ ...load, daysOld, amount });
+          agingData.totals.days60 += amount;
+          agingData.byCustomer[customerKey].days60 += amount;
+        } else {
+          agingData.days90plus.push({ ...load, daysOld, amount });
+          agingData.totals.days90plus += amount;
+          agingData.byCustomer[customerKey].days90plus += amount;
+        }
+
+        agingData.totals.total += amount;
+        agingData.byCustomer[customerKey].total += amount;
+      });
+
+      res.json(agingData);
+    } catch (error) {
+      console.error("Error generating aging report:", error);
+      res.status(500).json({ message: "Failed to generate aging report" });
+    }
+  });
+
   // Mark invoice as printed
   app.patch("/api/invoices/:id/print", isAdminAuthenticated, async (req, res) => {
     try {
