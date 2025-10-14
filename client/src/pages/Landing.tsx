@@ -13,14 +13,14 @@ export default function Landing() {
   
   useEffect(() => {
     if (showTelnyxInfo) {
-      document.title = "Go Farms & Cattle - LoadTracker Pro | Transportation & Logistics";
+      document.title = "Turtle Logistics - LoadTracker Pro | Transportation & Logistics";
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription) {
-        metaDescription.setAttribute('content', 'Go Farms & Cattle transportation and logistics services. Professional load management and dispatch solutions based in Melissa, Texas.');
+        metaDescription.setAttribute('content', 'Turtle Logistics transportation and logistics services. Professional load management and dispatch solutions based in Melissa, Texas.');
       } else {
         const meta = document.createElement('meta');
         meta.name = 'description';
-        meta.content = 'Go Farms & Cattle transportation and logistics services. Professional load management and dispatch solutions based in Melissa, Texas.';
+        meta.content = 'Turtle Logistics transportation and logistics services. Professional load management and dispatch solutions based in Melissa, Texas.';
         document.head.appendChild(meta);
       }
     }
@@ -40,7 +40,7 @@ export default function Landing() {
       <div className="mb-12 text-center">
         <img 
           src={logoUrl} 
-          alt="Go Farms & Cattle Logo" 
+          alt="Turtle Logistics Logo" 
           className="w-48 h-48 mx-auto mb-6 object-contain"
         />
         <h1 className="text-4xl font-bold text-primary">LoadTracker Pro</h1>
@@ -108,7 +108,7 @@ export default function Landing() {
                 <div>
                   <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Business Details</h3>
                   <div className="text-sm space-y-1">
-                    <p data-testid="text-company-name"><strong>Business Name:</strong> Go Farms & Cattle</p>
+                    <p data-testid="text-company-name"><strong>Business Name:</strong> Turtle Logistics</p>
                     <p data-testid="text-address"><strong>Address:</strong> 1510 Crystal Valley Way, Melissa, Texas</p>
                     <p data-testid="text-services"><strong>Services:</strong> Transportation & Logistics</p>
                   </div>

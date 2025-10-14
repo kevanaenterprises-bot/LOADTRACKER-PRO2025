@@ -94,7 +94,16 @@ export async function extractLoadDataFromDocument(fileBuffer: Buffer, mimeType: 
     
   } catch (error) {
     console.error('❌ Google Document AI error:', error);
-    throw new Error(`Document AI processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    
+    // Check if it's an image quality issue
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.toLowerCase().includes('quality') || 
+        errorMessage.toLowerCase().includes('resolution') ||
+        errorMessage.toLowerCase().includes('invalid image')) {
+      throw new Error('Image quality too low for OCR processing. Please try:\n• Taking photo in better lighting\n• Using a scanner instead of camera\n• Ensuring image is in focus and clear\n• Uploading a higher resolution image');
+    }
+    
+    throw new Error(`Document AI processing failed: ${errorMessage}`);
   }
 }
 

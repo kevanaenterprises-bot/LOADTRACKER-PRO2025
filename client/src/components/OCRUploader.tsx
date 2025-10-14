@@ -67,7 +67,11 @@ export function OCRUploader() {
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+        const error: any = new Error(errorMsg);
+        error.suggestions = errorData.suggestions || [];
+        throw error;
       }
       
       return await response.json();
@@ -88,13 +92,20 @@ export function OCRUploader() {
         description: `Found data with ${Math.round(data.confidence * 100)}% confidence. Review and edit if needed.`,
       });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("OCR extraction failed:", error);
-      // Show specific error instead of generic "cleaner image" message
+      // Show specific error with suggestions if available
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const suggestions = error.suggestions || [];
+      
+      let description = errorMessage;
+      if (suggestions.length > 0) {
+        description += '\n\nTips to improve results:\n' + suggestions.map((s: string) => `• ${s}`).join('\n');
+      }
+      
       toast({
         title: "Extraction Failed", 
-        description: `${errorMessage}. The system handles low-quality images - try uploading anyway or check file format.`,
+        description: description,
         variant: "destructive",
       });
     },

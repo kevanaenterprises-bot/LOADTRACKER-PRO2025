@@ -6840,9 +6840,21 @@ Reply YES to confirm acceptance or NO to decline.`
     } catch (error) {
       console.error('❌ OCR extraction error:', error);
       console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-      res.status(500).json({ 
-        message: 'Failed to extract data from document',
-        error: error instanceof Error ? error.message : 'Unknown error'
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const statusCode = errorMessage.includes('quality') || errorMessage.includes('resolution') ? 400 : 500;
+      
+      res.status(statusCode).json({ 
+        message: errorMessage.includes('quality') || errorMessage.includes('resolution') 
+          ? errorMessage 
+          : 'Failed to extract data from document. Please ensure the image is clear and try again.',
+        error: errorMessage,
+        suggestions: errorMessage.includes('quality') ? [
+          'Take photo in better lighting',
+          'Use a scanner instead of camera',
+          'Ensure image is in focus',
+          'Upload a higher resolution image'
+        ] : []
       });
     }
   });
