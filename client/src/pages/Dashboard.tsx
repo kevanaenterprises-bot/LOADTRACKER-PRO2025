@@ -42,6 +42,9 @@ const driverSchema = z.object({
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   username: z.string().min(1, "Username is required"),
   isCompanyDriver: z.boolean().default(false),
+  payType: z.enum(["percentage", "mileage"]).default("percentage"),
+  percentageRate: z.string().optional(),
+  mileageRate: z.string().optional(),
 });
 
 const locationSchema = z.object({
@@ -122,6 +125,9 @@ export default function Dashboard() {
       phoneNumber: "",
       username: "",
       isCompanyDriver: false,
+      payType: "percentage" as const,
+      percentageRate: "",
+      mileageRate: "",
     },
   });
 
@@ -622,6 +628,74 @@ export default function Dashboard() {
                               </FormItem>
                             )}
                           />
+                          <FormField
+                            control={driverForm.control}
+                            name="payType"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Pay Structure</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger data-testid="select-pay-type">
+                                      <SelectValue placeholder="Select pay type" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="percentage">Percentage of Revenue</SelectItem>
+                                    <SelectItem value="mileage">Per Mile Rate</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          {driverForm.watch("payType") === "percentage" && (
+                            <FormField
+                              control={driverForm.control}
+                              name="percentageRate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Percentage Rate (%)</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      type="number" 
+                                      placeholder="70" 
+                                      {...field} 
+                                      data-testid="input-percentage-rate"
+                                    />
+                                  </FormControl>
+                                  <p className="text-sm text-muted-foreground">
+                                    Driver earns this percentage of load revenue (e.g., 70%)
+                                  </p>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
+                          {driverForm.watch("payType") === "mileage" && (
+                            <FormField
+                              control={driverForm.control}
+                              name="mileageRate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Per Mile Rate ($)</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      type="number" 
+                                      step="0.01"
+                                      placeholder="1.50" 
+                                      {...field} 
+                                      data-testid="input-mileage-rate"
+                                    />
+                                  </FormControl>
+                                  <p className="text-sm text-muted-foreground">
+                                    Driver earns this amount per mile (e.g., $1.50/mile)
+                                  </p>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
                           <FormField
                             control={driverForm.control}
                             name="isCompanyDriver"
