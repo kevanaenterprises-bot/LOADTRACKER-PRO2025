@@ -4,6 +4,18 @@
 LoadTracker Pro is a comprehensive logistics management system for transportation companies, streamlining load dispatch, driver coordination, and automated invoicing. It features real-time status tracking, document management, and separate interfaces for office staff and drivers, aiming to significantly improve operational efficiency. The system includes advanced capabilities like GPS-triggered audio tours for drivers, powered by a database of over 222,969 historical markers.
 
 ## Recent Changes
+### October 14, 2025 - Turtle Logistics Rebranding & OCR Enhancement
+- **Turtle Logistics Rebranding**: Complete company rebrand from "Go 4 Farms & Cattle" to "Turtle Logistics"
+  - Updated all user-facing branding: landing pages, headers, invoices, emails
+  - New branding: "🐢 Turtle Logistics - Melissa, Texas 🚛"
+  - Email sender updated to "Turtle Logistics <kevin@go4fc.com>"
+- **Rate Con Scanner Error Handling**: Improved OCR error feedback for low-quality images
+  - Backend detects quality/resolution issues and provides specific guidance
+  - Frontend displays actionable suggestions: better lighting, use scanner, ensure focus, higher resolution
+  - Quality issues return 400 (bad request) instead of 500 (server error)
+  - Error messages formatted with bullet points for clarity
+- **Files**: client/src/pages/Landing.tsx, client/src/components/Header.tsx, client/src/components/PrintButton.tsx, server/emailService.ts, server/googleDocumentAI.ts, server/routes.ts, client/src/components/OCRUploader.tsx
+
 ### October 14, 2025 - Driver Pay & Aging Report Features
 - **Driver Pay Structure**: 
   - Added flexible pay options for drivers (percentage-based or per-mile rates)
