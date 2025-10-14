@@ -12,6 +12,7 @@ import DriverLogin from "@/pages/DriverLogin";
 import AdminLogin from "@/pages/AdminLogin";
 import Chat from "@/pages/Chat";
 import IFTAReport from "@/pages/IFTAReport";
+import DemoLanding from "@/pages/DemoLanding";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -20,6 +21,9 @@ function Router() {
       {/* Authentication Pages */}
       <Route path="/admin-login" component={AdminLogin} />
       <Route path="/driver-login" component={DriverLogin} />
+      
+      {/* Demo System */}
+      <Route path="/demo" component={DemoLanding} />
       
       {/* Main Application Pages */}
       <Route path="/dashboard" component={Dashboard} />

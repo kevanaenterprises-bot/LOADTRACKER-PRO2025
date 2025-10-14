@@ -39,7 +39,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
-import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users } from "@shared/schema";
+import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users, pricingTiers, customerSubscriptions } from "@shared/schema";
 import { PDFDocument } from 'pdf-lib';
 
 // Bypass secret for testing and mobile auth
@@ -7823,6 +7823,103 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
         success: false, 
         error: error instanceof Error ? error.message : "Migration failed" 
       });
+    }
+  });
+
+  // ===== USAGE TRACKING & BILLING ROUTES =====
+  
+  // Get current usage for authenticated user
+  app.get("/api/usage/current", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      // Get user's subscription
+      const subscription = await db
+        .select()
+        .from(customerSubscriptions)
+        .where(eq(customerSubscriptions.userId, user.id))
+        .limit(1);
+
+      if (!subscription || subscription.length === 0) {
+        return res.status(404).json({ message: "No active subscription found" });
+      }
+
+      const sub = subscription[0];
+      const periodStart = sub.currentPeriodStart || new Date();
+      const periodEnd = sub.currentPeriodEnd || new Date();
+
+      // Import usage tracking functions
+      const { getCurrentUsage, checkTierLimits } = await import("./usageTracking");
+
+      // Get tier info
+      const tier = await db
+        .select()
+        .from(pricingTiers)
+        .where(eq(pricingTiers.id, sub.tierId))
+        .limit(1);
+
+      if (!tier || tier.length === 0) {
+        return res.status(404).json({ message: "Pricing tier not found" });
+      }
+
+      // Get current usage
+      const usage = await getCurrentUsage(user.id, periodStart, periodEnd);
+
+      // Calculate overages
+      const overages = await checkTierLimits(user.id, tier[0], usage);
+
+      res.json({
+        usage,
+        overages,
+      });
+    } catch (error: any) {
+      console.error("Error fetching usage:", error);
+      res.status(500).json({ message: "Failed to fetch usage data" });
+    }
+  });
+
+  // Get current subscription for authenticated user
+  app.get("/api/subscription/current", isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      // Get user's subscription
+      const subscription = await db
+        .select()
+        .from(customerSubscriptions)
+        .where(eq(customerSubscriptions.userId, user.id))
+        .limit(1);
+
+      if (!subscription || subscription.length === 0) {
+        return res.status(404).json({ message: "No active subscription found" });
+      }
+
+      const sub = subscription[0];
+
+      // Get tier info
+      const tier = await db
+        .select()
+        .from(pricingTiers)
+        .where(eq(pricingTiers.id, sub.tierId))
+        .limit(1);
+
+      if (!tier || tier.length === 0) {
+        return res.status(404).json({ message: "Pricing tier not found" });
+      }
+
+      res.json({
+        ...sub,
+        tier: tier[0],
+      });
+    } catch (error: any) {
+      console.error("Error fetching subscription:", error);
+      res.status(500).json({ message: "Failed to fetch subscription data" });
     }
   });
 

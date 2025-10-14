@@ -3,28 +3,28 @@ import { apiUsageLogs } from "@shared/schema";
 import type { Request, Response, NextFunction } from "express";
 import { eq, and, gte, lte } from "drizzle-orm";
 
-// API service cost structure (in cents)
+// API service cost structure (ALL values in cents)
 const API_COSTS = {
   here_maps: {
-    routing: 75, // $0.75 per 1,000 transactions
-    weather: 500, // $5.00 per 1,000 transactions
-    geocoding: 75, // $0.75 per 1,000 transactions
-    matrix: 500, // $5.00 per 1,000 transactions
+    routing: 75, // 75 cents per 1,000 transactions = 0.075 cents each
+    weather: 500, // 500 cents per 1,000 transactions = 0.5 cents each
+    geocoding: 75, // 75 cents per 1,000 transactions = 0.075 cents each
+    matrix: 500, // 500 cents per 1,000 transactions = 0.5 cents each
   },
   document_ai: {
-    scan: 10, // $0.10 per document (1-10 pages)
+    scan: 10, // 10 cents per document (1-10 pages)
   },
   sms: {
-    message: 0.4, // $0.004 per message
+    message: 0.4, // 0.4 cents per message ($0.004)
   },
   email: {
-    send: 0.09, // $0.90 per 1,000 emails = $0.0009 each
+    send: 90, // 90 cents per 1,000 emails = 0.09 cents each
   },
   elevenlabs: {
-    character: 0.003, // Approximately $0.003 per character (varies by model)
+    character: 0.3, // 0.3 cents per character ($0.003)
   },
   storage: {
-    gb_month: 2, // $0.02 per GB per month
+    gb_month: 2, // 2 cents per GB per month ($0.02)
   },
 };
 
@@ -39,30 +39,30 @@ export async function logApiUsage(params: {
 }) {
   const { userId, subscriptionId, apiService, apiEndpoint, quantity = 1, metadata } = params;
 
-  // Calculate cost based on service
+  // Calculate cost based on service (keep everything in cents, no premature rounding)
   let costCents = 0;
   
   // Parse API service and endpoint to determine cost
   if (apiService === "here_maps") {
     if (apiEndpoint?.includes("routing")) {
-      costCents = Math.round((API_COSTS.here_maps.routing / 1000) * quantity * 100) / 100;
+      costCents = (API_COSTS.here_maps.routing / 1000) * quantity; // Already in cents
     } else if (apiEndpoint?.includes("weather")) {
-      costCents = Math.round((API_COSTS.here_maps.weather / 1000) * quantity * 100) / 100;
+      costCents = (API_COSTS.here_maps.weather / 1000) * quantity;
     } else if (apiEndpoint?.includes("geocode")) {
-      costCents = Math.round((API_COSTS.here_maps.geocoding / 1000) * quantity * 100) / 100;
+      costCents = (API_COSTS.here_maps.geocoding / 1000) * quantity;
     } else if (apiEndpoint?.includes("matrix")) {
-      costCents = Math.round((API_COSTS.here_maps.matrix / 1000) * quantity * 100) / 100;
+      costCents = (API_COSTS.here_maps.matrix / 1000) * quantity;
     }
   } else if (apiService === "document_ai") {
-    costCents = API_COSTS.document_ai.scan * quantity;
+    costCents = API_COSTS.document_ai.scan * quantity; // Already in cents
   } else if (apiService === "sms") {
-    costCents = API_COSTS.sms.message * quantity;
+    costCents = API_COSTS.sms.message * quantity; // Already in cents (0.4)
   } else if (apiService === "email") {
-    costCents = Math.round((API_COSTS.email.send / 1000) * quantity * 100) / 100;
+    costCents = (API_COSTS.email.send / 1000) * quantity; // Already in cents
   } else if (apiService === "elevenlabs") {
-    costCents = Math.round(API_COSTS.elevenlabs.character * quantity * 100) / 100;
+    costCents = API_COSTS.elevenlabs.character * quantity; // Already in cents (0.003)
   } else if (apiService === "storage") {
-    costCents = Math.round(API_COSTS.storage.gb_month * quantity * 100) / 100;
+    costCents = API_COSTS.storage.gb_month * quantity; // Already in cents
   }
 
   try {
@@ -72,7 +72,7 @@ export async function logApiUsage(params: {
       apiService,
       apiEndpoint: apiEndpoint || null,
       quantity: quantity.toString(),
-      costCents: Math.round(costCents),
+      costCents: costCents.toString(), // Store precise fractional cents (e.g., 0.0075)
       requestMetadata: metadata || null,
     });
   } catch (error) {
@@ -151,12 +151,13 @@ export async function getCurrentUsage(userId: string, periodStart: Date, periodE
 
   for (const log of usageLogs) {
     const quantity = parseFloat(log.quantity || "0");
+    const costCents = parseFloat(log.costCents?.toString() || "0");
     const service = log.apiService as keyof typeof usage;
     
     if (service in usage && service !== "totalCostCents") {
       usage[service] += quantity;
     }
-    usage.totalCostCents += log.costCents || 0;
+    usage.totalCostCents += costCents;
   }
 
   return usage;
@@ -172,23 +173,23 @@ export async function checkTierLimits(userId: string, tier: any, usage: any) {
     elevenlabs: Math.max(0, usage.elevenlabs - (tier.includedElevenlabsCharacters || 0)),
   };
 
-  // Calculate overage costs
+  // Calculate overage costs (all in cents) - reuse API_COSTS for consistency
   let overageCostCents = 0;
 
-  // HERE Maps overage (at $0.75 per 1k for routing)
-  overageCostCents += Math.round((overages.here_maps * 0.75 / 1000) * 100);
+  // HERE Maps overage (75 cents per 1k transactions)
+  overageCostCents += (overages.here_maps * API_COSTS.here_maps.routing / 1000);
   
-  // Document AI overage ($0.10 per doc)
-  overageCostCents += overages.document_ai * 10;
+  // Document AI overage (10 cents per doc)
+  overageCostCents += overages.document_ai * API_COSTS.document_ai.scan;
   
-  // SMS overage ($0.004 per message)
-  overageCostCents += Math.round(overages.sms * 0.4);
+  // SMS overage (0.4 cents per message)
+  overageCostCents += overages.sms * API_COSTS.sms.message;
   
-  // Email overage ($0.90 per 1k)
-  overageCostCents += Math.round((overages.email * 0.90 / 1000) * 100);
+  // Email overage (90 cents per 1k emails)
+  overageCostCents += (overages.email * API_COSTS.email.send / 1000);
   
-  // ElevenLabs overage (approx $0.003 per character)
-  overageCostCents += Math.round(overages.elevenlabs * 0.3) / 100;
+  // ElevenLabs overage (0.3 cents per character)
+  overageCostCents += overages.elevenlabs * API_COSTS.elevenlabs.character;
 
   return {
     overages,

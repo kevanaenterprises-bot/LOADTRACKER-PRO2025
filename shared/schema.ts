@@ -560,7 +560,7 @@ export const apiUsageLogs = pgTable("api_usage_logs", {
   apiService: varchar("api_service").notNull(), // "here_maps", "document_ai", "sms", "email", "elevenlabs", "storage"
   apiEndpoint: varchar("api_endpoint"), // Specific endpoint called
   quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull().default("1"), // For storage GB, characters, etc.
-  costCents: integer("cost_cents"), // Cost in cents (for accurate billing)
+  costCents: decimal("cost_cents", { precision: 12, scale: 4 }), // Cost in cents with sub-cent precision (e.g., 0.0075)
   requestMetadata: jsonb("request_metadata").$type<Record<string, any>>(), // Additional details
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
