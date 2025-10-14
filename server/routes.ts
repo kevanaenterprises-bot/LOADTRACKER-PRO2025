@@ -4439,15 +4439,16 @@ Reply YES to confirm acceptance or NO to decline.`
       
       console.log(`📋 Document availability for load ${load.number109}:`, availableDocuments);
 
-      // Generate email with all available documents - Use primary load number as identifier (any format)
-      const primaryLoadNumber = load.number109 || 'Unknown';
-      const subject = `Complete Package - Load ${primaryLoadNumber} - Invoice ${invoice.invoiceNumber}`;
+      // Generate email with all available documents - Use BOL# as primary identifier (preferred over load number)
+      const primaryIdentifier = load.bolNumber || load.number109 || 'Unknown';
+      const identifierLabel = load.bolNumber ? `BOL# ${load.bolNumber}` : `Load ${primaryIdentifier}`;
+      const subject = `Complete Package - ${identifierLabel} - Invoice ${invoice.invoiceNumber}`;
       
       // Simple email - single complete package attachment
       let emailHTML = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #2d5aa0;">GO 4 Farms & Cattle</h2>
-          <p>Please find attached the complete document package for Load ${primaryLoadNumber}.</p>
+          <p>Please find attached the complete document package for ${identifierLabel}.</p>
           <p><strong>Invoice Number:</strong> ${invoice.invoiceNumber}</p>
           <p><strong>Amount:</strong> $${invoice.totalAmount}</p>
           <p>The attached PDF contains the invoice, rate confirmation, and proof of delivery documents.</p>
@@ -4480,7 +4481,7 @@ Reply YES to confirm acceptance or NO to decline.`
       const invoiceHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       
       // Step 2: Collect ALL POD documents (both images and PDFs)
-      console.log(`🔍 EMAIL DEBUG: Checking POD for load ${primaryLoadNumber}`);
+      console.log(`🔍 EMAIL DEBUG: Checking POD for ${identifierLabel}`);
       console.log(`🔍 Invoice podSnapshot available: ${!!invoice.podSnapshot}`);
       console.log(`🔍 Load podDocumentPath: "${load.podDocumentPath}"`);
       
@@ -4518,13 +4519,13 @@ Reply YES to confirm acceptance or NO to decline.`
         
         console.log(`✅ Collected ${podDocuments.length} POD document(s) for merging`);
       } else {
-        console.log(`⚠️ No POD available for load ${primaryLoadNumber} - invoice only`);
+        console.log(`⚠️ No POD available for ${identifierLabel} - invoice only`);
       }
       
       // Step 3: Use PDF merge utility to create ONE combined PDF
       let combinedPDF;
       try {
-        combinedPDF = await buildFinalInvoicePdf(invoiceHTML, podDocuments, primaryLoadNumber);
+        combinedPDF = await buildFinalInvoicePdf(invoiceHTML, podDocuments, primaryIdentifier);
         console.log(`✅ Combined PDF created successfully: ${combinedPDF.length} bytes`);
       } catch (pdfError) {
         console.error(`❌ PDF merge failed:`, pdfError);
@@ -4546,12 +4547,12 @@ Reply YES to confirm acceptance or NO to decline.`
       
       // Step 4: Create ONE attachment as required by payment processor
       const attachments = [{
-        filename: `Complete-Package-${primaryLoadNumber}-${invoice.invoiceNumber}.pdf`,
+        filename: `Complete-Package-${primaryIdentifier}-${invoice.invoiceNumber}.pdf`,
         content: combinedPDF,
         contentType: 'application/pdf'
       }];
       
-      console.log(`📧 Final email summary for load ${primaryLoadNumber}:`);
+      console.log(`📧 Final email summary for ${identifierLabel}:`);
       console.log(`  - To: ${emailAddress}`);
       console.log(`  - Attachments: ${attachments.length}`);
       attachments.forEach((att, index) => {
