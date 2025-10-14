@@ -4,6 +4,21 @@
 LoadTracker Pro is a comprehensive logistics management system for transportation companies, streamlining load dispatch, driver coordination, and automated invoicing. It features real-time status tracking, document management, and separate interfaces for office staff and drivers, aiming to significantly improve operational efficiency. The system includes advanced capabilities like GPS-triggered audio tours for drivers, powered by a database of over 222,969 historical markers.
 
 ## Recent Changes
+### October 14, 2025 - Usage-Based Billing & Trial System
+- **Tiered Pricing Model**: Implemented 3-tier subscription system (Starter $149, Professional $249, Enterprise $349+) to compete against $700/month competitors while maintaining profitability
+- **Usage Tracking Infrastructure**:
+  - Comprehensive middleware logs all API calls (HERE Maps, Document AI, SMS, Email, ElevenLabs) with precise cost tracking
+  - Database schema: `api_usage_logs`, `customer_subscriptions`, `pricing_tiers`, `demo_sessions`, `visitor_tracking`
+  - All costs normalized to cents with fractional precision (decimal 12,4) to prevent rounding errors
+  - API_COSTS constants: HERE Maps 0.075¢/call, Document AI 10¢/doc, SMS 0.4¢/msg, Email 0.09¢/send, ElevenLabs 0.3¢/char
+- **Usage Dashboard**: Real-time display showing current usage vs tier limits, overage costs, billing projections with progress bars and metrics
+- **Demo/Trial System**: 
+  - Landing page for prospects with instant trial access (no credit card required)
+  - Automatic data wipeout on logout to prevent abuse
+  - Visitor tracking for conversion analytics
+- **Billing Accuracy**: All calculations verified by architect - no undercharges, proper overage math using single source of truth (API_COSTS constants)
+- **Files**: server/usageTracking.ts, client/src/pages/UsageDashboard.tsx, client/src/pages/DemoLanding.tsx
+
 ### October 14, 2025 - HERE Maps Official Implementation
 - **Official SDK Pattern**: Migrated HEREMapView component to use HERE's official JavaScript SDK initialization pattern as recommended by HERE Maps support
 - **Key Improvements**:
@@ -50,6 +65,8 @@ The frontend utilizes React with TypeScript, `shadcn/ui` (built on Radix UI), an
 - **Truck Service Management**: Comprehensive tracking with odometer readings, service history, and maintenance alerts.
 - **IFTA Reporting Dashboard**: Dedicated page displaying summary metrics, state-by-state mileage breakdown (loaded vs. deadhead), and individual load details.
 - **Historical Marker Road Tour**: GPS-triggered audio narration of historical markers, with voice selection, caching, and proximity detection, preventing repeats.
+- **Usage-Based Billing**: Tiered subscription pricing (Starter $149, Professional $249, Enterprise $349+) with metered billing for API usage overages. Real-time usage dashboard shows current consumption vs tier limits, overage costs, and billing projections.
+- **Demo/Trial System**: Instant trial access for prospects with automatic data cleanup, visitor tracking, and conversion analytics.
 
 ## External Dependencies
 
