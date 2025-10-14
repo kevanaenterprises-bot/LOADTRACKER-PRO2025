@@ -4,11 +4,12 @@
 LoadTracker Pro is a comprehensive logistics management system for transportation companies, streamlining load dispatch, driver coordination, and automated invoicing. It features real-time status tracking, document management, and separate interfaces for office staff and drivers, aiming to significantly improve operational efficiency. The system includes advanced capabilities like GPS-triggered audio tours for drivers, powered by a database of over 222,969 historical markers.
 
 ## Recent Changes
-### October 14, 2025 - Turtle Logistics Rebranding & OCR Enhancement
-- **Turtle Logistics Rebranding**: Complete company rebrand from "Go 4 Farms & Cattle" to "Turtle Logistics"
-  - Updated all user-facing branding: landing pages, headers, invoices, emails
-  - New branding: "🐢 Turtle Logistics - Melissa, Texas 🚛"
-  - Email sender updated to "Turtle Logistics <kevin@go4fc.com>"
+### October 14, 2025 - Branding Hierarchy & OCR Enhancement
+- **Branding Hierarchy Established**: Proper separation between software vendor and customer branding
+  - **Turtle Logistics** = Software company that owns/sells LoadTracker Pro (prominent on demo/marketing pages)
+  - **Go 4 Farms & Cattle** = Customer using the tracking system (internal system branding)
+  - Demo and landing pages showcase Turtle Logistics as the LoadTracker Pro vendor
+  - Headers, invoices, and emails maintain Go 4 Farms & Cattle branding for operations
 - **Rate Con Scanner Error Handling**: Improved OCR error feedback for low-quality images
   - Backend detects quality/resolution issues and provides specific guidance
   - Frontend displays actionable suggestions: better lighting, use scanner, ensure focus, higher resolution
