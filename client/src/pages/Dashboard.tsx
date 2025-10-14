@@ -741,10 +741,10 @@ export default function Dashboard() {
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
                                   <FormLabel className="font-medium">
-                                    Company Driver
+                                    Company Driver (IFTA Miles Tracking)
                                   </FormLabel>
                                   <p className="text-sm text-muted-foreground">
-                                    Check this if driver is a company driver (IFTA tracking & fuel receipts enabled)
+                                    ✅ Check this box to enable automatic IFTA mileage tracking and fuel receipt collection for this driver
                                   </p>
                                 </div>
                               </FormItem>
