@@ -6676,16 +6676,28 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(400).json({ message: 'No file provided' });
       }
 
-      console.log("Processing document for OCR:", req.file.originalname, req.file.mimetype, req.file.size);
+      console.log("📄 Processing document for OCR:", req.file.originalname, req.file.mimetype, req.file.size);
+      console.log("📄 Google Cloud Config Check:", {
+        hasProjectId: !!process.env.GOOGLE_CLOUD_PROJECT_ID,
+        hasProcessorId: !!process.env.GOOGLE_DOCUMENT_AI_PROCESSOR_ID,
+        hasCredentials: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
+        credentialsLength: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.length || 0
+      });
       
       // Import Google Document AI service
       const { extractLoadDataFromDocument } = await import('./googleDocumentAI');
       
       const extractedData = await extractLoadDataFromDocument(req.file.buffer, req.file.mimetype);
       
+      console.log("✅ OCR extraction successful:", {
+        confidence: extractedData.confidence,
+        fieldsExtracted: Object.keys(extractedData).filter(k => extractedData[k as keyof typeof extractedData]).length
+      });
+      
       res.json(extractedData);
     } catch (error) {
-      console.error('OCR extraction error:', error);
+      console.error('❌ OCR extraction error:', error);
+      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       res.status(500).json({ 
         message: 'Failed to extract data from document',
         error: error instanceof Error ? error.message : 'Unknown error'
