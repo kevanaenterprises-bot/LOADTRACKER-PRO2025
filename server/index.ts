@@ -261,8 +261,7 @@ async function startServer() {
     });
 
     // Setup frontend serving based on environment
-    // RAILWAY FIX: Force production mode regardless of NODE_ENV since Railway blocks env var changes
-    const isProduction = true; // process.env.NODE_ENV === "production";
+    const isProduction = process.env.NODE_ENV === "production";
     
     if (isProduction) {
       console.log('📁 Setting up static file serving for production...');
@@ -282,42 +281,42 @@ async function startServer() {
         process.exit(1);
       }
     } else {
-      console.log('🔧 Development mode - Vite temporarily disabled due to config issues');
-      console.log('⚠️  To see your latest code changes, please:');
-      console.log('   1. Clear browser cache (Ctrl+Shift+R or Cmd+Shift+R)');
-      console.log('   2. Fix syntax error in server/vite.ts line 68');
-      console.log('   3. Re-enable Vite development server');
+      console.log('🔧 Development mode - Setting up Vite dev server...');
       
-      // Serve the latest built frontend if available, otherwise show message
-      const devDistPath = path.resolve(__dirname, "public");
-      console.log('🔍 DEBUG: Development static path:', devDistPath);
-      if (fs.existsSync(devDistPath)) {
-        console.log('📁 Serving built frontend (may be outdated - clear browser cache!)');
-        app.use(express.static(devDistPath));
-        app.use("*", (_req, res) => {
-          res.sendFile(path.resolve(devDistPath, "index.html"));
-        });
-      } else {
-        app.use("*", (_req, res) => {
-          res.send(`
-            <html>
-              <body style="font-family: Arial, sans-serif; padding: 20px;">
-                <h1>🚛 LoadTracker Pro - Development Mode</h1>
-                <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                  <h3>⚠️ Frontend Not Available</h3>
-                  <p>The development server needs to be configured to serve your latest code changes.</p>
-                  <p><strong>To see your new features:</strong></p>
-                  <ul>
-                    <li>Fix syntax error in server/vite.ts</li>
-                    <li>Clear browser cache completely</li>
-                    <li>Restart the development server</li>
-                  </ul>
-                </div>
-                <p><a href="/api/status" style="color: #007bff;">API Status Check</a></p>
-              </body>
-            </html>
-          `);
-        });
+      try {
+        // Import and setup Vite for development
+        const { setupVite } = await import('./vite');
+        await setupVite(app, server);
+        console.log('✅ Vite dev server configured successfully');
+      } catch (viteError) {
+        console.error('⚠️ Vite dev server setup failed:', viteError);
+        console.log('📁 Falling back to static file serving...');
+        
+        // Fallback: serve built frontend if available
+        const devDistPath = path.resolve(__dirname, "public");
+        if (fs.existsSync(devDistPath)) {
+          console.log('📁 Serving built frontend from:', devDistPath);
+          app.use(express.static(devDistPath));
+          app.use("*", (_req, res) => {
+            res.sendFile(path.resolve(devDistPath, "index.html"));
+          });
+        } else {
+          console.error('❌ No frontend build found. Please run: npm run build');
+          app.use("*", (_req, res) => {
+            res.send(`
+              <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px;">
+                  <h1>🚛 LoadTracker Pro - Development Mode</h1>
+                  <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                    <h3>⚠️ Frontend Not Available</h3>
+                    <p>Please build the frontend: <code>npm run build</code></p>
+                  </div>
+                  <p><a href="/api/status" style="color: #007bff;">API Status Check</a></p>
+                </body>
+              </html>
+            `);
+          });
+        }
       }
     }
 
