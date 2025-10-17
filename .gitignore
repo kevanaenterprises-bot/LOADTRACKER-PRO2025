@@ -4,3 +4,8 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Ignore sensitive attached assets
+attached_assets/*service-account*
+attached_assets/*credentials*
+attached_assets/*private-key*
