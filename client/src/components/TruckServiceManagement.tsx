@@ -325,13 +325,13 @@ export function TruckServiceManagement() {
                         </div>
                       </div>
                       <Badge variant="outline">
-                        {record.odometerAtService.toLocaleString()} mi
+                        {record.odometerAtService?.toLocaleString() || 'N/A'} mi
                       </Badge>
                     </div>
                     
                     {record.nextServiceOdometer && (
                       <div className="text-sm text-gray-600 mb-1">
-                        Next service due: {record.nextServiceOdometer.toLocaleString()} miles
+                        Next service due: {record.nextServiceOdometer?.toLocaleString() || 'N/A'} miles
                       </div>
                     )}
                     
