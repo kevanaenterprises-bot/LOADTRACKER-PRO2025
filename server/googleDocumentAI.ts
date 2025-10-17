@@ -64,9 +64,10 @@ export async function extractLoadDataFromDocument(fileBuffer: Buffer, mimeType: 
     // Process the document - content must be base64 encoded
     const [result] = await client.processDocument({
       name,
+      skipHumanReview: true,
       rawDocument: {
-        content: fileBuffer.toString('base64'),
         mimeType: mimeType,
+        content: fileBuffer.toString('base64'),
       },
     });
     
