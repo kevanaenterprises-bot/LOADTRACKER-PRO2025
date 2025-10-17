@@ -52,11 +52,13 @@ export async function extractLoadDataFromDocument(fileBuffer: Buffer, mimeType: 
     console.log(`   MIME type: ${mimeType}`);
     console.log(`   File size: ${fileBuffer.length} bytes`);
     
-    // Process the document
+    // Process the document - Document AI expects base64 encoded content
+    const base64Content = fileBuffer.toString('base64');
+    
     const [result] = await client.processDocument({
       name,
       rawDocument: {
-        content: fileBuffer,
+        content: base64Content,
         mimeType: mimeType,
       },
     });
