@@ -58,6 +58,9 @@ export default function DriverPortal() {
   const queryClient = useQueryClient();
   console.log("🚨 Auth state:", { isAuthenticated, isLoading, hasUser: !!user, error });
 
+  // Check if driver has active loads - must be called before any conditional returns
+  const hasActiveLoad = useHasActiveLoad(user?.id || '');
+
   // Show loading while authentication is being checked
   if (isLoading) {
     return (
@@ -112,9 +115,6 @@ export default function DriverPortal() {
     role: user.role,
     fullUserObject: JSON.stringify(user, null, 2)
   });
-
-  // Check if driver has active loads
-  const hasActiveLoad = useHasActiveLoad(user.id);
 
   // SUCCESS: Show authenticated driver portal - TWO-COLUMN LAYOUT
   return (
