@@ -4,6 +4,18 @@
 LoadTracker Pro is a comprehensive logistics management system for transportation companies, streamlining load dispatch, driver coordination, and automated invoicing. It features real-time status tracking, document management, and separate interfaces for office staff and drivers, aiming to significantly improve operational efficiency. The system includes advanced capabilities like GPS-triggered audio tours for drivers, powered by a database of over 222,969 historical markers.
 
 ## Recent Changes
+### October 17, 2025 - Return to Terminal Feature
+- **Return to Terminal IFTA Tracking**: Drivers can now track IFTA miles when returning to the terminal without a load
+  - Added checkbox in driver portal that appears only when driver has no active loads
+  - Terminal address: 1800 Plano Pkwy, Plano, Texas 75079
+  - Calculates route from current GPS location to terminal using HERE Maps API v8
+  - Displays total miles and state-by-state IFTA mileage breakdown before starting trip
+  - Creates special "RTT" (Return To Terminal) load to track the trip with full IFTA compliance
+  - Automatically saves milesByState data for each return trip
+  - Component: client/src/components/ReturnToTerminal.tsx
+  - Backend routes: `/api/return-to-terminal/calculate-route`, `/api/return-to-terminal/start`
+- **Files**: client/src/components/ReturnToTerminal.tsx, client/src/pages/DriverPortal.tsx, server/routes.ts
+
 ### October 14, 2025 - Branding Hierarchy & OCR Enhancement
 - **Branding Hierarchy Established**: Proper separation between software vendor and customer branding
   - **Turtle Logistics** = Software company that owns/sells LoadTracker Pro (prominent on demo/marketing pages)
@@ -101,6 +113,7 @@ The frontend utilizes React with TypeScript, `shadcn/ui` (built on Radix UI), an
 - **Aging Report**: Accounts receivable aging analysis categorizing unpaid invoices by time periods (0-30, 31-60, 61-90, 90+ days). Provides customer-level breakdown with color-coded severity indicators for collections management.
 - **Usage-Based Billing**: Tiered subscription pricing (Starter $149, Professional $249, Enterprise $349+) with metered billing for API usage overages. Real-time usage dashboard shows current consumption vs tier limits, overage costs, and billing projections.
 - **Demo/Trial System**: Instant trial access for prospects with automatic data cleanup, visitor tracking, and conversion analytics.
+- **Return to Terminal**: Drivers can check a box when they have no load to calculate and track their return trip to the terminal (1800 Plano Pkwy, Plano, TX 75079). System calculates route, displays state-by-state IFTA miles, and creates a tracking load for compliance.
 
 ## External Dependencies
 
