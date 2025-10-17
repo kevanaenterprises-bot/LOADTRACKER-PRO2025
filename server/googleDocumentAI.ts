@@ -18,11 +18,20 @@ function getDocumentAIClient(): DocumentProcessorServiceClient {
   if (!documentAIClient) {
     // Parse the JSON credentials from environment variable
     const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON || '{}');
+    const location = process.env.GOOGLE_DOCUMENT_AI_LOCATION || 'us';
+    
+    // Use region-specific endpoint
+    const apiEndpoint = location === 'eu' 
+      ? 'eu-documentai.googleapis.com'
+      : 'us-documentai.googleapis.com';
     
     documentAIClient = new DocumentProcessorServiceClient({
       credentials: credentials,
       projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+      apiEndpoint: apiEndpoint,
     });
+    
+    console.log(`📡 Document AI client initialized with endpoint: ${apiEndpoint}`);
   }
   
   return documentAIClient;
