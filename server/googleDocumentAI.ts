@@ -30,6 +30,16 @@ function getDocumentAIClient(): DocumentProcessorServiceClient {
       console.log('   Client email:', credentials.client_email);
       console.log('   Has private key:', !!credentials.private_key);
       console.log('   Private key length:', credentials.private_key?.length || 0);
+      console.log('   Private key starts with:', credentials.private_key?.substring(0, 30));
+      console.log('   Private key has \\n escapes:', credentials.private_key?.includes('\\n'));
+      console.log('   Private key has actual newlines:', credentials.private_key?.includes('\n'));
+      
+      // Fix: Convert literal \n to actual newlines if needed
+      if (credentials.private_key && credentials.private_key.includes('\\n')) {
+        console.log('⚠️  Fixing escaped newlines in private key...');
+        credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+        console.log('✅ Private key newlines fixed');
+      }
     } catch (error) {
       console.error('❌ Failed to parse credentials JSON:', error);
       throw new Error('Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON format');
