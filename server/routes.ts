@@ -625,10 +625,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       fileSize: 25 * 1024 * 1024, // 25MB limit - increased for high-res/poor quality scans
     },
     fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith('image/')) {
+      if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
         cb(null, true);
       } else {
-        cb(new Error('Only image files are allowed'));
+        cb(new Error('Only image files and PDFs are allowed'));
       }
     },
   });
