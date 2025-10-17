@@ -17,21 +17,44 @@ let documentAIClient: DocumentProcessorServiceClient | null = null;
 function getDocumentAIClient(): DocumentProcessorServiceClient {
   if (!documentAIClient) {
     // Parse the JSON credentials from environment variable
-    const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON || '{}');
+    const credentialsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON || '{}';
+    
+    console.log('🔐 Parsing Google credentials...');
+    console.log('   Credentials length:', credentialsJson.length);
+    
+    let credentials;
+    try {
+      credentials = JSON.parse(credentialsJson);
+      console.log('✅ Credentials parsed successfully');
+      console.log('   Project ID from creds:', credentials.project_id);
+      console.log('   Client email:', credentials.client_email);
+      console.log('   Has private key:', !!credentials.private_key);
+      console.log('   Private key length:', credentials.private_key?.length || 0);
+    } catch (error) {
+      console.error('❌ Failed to parse credentials JSON:', error);
+      throw new Error('Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON format');
+    }
+    
     const location = process.env.GOOGLE_DOCUMENT_AI_LOCATION || 'us';
+    const projectId = process.env.GOOGLE_CLOUD_PROJECT_ID;
     
     // Use region-specific endpoint
     const apiEndpoint = location === 'eu' 
       ? 'eu-documentai.googleapis.com'
       : 'us-documentai.googleapis.com';
     
+    console.log('🔧 Initializing Document AI client...');
+    console.log('   Endpoint:', apiEndpoint);
+    console.log('   Project ID:', projectId);
+    console.log('   Location:', location);
+    
     documentAIClient = new DocumentProcessorServiceClient({
       credentials: credentials,
-      projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+      projectId: projectId,
       apiEndpoint: apiEndpoint,
     });
     
-    console.log(`📡 Document AI client initialized with endpoint: ${apiEndpoint}`);
+    console.log(`✅ Document AI client initialized successfully`);
   }
   
   return documentAIClient;
