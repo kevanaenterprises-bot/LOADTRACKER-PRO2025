@@ -1,0 +1,301 @@
+2025-10-17T23:37:03.000000000Z [inf]  Starting Container
+2025-10-17T23:37:04.382614427Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-17T23:37:04.382659873Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-17T23:37:04.382665126Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-17T23:37:04.760272720Z [inf]  Using 'pg' driver for database querying
+2025-10-17T23:37:04.881603223Z [inf]  [⣷] Pulling schema from database...
+2025-10-17T23:37:05.061396787Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-17T23:37:05.324975184Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-17T23:37:05.325012743Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-17T23:37:05.398437353Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-17T23:37:05.550070843Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-10-17T23:37:05.643020238Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-10-17T23:37:05.771785478Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-10-17T23:37:05.901027487Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-17T23:37:06.338436963Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-17T23:37:06.338448241Z [inf]  [i] No changes detected
+2025-10-17T23:37:06.338457083Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-17T23:37:06.338499689Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-17T23:37:06.345532430Z [inf]  
+2025-10-17T23:37:06.345540280Z [inf]  > rest-express@1.0.0 start
+2025-10-17T23:37:06.345546602Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-17T23:37:06.345552651Z [inf]  
+2025-10-17T23:37:07.691032463Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-17T23:37:07.697991569Z [inf]    "heapUsed": 66459144,
+2025-10-17T23:37:07.697997157Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-17T23:37:07.698002323Z [inf]    "external": 4204721,
+2025-10-17T23:37:07.698002873Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-17T23:37:07.694Z
+2025-10-17T23:37:07.698008872Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-17T23:37:07.698009916Z [inf]    "arrayBuffers": 532394
+2025-10-17T23:37:07.698015887Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-17T23:37:07.698016651Z [inf]  }
+2025-10-17T23:37:07.698022734Z [inf]  🔧 Process ID: 51
+2025-10-17T23:37:07.698026653Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-17T23:37:07.698031680Z [inf]  🔧 Platform: linux
+2025-10-17T23:37:07.698035646Z [inf]  🔧 Architecture: x64
+2025-10-17T23:37:07.698039785Z [inf]  🔧 Memory usage: {
+2025-10-17T23:37:07.698044135Z [inf]    "rss": 182972416,
+2025-10-17T23:37:07.698047956Z [inf]    "heapTotal": 95485952,
+2025-10-17T23:37:07.704749806Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-17T23:37:07.704750565Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-17T23:37:07.704762777Z [inf]  🔧 Testing database connection...
+2025-10-17T23:37:07.704765598Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-17T23:37:07.699Z
+2025-10-17T23:37:07.704773149Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-17T23:37:07.704778233Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-17T23:37:07.699Z
+2025-10-17T23:37:07.704785200Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-17T23:37:07.704790293Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-17T23:37:07.704794719Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-17T23:37:07.704799185Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-17T23:37:07.704803671Z [inf]  🔧 Validating environment configuration...
+2025-10-17T23:37:07.704808149Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-17T23:37:07.704813301Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-17T23:37:07.704819327Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-17T23:37:07.704824149Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-17T23:37:07.704828271Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-17T23:37:07.704832523Z [inf]  ✅ Database URL configured
+2025-10-17T23:37:07.704837019Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-10-17T23:37:07.704841113Z [inf]  ✅ SMS service (Telnyx) configured
+2025-10-17T23:37:07.704845172Z [inf]  ✅ Session authentication configured
+2025-10-17T23:37:07.704849323Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-17T23:37:07.717958228Z [err]  (node:51) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-17T23:37:07.717962902Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-17T23:37:07.912155244Z [inf]  ✅ Database connection successful
+2025-10-17T23:37:07.912162022Z [inf]  📝 Registering application routes...
+2025-10-17T23:37:08.356852718Z [inf]  ✅ Routes registered successfully
+2025-10-17T23:37:08.356859438Z [inf]  📁 Setting up static file serving for production...
+2025-10-17T23:37:08.356866322Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-17T23:37:08.356875876Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-17T23:37:08.356883593Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-17T23:37:08.356890266Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-17T23:37:08.356915266Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-17T23:37:08.356921106Z [inf]  📍 Health check endpoints available:
+2025-10-17T23:37:08.356926444Z [inf]     - GET /api/status (basic status)
+2025-10-17T23:37:08.356931657Z [inf]     - GET /api/health (health check)
+2025-10-17T23:37:08.356937338Z [inf]     - GET /api/ready (readiness check)
+2025-10-17T23:37:08.356943936Z [inf]  11:37:08 PM [express] serving on port 8080
+2025-10-17T23:37:08.462410093Z [inf]  11:37:08 PM [express] GET /api/health 200 in 4ms :: {"status":"ok","timestamp":"2025-10-17T23:37:08.4…
+2025-10-17T23:37:38.496447433Z [inf]    hasSession: true,
+2025-10-17T23:37:38.496460182Z [inf]    hasAdminAuth: true,
+2025-10-17T23:37:38.496467750Z [inf]    sessionId: '89FkYp-sRosqkbihElGsgD7zLFCYFZOa',
+2025-10-17T23:37:38.496473481Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-17T23:37:38.496483655Z [inf]    adminAuthData: {
+2025-10-17T23:37:38.496493467Z [inf]      id: 'admin-001',
+2025-10-17T23:37:38.496500431Z [inf]      role: 'admin',
+2025-10-17T23:37:38.496508615Z [inf]      lastName: 'User',
+2025-10-17T23:37:38.496523211Z [inf]  Admin login attempt: {
+2025-10-17T23:37:38.496528964Z [inf]    username: 'ADMIN',
+2025-10-17T23:37:38.496534960Z [inf]    usernameLength: 5,
+2025-10-17T23:37:38.496541333Z [inf]    password: '[LENGTH:9]',
+2025-10-17T23:37:38.496547447Z [inf]    passwordActual: '"go4fc2024"',
+2025-10-17T23:37:38.496553331Z [inf]    sessionId: '89FkYp-sRosqkbihElGsgD7zLFCYFZOa',
+2025-10-17T23:37:38.496559101Z [inf]    hasSession: true
+2025-10-17T23:37:38.496564896Z [inf]  }
+2025-10-17T23:37:38.496576641Z [inf]  Admin credentials matched successfully
+2025-10-17T23:37:38.496582412Z [inf]  Session saved and verified, adminAuth: {
+2025-10-17T23:37:38.496588381Z [inf]    id: 'admin-001',
+2025-10-17T23:37:38.496594224Z [inf]    role: 'admin',
+2025-10-17T23:37:38.496600141Z [inf]    lastName: 'User',
+2025-10-17T23:37:38.496609571Z [inf]    username: 'admin',
+2025-10-17T23:37:38.496621068Z [inf]    firstName: 'Admin'
+2025-10-17T23:37:38.496627253Z [inf]  }
+2025-10-17T23:37:38.496632867Z [inf]  11:37:37 PM [express] POST /api/auth/admin-login 200 in 16ms :: {"message":"Login successful","user":…
+2025-10-17T23:37:38.496638470Z [inf]  Browser auth bypass token requested
+2025-10-17T23:37:38.496644221Z [inf]  11:37:37 PM [express] POST /api/auth/browser-bypass 200 in 8ms :: {"message":"Browser auth bypass tok…
+2025-10-17T23:37:38.496650099Z [inf]  Admin user check: {
+2025-10-17T23:37:38.497635327Z [inf]      username: 'admin',
+2025-10-17T23:37:38.497640955Z [inf]      firstName: 'Admin'
+2025-10-17T23:37:38.497646765Z [inf]    },
+2025-10-17T23:37:38.497653096Z [inf]    hasBypassToken: false
+2025-10-17T23:37:38.497658413Z [inf]  }
+2025-10-17T23:37:38.497664279Z [inf]  11:37:38 PM [express] GET /api/auth/admin-user 304 in 7ms :: {"id":"admin-001","role":"admin","lastNa…
+2025-10-17T23:37:38.497669404Z [inf]  Authentication failed: No user or expiration
+2025-10-17T23:37:38.497674564Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-17T23:37:38.497679379Z [inf]    role: 'driver',
+2025-10-17T23:37:38.497684804Z [inf]    userId: '34366fd7-7b43-47a2-baae-73fcd1f78d47',
+2025-10-17T23:37:38.497690664Z [inf]    lastName: 'OWEN',
+2025-10-17T23:37:38.497696197Z [inf]    username: 'KOWEN',
+2025-10-17T23:37:38.497701719Z [inf]    firstName: 'KEVIN'
+2025-10-17T23:37:38.497707277Z [inf]  }
+2025-10-17T23:37:38.497713570Z [inf]  11:37:38 PM [express] GET /api/auth/user 401 in 7ms :: {"message":"Unauthorized"}
+2025-10-17T23:37:38.497719402Z [inf]  11:37:38 PM [express] GET /api/auth/driver-user 304 in 6ms :: {"id":"34366fd7-7b43-47a2-baae-73fcd1f7…
+2025-10-17T23:37:38.497725579Z [inf]  11:37:38 PM [express] GET /api/customers 304 in 8ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-10-17T23:37:38.497731549Z [inf]  11:37:38 PM [express] GET /api/drivers/available 304 in 42ms :: [{"id":"6f06b2ff-1dd4-4966-94ff-5c2bf…
+2025-10-17T23:37:38.497737169Z [inf]  11:37:38 PM [express] GET /api/locations 304 in 52ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01"…
+2025-10-17T23:37:38.497742974Z [inf]  Bypass check: {
+2025-10-17T23:37:38.497748458Z [inf]    token: '[PROVIDED]',
+2025-10-17T23:37:38.497753955Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-17T23:37:38.497759826Z [inf]    isActive: true
+2025-10-17T23:37:38.497765994Z [inf]  }
+2025-10-17T23:37:38.497798560Z [inf]  Dashboard stats auth check: {
+2025-10-17T23:37:38.499582281Z [inf]    hasAdminAuth: true,
+2025-10-17T23:37:38.499590861Z [inf]    hasReplitAuth: false,
+2025-10-17T23:37:38.499598638Z [inf]    hasTokenBypass: true,
+2025-10-17T23:37:38.499609302Z [inf]    headers: [
+2025-10-17T23:37:38.499633581Z [inf]      'host',                 'user-agent',
+2025-10-17T23:37:38.499640964Z [inf]      'accept',               'accept-encoding',
+2025-10-17T23:37:38.499648207Z [inf]      'accept-language',      'cookie',
+2025-10-17T23:37:38.499656015Z [inf]      'if-none-match',        'referer',
+2025-10-17T23:37:38.499662979Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-17T23:37:38.499669776Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-17T23:37:38.499676628Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-17T23:37:38.499683897Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-17T23:37:38.499690850Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-17T23:37:38.499697233Z [inf]      'x-request-start'
+2025-10-17T23:37:38.499703851Z [inf]    ],
+2025-10-17T23:37:38.499711290Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-17T23:37:38.499736609Z [inf]  }
+2025-10-17T23:37:38.499743492Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-17T23:37:38.499750409Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-17T23:37:38.499757226Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-17T23:37:38.499763816Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-17T23:37:38.499771025Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-17T23:37:38.499791493Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-17T23:37:38.499799343Z [inf]  11:37:38 PM [express] GET /api/dashboard/stats 304 in 19ms :: {"activeLoads":"4","inTransit":"3","del…
+2025-10-17T23:37:38.615169455Z [inf]  11:37:38 PM [express] GET /api/invoices 304 in 153ms :: [{"id":"cd96b004-a798-4cee-8575-42922fe1e632"…
+2025-10-17T23:37:38.640918857Z [inf]  🔥 RETURNING: 9 loads
+2025-10-17T23:37:38.640969658Z [inf]  📋 ADMIN: Returning 9 loads
+2025-10-17T23:37:38.640976341Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 9 loads
+2025-10-17T23:37:38.697314885Z [inf]  11:37:38 PM [express] GET /api/loads 304 in 238ms :: [{"id":"463d0aee-45eb-4860-909b-063ce6fb7d23","n…
+2025-10-17T23:40:19.647107730Z [inf]     Location: us
+2025-10-17T23:40:19.647118483Z [inf]     Private key length: 1704
+2025-10-17T23:40:19.647120393Z [inf]  ✅ Document AI client initialized successfully
+2025-10-17T23:40:19.647128393Z [inf]  🔍 Processing document with Google Document AI...
+2025-10-17T23:40:19.647133140Z [inf]     Private key starts with: -----BEGIN PRIVATE KEY-----
+2025-10-17T23:40:19.647136569Z [inf]     Processor: projects/load-tracker-pro-2025/locations/us/processors/995fb9cb6df9854e
+2025-10-17T23:40:19.647143317Z [inf]  MI
+2025-10-17T23:40:19.647144654Z [inf]     MIME type: application/pdf
+2025-10-17T23:40:19.647152216Z [inf]     Private key has \n escapes: false
+2025-10-17T23:40:19.647160345Z [inf]     Private key has actual newlines: true
+2025-10-17T23:40:19.647166385Z [inf]  📄 Processing document for OCR: 477000300.pdf application/pdf 978763
+2025-10-17T23:40:19.647171214Z [inf]  🔧 Initializing Document AI client...
+2025-10-17T23:40:19.647175601Z [inf]  📄 Google Cloud Config Check: {
+2025-10-17T23:40:19.647181389Z [inf]    hasProjectId: true,
+2025-10-17T23:40:19.647189344Z [inf]    hasProcessorId: true,
+2025-10-17T23:40:19.647191175Z [inf]     Endpoint: us-documentai.googleapis.com
+2025-10-17T23:40:19.647195837Z [inf]    hasCredentials: true,
+2025-10-17T23:40:19.647204017Z [inf]    credentialsLength: 2341
+2025-10-17T23:40:19.647204960Z [inf]     Project ID: load-tracker-pro-2025
+2025-10-17T23:40:19.647210648Z [inf]  }
+2025-10-17T23:40:19.647215486Z [inf]  🔐 Parsing Google credentials...
+2025-10-17T23:40:19.647221103Z [inf]     Credentials length: 2341
+2025-10-17T23:40:19.647226921Z [inf]  ✅ Credentials parsed successfully
+2025-10-17T23:40:19.647232052Z [inf]     Project ID from creds: load-tracker-pro-2025
+2025-10-17T23:40:19.647236656Z [inf]     Client email: loadtracker-ocr@load-tracker-pro-2025.iam.gserviceaccount.com
+2025-10-17T23:40:19.647240926Z [inf]     Has private key: true
+2025-10-17T23:40:19.649582561Z [inf]     File size: 978763 bytes
+2025-10-17T23:40:19.649586697Z [err]  ❌ Google Document AI error: Error: 16 UNAUTHENTICATED: Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+2025-10-17T23:40:19.649592382Z [err]      at callErrorFromStatus (/app/node_modules/@grpc/grpc-js/build/src/call.js:32:19)
+2025-10-17T23:40:19.649596451Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/build/src/client.js:193:76)
+2025-10-17T23:40:19.649600031Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/build/src/client-interceptors.js:367:141)
+2025-10-17T23:40:19.649603628Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/build/src/client-interceptors.js:327:181)
+2025-10-17T23:40:19.649608159Z [err]      at /app/node_modules/@grpc/grpc-js/build/src/resolving-call.js:135:78
+2025-10-17T23:40:19.649611911Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2025-10-17T23:40:19.649615828Z [err]  for call at
+2025-10-17T23:40:19.649619592Z [err]      at ServiceClientImpl.makeUnaryRequest (/app/node_modules/@grpc/grpc-js/build/src/client.js:161:32)
+2025-10-17T23:40:19.649625620Z [err]      at ServiceClientImpl.<anonymous> (/app/node_modules/@grpc/grpc-js/build/src/make-client.js:105:19)
+2025-10-17T23:40:19.649629504Z [err]      at /app/node_modules/@google-cloud/documentai/build/src/v1/document_processor_service_client.js:279:29
+2025-10-17T23:40:19.649633001Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/timeout.js:44:16
+2025-10-17T23:40:19.649637043Z [err]      at repeat (/app/node_modules/google-gax/build/src/normalCalls/retries.js:114:25)
+2025-10-17T23:40:19.649640613Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/retries.js:156:13
+2025-10-17T23:40:19.650159660Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-10-17T23:40:19.650167268Z [err]    "code": 16,
+2025-10-17T23:40:19.650171714Z [err]    code: 16,
+2025-10-17T23:40:19.650175725Z [err]    "details": "Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.",
+2025-10-17T23:40:19.650180022Z [err]    details: 'Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.',
+2025-10-17T23:40:19.650185645Z [err]    metadata: Metadata {
+2025-10-17T23:40:19.650191722Z [err]      internalRepr: Map(4) {
+2025-10-17T23:40:19.650192630Z [err]      at OngoingCallPromise.call (/app/node_modules/google-gax/build/src/call.js:70:27)
+2025-10-17T23:40:19.650198317Z [err]      at NormalApiCaller.call (/app/node_modules/google-gax/build/src/normalCalls/normalApiCaller.js:34:19)
+2025-10-17T23:40:19.650198574Z [err]        'endpoint-load-metrics-bin' => [Array],
+2025-10-17T23:40:19.650205714Z [err]      at /app/node_modules/google-gax/build/src/createApiCall.js:110:30
+2025-10-17T23:40:19.650206345Z [err]        'grpc-server-stats-bin' => [Array],
+2025-10-17T23:40:19.650211572Z [err]        'pc-high-bwd-bin' => [Array],
+2025-10-17T23:40:19.650215821Z [err]        'pcx-high-bwd-bin' => [Array]
+2025-10-17T23:40:19.650220360Z [err]      },
+2025-10-17T23:40:19.650224716Z [err]      opaqueData: Map(0) {},
+2025-10-17T23:40:19.650228748Z [err]      options: {}
+2025-10-17T23:40:19.650232788Z [err]    },
+2025-10-17T23:40:19.650238529Z [err]    note: 'Exception occurred in retry method that was not classified as transient'
+2025-10-17T23:40:19.650242745Z [err]  }
+2025-10-17T23:40:19.650247919Z [err]  ❌ Error details: {
+2025-10-17T23:40:19.652136507Z [err]    "metadata": {
+2025-10-17T23:40:19.652143862Z [err]            203,
+2025-10-17T23:40:19.652144978Z [err]      "endpoint-load-metrics-bin": [
+2025-10-17T23:40:19.652151013Z [err]            142,
+2025-10-17T23:40:19.652154040Z [err]          "type": "Buffer",
+2025-10-17T23:40:19.652154282Z [err]        {
+2025-10-17T23:40:19.652160679Z [err]          "data": [
+2025-10-17T23:40:19.652166584Z [err]          "type": "Buffer",
+2025-10-17T23:40:19.652166919Z [err]            0,
+2025-10-17T23:40:19.652174292Z [err]            0,
+2025-10-17T23:40:19.652175405Z [err]          "data": [
+2025-10-17T23:40:19.652180405Z [err]            81,
+2025-10-17T23:40:19.652182278Z [err]            250,
+2025-10-17T23:40:19.652183824Z [err]            49,
+2025-10-17T23:40:19.652191815Z [err]            165,
+2025-10-17T23:40:19.652191992Z [err]            86,
+2025-10-17T23:40:19.652199765Z [err]            70,
+2025-10-17T23:40:19.652200375Z [err]            236,
+2025-10-17T23:40:19.652207361Z [err]            182,
+2025-10-17T23:40:19.652207396Z [err]            23,
+2025-10-17T23:40:19.652213923Z [err]            71,
+2025-10-17T23:40:19.652215573Z [err]            60,
+2025-10-17T23:40:19.652222827Z [err]            133,
+2025-10-17T23:40:19.652223017Z [err]            50,
+2025-10-17T23:40:19.652230159Z [err]            51,
+2025-10-17T23:40:19.652231441Z [err]            178,
+2025-10-17T23:40:19.652237229Z [err]            243,
+2025-10-17T23:40:19.652239031Z [inf]            63
+2025-10-17T23:40:19.652245604Z [err]          ]
+2025-10-17T23:40:19.652246339Z [err]            63,
+2025-10-17T23:40:19.652254305Z [err]            73,
+2025-10-17T23:40:19.652254548Z [err]        }
+2025-10-17T23:40:19.652262158Z [err]      ],
+2025-10-17T23:40:19.652267030Z [err]      "grpc-server-stats-bin": [
+2025-10-17T23:40:19.652271381Z [err]        {
+2025-10-17T23:40:19.654209236Z [err]            8,
+2025-10-17T23:40:19.654214182Z [err]      ],
+2025-10-17T23:40:19.654217052Z [err]            0,
+2025-10-17T23:40:19.654223035Z [err]            0,
+2025-10-17T23:40:19.654226100Z [err]      "pcx-high-bwd-bin": [
+2025-10-17T23:40:19.654228668Z [err]            0,
+2025-10-17T23:40:19.654234466Z [inf]            0
+2025-10-17T23:40:19.654235486Z [err]        {
+2025-10-17T23:40:19.654239531Z [err]          ]
+2025-10-17T23:40:19.654242998Z [err]          "type": "Buffer",
+2025-10-17T23:40:19.654244959Z [err]        }
+2025-10-17T23:40:19.654251057Z [err]          "data": [
+2025-10-17T23:40:19.654251531Z [err]      ],
+2025-10-17T23:40:19.654258631Z [err]      "pc-high-bwd-bin": [
+2025-10-17T23:40:19.654260046Z [err]            42,
+2025-10-17T23:40:19.654263997Z [err]        {
+2025-10-17T23:40:19.654267946Z [err]            2,
+2025-10-17T23:40:19.654269395Z [err]          "type": "Buffer",
+2025-10-17T23:40:19.654274879Z [err]          "data": [
+2025-10-17T23:40:19.654274938Z [err]            24,
+2025-10-17T23:40:19.654283072Z [inf]            6
+2025-10-17T23:40:19.654283149Z [err]            75,
+2025-10-17T23:40:19.654289495Z [err]            103,
+2025-10-17T23:40:19.654294273Z [err]          ]
+2025-10-17T23:40:19.654294329Z [err]            73,
+2025-10-17T23:40:19.654301073Z [err]            89,
+2025-10-17T23:40:19.654301970Z [err]        }
+2025-10-17T23:40:19.654306871Z [err]            66,
+2025-10-17T23:40:19.654309886Z [err]      ]
+2025-10-17T23:40:19.654314675Z [inf]            103
+2025-10-17T23:40:19.654316891Z [err]    },
+2025-10-17T23:40:19.654320948Z [err]          ]
+2025-10-17T23:40:19.654323505Z [err]    "note": "Exception occurred in retry method that was not classified as transient"
+2025-10-17T23:40:19.654328130Z [err]        }
+2025-10-17T23:40:19.654330035Z [err]  }
+2025-10-17T23:40:19.655463332Z [err]  ❌ OCR extraction error: Error: Document AI processing failed: 16 UNAUTHENTICATED: Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+2025-10-17T23:40:19.655471904Z [err]      at extractLoadDataFromDocument (file:///app/dist/index.js:2660:11)
+2025-10-17T23:40:19.655478628Z [err]      at runNextTicks (node:internal/process/task_queues:65:5)
+2025-10-17T23:40:19.655483427Z [err]      at process.processImmediate (node:internal/timers:459:9)
+2025-10-17T23:40:19.655488883Z [err]      at async file:///app/dist/index.js:10032:29
+2025-10-17T23:40:19.655493789Z [err]  ❌ Error stack: Error: Document AI processing failed: 16 UNAUTHENTICATED: Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+2025-10-17T23:40:19.655500405Z [err]      at extractLoadDataFromDocument (file:///app/dist/index.js:2660:11)
+2025-10-17T23:40:19.655505059Z [err]      at runNextTicks (node:internal/process/task_queues:65:5)
+2025-10-17T23:40:19.655511103Z [err]      at process.processImmediate (node:internal/timers:459:9)
+2025-10-17T23:40:19.655517198Z [err]      at async file:///app/dist/index.js:10032:29
+2025-10-17T23:40:19.655532153Z [inf]  11:40:17 PM [express] POST /api/ocr/extract 500 in 13651ms :: {"message":"Failed to extract data from…
