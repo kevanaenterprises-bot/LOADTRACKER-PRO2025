@@ -34,7 +34,7 @@ export async function extractLoadDataFromDocument(fileBuffer: Buffer, mimeType: 
     
     // Determine processor name
     const projectId = process.env.GOOGLE_CLOUD_PROJECT_ID;
-    const location = 'us'; // Default location
+    const location = process.env.GOOGLE_DOCUMENT_AI_LOCATION || 'us'; // Default location
     const processorId = process.env.GOOGLE_DOCUMENT_AI_PROCESSOR_ID;
     
     if (!projectId) {
