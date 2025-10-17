@@ -2,7 +2,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npx puppeteer browsers install chrome && npm run build"
+    "buildCommand": "npm run build"
   },
   "deploy": {
     "startCommand": "npx drizzle-kit push --force && npm start",
@@ -14,7 +14,8 @@
   "environments": {
     "production": {
       "variables": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "false"
       }
     }
   }

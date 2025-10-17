@@ -4,7 +4,7 @@
 LoadTracker Pro is a comprehensive logistics management system for transportation companies, streamlining load dispatch, driver coordination, and automated invoicing. It features real-time status tracking, document management, and separate interfaces for office staff and drivers, aiming to significantly improve operational efficiency. The system includes advanced capabilities like GPS-triggered audio tours for drivers, powered by a database of over 222,969 historical markers.
 
 ## Recent Changes
-### October 17, 2025 - Return to Terminal Feature
+### October 17, 2025 - Return to Terminal Feature & Railway Deployment Fix
 - **Return to Terminal IFTA Tracking**: Drivers can now track IFTA miles when returning to the terminal without a load
   - Added checkbox in driver portal that appears only when driver has no active loads
   - Terminal address: 1800 Plano Pkwy, Plano, Texas 75079
@@ -14,7 +14,13 @@ LoadTracker Pro is a comprehensive logistics management system for transportatio
   - Automatically saves milesByState data for each return trip
   - Component: client/src/components/ReturnToTerminal.tsx
   - Backend routes: `/api/return-to-terminal/calculate-route`, `/api/return-to-terminal/start`
-- **Files**: client/src/components/ReturnToTerminal.tsx, client/src/pages/DriverPortal.tsx, server/routes.ts
+- **Railway Deployment Fix**: Fixed Puppeteer/Chromium installation for Railway deployment
+  - Removed hard-coded Replit-specific Chromium paths that caused Railway failures
+  - Updated `getChromeExecutablePath()` to auto-detect Railway environment
+  - Configured nixpacks.toml to use Puppeteer's bundled Chrome instead of apt-get chromium
+  - Removed problematic apt package installation that was failing on Railway
+  - PDF generation (invoices, documents) now works on both Replit and Railway
+- **Files**: server/emailService.ts, nixpacks.toml, railway.json, client/src/components/ReturnToTerminal.tsx, client/src/pages/DriverPortal.tsx, server/routes.ts
 
 ### October 14, 2025 - Branding Hierarchy & OCR Enhancement
 - **Branding Hierarchy Established**: Proper separation between software vendor and customer branding

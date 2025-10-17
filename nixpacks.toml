@@ -7,10 +7,15 @@ cmd = "npm start"
 [variables]
 NODE_ENV = "production"
 NIXPACKS_METADATA = "node"
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "false"
 
 [phases.setup]
 nixPkgs = ["nodejs", "python3"]
 
-[phases.build]
+[phases.install]
 dependsOn = ["setup"]
-cmds = ["npm ci", "npm run build"]
+cmds = ["npm ci"]
+
+[phases.build]
+dependsOn = ["install"]
+cmds = ["npm run build"]

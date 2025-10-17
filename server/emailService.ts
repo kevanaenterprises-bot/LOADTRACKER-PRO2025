@@ -7,6 +7,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Helper function to get Chrome executable path based on platform
 function getChromeExecutablePath(): string | undefined {
+  // Check for Railway environment variable
+  if (process.env.RAILWAY_ENVIRONMENT) {
+    console.log('🚂 Railway detected - using Puppeteer bundled Chrome');
+    return undefined; // Let Puppeteer use its bundled Chrome
+  }
+  
   // Replit-specific path
   const replitChromePath = '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium';
   
@@ -15,8 +21,8 @@ function getChromeExecutablePath(): string | undefined {
     return replitChromePath;
   }
   
-  // Railway/other platforms - let Puppeteer use bundled Chrome
-  console.log('🔍 Using Puppeteer bundled Chrome (Railway/cloud)');
+  // Other platforms - let Puppeteer use bundled Chrome
+  console.log('🔍 Using Puppeteer bundled Chrome (default)');
   return undefined; // Let Puppeteer auto-detect
 }
 
@@ -182,7 +188,7 @@ export async function compressImageForPDF(imageBuffer: Buffer, contentType: stri
   
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
+    executablePath: getChromeExecutablePath(),
     args: [
       '--no-sandbox', 
       '--disable-setuid-sandbox',
@@ -264,7 +270,7 @@ export async function convertImageToPDF(imageBuffer: Buffer, contentType: string
   
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
+    executablePath: getChromeExecutablePath(),
     args: [
       '--no-sandbox', 
       '--disable-setuid-sandbox',
