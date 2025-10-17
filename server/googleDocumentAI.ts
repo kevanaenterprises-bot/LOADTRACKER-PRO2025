@@ -104,6 +104,14 @@ export async function extractLoadDataFromDocument(fileBuffer: Buffer, mimeType: 
   } catch (error) {
     console.error('❌ Google Document AI error:', error);
     
+    // Log detailed error information for debugging
+    if (error && typeof error === 'object') {
+      console.error('❌ Error details:', JSON.stringify(error, null, 2));
+      if ('statusDetails' in error) {
+        console.error('❌ Status details:', JSON.stringify((error as any).statusDetails, null, 2));
+      }
+    }
+    
     // Check if it's an image quality issue
     const errorMessage = error instanceof Error ? error.message : String(error);
     if (errorMessage.toLowerCase().includes('quality') || 
