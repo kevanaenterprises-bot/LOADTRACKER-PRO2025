@@ -15,6 +15,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { HelpButton, TruckerTip } from "@/components/HelpTooltip";
 import { RoadTour } from "@/components/RoadTour";
 import { FuelReceiptTracker } from "@/components/FuelReceiptTracker";
+import { ReturnToTerminal } from "@/components/ReturnToTerminal";
 
 // Component to show fuel tracker for driver's active load
 function ActiveLoadFuelTracker({ driverId, isCompanyDriver }: { driverId: string; isCompanyDriver: boolean }) {
@@ -33,6 +34,20 @@ function ActiveLoadFuelTracker({ driverId, isCompanyDriver }: { driverId: string
   }
 
   return <FuelReceiptTracker loadId={activeLoad.id} driverId={driverId} isCompanyDriver={isCompanyDriver} />;
+}
+
+// Hook to check if driver has active loads
+function useHasActiveLoad(driverId: string) {
+  const { data: loads = [] } = useQuery<any[]>({
+    queryKey: [`/api/drivers/${driverId}/loads`],
+    enabled: !!driverId,
+  });
+
+  const hasActiveLoad = loads.some((load) => 
+    ["assigned", "in_progress", "in_transit", "en_route_pickup", "at_shipper", "left_shipper", "en_route_receiver", "at_receiver", "delivered"].includes(load.status)
+  );
+
+  return hasActiveLoad;
 }
 
 export default function DriverPortal() {
@@ -98,6 +113,9 @@ export default function DriverPortal() {
     fullUserObject: JSON.stringify(user, null, 2)
   });
 
+  // Check if driver has active loads
+  const hasActiveLoad = useHasActiveLoad(user.id);
+
   // SUCCESS: Show authenticated driver portal - TWO-COLUMN LAYOUT
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -132,6 +150,9 @@ export default function DriverPortal() {
                 )}
               </CardContent>
             </Card>
+            
+            {/* Return to Terminal - Shows only when no active load */}
+            <ReturnToTerminal driverId={user.id} hasActiveLoad={hasActiveLoad} />
           </div>
 
           {/* RIGHT COLUMN - POD Uploader & Road Tour */}
