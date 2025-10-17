@@ -1132,6 +1132,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(401).json({ message: "Unauthorized" });
   });
 
+  // Debug endpoint for Document AI configuration (Railway troubleshooting)
+  app.get('/api/debug/documentai', (req, res) => {
+    try {
+      const hasCredentials = !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+      const hasProjectId = !!process.env.GOOGLE_CLOUD_PROJECT_ID;
+      const hasProcessorId = !!process.env.GOOGLE_DOCUMENT_AI_PROCESSOR_ID;
+      const hasLocation = !!process.env.GOOGLE_DOCUMENT_AI_LOCATION;
+      
+      let credentialsValid = false;
+      let credentialsError = null;
+      
+      if (hasCredentials) {
+        try {
+          const parsed = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON!);
+          credentialsValid = !!parsed.project_id && !!parsed.private_key;
+        } catch (e) {
+          credentialsError = e instanceof Error ? e.message : 'Failed to parse JSON';
+        }
+      }
+      
+      res.json({
+        configured: hasCredentials && hasProjectId && hasProcessorId && hasLocation,
+        details: {
+          credentials: {
+            present: hasCredentials,
+            valid: credentialsValid,
+            error: credentialsError,
+            length: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.length || 0
+          },
+          projectId: {
+            present: hasProjectId,
+            value: process.env.GOOGLE_CLOUD_PROJECT_ID || 'NOT_SET'
+          },
+          processorId: {
+            present: hasProcessorId,
+            value: process.env.GOOGLE_DOCUMENT_AI_PROCESSOR_ID || 'NOT_SET'
+          },
+          location: {
+            present: hasLocation,
+            value: process.env.GOOGLE_DOCUMENT_AI_LOCATION || 'NOT_SET'
+          }
+        }
+      });
+    } catch (error) {
+      res.status(500).json({
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Check driver authentication
   app.get('/api/auth/driver-user', (req, res) => {
     // Check session auth FIRST - if there's a valid driver session, use it
