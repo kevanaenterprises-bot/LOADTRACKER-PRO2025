@@ -8222,6 +8222,84 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+  // ===== RETURN TO TERMINAL ROUTES =====
+  
+  // Calculate route from current location to terminal
+  app.post("/api/return-to-terminal/calculate-route", async (req, res) => {
+    try {
+      const { currentLat, currentLng, terminalLat, terminalLng, driverId } = req.body;
+
+      if (!currentLat || !currentLng || !terminalLat || !terminalLng) {
+        return res.status(400).json({ message: "Missing required location coordinates" });
+      }
+
+      // Import the routing service
+      const { getTruckRouteWithStateMileage } = await import('./hereRoutingService');
+      
+      // Calculate route with state-by-state mileage
+      const routeAnalysis = await getTruckRouteWithStateMileage(
+        currentLat,
+        currentLng,
+        terminalLat,
+        terminalLng
+      );
+
+      if (!routeAnalysis) {
+        return res.status(500).json({ message: "Failed to calculate route. Please check HERE Maps API configuration." });
+      }
+
+      // Estimate time (assuming average 55 mph)
+      const estimatedTime = (routeAnalysis.totalMiles / 55) * 60; // in minutes
+
+      res.json({
+        totalMiles: routeAnalysis.totalMiles,
+        milesByState: routeAnalysis.milesByState,
+        estimatedTime: Math.round(estimatedTime)
+      });
+    } catch (error: any) {
+      console.error("Error calculating return route:", error);
+      res.status(500).json({ message: error.message || "Failed to calculate route" });
+    }
+  });
+
+  // Start return trip and track IFTA miles
+  app.post("/api/return-to-terminal/start", async (req, res) => {
+    try {
+      const { currentLat, currentLng, terminalLat, terminalLng, driverId, totalMiles, milesByState } = req.body;
+
+      if (!currentLat || !currentLng || !terminalLat || !terminalLng || !driverId || !milesByState) {
+        return res.status(400).json({ message: "Missing required data" });
+      }
+
+      // Create a special "return to terminal" load to track the trip
+      const returnLoad = await storage.createLoad({
+        number109: `RTT-${Date.now()}`, // RTT = Return To Terminal
+        customerId: null,
+        driverId,
+        locationId: null,
+        pickupLocationId: null,
+        estimatedMiles: totalMiles.toString(),
+        specialInstructions: "Return to Terminal - Empty/No Load",
+        status: "in_transit",
+        milesByState: milesByState,
+        trackingEnabled: true,
+        currentLatitude: currentLat.toString(),
+        currentLongitude: currentLng.toString(),
+        receiverLatitude: terminalLat.toString(),
+        receiverLongitude: terminalLng.toString(),
+      });
+
+      res.json({
+        success: true,
+        loadId: returnLoad.id,
+        message: "Return trip started successfully"
+      });
+    } catch (error: any) {
+      console.error("Error starting return trip:", error);
+      res.status(500).json({ message: error.message || "Failed to start return trip" });
+    }
+  });
+
   // Create and return HTTP server
   const server = createServer(app);
   return server;
