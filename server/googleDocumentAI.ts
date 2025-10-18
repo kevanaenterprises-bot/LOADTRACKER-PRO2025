@@ -5,6 +5,8 @@ export interface ExtractedLoadData {
   poNumber?: string;
   appointmentTime?: string;
   companyName?: string;
+  pickupCompanyName?: string;
+  deliveryCompanyName?: string;
   pickupAddress?: string;
   deliveryAddress?: string;
   confidence: number;
@@ -119,14 +121,16 @@ export async function extractLoadDataFromDocument(fileBuffer: Buffer, mimeType: 
       extractedData.poNumber,
       extractedData.appointmentTime,
       extractedData.companyName,
+      extractedData.pickupCompanyName,
+      extractedData.deliveryCompanyName,
       extractedData.pickupAddress,
       extractedData.deliveryAddress
     ].filter(Boolean).length;
     
-    const confidence = fieldsFound > 0 ? Math.min(0.5 + (fieldsFound * 0.1), 0.95) : 0.3;
+    const confidence = fieldsFound > 0 ? Math.min(0.5 + (fieldsFound * 0.08), 0.95) : 0.3;
     
     console.log('✅ Document AI extraction complete');
-    console.log(`   Fields found: ${fieldsFound}/6`);
+    console.log(`   Fields found: ${fieldsFound}/8`);
     console.log(`   Confidence: ${Math.round(confidence * 100)}%`);
     
     return {
@@ -204,17 +208,47 @@ function extractLogisticsData(text: string): Omit<ExtractedLoadData, 'confidence
     }
   }
   
-  // Extract company names (look for common logistics terms)
-  const companyPatterns = [
-    /(?:carrier|broker|company)[\s:]*([A-Z][A-Za-z\s&,\.]{5,50}?)(?:\n|$|[A-Z]{2}\s+\d{5})/i,
-    /(?:shipper|consignee)[\s:]*([A-Z][A-Za-z\s&,\.]{5,50}?)(?:\n|$|[A-Z]{2}\s+\d{5})/i,
+  // Extract company names - separate pickup and delivery
+  // Look for shipper/pickup company
+  const pickupCompanyPatterns = [
+    /(?:shipper|pickup|origin)[\s:]*([A-Z][A-Za-z\s&,\.]{3,50}?)(?:\n|$|[A-Z]{2}\s+\d{5})/i,
+    /(?:pick\s*up\s*at|from)[\s:]*([A-Z][A-Za-z\s&,\.]{3,50}?)(?:\n|$|[A-Z]{2}\s+\d{5})/i,
   ];
   
-  for (const pattern of companyPatterns) {
+  for (const pattern of pickupCompanyPatterns) {
     const match = text.match(pattern);
     if (match) {
-      data.companyName = match[1].trim();
+      data.pickupCompanyName = match[1].trim();
       break;
+    }
+  }
+  
+  // Look for consignee/delivery company
+  const deliveryCompanyPatterns = [
+    /(?:consignee|delivery|destination)[\s:]*([A-Z][A-Za-z\s&,\.]{3,50}?)(?:\n|$|[A-Z]{2}\s+\d{5})/i,
+    /(?:deliver\s*to|to)[\s:]*([A-Z][A-Za-z\s&,\.]{3,50}?)(?:\n|$|[A-Z]{2}\s+\d{5})/i,
+  ];
+  
+  for (const pattern of deliveryCompanyPatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      data.deliveryCompanyName = match[1].trim();
+      break;
+    }
+  }
+  
+  // Fallback: Use general company name if specific ones not found
+  if (!data.pickupCompanyName && !data.deliveryCompanyName) {
+    const companyPatterns = [
+      /(?:carrier|broker|company)[\s:]*([A-Z][A-Za-z\s&,\.]{5,50}?)(?:\n|$|[A-Z]{2}\s+\d{5})/i,
+    ];
+    
+    for (const pattern of companyPatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        data.companyName = match[1].trim();
+        break;
+      }
     }
   }
   

@@ -6925,18 +6925,22 @@ Reply YES to confirm acceptance or NO to decline.`
 
       console.log("🚛 Creating load from OCR data:", { 
         loadNumber: number109, 
+        pickupCompany: extractedData.pickupCompanyName,
+        deliveryCompany: extractedData.deliveryCompanyName,
         pickup: extractedData.pickupAddress,
-        delivery: extractedData.deliveryAddress
+        delivery: extractedData.deliveryAddress,
+        poNumber: extractedData.poNumber
       });
 
-      // Create stops array from extracted addresses
+      // Create stops array from extracted addresses with correct company names
       const stops: Partial<InsertLoadStop>[] = [];
       
       if (extractedData.pickupAddress) {
         stops.push({
           stopType: 'pickup',
           stopSequence: 1,
-          companyName: extractedData.companyName || 'Pickup Location',
+          // Use specific pickup company name, fallback to general company name, then generic label
+          companyName: extractedData.pickupCompanyName || extractedData.companyName || 'Pickup Location',
           address: extractedData.pickupAddress,
           contactName: null,
           contactPhone: null,
@@ -6948,7 +6952,8 @@ Reply YES to confirm acceptance or NO to decline.`
         stops.push({
           stopType: 'dropoff',
           stopSequence: 2,
-          companyName: extractedData.companyName || 'Delivery Location',
+          // Use specific delivery company name, fallback to general company name, then generic label
+          companyName: extractedData.deliveryCompanyName || extractedData.companyName || 'Delivery Location',
           address: extractedData.deliveryAddress,
           contactName: null,
           contactPhone: null,
@@ -6984,7 +6989,7 @@ Reply YES to confirm acceptance or NO to decline.`
       const loadData = {
         number109,
         status: 'created' as const,
-        bolNumber: extractedData.loadNumber || null,
+        bolNumber: null, // BOL should only be set for actual Bill of Lading numbers, not load numbers
         poNumber: extractedData.poNumber || null,
         appointmentTime: extractedData.appointmentTime || null,
         pickupAddress: extractedData.pickupAddress || null,
