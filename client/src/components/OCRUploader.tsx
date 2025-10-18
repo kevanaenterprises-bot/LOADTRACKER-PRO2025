@@ -12,7 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, FileText, Loader2, CheckCircle, AlertCircle, Edit3 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Upload, FileText, Loader2, CheckCircle, AlertCircle, Edit3, Eye } from "lucide-react";
 
 interface ExtractedData {
   loadNumber?: string;
@@ -40,6 +41,8 @@ export function OCRUploader() {
   const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -174,6 +177,23 @@ export function OCRUploader() {
     return "bg-red-100 text-red-800";
   };
 
+  const openPreview = () => {
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      setShowPreview(true);
+    }
+  };
+
+  const closePreview = () => {
+    setShowPreview(false);
+    // Clean up the URL to avoid memory leaks
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl('');
+    }
+  };
+
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
@@ -230,23 +250,35 @@ export function OCRUploader() {
                 ({(selectedFile.size / 1024 / 1024).toFixed(1)} MB)
               </span>
             </div>
-            <Button
-              onClick={() => extractDataMutation.mutate(selectedFile)}
-              disabled={extractDataMutation.isPending}
-              size="sm"
-            >
-              {extractDataMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Reading...
-                </>
-              ) : (
-                <>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Extract Data
-                </>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={openPreview}
+                variant="outline"
+                size="sm"
+                data-testid="button-preview-document"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Preview
+              </Button>
+              <Button
+                onClick={() => extractDataMutation.mutate(selectedFile)}
+                disabled={extractDataMutation.isPending}
+                size="sm"
+                data-testid="button-extract-data"
+              >
+                {extractDataMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Reading...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Extract Data
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         )}
 
@@ -492,6 +524,34 @@ export function OCRUploader() {
           </div>
         )}
       </CardContent>
+
+      {/* Document Preview Dialog */}
+      <Dialog open={showPreview} onOpenChange={(open) => !open && closePreview()}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Document Preview</DialogTitle>
+          </DialogHeader>
+          <div className="overflow-auto max-h-[calc(90vh-100px)]">
+            {selectedFile && (
+              selectedFile.type === 'application/pdf' ? (
+                <embed
+                  src={previewUrl}
+                  type="application/pdf"
+                  width="100%"
+                  height="600px"
+                  className="rounded-lg"
+                />
+              ) : (
+                <img
+                  src={previewUrl}
+                  alt="Document preview"
+                  className="w-full h-auto rounded-lg"
+                />
+              )
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
