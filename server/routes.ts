@@ -39,7 +39,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
-import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users, pricingTiers, customerSubscriptions } from "@shared/schema";
+import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users, pricingTiers, customerSubscriptions, type InsertLoadStop } from "@shared/schema";
 import { PDFDocument } from 'pdf-lib';
 
 // Bypass secret for testing and mobile auth
@@ -6923,21 +6923,76 @@ Reply YES to confirm acceptance or NO to decline.`
       const timestamp = Date.now();
       const number109 = `109-${timestamp.toString().slice(-8)}`;
 
+      console.log("🚛 Creating load from OCR data:", { 
+        loadNumber: number109, 
+        pickup: extractedData.pickupAddress,
+        delivery: extractedData.deliveryAddress
+      });
+
+      // Create stops array from extracted addresses
+      const stops: Partial<InsertLoadStop>[] = [];
+      
+      if (extractedData.pickupAddress) {
+        stops.push({
+          stopType: 'pickup',
+          stopSequence: 1,
+          companyName: extractedData.companyName || 'Pickup Location',
+          address: extractedData.pickupAddress,
+          contactName: null,
+          contactPhone: null,
+          notes: null
+        });
+      }
+      
+      if (extractedData.deliveryAddress) {
+        stops.push({
+          stopType: 'dropoff',
+          stopSequence: 2,
+          companyName: extractedData.companyName || 'Delivery Location',
+          address: extractedData.deliveryAddress,
+          contactName: null,
+          contactPhone: null,
+          notes: null
+        });
+      }
+
+      // Calculate mileage if we have both pickup and delivery addresses
+      let calculatedMiles: string | null = null;
+      if (extractedData.pickupAddress && extractedData.deliveryAddress) {
+        try {
+          console.log("📍 Calculating route mileage...");
+          const { HERETrackingService } = await import('./services/hereTracking');
+          const hereService = new HERETrackingService();
+          
+          const routeInfo = await hereService.calculateOptimizedRoute(
+            { lat: 0, lng: 0, address: extractedData.pickupAddress },
+            { lat: 0, lng: 0, address: extractedData.deliveryAddress }
+          );
+          
+          if (routeInfo && routeInfo.distance) {
+            // Convert meters to miles
+            const miles = (routeInfo.distance / 1609.34).toFixed(2);
+            calculatedMiles = miles;
+            console.log(`✅ Route calculated: ${miles} miles`);
+          }
+        } catch (error) {
+          console.error('⚠️  Route calculation failed, continuing without mileage:', error);
+        }
+      }
+
       // Create the load with extracted data
       const loadData = {
         number109,
         status: 'created' as const,
-        // Use extracted data if available, otherwise set to null
         bolNumber: extractedData.loadNumber || null,
         poNumber: extractedData.poNumber || null,
         appointmentTime: extractedData.appointmentTime || null,
         pickupAddress: extractedData.pickupAddress || null,
         deliveryAddress: extractedData.deliveryAddress || null,
         companyName: extractedData.companyName || null,
-        // Default values for required fields
+        estimatedMiles: calculatedMiles,
         extraStops: "0.00",
         lumperCharge: "0.00",
-        estimatedMiles: null,
         driverId: null,
         locationId: null,
         bolDocumentPath: null,
@@ -6946,18 +7001,23 @@ Reply YES to confirm acceptance or NO to decline.`
         updatedAt: new Date(),
       };
 
-      const newLoad = await storage.createLoad(loadData);
+      // Create load with stops (storage.createLoad adds loadId internally)
+      const newLoad = await storage.createLoad(loadData, stops.length > 0 ? stops as any : undefined);
       
-      console.log("Generated load from OCR:", newLoad.number109);
+      console.log("✅ Generated load from OCR:", newLoad.number109, {
+        stops: stops.length,
+        miles: calculatedMiles
+      });
       
       res.json({
         ...newLoad,
         message: `Load ${newLoad.number109} created from Rate Con data`,
-        extractedData
+        extractedData,
+        calculatedMiles
       });
       
     } catch (error) {
-      console.error('Load generation error:', error);
+      console.error('❌ Load generation error:', error);
       res.status(500).json({ 
         message: 'Failed to generate load from extracted data',
         error: error instanceof Error ? error.message : 'Unknown error'
