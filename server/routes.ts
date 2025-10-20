@@ -4530,9 +4530,10 @@ Reply YES to confirm acceptance or NO to decline.`
       // Step 1: Generate clean invoice HTML (no POD embedding needed)
       // IMPORTANT: Use LOAD's financial data if available (same as print preview)
       // Use nullish coalescing (??) to properly handle zero values
+      // Check BOTH tripRate and flatRate fields on load (either one could have the freight charge)
       const mergedInvoice = {
         ...invoice,
-        flatRate: load.tripRate ?? invoice.flatRate,
+        flatRate: load.tripRate ?? load.flatRate ?? invoice.flatRate,
         lumperCharge: load.lumperCharge ?? invoice.lumperCharge,
         extraStopsCharge: load.extraStops ?? invoice.extraStopsCharge
       };
@@ -7200,9 +7201,10 @@ Reply YES to confirm acceptance or NO to decline.`
       // IMPORTANT: Use LOAD's financial data if available (updated more recently than invoice)
       // This ensures print preview shows the latest lumper charge even before clicking "Update Invoice"
       // Use nullish coalescing (??) to properly handle zero values
+      // Check BOTH tripRate and flatRate fields on load (either one could have the freight charge)
       const mergedInvoice = {
         ...invoice,
-        flatRate: load.tripRate ?? invoice.flatRate,
+        flatRate: load.tripRate ?? load.flatRate ?? invoice.flatRate,
         lumperCharge: load.lumperCharge ?? invoice.lumperCharge,
         extraStopsCharge: load.extraStops ?? invoice.extraStopsCharge
       };
