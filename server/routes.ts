@@ -4528,8 +4528,31 @@ Reply YES to confirm acceptance or NO to decline.`
       console.log("🔍 Generating combined invoice+POD PDF using PDF merge utility...");
       
       // Step 1: Generate clean invoice HTML (no POD embedding needed)
+      // IMPORTANT: Use LOAD's financial data if available (same as print preview)
+      // Use nullish coalescing (??) to properly handle zero values
+      const mergedInvoice = {
+        ...invoice,
+        flatRate: load.tripRate ?? invoice.flatRate,
+        lumperCharge: load.lumperCharge ?? invoice.lumperCharge,
+        extraStopsCharge: load.extraStops ?? invoice.extraStopsCharge
+      };
+      
+      // Recalculate total with latest values
+      const flatRateNum = parseFloat(mergedInvoice.flatRate?.toString() || '0');
+      const lumperChargeNum = parseFloat(mergedInvoice.lumperCharge?.toString() || '0');
+      const extraStopsNum = parseFloat(mergedInvoice.extraStopsCharge?.toString() || '0');
+      mergedInvoice.totalAmount = (flatRateNum + lumperChargeNum + extraStopsNum).toFixed(2);
+      
+      console.log(`💰 Email using merged financial data:`, {
+        loadNumber: load.number109,
+        flatRate: mergedInvoice.flatRate,
+        lumperCharge: mergedInvoice.lumperCharge,
+        extraStops: mergedInvoice.extraStopsCharge,
+        total: mergedInvoice.totalAmount
+      });
+      
       const invoiceContext = await computeInvoiceContext(load);
-      const invoiceHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
+      const invoiceHTML = generateInvoiceOnlyHTML(mergedInvoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       
       // Step 2: Collect ALL POD documents (both images and PDFs)
       console.log(`🔍 EMAIL DEBUG: Checking POD for ${identifierLabel}`);
@@ -7174,9 +7197,34 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`💡 This could be due to load deletion/recreation cycle - check if load was recently recreated`);
       }
 
+      // IMPORTANT: Use LOAD's financial data if available (updated more recently than invoice)
+      // This ensures print preview shows the latest lumper charge even before clicking "Update Invoice"
+      // Use nullish coalescing (??) to properly handle zero values
+      const mergedInvoice = {
+        ...invoice,
+        flatRate: load.tripRate ?? invoice.flatRate,
+        lumperCharge: load.lumperCharge ?? invoice.lumperCharge,
+        extraStopsCharge: load.extraStops ?? invoice.extraStopsCharge
+      };
+      
+      // Recalculate total with latest values
+      const flatRateNum = parseFloat(mergedInvoice.flatRate?.toString() || '0');
+      const lumperChargeNum = parseFloat(mergedInvoice.lumperCharge?.toString() || '0');
+      const extraStopsNum = parseFloat(mergedInvoice.extraStopsCharge?.toString() || '0');
+      mergedInvoice.totalAmount = (flatRateNum + lumperChargeNum + extraStopsNum).toFixed(2);
+      
+      console.log(`💰 Preview using merged financial data:`, {
+        loadNumber: load.number109,
+        flatRate: mergedInvoice.flatRate,
+        lumperCharge: mergedInvoice.lumperCharge,
+        extraStops: mergedInvoice.extraStopsCharge,
+        total: mergedInvoice.totalAmount,
+        source: 'Load data merged with invoice'
+      });
+
       // Generate the base invoice HTML (simplified - no rate confirmation)
       const invoiceContext = await computeInvoiceContext(load);
-      const baseHTML = generateInvoiceOnlyHTML(invoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
+      const baseHTML = generateInvoiceOnlyHTML(mergedInvoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
       
       // Embed POD images if available - PRIORITIZE STORED SNAPSHOTS
       let previewHTML = baseHTML;

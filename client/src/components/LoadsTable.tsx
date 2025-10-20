@@ -1652,30 +1652,35 @@ export default function LoadsTable() {
                   </div>
                 </div>
                 
-                {/* Update Invoice Button - Show if invoice exists AND financials have been modified */}
+                {/* Update Invoice Button - Show if invoice exists */}
                 {hasInvoice(selectedLoad) && (
-                  <div className="mt-3 text-center">
-                    <Button 
-                      onClick={() => updateInvoiceWithNewCharges(selectedLoad.id)}
-                      disabled={updateInvoiceMutation.isPending}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                      size="sm"
-                    >
-                      {updateInvoiceMutation.isPending ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Updating...
-                        </>
-                      ) : (
-                        <>
-                          <i className="fas fa-sync mr-2"></i>
-                          Update Invoice
-                        </>
-                      )}
-                    </Button>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Recalculate invoice with current lumper/stop fees
-                    </p>
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+                    <div className="text-center">
+                      <Button 
+                        onClick={() => updateInvoiceWithNewCharges(selectedLoad.id)}
+                        disabled={updateInvoiceMutation.isPending}
+                        className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                        size="default"
+                      >
+                        {updateInvoiceMutation.isPending ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Updating...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-sync mr-2"></i>
+                            Update Invoice with New Amounts
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <div className="mt-2 text-xs text-blue-700">
+                      <p className="font-semibold">💡 Note:</p>
+                      <p className="mt-1">
+                        Print preview shows current values automatically. Click this button to permanently save changes to the invoice record.
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
