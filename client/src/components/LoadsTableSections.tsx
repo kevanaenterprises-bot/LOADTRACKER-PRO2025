@@ -210,6 +210,7 @@ export function LoadSection({
           <TableHeader>
             <TableRow>
               <TableHead>109 Number</TableHead>
+              <TableHead>Deliver By</TableHead>
               <TableHead data-testid="th-bol-374">BOL (374)</TableHead>
               <TableHead>Invoice #</TableHead>
               {showDriverAssign && <TableHead>Assign Driver</TableHead>}
@@ -232,6 +233,20 @@ export function LoadSection({
                     <div className="text-xs text-gray-500">
                       {new Date(load.createdAt).toLocaleDateString()}
                     </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm font-medium" data-testid={`text-deliver-by-${load.id}`}>
+                    {load.deliveryDueAt ? (
+                      <div>
+                        <div>{new Date(load.deliveryDueAt).toLocaleDateString()}</div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(load.deliveryDueAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 italic">Not set</span>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>

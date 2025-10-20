@@ -419,7 +419,7 @@ export class DatabaseStorage implements IStorage {
         .leftJoin(users, eq(loads.driverId, users.id))
         .leftJoin(locations, eq(loads.locationId, locations.id))
         .leftJoin(invoices, eq(loads.id, invoices.loadId))
-        .orderBy(desc(loads.createdAt));
+        .orderBy(sql`${loads.deliveryDueAt} ASC NULLS LAST, ${loads.createdAt} DESC`);
 
       // Get stops for each load
       const loadsWithStops = await Promise.all(
@@ -816,7 +816,7 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(locations, eq(loads.locationId, locations.id))
       .leftJoin(invoices, eq(loads.id, invoices.loadId))
       .where(whereCondition)
-      .orderBy(desc(loads.updatedAt));
+      .orderBy(sql`${loads.deliveryDueAt} ASC NULLS LAST, ${loads.createdAt} DESC`);
 
     const filteredResults = result.map(row => ({
       ...row.load,
