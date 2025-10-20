@@ -4,6 +4,17 @@
 LoadTracker Pro is a comprehensive logistics management system for transportation companies, streamlining load dispatch, driver coordination, and automated invoicing. It features real-time status tracking, document management, and separate interfaces for office staff and drivers, aiming to significantly improve operational efficiency. The system includes advanced capabilities like GPS-triggered audio tours for drivers, powered by a database of over 222,969 historical markers.
 
 ## Recent Changes
+### October 20, 2025 - Multiple POD Document Support Fix
+- **Critical Bug Fix**: Resolved issue where multiple POD uploads (delivery POD, rate confirmation, lumper receipt) were overwriting each other instead of being stored together
+- **Root Cause**: The `updateLoadPOD` function was performing a simple SET operation that replaced the existing `podDocumentPath` value rather than appending to it
+- **Solution**: Implemented atomic SQL update using CASE expression to safely append comma-separated document paths
+  - First upload: Sets `podDocumentPath` to the new document
+  - Subsequent uploads: Appends with comma separator (e.g., "pod.jpg,rate-conf.pdf,lumper.pdf")
+  - Duplicate prevention: Uses PostgreSQL `position()` function to skip already-uploaded documents
+  - Concurrency-safe: Single SQL statement prevents race conditions from simultaneous uploads
+- **Impact**: All POD documents now properly merge into email attachments; print preview and email functionality fully aligned
+- **Files**: server/storage.ts (updateLoadPOD function)
+
 ### October 17, 2025 - Return to Terminal Feature & Railway Deployment Fix
 - **Return to Terminal IFTA Tracking**: Drivers can now track IFTA miles when returning to the terminal without a load
   - Added checkbox in driver portal that appears only when driver has no active loads
