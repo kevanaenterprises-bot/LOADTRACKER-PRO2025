@@ -4641,6 +4641,69 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`⚠️ No POD available for ${identifierLabel} - invoice only`);
       }
       
+      // ALSO collect BOL documents if available
+      console.log(`🔍 EMAIL DEBUG: Checking BOL for ${identifierLabel}`);
+      console.log(`🔍 Load bolDocumentPath: "${load.bolDocumentPath}"`);
+
+      if (load.bolDocumentPath && load.bolDocumentPath !== 'test-bol-document.pdf') {
+        const allBolSnapshots = await fetchAllPodSnapshotsFromStorage(load.bolDocumentPath);
+        
+        if (allBolSnapshots.length > 0) {
+          console.log(`📧 Using ${allBolSnapshots.length} BOL(s) for email merge`);
+          console.log(`📧 BOL Details:`, allBolSnapshots.map((p, i) => ({
+            index: i + 1,
+            type: p.contentType,
+            source: p.sourcePath,
+            size: `${Math.round(p.size / 1024)}KB`
+          })));
+          
+          // Process all BOL documents similar to POD
+          for (let i = 0; i < allBolSnapshots.length; i++) {
+            const snapshot = allBolSnapshots[i];
+            const bolBuffer = convertPodSnapshotToBuffer(snapshot);
+            
+            console.log(`📧 Processing BOL ${i + 1}/${allBolSnapshots.length}:`, {
+              sourcePath: snapshot.sourcePath,
+              contentType: bolBuffer.type,
+              bufferSize: `${Math.round(bolBuffer.content.length / 1024)}KB`,
+              isImage: bolBuffer.type.startsWith('image/'),
+              isPDF: bolBuffer.type === 'application/pdf'
+            });
+            
+            // Optionally compress images before merging
+            if (bolBuffer.type.startsWith('image/')) {
+              try {
+                const { compressImageForPDF } = await import('./emailService');
+                const compressedBuffer = await compressImageForPDF(bolBuffer.content, bolBuffer.type, 800);
+                podDocuments.push({
+                  content: compressedBuffer,
+                  type: 'image/jpeg'
+                });
+                console.log(`✅ BOL ${i + 1}: Compressed ${bolBuffer.type} (${Math.round(bolBuffer.content.length / 1024)}KB -> ${Math.round(compressedBuffer.length / 1024)}KB)`);
+              } catch (compressionError) {
+                console.error(`❌ Compression failed for BOL ${i + 1}:`, compressionError);
+                console.log(`⚠️ Adding original uncompressed buffer for BOL ${i + 1}`);
+                podDocuments.push(bolBuffer);
+              }
+            } else {
+              // PDF BOLs go in as-is
+              podDocuments.push(bolBuffer);
+              console.log(`✅ BOL ${i + 1}: ${bolBuffer.type} (${Math.round(bolBuffer.content.length / 1024)}KB) - added for merge`);
+            }
+          }
+          
+          console.log(`✅ After adding BOL: Total ${podDocuments.length} document(s) (POD + BOL) for merging:`, {
+            total: podDocuments.length,
+            types: podDocuments.map(p => p.type),
+            totalSize: `${Math.round(podDocuments.reduce((sum, p) => sum + p.content.length, 0) / 1024)}KB`
+          });
+        } else {
+          console.log(`⚠️ No BOL snapshots retrieved for ${identifierLabel}`);
+        }
+      } else {
+        console.log(`⚠️ No BOL document path available for ${identifierLabel}`);
+      }
+      
       // Step 3: Use PDF merge utility to create ONE combined PDF
       let combinedPDF;
       try {
