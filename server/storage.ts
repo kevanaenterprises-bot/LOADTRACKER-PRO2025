@@ -704,9 +704,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateLoadPOD(id: string, podDocumentPath: string): Promise<Load> {
+    // Get current load to check for existing POD documents
+    const [currentLoad] = await db
+      .select()
+      .from(loads)
+      .where(eq(loads.id, id))
+      .limit(1);
+    
+    let finalPodPath = podDocumentPath;
+    
+    // If there's already a POD document path, append with comma separator for multiple documents
+    if (currentLoad?.podDocumentPath && currentLoad.podDocumentPath.trim()) {
+      // Check if this exact document is already in the path (prevent duplicates)
+      const existingPaths = currentLoad.podDocumentPath.split(',').map(p => p.trim());
+      if (!existingPaths.includes(podDocumentPath)) {
+        finalPodPath = `${currentLoad.podDocumentPath},${podDocumentPath}`;
+        console.log(`📎 Appending POD document to existing path. Total documents: ${existingPaths.length + 1}`);
+      } else {
+        console.log(`📎 POD document already exists in path, skipping duplicate`);
+        finalPodPath = currentLoad.podDocumentPath; // Keep existing
+      }
+    } else {
+      console.log(`📎 Setting first POD document for load`);
+    }
+    
     const [updatedLoad] = await db
       .update(loads)
-      .set({ podDocumentPath, updatedAt: new Date() })
+      .set({ podDocumentPath: finalPodPath, updatedAt: new Date() })
       .where(eq(loads.id, id))
       .returning();
     
