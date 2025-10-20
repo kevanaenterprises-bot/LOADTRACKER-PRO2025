@@ -260,6 +260,12 @@ async function buildFinalInvoicePdf(
 ): Promise<Buffer> {
   console.log(`📄 Building final invoice PDF for load ${loadNumber}...`);
   console.log(`📄 POD documents to merge: ${podDocuments.length}`);
+  console.log(`📄 POD types to merge:`, podDocuments.map((p, i) => ({
+    index: i + 1,
+    type: p.type,
+    size: `${Math.round(p.content.length / 1024)}KB`,
+    isValidBuffer: Buffer.isBuffer(p.content) && p.content.length > 0
+  })));
   
   try {
     // Step 1: Generate invoice PDF from HTML (existing flow)
@@ -269,10 +275,11 @@ async function buildFinalInvoicePdf(
     
     // Step 2: Load invoice PDF with pdf-lib
     const pdfDoc = await PDFDocument.load(invoicePdfBuffer);
-    console.log(`✅ Invoice PDF loaded into pdf-lib`);
+    console.log(`✅ Invoice PDF loaded into pdf-lib, starting with ${pdfDoc.getPageCount()} page(s)`);
     
     // Step 3: Process each POD document with error isolation
     const failedPods: string[] = [];
+    const successfulPods: string[] = [];
     
     for (let i = 0; i < podDocuments.length; i++) {
       const pod = podDocuments[i];
@@ -285,6 +292,7 @@ async function buildFinalInvoicePdf(
           const copiedPages = await pdfDoc.copyPages(podPdfDoc, podPdfDoc.getPageIndices());
           copiedPages.forEach(page => pdfDoc.addPage(page));
           console.log(`✅ PDF POD ${i + 1}: Added ${copiedPages.length} pages`);
+          successfulPods.push(`POD ${i + 1} (${pod.type}, ${copiedPages.length} pages)`);
         } else if (pod.type.startsWith('image/')) {
           // For image PODs: Embed as new pages
           let image;
@@ -328,20 +336,37 @@ async function buildFinalInvoicePdf(
           });
           
           console.log(`✅ Image POD ${i + 1}: Embedded as new page`);
+          successfulPods.push(`POD ${i + 1} (${pod.type})`);
         }
       } catch (podError) {
         // Isolate POD errors - log and continue with other PODs
         const errorMsg = `POD ${i + 1} (${pod.type})`;
         failedPods.push(errorMsg);
         console.error(`❌ Failed to process ${errorMsg}:`, podError);
+        console.error(`❌ Error details:`, {
+          name: podError instanceof Error ? podError.name : 'Unknown',
+          message: podError instanceof Error ? podError.message : String(podError),
+          stack: podError instanceof Error ? podError.stack?.split('\n').slice(0, 3).join('\n') : undefined
+        });
         console.log(`⚠️ Continuing with remaining PODs...`);
       }
     }
     
-    // Log summary of failed PODs if any
+    // Log summary of POD processing
+    console.log(`📊 POD Processing Summary:`, {
+      total: podDocuments.length,
+      successful: successfulPods.length,
+      failed: failedPods.length,
+      finalPageCount: pdfDoc.getPageCount()
+    });
+    
+    if (successfulPods.length > 0) {
+      console.log(`✅ Successfully merged: ${successfulPods.join(', ')}`);
+    }
+    
     if (failedPods.length > 0) {
-      console.warn(`⚠️ ${failedPods.length} POD(s) failed to merge: ${failedPods.join(', ')}`);
-      console.log(`📄 Invoice PDF will still be sent with ${podDocuments.length - failedPods.length} successful POD(s)`);
+      console.warn(`❌ Failed to merge: ${failedPods.join(', ')}`);
+      console.log(`📄 Invoice PDF will still be sent with ${successfulPods.length} successful POD(s)`);
     }
     
     // Step 4: Save and return final combined PDF
@@ -4565,11 +4590,25 @@ Reply YES to confirm acceptance or NO to decline.`
       
       if (allPodSnapshots.length > 0) {
         console.log(`📧 Using ${allPodSnapshots.length} POD(s) for email merge`);
+        console.log(`📧 POD Details:`, allPodSnapshots.map((p, i) => ({
+          index: i + 1,
+          type: p.contentType,
+          source: p.sourcePath,
+          size: `${Math.round(p.size / 1024)}KB`
+        })));
         
         // Collect ALL PODs (images and PDFs) - they'll all be merged into ONE PDF
         for (let i = 0; i < allPodSnapshots.length; i++) {
           const snapshot = allPodSnapshots[i];
           const podBuffer = convertPodSnapshotToBuffer(snapshot);
+          
+          console.log(`📧 Processing POD ${i + 1}/${allPodSnapshots.length}:`, {
+            sourcePath: snapshot.sourcePath,
+            contentType: podBuffer.type,
+            bufferSize: `${Math.round(podBuffer.content.length / 1024)}KB`,
+            isImage: podBuffer.type.startsWith('image/'),
+            isPDF: podBuffer.type === 'application/pdf'
+          });
           
           // Optionally compress images before merging
           if (podBuffer.type.startsWith('image/')) {
@@ -4580,19 +4619,24 @@ Reply YES to confirm acceptance or NO to decline.`
                 content: compressedBuffer,
                 type: 'image/jpeg'
               });
-              console.log(`📧 POD ${i + 1}: Compressed ${podBuffer.type} (${Math.round(podBuffer.content.length / 1024)}KB -> ${Math.round(compressedBuffer.length / 1024)}KB)`);
+              console.log(`✅ POD ${i + 1}: Compressed ${podBuffer.type} (${Math.round(podBuffer.content.length / 1024)}KB -> ${Math.round(compressedBuffer.length / 1024)}KB)`);
             } catch (compressionError) {
-              console.error(`⚠️ Compression failed for POD ${i + 1}, using original`);
+              console.error(`❌ Compression failed for POD ${i + 1}:`, compressionError);
+              console.log(`⚠️ Adding original uncompressed buffer for POD ${i + 1}`);
               podDocuments.push(podBuffer);
             }
           } else {
             // PDF PODs go in as-is
             podDocuments.push(podBuffer);
-            console.log(`📧 POD ${i + 1}: ${podBuffer.type} (${Math.round(podBuffer.content.length / 1024)}KB) - will merge`);
+            console.log(`✅ POD ${i + 1}: ${podBuffer.type} (${Math.round(podBuffer.content.length / 1024)}KB) - added for merge`);
           }
         }
         
-        console.log(`✅ Collected ${podDocuments.length} POD document(s) for merging`);
+        console.log(`✅ Collected ${podDocuments.length} POD document(s) for merging:`, {
+          total: podDocuments.length,
+          types: podDocuments.map(p => p.type),
+          totalSize: `${Math.round(podDocuments.reduce((sum, p) => sum + p.content.length, 0) / 1024)}KB`
+        });
       } else {
         console.log(`⚠️ No POD available for ${identifierLabel} - invoice only`);
       }
