@@ -704,35 +704,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateLoadPOD(id: string, podDocumentPath: string): Promise<Load> {
-    // Get current load to check for existing POD documents
-    const [currentLoad] = await db
-      .select()
-      .from(loads)
-      .where(eq(loads.id, id))
-      .limit(1);
-    
-    let finalPodPath = podDocumentPath;
-    
-    // If there's already a POD document path, append with comma separator for multiple documents
-    if (currentLoad?.podDocumentPath && currentLoad.podDocumentPath.trim()) {
-      // Check if this exact document is already in the path (prevent duplicates)
-      const existingPaths = currentLoad.podDocumentPath.split(',').map(p => p.trim());
-      if (!existingPaths.includes(podDocumentPath)) {
-        finalPodPath = `${currentLoad.podDocumentPath},${podDocumentPath}`;
-        console.log(`📎 Appending POD document to existing path. Total documents: ${existingPaths.length + 1}`);
-      } else {
-        console.log(`📎 POD document already exists in path, skipping duplicate`);
-        finalPodPath = currentLoad.podDocumentPath; // Keep existing
-      }
-    } else {
-      console.log(`📎 Setting first POD document for load`);
-    }
-    
+    // Atomic update using SQL CASE expression to append or set POD path
+    // This prevents race conditions from concurrent uploads
     const [updatedLoad] = await db
       .update(loads)
-      .set({ podDocumentPath: finalPodPath, updatedAt: new Date() })
+      .set({ 
+        podDocumentPath: sql`
+          CASE 
+            WHEN ${loads.podDocumentPath} IS NULL OR ${loads.podDocumentPath} = '' THEN ${podDocumentPath}
+            WHEN position(${podDocumentPath} in ${loads.podDocumentPath}) > 0 THEN ${loads.podDocumentPath}
+            ELSE ${loads.podDocumentPath} || ',' || ${podDocumentPath}
+          END
+        `,
+        updatedAt: new Date() 
+      })
       .where(eq(loads.id, id))
       .returning();
+    
+    console.log(`📎 POD document updated for load. Final path: ${updatedLoad.podDocumentPath}`);
     
     return updatedLoad;
   }
