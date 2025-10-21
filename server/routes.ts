@@ -5162,6 +5162,143 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // FIX: Regenerate invoice POD snapshots from GCS (for invoices created before GCS was configured)
+  app.post("/api/invoices/:invoiceNumber/regenerate-pods", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { invoiceNumber } = req.params;
+      console.log(`🔄 REGENERATING POD snapshots for invoice: ${invoiceNumber}`);
+      
+      // Get the invoice
+      const invoice = await storage.getInvoice(invoiceNumber);
+      if (!invoice) {
+        return res.status(404).json({ message: `Invoice ${invoiceNumber} not found` });
+      }
+      
+      // Get the associated load
+      const allLoads = await storage.getLoads();
+      const load = allLoads.find(l => l.id === invoice.loadId);
+      if (!load) {
+        return res.status(404).json({ message: `Load not found for invoice ${invoiceNumber}` });
+      }
+      
+      console.log(`🔍 Load ${load.number109} has podDocumentPath: ${load.podDocumentPath || 'NONE'}`);
+      console.log(`🔍 Load ${load.number109} has bolDocumentPath: ${load.bolDocumentPath || 'NONE'}`);
+      
+      // Collect ALL document paths (PODs, BOL, rate confirmation, lumper receipt)
+      const allDocumentPaths: string[] = [];
+      
+      if (load.podDocumentPath && load.podDocumentPath !== 'test-pod-document.pdf') {
+        const podPaths = load.podDocumentPath.includes(',') 
+          ? load.podDocumentPath.split(',').map(p => p.trim())
+          : [load.podDocumentPath];
+        allDocumentPaths.push(...podPaths);
+      }
+      
+      if (load.bolDocumentPath && load.bolDocumentPath !== 'test-bol-document.pdf') {
+        const bolPaths = load.bolDocumentPath.includes(',')
+          ? load.bolDocumentPath.split(',').map(p => p.trim())
+          : [load.bolDocumentPath];
+        allDocumentPaths.push(...bolPaths);
+      }
+      
+      if (allDocumentPaths.length === 0) {
+        return res.status(400).json({ 
+          message: `No documents found for load ${load.number109}`,
+          loadNumber: load.number109,
+          podPath: load.podDocumentPath,
+          bolPath: load.bolDocumentPath
+        });
+      }
+      
+      console.log(`📄 Fetching ${allDocumentPaths.length} document(s) from GCS:`, allDocumentPaths);
+      
+      // Fetch ALL documents from GCS
+      const allSnapshots = [];
+      const objectStorageService = new ObjectStorageService();
+      
+      for (let i = 0; i < allDocumentPaths.length; i++) {
+        const docPath = allDocumentPaths[i];
+        console.log(`📄 Processing document ${i + 1}/${allDocumentPaths.length}: ${docPath}`);
+        
+        try {
+          const normalizedPath = objectStorageService.normalizeObjectEntityPath(docPath);
+          const docFile = await objectStorageService.getObjectEntityFile(normalizedPath);
+          const [metadata] = await docFile.getMetadata();
+          
+          // Read file content
+          const chunks: Buffer[] = [];
+          const stream = docFile.createReadStream();
+          
+          await new Promise<void>((resolve, reject) => {
+            stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+            stream.on('error', reject);
+            stream.on('end', resolve);
+          });
+          
+          const buffer = Buffer.concat(chunks);
+          const contentBase64 = buffer.toString('base64');
+          
+          allSnapshots.push({
+            contentBase64,
+            contentType: metadata.contentType || 'application/octet-stream',
+            size: parseInt(String(metadata.size || '0')),
+            sourcePath: docPath,
+            attachedAt: new Date().toISOString()
+          });
+          
+          console.log(`✅ Document ${i + 1}: ${docPath} (${metadata.contentType}, ${metadata.size} bytes)`);
+          
+        } catch (docError) {
+          console.error(`❌ Failed to fetch document ${docPath}:`, docError);
+          // Continue with other documents
+        }
+      }
+      
+      if (allSnapshots.length === 0) {
+        return res.status(500).json({ 
+          message: `Failed to fetch any documents from GCS for load ${load.number109}`,
+          attemptedPaths: allDocumentPaths
+        });
+      }
+      
+      console.log(`✅ Fetched ${allSnapshots.length} document(s) from GCS`);
+      
+      // Update invoice with fresh POD snapshots
+      const updatedInvoice = await storage.updateInvoice(invoiceNumber, {
+        podSnapshot: allSnapshots as any
+      });
+      
+      console.log(`✅ Invoice ${invoiceNumber} updated with ${allSnapshots.length} document snapshot(s)`);
+      
+      res.json({
+        message: "Invoice POD snapshots regenerated successfully",
+        invoiceNumber,
+        loadNumber: load.number109,
+        documentsProcessed: allSnapshots.length,
+        documentDetails: allSnapshots.map((s, i) => ({
+          index: i + 1,
+          type: s.contentType,
+          size: `${Math.round(s.size / 1024)}KB`,
+          source: s.sourcePath
+        }))
+      });
+      
+    } catch (error) {
+      console.error("❌ POD regeneration failed:", error);
+      res.status(500).json({ 
+        message: "Failed to regenerate POD snapshots", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
   // CENTRALIZED AUTO-INVOICE FUNCTION - Used by both POD upload routes
   async function ensureAutoInvoice(load: any): Promise<void> {
     if (!['delivered', 'completed', 'awaiting_invoicing'].includes(load.status)) {
