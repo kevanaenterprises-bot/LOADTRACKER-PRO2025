@@ -8204,6 +8204,95 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   app.post("/api/tracking/eta", isAuthenticated, calculateETA);
   app.get("/api/tracking/status/:loadId", isAuthenticated, getLoadTrackingStatus);
 
+  // HERE Tracking API Webhook - Automatic geofence entry/exit notifications
+  // NOTE: No authentication required - this endpoint receives webhooks from HERE servers
+  app.post("/api/tracking-webhook", async (req, res) => {
+    try {
+      const event = req.body;
+      console.log('📬 Received HERE Tracking webhook:', JSON.stringify(event, null, 2));
+
+      // HERE Tracking sends events like:
+      // { type: 'geofence.entry', deviceId: 'load_123', geofenceId: 'geofence_456', timestamp: '...' }
+      // { type: 'geofence.exit', deviceId: 'load_123', geofenceId: 'geofence_456', timestamp: '...' }
+
+      const { type, deviceId, geofenceId, timestamp } = event;
+      
+      if (!type || !deviceId || !geofenceId) {
+        console.warn('⚠️ Invalid webhook payload - missing required fields');
+        return res.status(400).json({ message: 'Invalid webhook payload' });
+      }
+
+      // Extract load ID from device ID (format: load_{loadId})
+      const loadId = deviceId.replace('load_', '');
+      
+      // Get the load to check which geofence was triggered
+      const [load] = await db.select().from(loads).where(eq(loads.id, loadId)).limit(1);
+      
+      if (!load) {
+        console.warn(`⚠️ Load not found for device: ${deviceId}`);
+        return res.status(404).json({ message: 'Load not found' });
+      }
+
+      const eventTime = new Date(timestamp || Date.now());
+      const isEntry = type === 'geofence.entry';
+      const isExit = type === 'geofence.exit';
+
+      // Determine which location (shipper or receiver) based on geofence ID
+      const isShipperGeofence = geofenceId === load.shipperGeofenceId;
+      const isReceiverGeofence = geofenceId === load.receiverGeofenceId;
+
+      if (isShipperGeofence) {
+        if (isEntry && !load.shipperInTime) {
+          // Driver arrived at shipper
+          await db.update(loads)
+            .set({ 
+              shipperInTime: eventTime,
+              status: 'at_shipper',
+              updatedAt: new Date()
+            })
+            .where(eq(loads.id, loadId));
+          console.log(`✅ Load ${load.number109}: Driver ARRIVED at shipper at ${eventTime.toISOString()}`);
+        } else if (isExit && load.shipperInTime && !load.shipperOutTime) {
+          // Driver left shipper
+          await db.update(loads)
+            .set({ 
+              shipperOutTime: eventTime,
+              status: 'left_shipper',
+              updatedAt: new Date()
+            })
+            .where(eq(loads.id, loadId));
+          console.log(`✅ Load ${load.number109}: Driver LEFT shipper at ${eventTime.toISOString()}`);
+        }
+      } else if (isReceiverGeofence) {
+        if (isEntry && !load.receiverInTime) {
+          // Driver arrived at receiver
+          await db.update(loads)
+            .set({ 
+              receiverInTime: eventTime,
+              status: 'at_receiver',
+              updatedAt: new Date()
+            })
+            .where(eq(loads.id, loadId));
+          console.log(`✅ Load ${load.number109}: Driver ARRIVED at receiver at ${eventTime.toISOString()}`);
+        } else if (isExit && load.receiverInTime && !load.receiverOutTime) {
+          // Driver left receiver
+          await db.update(loads)
+            .set({ 
+              receiverOutTime: eventTime,
+              updatedAt: new Date()
+            })
+            .where(eq(loads.id, loadId));
+          console.log(`✅ Load ${load.number109}: Driver LEFT receiver at ${eventTime.toISOString()}`);
+        }
+      }
+
+      res.status(200).json({ message: 'Webhook processed successfully' });
+    } catch (error: any) {
+      console.error('❌ Webhook processing failed:', error);
+      res.status(500).json({ message: 'Webhook processing failed', error: error.message });
+    }
+  });
+
   // Historical Marker Road Tour API Routes
   // Get nearby historical markers based on GPS coordinates
   app.get("/api/road-tour/nearby", (req, res, next) => {
