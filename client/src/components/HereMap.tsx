@@ -369,21 +369,42 @@ export default function HereMap() {
         fetchWeather(lat, lng, load.id);
       }
 
-      // Create truck marker
+      // Create truck marker with driver name label
+      const driverInitials = load.driver 
+        ? `${load.driver.firstName.charAt(0)}${load.driver.lastName.charAt(0)}`
+        : '?';
+      const driverName = load.driver 
+        ? `${load.driver.firstName} ${load.driver.lastName}`
+        : 'Unknown Driver';
+      
       const truckIcon = new H.map.DomIcon(`
-        <div style="
-          background-color: ${getStatusColor(load.status)};
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          border: 3px solid white;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 14px;
-        ">
-          🚛
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+          <div style="
+            background-color: ${getStatusColor(load.status)};
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+          ">
+            🚛
+          </div>
+          <div style="
+            background-color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1f2937;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            white-space: nowrap;
+          ">
+            ${driverName}
+          </div>
         </div>
       `);
 

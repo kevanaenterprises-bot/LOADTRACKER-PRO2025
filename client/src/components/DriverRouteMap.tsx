@@ -97,8 +97,27 @@ export default function DriverRouteMap({ load, currentLat, currentLng }: DriverR
       const platform = new window.H.service.Platform({ apikey: apiKey });
       const defaultLayers = platform.createDefaultLayers();
       
-      const centerLat = currentLat || parseFloat(load.receiverLatitude || '33.0');
-      const centerLng = currentLng || parseFloat(load.receiverLongitude || '-97.0');
+      // IMPORTANT: Prioritize current GPS location, then destination, then default
+      // This ensures driver always sees their current location first
+      let centerLat: number;
+      let centerLng: number;
+      
+      if (currentLat && currentLng) {
+        // Use driver's current GPS location (highest priority)
+        centerLat = currentLat;
+        centerLng = currentLng;
+        console.log('📍 Centering map on driver GPS location:', centerLat, centerLng);
+      } else if (load.receiverLatitude && load.receiverLongitude) {
+        // Fallback to destination
+        centerLat = parseFloat(load.receiverLatitude);
+        centerLng = parseFloat(load.receiverLongitude);
+        console.log('📍 Centering map on destination:', centerLat, centerLng);
+      } else {
+        // Last resort default (center of US)
+        centerLat = 39.8283;
+        centerLng = -98.5795;
+        console.log('⚠️ No GPS or destination, using default center');
+      }
 
       const map = new window.H.Map(
         mapRef.current,
@@ -208,12 +227,26 @@ export default function DriverRouteMap({ load, currentLat, currentLng }: DriverR
           const group = new H.map.Group();
           group.addObject(new H.map.Marker({ lat: currentLat, lng: currentLng }));
           group.addObject(new H.map.Marker({ lat: destLat, lng: destLng }));
-          map.getViewModel().setLookAtData({ bounds: group.getBounds() }, true);
+          
+          // Smoothly animate to show both current location and destination
+          map.getViewModel().setLookAtData({ 
+            bounds: group.getBounds(),
+            zoom: 10
+          }, true);
+          
+          console.log('📍 Map centered on route: Current location to destination');
         } else {
+          // No GPS yet - just show destination
           map.setCenter({ lat: destLat, lng: destLng });
           map.setZoom(12);
+          console.log('📍 Map centered on destination (no GPS yet)');
         }
       }
+    } else if (currentLat && currentLng) {
+      // No destination but have GPS - center on current location
+      map.setCenter({ lat: currentLat, lng: currentLng });
+      map.setZoom(13);
+      console.log('📍 Map centered on current GPS location (no destination)');
     }
   }, [load, currentLat, currentLng]);
 
