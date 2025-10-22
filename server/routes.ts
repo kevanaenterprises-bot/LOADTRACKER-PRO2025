@@ -7186,20 +7186,31 @@ Reply YES to confirm acceptance or NO to decline.`
 
   // Load tracking endpoint for real-time map
   app.get("/api/tracking/loads", (req, res, next) => {
-    // Allow admin, Replit auth, or driver auth for tracking data
-    if ((req.session as any)?.adminAuth || req.user || (req.session as any)?.driverAuth) {
+    // Allow admin, Replit auth, driver auth, OR bypass for tracking data
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || isBypassActive(req);
+    if (hasAuth) {
       next();
     } else {
       res.status(401).json({ message: "Authentication required" });
     }
   }, async (req, res) => {
-    console.log("Tracking endpoint reached");
+    console.log("📍 Tracking endpoint reached - fetching active loads with GPS data");
     try {
       const trackingLoads = await storage.getLoadsWithTracking();
-      console.log("Found tracking loads:", trackingLoads.length);
+      console.log(`📍 Found ${trackingLoads.length} loads with tracking enabled`);
+      
+      // Log which loads have GPS data
+      trackingLoads.forEach(load => {
+        if (load.currentLatitude && load.currentLongitude) {
+          console.log(`  ✅ Load ${load.number109}: GPS at ${load.currentLatitude}, ${load.currentLongitude}`);
+        } else {
+          console.log(`  ⚠️ Load ${load.number109}: No GPS data yet`);
+        }
+      });
+      
       res.json(trackingLoads);
     } catch (error) {
-      console.error("Error fetching tracking loads:", error);
+      console.error("❌ Error fetching tracking loads:", error);
       res.status(500).json({ message: "Failed to fetch tracking data" });
     }
   });
