@@ -5324,17 +5324,42 @@ Reply YES to confirm acceptance or NO to decline.`
       const invoiceNumber = await storage.getNextInvoiceNumber();
       const now = new Date();
       
+      // FIXED: Look up rate from rates table based on location (like backfill does)
+      let flatRate = 0;
+      if (load.tripRate && parseFloat(load.tripRate.toString()) > 0) {
+        // Use tripRate if specified on the load
+        flatRate = parseFloat(load.tripRate.toString());
+        console.log(`💰 Using tripRate from load: $${flatRate}`);
+      } else if (load.location?.city && load.location?.state) {
+        // Look up rate from rates table based on delivery location
+        const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+        if (rate) {
+          flatRate = parseFloat(rate.flatRate.toString());
+          console.log(`💰 Looked up rate for ${load.location.city}, ${load.location.state}: $${flatRate}`);
+        } else {
+          console.log(`⚠️ No rate found for ${load.location.city}, ${load.location.state} - using $0`);
+        }
+      } else {
+        console.log(`⚠️ No location data on load ${load.number109} - cannot look up rate`);
+      }
+      
+      const lumperCharge = parseFloat(load.lumperCharge?.toString() || '0');
+      const extraStopsCharge = parseFloat(load.extraStops?.toString() || '0');
+      const totalAmount = flatRate + lumperCharge + extraStopsCharge;
+      
+      console.log(`💰 Invoice totals: flatRate=$${flatRate}, lumper=$${lumperCharge}, extra=$${extraStopsCharge}, total=$${totalAmount}`);
+      
       // Prepare invoice data
       const invoiceData: any = {
         loadId: load.id,
         invoiceNumber,
         status: 'pending',
-        lumperCharge: load.lumperCharge || '0.00',
-        flatRate: load.flatRate || '0.00',
+        lumperCharge: lumperCharge.toFixed(2),
+        flatRate: flatRate.toFixed(2),
         customerId: null, // Will be populated from load data
-        extraStopsCharge: load.extraStops || '0.00',
+        extraStopsCharge: extraStopsCharge.toFixed(2),
         extraStopsCount: 0, // Default value
-        totalAmount: load.flatRate || '0.00', // Use flat rate as default
+        totalAmount: totalAmount.toFixed(2),
         printedAt: null
       };
 
