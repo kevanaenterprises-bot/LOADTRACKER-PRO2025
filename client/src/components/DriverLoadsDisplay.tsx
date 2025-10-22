@@ -363,8 +363,8 @@ export default function DriverLoadsDisplay({ driverId }: DriverLoadsDisplayProps
               <div className="mb-4">
                 <DriverRouteMap 
                   load={selectedLoad}
-                  currentLat={selectedLoad.lastKnownLat}
-                  currentLng={selectedLoad.lastKnownLng}
+                  currentLat={selectedLoad.currentLatitude ? parseFloat(selectedLoad.currentLatitude) : undefined}
+                  currentLng={selectedLoad.currentLongitude ? parseFloat(selectedLoad.currentLongitude) : undefined}
                 />
               </div>
             )}

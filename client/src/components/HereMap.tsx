@@ -511,7 +511,7 @@ export default function HereMap() {
     } else {
       console.warn('⚠️ No valid GPS coordinates found - map not centered');
     }
-  }, [loads, showWeather, weather]);
+  }, [loads, showWeather]); // Removed 'weather' - it shouldn't trigger marker re-rendering
 
   // Fetch fuel prices when enabled
   useEffect(() => {
