@@ -240,6 +240,99 @@ export default function HereMap() {
     return statusMap[status] || status;
   };
 
+  // Calculate and display truck route using HERE Routing API v8
+  const calculateTruckRoute = async (loadId: string, fromLat: number, fromLng: number, toLat: number, toLng: number, map: any, H: any) => {
+    const apiKey = import.meta.env.VITE_HERE_MAPS_API_KEY;
+    const load = loads?.find(l => l.id === loadId);
+    const routeColor = load ? getStatusColor(load.status) : '#3b82f6';
+
+    // Helper to draw fallback straight line
+    const drawFallbackLine = (reason: string) => {
+      console.log(`⚠️ Using fallback route for load ${loadId}: ${reason}`);
+      const lineString = new H.geo.LineString();
+      lineString.pushPoint({ lat: fromLat, lng: fromLng });
+      lineString.pushPoint({ lat: toLat, lng: toLng });
+      
+      const fallbackLine = new H.map.Polyline(lineString, {
+        style: {
+          strokeColor: routeColor,
+          lineWidth: 3,
+          lineDash: [5, 10]
+        }
+      });
+      
+      map.addObject(fallbackLine);
+      markersRef.current.set(`route-${loadId}`, fallbackLine);
+    };
+
+    // No API key - use fallback
+    if (!apiKey) {
+      drawFallbackLine('No HERE Maps API key configured');
+      return;
+    }
+
+    try {
+      // HERE Routing API v8 for truck routing
+      const url = 'https://router.hereapi.com/v8/routes';
+      const params = new URLSearchParams({
+        apikey: apiKey,
+        transportMode: 'truck',
+        origin: `${fromLat},${fromLng}`,
+        destination: `${toLat},${toLng}`,
+        return: 'polyline,summary'
+      });
+
+      const response = await fetch(`${url}?${params}`);
+      
+      // Check if response is OK
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error(`HERE Routing API error ${response.status}:`, errorData);
+        drawFallbackLine(`API returned ${response.status}`);
+        return;
+      }
+
+      const data = await response.json();
+
+      // Check if we got valid route data
+      if (!data.routes || data.routes.length === 0) {
+        console.warn(`No routes returned for load ${loadId}`);
+        drawFallbackLine('No routes found');
+        return;
+      }
+
+      const route = data.routes[0];
+      const section = route.sections[0];
+      
+      // Validate section has polyline
+      if (!section || !section.polyline) {
+        drawFallbackLine('Invalid route data');
+        return;
+      }
+      
+      // Decode the flexible polyline
+      const lineString = H.geo.LineString.fromFlexiblePolyline(section.polyline);
+      
+      // Create polyline for the route
+      const routeLine = new H.map.Polyline(lineString, {
+        style: {
+          strokeColor: routeColor,
+          lineWidth: 4,
+          lineDash: [0, 0] // Solid line for actual route
+        }
+      });
+
+      map.addObject(routeLine);
+      markersRef.current.set(`route-${loadId}`, routeLine);
+      
+      const miles = section.summary?.length ? (section.summary.length / 1609.34).toFixed(1) : '?';
+      console.log(`🛣️ Calculated truck route for load ${loadId}: ${miles} miles`);
+    } catch (error) {
+      console.error(`Failed to calculate route for load ${loadId}:`, error);
+      drawFallbackLine('Network or parsing error');
+    }
+  };
+
   // Update markers when loads change
   useEffect(() => {
     if (!mapInstanceRef.current || !loads || !window.H) return;
@@ -355,22 +448,9 @@ export default function HereMap() {
           map.addObject(destMarker);
           markersRef.current.set(`dest-${load.id}`, destMarker);
 
-          // Draw route line
+          // Calculate and draw actual truck route using HERE Routing API
           if (['in_transit', 'confirmed', 'en_route_pickup', 'at_shipper', 'left_shipper', 'en_route_receiver'].includes(load.status)) {
-            const lineString = new H.geo.LineString();
-            lineString.pushPoint({ lat, lng });
-            lineString.pushPoint({ lat: destLat, lng: destLng });
-
-            const polyline = new H.map.Polyline(lineString, {
-              style: {
-                strokeColor: getStatusColor(load.status),
-                lineWidth: 3,
-                lineDash: [5, 10]
-              }
-            });
-
-            map.addObject(polyline);
-            markersRef.current.set(`line-${load.id}`, polyline);
+            calculateTruckRoute(load.id, lat, lng, destLat, destLng, map, H);
           }
         }
       }

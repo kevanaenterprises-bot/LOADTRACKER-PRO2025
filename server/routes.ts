@@ -4942,97 +4942,11 @@ Reply YES to confirm acceptance or NO to decline.`
         lastLocationUpdate: new Date()
       });
 
-      // Check geofences and update status automatically (with hysteresis to prevent jitter)
-      const events = [];
-      let statusChanged = false;
-      let newStatus = load.status;
-      const updates: any = {}; // Collect all updates for atomic write
-
-      // Only check geofences for active loads
-      if (['confirmed', 'en_route_pickup', 'at_shipper', 'left_shipper', 'en_route_receiver', 'in_transit'].includes(load.status)) {
-        const { HERETrackingService } = await import('./services/hereTracking');
-        const trackingService = new HERETrackingService();
-
-        // Create geofences if we have shipper and receiver coordinates
-        if (load.shipperLatitude && load.shipperLongitude && load.receiverLatitude && load.receiverLongitude) {
-          const pickupLocation = {
-            lat: parseFloat(load.shipperLatitude),
-            lng: parseFloat(load.shipperLongitude)
-          };
-          const deliveryLocation = {
-            lat: parseFloat(load.receiverLatitude),
-            lng: parseFloat(load.receiverLongitude)
-          };
-
-          const { pickupGeofence, deliveryGeofence } = await trackingService.createGeofences(
-            loadId,
-            pickupLocation,
-            deliveryLocation
-          );
-
-          const currentLocation = { lat: parseFloat(latitude.toString()), lng: parseFloat(longitude.toString()) };
-
-          // Check pickup geofence
-          const atPickup = trackingService.checkGeofenceEntry(currentLocation, pickupGeofence);
-          // Check delivery geofence
-          const atDelivery = trackingService.checkGeofenceEntry(currentLocation, deliveryGeofence);
-
-          // Status transitions based on geofence and current status (with edge detection)
-          // Only transition if we're NOT already in that state (prevents redundant updates)
-          if (atPickup && ['confirmed', 'en_route_pickup'].includes(load.status) && !load.shipperInTime) {
-            // Arrived at shipper (first time - check that shipperInTime is not set)
-            newStatus = 'at_shipper';
-            statusChanged = true;
-            events.push({ type: 'arrival', location: 'shipper', time: new Date() });
-            console.log(`🚛 Load ${load.number109} arrived at shipper (first time)`);
-            
-            // Update status and stamp in time
-            updates.status = newStatus;
-            updates.shipperInTime = new Date();
-          } else if (!atPickup && load.status === 'at_shipper' && !load.shipperOutTime) {
-            // Left shipper (first time - check that shipperOutTime is not set)
-            newStatus = 'left_shipper';
-            statusChanged = true;
-            events.push({ type: 'departure', location: 'shipper', time: new Date() });
-            console.log(`🚛 Load ${load.number109} left shipper (first time)`);
-            
-            // Update status and stamp out time
-            updates.status = newStatus;
-            updates.shipperOutTime = new Date();
-          } else if (atDelivery && ['left_shipper', 'en_route_receiver', 'in_transit'].includes(load.status) && !load.receiverInTime) {
-            // Arrived at receiver (first time - check that receiverInTime is not set)
-            newStatus = 'at_receiver';
-            statusChanged = true;
-            events.push({ type: 'arrival', location: 'receiver', time: new Date() });
-            console.log(`🚛 Load ${load.number109} arrived at receiver (first time)`);
-            
-            // Update status and stamp in time
-            updates.status = newStatus;
-            updates.receiverInTime = new Date();
-          } else if (!atDelivery && load.status === 'at_receiver' && !load.receiverOutTime) {
-            // Left receiver (first time - check that receiverOutTime is not set)
-            console.log(`🚛 Load ${load.number109} left receiver (waiting for POD to mark delivered)`);
-            
-            // Stamp out time only
-            updates.receiverOutTime = new Date();
-          }
-
-          // Apply all updates atomically if any transitions occurred
-          if (Object.keys(updates).length > 0) {
-            await storage.updateLoad(loadId, updates);
-            console.log(`📍 Applied atomic update to load ${load.number109}:`, updates);
-          }
-        }
-      }
-
       res.json({ 
         message: "Location updated successfully",
         loadId,
         latitude,
-        longitude,
-        statusChanged,
-        newStatus,
-        events
+        longitude
       });
 
     } catch (error) {
