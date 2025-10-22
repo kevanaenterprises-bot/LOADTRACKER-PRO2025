@@ -252,6 +252,9 @@ export default function HereMap() {
     markersRef.current.forEach(marker => map.removeObject(marker));
     markersRef.current.clear();
 
+    // Track valid coordinates for bounds calculation
+    const validCoords: { lat: number; lng: number }[] = [];
+
     // Add markers for active loads
     loads.forEach(load => {
       if (!load.currentLatitude || !load.currentLongitude) return;
@@ -260,7 +263,13 @@ export default function HereMap() {
       const lng = parseFloat(load.currentLongitude);
 
       // Skip invalid or null island (0, 0) coordinates
-      if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) return;
+      if (isNaN(lat) || isNaN(lng) || (lat === 0 && lng === 0)) {
+        console.warn(`Skipping invalid coordinates for load ${load.number109}: ${lat}, ${lng}`);
+        return;
+      }
+
+      // Add to valid coords
+      validCoords.push({ lat, lng });
 
       // Fetch weather if enabled
       if (showWeather) {
@@ -323,6 +332,8 @@ export default function HereMap() {
         const destLng = parseFloat(load.receiverLongitude);
 
         if (!isNaN(destLat) && !isNaN(destLng)) {
+          validCoords.push({ lat: destLat, lng: destLng });
+
           const destIcon = new H.map.DomIcon(`
             <div style="
               background-color: #ef4444;
@@ -365,17 +376,39 @@ export default function HereMap() {
       }
     });
 
-    // Auto-fit bounds
-    if (markersRef.current.size > 0) {
-      const markers = Array.from(markersRef.current.values()).filter(m => m instanceof H.map.DomMarker);
-      if (markers.length > 0) {
-        let bounds = new H.geo.Rect(90, 180, -90, -180);
-        markers.forEach(marker => {
-          const pos = marker.getGeometry();
-          bounds = bounds.mergePoint(pos);
-        });
-        map.getViewModel().setLookAtData({ bounds }, true);
-      }
+    // Auto-fit bounds ONLY if we have valid coordinates
+    if (validCoords.length > 0) {
+      console.log(`📍 Fitting map to ${validCoords.length} valid coordinate(s)`);
+      
+      // Calculate proper bounding box from valid coordinates
+      let minLat = validCoords[0].lat;
+      let maxLat = validCoords[0].lat;
+      let minLng = validCoords[0].lng;
+      let maxLng = validCoords[0].lng;
+
+      validCoords.forEach(coord => {
+        minLat = Math.min(minLat, coord.lat);
+        maxLat = Math.max(maxLat, coord.lat);
+        minLng = Math.min(minLng, coord.lng);
+        maxLng = Math.max(maxLng, coord.lng);
+      });
+
+      // Add padding to bounds (10%)
+      const latPadding = (maxLat - minLat) * 0.1 || 0.1;
+      const lngPadding = (maxLng - minLng) * 0.1 || 0.1;
+
+      const bounds = new H.geo.Rect(
+        maxLat + latPadding,  // top
+        minLng - lngPadding,  // left
+        minLat - latPadding,  // bottom
+        maxLng + lngPadding   // right
+      );
+
+      console.log(`📍 Map bounds: top=${bounds.getTop()}, left=${bounds.getLeft()}, bottom=${bounds.getBottom()}, right=${bounds.getRight()}`);
+      
+      map.getViewModel().setLookAtData({ bounds }, true);
+    } else {
+      console.warn('⚠️ No valid GPS coordinates found - map not centered');
     }
   }, [loads, showWeather, weather]);
 

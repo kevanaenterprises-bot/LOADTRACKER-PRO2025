@@ -124,6 +124,11 @@ export const loads = pgTable("loads", {
   receiverLatitude: decimal("receiver_latitude", { precision: 10, scale: 8 }),
   receiverLongitude: decimal("receiver_longitude", { precision: 11, scale: 8 }),
   lastLocationUpdate: timestamp("last_location_update"),
+  // Automatic timestamp tracking for geofence entry/exit
+  shipperInTime: timestamp("shipper_in_time"),
+  shipperOutTime: timestamp("shipper_out_time"),
+  receiverInTime: timestamp("receiver_in_time"),
+  receiverOutTime: timestamp("receiver_out_time"),
   // IFTA reporting fields
   iftaTruckNumber: varchar("ifta_truck_number"), // Truck # for this trip (mandatory at POD upload)
   startingOdometerReading: decimal("starting_odometer_reading", { precision: 10, scale: 1 }), // Odometer when leaving yard/starting load
