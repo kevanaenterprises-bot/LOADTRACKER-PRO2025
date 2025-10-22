@@ -69,6 +69,16 @@ export async function updateDriverLocation(req: Request, res: Response) {
   try {
     const validatedData = LocationUpdateSchema.parse(req.body);
     
+    // CRITICAL: Save GPS coordinates to database for real-time fleet map display
+    const { storage } = await import('../storage');
+    await storage.updateLoad(validatedData.loadId, {
+      currentLatitude: validatedData.location.lat.toString(),
+      currentLongitude: validatedData.location.lng.toString(),
+      updatedAt: new Date(),
+    });
+    
+    console.log(`📍 GPS coordinates saved for load ${validatedData.loadId}: ${validatedData.location.lat}, ${validatedData.location.lng}`);
+    
     // Send position to HERE Tracking API for automatic geofence detection
     // This will trigger webhooks when truck enters/exits shipper or receiver geofences
     const deviceId = `load_${validatedData.loadId}`;
