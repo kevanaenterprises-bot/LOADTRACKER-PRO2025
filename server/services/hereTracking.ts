@@ -2,10 +2,17 @@ import { db } from "../db";
 import { loads } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
+// HERE Tracking API with automatic geofence notifications
+import Tracking from '@here/tracking-js';
+
 // HERE API Configuration
 const HERE_API_BASE = "https://router.hereapi.com/v8";
 const HERE_GEOCODE_BASE = "https://geocoder.ls.hereapi.com/6.2";
 const HERE_GEOFENCE_BASE = "https://geofencing.hereapi.com/v8";
+const HERE_API_KEY = process.env.HERE_MAPS_API_KEY || process.env.HERE_API_KEY || '';
+const WEBHOOK_URL = process.env.REPLIT_DOMAINS 
+  ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}/api/tracking-webhook`
+  : 'http://localhost:5000/api/tracking-webhook';
 
 interface Location {
   lat: number;
@@ -39,11 +46,168 @@ interface Geofence {
 
 export class HERETrackingService {
   private apiKey: string;
+  private trackingClient: any = null;
 
   constructor() {
     this.apiKey = process.env.HERE_MAPS_API_KEY || process.env.HERE_API_KEY || '';
     if (!this.apiKey) {
       console.warn('⚠️ HERE API key not found. Tracking features will be disabled.');
+    } else {
+      try {
+        this.trackingClient = new Tracking({
+          apiKey: this.apiKey,
+          environment: 'production'
+        });
+        console.log('✅ HERE Tracking API initialized');
+      } catch (error) {
+        console.error('❌ Failed to initialize HERE Tracking API:', error);
+      }
+    }
+  }
+
+  /**
+   * Register or get existing tracking device for a load
+   */
+  async getOrCreateTrackingDevice(loadId: string, loadNumber: string): Promise<string | null> {
+    if (!this.trackingClient) return null;
+
+    try {
+      const deviceId = `load_${loadId}`;
+      
+      // Try to create device (will fail if exists, which is fine)
+      try {
+        await this.trackingClient.devices.create({
+          deviceId,
+          name: `Load ${loadNumber}`,
+          description: `Tracking device for load ${loadNumber}`
+        });
+        console.log(`✅ Created tracking device: ${deviceId}`);
+      } catch (error: any) {
+        if (error?.status === 409 || error?.message?.includes('already exists')) {
+          console.log(`ℹ️ Tracking device already exists: ${deviceId}`);
+        } else {
+          throw error;
+        }
+      }
+      
+      return deviceId;
+    } catch (error) {
+      console.error('❌ Failed to create tracking device:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Create automatic geofences for shipper and receiver locations
+   */
+  async createAutoGeofences(loadId: string, loadNumber: string, pickup: Location, delivery: Location): Promise<{
+    shipperGeofenceId: string | null;
+    receiverGeofenceId: string | null;
+  }> {
+    if (!this.trackingClient) {
+      return { shipperGeofenceId: null, receiverGeofenceId: null };
+    }
+
+    try {
+      // Create shipper geofence
+      const shipperGeofence = await this.trackingClient.geofences.create({
+        name: `Shipper - Load ${loadNumber}`,
+        description: `Pickup location for load ${loadNumber}`,
+        geometry: {
+          type: 'Point',
+          coordinates: [pickup.lng, pickup.lat]
+        },
+        radius: 100 // 100 meter radius
+      });
+
+      // Create receiver geofence
+      const receiverGeofence = await this.trackingClient.geofences.create({
+        name: `Receiver - Load ${loadNumber}`,
+        description: `Delivery location for load ${loadNumber}`,
+        geometry: {
+          type: 'Point',
+          coordinates: [delivery.lng, delivery.lat]
+        },
+        radius: 100 // 100 meter radius
+      });
+
+      console.log(`✅ Created automatic geofences for load ${loadNumber}`);
+      
+      return {
+        shipperGeofenceId: shipperGeofence.id,
+        receiverGeofenceId: receiverGeofence.id
+      };
+    } catch (error) {
+      console.error('❌ Failed to create geofences:', error);
+      return { shipperGeofenceId: null, receiverGeofenceId: null };
+    }
+  }
+
+  /**
+   * Delete geofences when load is completed
+   */
+  async deleteAutoGeofences(shipperGeofenceId: string | null, receiverGeofenceId: string | null): Promise<void> {
+    if (!this.trackingClient) return;
+
+    try {
+      if (shipperGeofenceId) {
+        await this.trackingClient.geofences.delete(shipperGeofenceId);
+        console.log(`🗑️ Deleted shipper geofence: ${shipperGeofenceId}`);
+      }
+      if (receiverGeofenceId) {
+        await this.trackingClient.geofences.delete(receiverGeofenceId);
+        console.log(`🗑️ Deleted receiver geofence: ${receiverGeofenceId}`);
+      }
+    } catch (error) {
+      console.error('❌ Failed to delete geofences:', error);
+    }
+  }
+
+  /**
+   * Send GPS position to HERE Tracking (triggers automatic geofence checking)
+   */
+  async sendTrackingPosition(deviceId: string, location: Location, timestamp?: Date): Promise<void> {
+    if (!this.trackingClient || !deviceId) return;
+
+    try {
+      await this.trackingClient.telemetry.send({
+        deviceId,
+        position: {
+          lat: location.lat,
+          lng: location.lng,
+          timestamp: timestamp || new Date()
+        }
+      });
+    } catch (error) {
+      console.error(`❌ Failed to send position for device ${deviceId}:`, error);
+    }
+  }
+
+  /**
+   * Register webhook for automatic geofence notifications
+   */
+  async ensureWebhookRegistered(): Promise<boolean> {
+    if (!this.trackingClient) return false;
+
+    try {
+      const webhooks = await this.trackingClient.notifications.webhooks.list();
+      
+      const existingWebhook = webhooks.find((w: any) => w.url === WEBHOOK_URL);
+      if (existingWebhook) {
+        console.log(`ℹ️ Webhook already registered: ${WEBHOOK_URL}`);
+        return true;
+      }
+
+      await this.trackingClient.notifications.webhooks.create({
+        url: WEBHOOK_URL,
+        events: ['geofence.entry', 'geofence.exit']
+      });
+      
+      console.log(`✅ Registered webhook: ${WEBHOOK_URL}`);
+      return true;
+    } catch (error) {
+      console.error('❌ Failed to register webhook:', error);
+      return false;
     }
   }
 

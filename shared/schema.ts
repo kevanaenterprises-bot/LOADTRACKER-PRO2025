@@ -129,6 +129,10 @@ export const loads = pgTable("loads", {
   shipperOutTime: timestamp("shipper_out_time"),
   receiverInTime: timestamp("receiver_in_time"),
   receiverOutTime: timestamp("receiver_out_time"),
+  // HERE Tracking API geofence IDs for automatic arrival/departure detection
+  shipperGeofenceId: varchar("shipper_geofence_id"), // HERE Tracking geofence ID for shipper location
+  receiverGeofenceId: varchar("receiver_geofence_id"), // HERE Tracking geofence ID for receiver location
+  hereTrackingDeviceId: varchar("here_tracking_device_id"), // HERE Tracking device ID (truck identifier)
   // IFTA reporting fields
   iftaTruckNumber: varchar("ifta_truck_number"), // Truck # for this trip (mandatory at POD upload)
   startingOdometerReading: decimal("starting_odometer_reading", { precision: 10, scale: 1 }), // Odometer when leaving yard/starting load
