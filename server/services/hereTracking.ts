@@ -185,6 +185,13 @@ export class HERETrackingService {
 
   /**
    * Register webhook for automatic geofence notifications
+   * 
+   * SECURITY NOTE: Configure HERE_WEBHOOK_SECRET environment variable
+   * and ensure HERE sends this secret in X-Webhook-Secret header.
+   * If HERE Tracking doesn't support custom headers, consider:
+   * 1. Using IP allowlist for HERE's webhook servers
+   * 2. Implementing HMAC signature verification if HERE provides it
+   * 3. Monitoring logs for suspicious webhook activity
    */
   async ensureWebhookRegistered(): Promise<boolean> {
     if (!this.trackingClient) return false;
@@ -198,12 +205,16 @@ export class HERETrackingService {
         return true;
       }
 
+      // Register webhook with HERE Tracking
+      // NOTE: If HERE supports webhook signature/authentication headers,
+      // configure them here. Otherwise, rely on HERE_WEBHOOK_SECRET env var.
       await this.trackingClient.notifications.webhooks.create({
         url: WEBHOOK_URL,
         events: ['geofence.entry', 'geofence.exit']
       });
       
       console.log(`✅ Registered webhook: ${WEBHOOK_URL}`);
+      console.log(`⚠️ SECURITY: Set HERE_WEBHOOK_SECRET environment variable to secure webhook endpoint`);
       return true;
     } catch (error) {
       console.error('❌ Failed to register webhook:', error);

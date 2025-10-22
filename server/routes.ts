@@ -8242,11 +8242,34 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   app.get("/api/tracking/status/:loadId", isAuthenticated, getLoadTrackingStatus);
 
   // HERE Tracking API Webhook - Automatic geofence entry/exit notifications
-  // NOTE: No authentication required - this endpoint receives webhooks from HERE servers
+  // Secured with shared secret to prevent spoofing
   app.post("/api/tracking-webhook", async (req, res) => {
     try {
+      // Log all webhook attempts for security monitoring
+      const clientIP = req.ip || req.socket.remoteAddress;
+      console.log(`📬 Webhook request from IP: ${clientIP}`);
+      
+      // Verify webhook authenticity using shared secret
+      const webhookSecret = process.env.HERE_WEBHOOK_SECRET;
+      const providedSecret = req.headers['x-webhook-secret'] as string;
+      
+      // Use constant-time comparison to prevent timing attacks
+      if (webhookSecret && (!providedSecret || 
+          !require('crypto').timingSafeEqual(
+            Buffer.from(webhookSecret),
+            Buffer.from(providedSecret)
+          ))) {
+        console.warn(`⚠️ SECURITY ALERT: Webhook authentication FAILED from ${clientIP} - invalid secret`);
+        console.warn(`Headers received:`, JSON.stringify(req.headers, null, 2));
+        return res.status(403).json({ message: 'Forbidden: Invalid webhook secret' });
+      }
+      
+      if (!webhookSecret) {
+        console.warn(`⚠️ SECURITY WARNING: HERE_WEBHOOK_SECRET not configured - webhooks unprotected! Request from ${clientIP}`);
+      }
+      
       const event = req.body;
-      console.log('📬 Received HERE Tracking webhook:', JSON.stringify(event, null, 2));
+      console.log('✅ Webhook authenticated - processing event:', JSON.stringify(event, null, 2));
 
       // HERE Tracking sends events like:
       // { type: 'geofence.entry', deviceId: 'load_123', geofenceId: 'geofence_456', timestamp: '...' }
