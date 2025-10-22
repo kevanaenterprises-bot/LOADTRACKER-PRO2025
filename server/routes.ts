@@ -388,11 +388,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve static files from public directory
   app.use(express.static('public'));
   
-  // Auth middleware (includes session setup)
-  await setupAuth(app);
-  
   // HTTPS Cookie Persistence Fix for Railway/HTTPS deployments
   app.set('trust proxy', 1);
+  
+  // Auth middleware (includes session setup)
+  try {
+    await setupAuth(app);
+    console.log('✅ Authentication initialized successfully');
+  } catch (error) {
+    console.error('❌ Authentication setup failed - app will continue without Replit Auth:', error);
+    console.warn('⚠️ Users can still access the app using bypass tokens or driver direct access');
+    // Continue without auth - don't crash the app
+  }
   app.use((req, res, next) => {
     // Fix cookie persistence in HTTPS deployments
     if (req.secure || req.headers['x-forwarded-proto'] === 'https') {

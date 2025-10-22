@@ -10,6 +10,14 @@ import { storage } from "./storage";
 import pkg from 'pg';
 const { Pool } = pkg;
 
+// Ensure global fetch and Headers are available for openid-client
+if (typeof globalThis.fetch === 'undefined') {
+  console.warn('⚠️ Global fetch not available - attempting to polyfill');
+}
+if (typeof globalThis.Headers === 'undefined') {
+  console.warn('⚠️ Global Headers not available - attempting to polyfill');
+}
+
 if (!process.env.REPLIT_DOMAINS) {
   console.warn("⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.");
   process.env.REPLIT_DOMAINS = "localhost,replit.app";
@@ -17,10 +25,9 @@ if (!process.env.REPLIT_DOMAINS) {
 
 const getOidcConfig = memoize(
   async () => {
-    return await client.discovery(
-      new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc"),
-      process.env.REPL_ID || "loadtracker-pro"
-    );
+    const issuerUrl = new URL(process.env.ISSUER_URL ?? "https://replit.com/oidc");
+    const clientId = process.env.REPL_ID || "loadtracker-pro";
+    return await client.discovery(issuerUrl, clientId);
   },
   { maxAge: 3600 * 1000 }
 );
