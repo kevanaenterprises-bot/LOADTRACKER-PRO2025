@@ -2891,6 +2891,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           console.log(`✅ Driver ${driver.firstName} ${driver.lastName} confirmed load ${unconfirmedLoad.number109}`);
           
+          // Create automatic geofences if we have shipper and receiver coordinates
+          if (unconfirmedLoad.shipperLatitude && unconfirmedLoad.shipperLongitude && 
+              unconfirmedLoad.receiverLatitude && unconfirmedLoad.receiverLongitude) {
+            const { hereTracking } = await import('./services/hereTracking');
+            
+            // Create tracking device for this load
+            const deviceId = await hereTracking.getOrCreateTrackingDevice(unconfirmedLoad.id, unconfirmedLoad.number109);
+            
+            // Create geofences at shipper and receiver
+            const { shipperGeofenceId, receiverGeofenceId } = await hereTracking.createAutoGeofences(
+              unconfirmedLoad.id,
+              unconfirmedLoad.number109,
+              { 
+                lat: parseFloat(unconfirmedLoad.shipperLatitude), 
+                lng: parseFloat(unconfirmedLoad.shipperLongitude) 
+              },
+              { 
+                lat: parseFloat(unconfirmedLoad.receiverLatitude), 
+                lng: parseFloat(unconfirmedLoad.receiverLongitude) 
+              }
+            );
+            
+            // Update load with geofence IDs and device ID
+            if (shipperGeofenceId && receiverGeofenceId && deviceId) {
+              await storage.updateLoad(unconfirmedLoad.id, {
+                shipperGeofenceId,
+                receiverGeofenceId,
+                hereTrackingDeviceId: deviceId,
+                trackingEnabled: true
+              });
+              console.log(`🔵 Created automatic geofences for load ${unconfirmedLoad.number109}`);
+            }
+            
+            // Ensure webhook is registered (only runs once)
+            await hereTracking.ensureWebhookRegistered();
+          }
+          
           // Send confirmation SMS
           await sendSMSToDriver(
             phoneNumber,

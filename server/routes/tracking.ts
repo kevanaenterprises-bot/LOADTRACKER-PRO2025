@@ -69,6 +69,15 @@ export async function updateDriverLocation(req: Request, res: Response) {
   try {
     const validatedData = LocationUpdateSchema.parse(req.body);
     
+    // Send position to HERE Tracking API for automatic geofence detection
+    // This will trigger webhooks when truck enters/exits shipper or receiver geofences
+    const deviceId = `load_${validatedData.loadId}`;
+    await hereTracking.sendTrackingPosition(
+      deviceId,
+      validatedData.location
+    );
+
+    // Also process location update for legacy manual geofence checking (backup)
     const events = await hereTracking.processLocationUpdate(
       validatedData.driverId,
       validatedData.loadId,
