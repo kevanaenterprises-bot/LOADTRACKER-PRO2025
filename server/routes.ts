@@ -8907,6 +8907,36 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+  // ===== TEXT-TO-SPEECH UTILITY =====
+  
+  // Generate custom audio from text (for commercials, scripts, etc.)
+  app.post("/api/tts/generate", isAuthenticated, async (req, res) => {
+    try {
+      const { text, voice } = req.body;
+
+      if (!text) {
+        return res.status(400).json({ message: "Text is required" });
+      }
+
+      // Import the ElevenLabs service
+      const { generateCustomSpeech } = await import('./services/elevenlabs');
+      
+      // Generate audio
+      const audioBuffer = await generateCustomSpeech(text, voice || 'male');
+
+      // Set headers for file download
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.setHeader('Content-Disposition', 'attachment; filename="commercial-audio.mp3"');
+      res.setHeader('Content-Length', audioBuffer.length.toString());
+
+      // Send the audio file
+      res.send(audioBuffer);
+    } catch (error: any) {
+      console.error("Error generating TTS audio:", error);
+      res.status(500).json({ message: error.message || "Failed to generate audio" });
+    }
+  });
+
   // Create and return HTTP server
   const server = createServer(app);
   return server;

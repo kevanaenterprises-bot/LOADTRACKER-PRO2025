@@ -14,6 +14,7 @@ import Chat from "@/pages/Chat";
 import IFTAReport from "@/pages/IFTAReport";
 import DemoLanding from "@/pages/DemoLanding";
 import AgingReport from "@/pages/AgingReport";
+import TTSGenerator from "@/pages/TTSGenerator";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/paid-loads" component={PaidLoads} />
       <Route path="/ifta-report" component={IFTAReport} />
       <Route path="/aging-report" component={AgingReport} />
+      <Route path="/tts-generator" component={TTSGenerator} />
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
       <Route path="/chat" component={Chat} />

@@ -112,3 +112,46 @@ export function formatMarkerTextForTTS(title: string, inscription: string): stri
   // Add pauses and formatting for natural speech
   return `Historical Marker. ${title}. ${inscription}`;
 }
+
+/**
+ * Generate speech audio from custom text (for commercials, scripts, etc.)
+ * Does not use caching - generates fresh audio each time
+ */
+export async function generateCustomSpeech(text: string, voice: 'male' | 'female' = 'male'): Promise<Buffer> {
+  if (!client) {
+    throw new Error("ElevenLabs API key not configured");
+  }
+
+  const voiceId = VOICES[voice];
+  
+  console.log(`🎙️ Generating custom speech with ${voice} voice (${text.length} characters)...`);
+
+  try {
+    // Generate audio using ElevenLabs API
+    const audio = await client.textToSpeech.convert(voiceId, {
+      text,
+      model_id: "eleven_flash_v2_5",
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.75,
+        style: 0.0,
+        use_speaker_boost: true,
+      },
+    });
+
+    // Convert Node.js Readable stream to Buffer
+    const chunks: Buffer[] = [];
+    
+    for await (const chunk of audio) {
+      chunks.push(Buffer.from(chunk));
+    }
+
+    const buffer = Buffer.concat(chunks);
+    console.log(`✅ Generated ${buffer.length} bytes of custom audio`);
+    
+    return buffer;
+  } catch (error) {
+    console.error("❌ ElevenLabs custom speech generation error:", error);
+    throw new Error(`Failed to generate custom speech: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}

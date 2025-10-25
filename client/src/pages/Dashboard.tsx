@@ -525,7 +525,7 @@ export default function Dashboard() {
               <div className="lg:col-span-2 order-1 lg:order-2">
                 <div className="mb-4 flex justify-between items-center">
                   <h2 className="text-xl font-semibold">Active Loads</h2>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       variant="outline"
                       onClick={() => setLocation("/ifta-report")}
@@ -543,6 +543,15 @@ export default function Dashboard() {
                     >
                       <i className="fas fa-archive text-green-600"></i>
                       View Paid Loads
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setLocation("/tts-generator")}
+                      className="flex items-center gap-2 bg-purple-50 border-purple-200 text-purple-800 hover:bg-purple-100"
+                      data-testid="button-tts-generator"
+                    >
+                      <i className="fas fa-microphone text-purple-600"></i>
+                      TTS Audio
                     </Button>
                   </div>
                 </div>
