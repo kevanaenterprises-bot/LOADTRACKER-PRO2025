@@ -4,7 +4,7 @@
 **Instructions:** Navigate to each section on your Railway deployment while reading the narration. Record your screen as you go through each feature.
 
 ---
-
+)
 ## SCENE 1: Login Screen (Homepage)
 **What to show:** Navigate to your Railway URL homepage
 
@@ -49,7 +49,7 @@ This is what GPS tracking should be. No expensive hardware. Just your driver's p
 **NARRATION:**
 "With one click, you can see the weather conditions at each truck's location. Temperature, conditions - real-time data from HERE Weather API.
 
-Your driver's in a snowstorm? You'll know before they call you.
+)
 
 Click Fuel, and the system finds the nearest diesel stations along their routes. Helps drivers plan fuel stops, helps you track fuel costs.
 
