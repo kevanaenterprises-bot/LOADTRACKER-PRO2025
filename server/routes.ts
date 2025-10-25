@@ -8910,7 +8910,8 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   // ===== TEXT-TO-SPEECH UTILITY =====
   
   // Generate custom audio from text (for commercials, scripts, etc.)
-  app.post("/api/tts/generate", isAuthenticated, async (req, res) => {
+  // Note: No authentication required - page access is already protected on frontend
+  app.post("/api/tts/generate", async (req, res) => {
     try {
       const { text, voice } = req.body;
 
@@ -8918,11 +8919,15 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
         return res.status(400).json({ message: "Text is required" });
       }
 
+      console.log(`🎙️ TTS Generation request: ${text.length} characters, ${voice || 'male'} voice`);
+
       // Import the ElevenLabs service
       const { generateCustomSpeech } = await import('./services/elevenlabs');
       
       // Generate audio
       const audioBuffer = await generateCustomSpeech(text, voice || 'male');
+
+      console.log(`✅ TTS Generation successful: ${audioBuffer.length} bytes`);
 
       // Set headers for file download
       res.setHeader('Content-Type', 'audio/mpeg');
@@ -8932,7 +8937,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       // Send the audio file
       res.send(audioBuffer);
     } catch (error: any) {
-      console.error("Error generating TTS audio:", error);
+      console.error("❌ Error generating TTS audio:", error);
       res.status(500).json({ message: error.message || "Failed to generate audio" });
     }
   });
