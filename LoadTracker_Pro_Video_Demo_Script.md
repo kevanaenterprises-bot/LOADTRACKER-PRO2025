@@ -129,7 +129,7 @@ Watch what happens when you upload a rate confirmation PDF..."
 
 **ACTION:** (If possible, upload a sample rate con) or explain: "The system automatically reads the document"
 
-**NARRATION:**
+**NARRATION:**<
 "The system reads it. Automatically. It pulls out the load number, pickup location, delivery location, rate - all the details extracted without typing a single character.
 
 That's Google's Document AI technology doing the work for you.
