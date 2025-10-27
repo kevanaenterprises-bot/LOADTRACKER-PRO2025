@@ -626,6 +626,38 @@ export const visitorTracking = pgTable("visitor_tracking", {
   index("IDX_visitor_visited").on(table.visitedAt.desc()),
 ]);
 
+// LoadRight integration - tracks tendered loads from LoadRight carrier portal
+export const loadRightTenders = pgTable("loadright_tenders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  loadNumber: varchar("load_number").notNull().unique(), // LoadRight load number (e.g., "109-40340")
+  shipper: varchar("shipper"), // Shipper company name (e.g., "PCA PLANO")
+  pickupLocation: text("pickup_location"),
+  pickupCity: varchar("pickup_city"),
+  pickupState: varchar("pickup_state"),
+  pickupDate: varchar("pickup_date"), // Store as string from LoadRight
+  pickupTime: varchar("pickup_time"),
+  deliveryLocation: text("delivery_location"),
+  deliveryCity: varchar("delivery_city"),
+  deliveryState: varchar("delivery_state"),
+  deliveryDate: varchar("delivery_date"),
+  deliveryTime: varchar("delivery_time"),
+  orderNumber: varchar("order_number"),
+  pieces: varchar("pieces"),
+  miles: varchar("miles"),
+  weight: varchar("weight"),
+  rate: varchar("rate"), // Rate if shown in portal
+  notes: text("notes"), // Special instructions from LoadRight
+  status: varchar("status").notNull().default("tendered"), // tendered, accepted, dispatched, rejected
+  loadId: varchar("load_id").references(() => loads.id), // Link to created load if accepted
+  acceptedAt: timestamp("accepted_at"), // When tender was accepted
+  syncedAt: timestamp("synced_at").defaultNow(), // When this tender was pulled from LoadRight
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_loadright_status").on(table.status),
+  index("IDX_loadright_synced").on(table.syncedAt.desc()),
+]);
+
 // Insert schemas for new tables
 export const insertPricingTierSchema = createInsertSchema(pricingTiers).omit({
   id: true,
@@ -654,6 +686,13 @@ export const insertVisitorTrackingSchema = createInsertSchema(visitorTracking).o
   visitedAt: true,
 });
 
+export const insertLoadRightTenderSchema = createInsertSchema(loadRightTenders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  syncedAt: true,
+});
+
 // New types
 export type InsertPricingTier = z.infer<typeof insertPricingTierSchema>;
 export type PricingTier = typeof pricingTiers.$inferSelect;
@@ -665,6 +704,8 @@ export type InsertDemoSession = z.infer<typeof insertDemoSessionSchema>;
 export type DemoSession = typeof demoSessions.$inferSelect;
 export type InsertVisitorTracking = z.infer<typeof insertVisitorTrackingSchema>;
 export type VisitorTracking = typeof visitorTracking.$inferSelect;
+export type InsertLoadRightTender = z.infer<typeof insertLoadRightTenderSchema>;
+export type LoadRightTender = typeof loadRightTenders.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {

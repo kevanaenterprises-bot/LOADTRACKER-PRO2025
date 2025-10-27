@@ -40,6 +40,7 @@ The frontend uses React with TypeScript, `shadcn/ui` (built on Radix UI), and Ta
 - **Usage-Based Billing**: Tiered subscription pricing with metered billing for API usage overages. Includes a real-time usage dashboard displaying current consumption vs. tier limits, overage costs, and billing projections.
 - **Demo/Trial System**: Instant trial access for prospects with automatic data cleanup, visitor tracking, and conversion analytics.
 - **Branding Hierarchy**: Clear separation between software vendor (Turtle Logistics) and customer (Go 4 Farms & Cattle) branding across demo pages, internal systems, invoices, and emails.
+- **LoadRight Integration**: Automated load tendering workflow with Puppeteer-based portal scraping. Features include manual sync button to fetch tendered loads, one-click acceptance creating loads in the system (no driver assignment required at acceptance), and complete tender tracking with status management.
 
 ## External Dependencies
 

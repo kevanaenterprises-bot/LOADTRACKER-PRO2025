@@ -553,6 +553,15 @@ export default function Dashboard() {
                       <i className="fas fa-microphone text-purple-600"></i>
                       TTS Audio
                     </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setLocation("/loadright")}
+                      className="flex items-center gap-2 bg-orange-50 border-orange-200 text-orange-800 hover:bg-orange-100"
+                      data-testid="button-loadright"
+                    >
+                      <i className="fas fa-shipping-fast text-orange-600"></i>
+                      LoadRight
+                    </Button>
                   </div>
                 </div>
                 <LoadsTable />

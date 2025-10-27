@@ -8942,6 +8942,135 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+  // ===== LOADRIGHT INTEGRATION ROUTES =====
+  
+  // Sync loads from LoadRight portal
+  app.get("/api/loadright/sync", async (req, res) => {
+    try {
+      console.log("🔄 Starting LoadRight sync...");
+      
+      const { loadRightService } = await import('./services/loadright');
+      const tenders = await loadRightService.syncTenders();
+      
+      console.log(`✅ LoadRight sync complete: ${tenders.length} tenders synced`);
+      
+      res.json({
+        success: true,
+        count: tenders.length,
+        tenders
+      });
+    } catch (error: any) {
+      console.error("❌ Error syncing LoadRight tenders:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Failed to sync LoadRight tenders" 
+      });
+    }
+  });
+
+  // Get all LoadRight tenders
+  app.get("/api/loadright/tenders", async (req, res) => {
+    try {
+      const status = req.query.status as string | undefined;
+      const tenders = await storage.getLoadRightTenders(status);
+      res.json(tenders);
+    } catch (error: any) {
+      console.error("❌ Error fetching LoadRight tenders:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch tenders" });
+    }
+  });
+
+  // Get single LoadRight tender
+  app.get("/api/loadright/tenders/:id", async (req, res) => {
+    try {
+      const tender = await storage.getLoadRightTender(req.params.id);
+      if (!tender) {
+        return res.status(404).json({ message: "Tender not found" });
+      }
+      res.json(tender);
+    } catch (error: any) {
+      console.error("❌ Error fetching LoadRight tender:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch tender" });
+    }
+  });
+
+  // Accept a LoadRight tender and create a load
+  app.post("/api/loadright/accept/:tenderId", async (req, res) => {
+    try {
+      const { tenderId } = req.params;
+      
+      console.log(`✅ Accepting LoadRight tender ${tenderId}...`);
+      
+      // Get the tender
+      const tender = await storage.getLoadRightTender(tenderId);
+      if (!tender) {
+        return res.status(404).json({ message: "Tender not found" });
+      }
+
+      if (tender.status === 'accepted') {
+        return res.status(400).json({ message: "Tender already accepted" });
+      }
+
+      // Find or create customer for the tender
+      let customerId: string | undefined;
+      const customerName = tender.customer || tender.shipper || 'LoadRight Customer';
+      
+      // Try to find existing customer by name
+      const existingCustomers = await storage.getCustomers();
+      const existingCustomer = existingCustomers.find(c => 
+        c.name.toLowerCase() === customerName.toLowerCase()
+      );
+      
+      if (existingCustomer) {
+        customerId = existingCustomer.id;
+      } else {
+        // Create new customer
+        const newCustomer = await storage.createCustomer({
+          name: customerName,
+        });
+        customerId = newCustomer.id;
+      }
+
+      // Create a load from the tender data with correct field mapping
+      const newLoad = await storage.createLoad({
+        number109: tender.loadNumber, // Maps to number109 field
+        customerId: customerId,
+        status: 'pending', // Available for driver assignment
+        pickupAddress: tender.pickupLocation || 'See tender details',
+        deliveryAddress: tender.deliveryLocation || 'See tender details',
+        companyName: customerName,
+        tripRate: tender.rate || undefined, // Keep as string for decimal field
+        estimatedMiles: tender.miles || undefined, // Keep as string for decimal field
+        deliveryDueAt: tender.deliveryDate ? new Date(tender.deliveryDate) : undefined,
+      });
+
+      // Mark tender as accepted and link to the load
+      const acceptedTender = await storage.acceptLoadRightTender(tenderId, newLoad.id);
+
+      console.log(`✅ Tender accepted and load ${newLoad.number109} created`);
+
+      res.json({
+        success: true,
+        tender: acceptedTender,
+        load: newLoad
+      });
+    } catch (error: any) {
+      console.error("❌ Error accepting LoadRight tender:", error);
+      res.status(500).json({ message: error.message || "Failed to accept tender" });
+    }
+  });
+
+  // Delete a LoadRight tender
+  app.delete("/api/loadright/tenders/:id", async (req, res) => {
+    try {
+      await storage.deleteTender(req.params.id);
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("❌ Error deleting LoadRight tender:", error);
+      res.status(500).json({ message: error.message || "Failed to delete tender" });
+    }
+  });
+
   // Create and return HTTP server
   const server = createServer(app);
   return server;

@@ -52,6 +52,9 @@ import {
   type InsertHistoricalMarker,
   type MarkerHistory,
   type InsertMarkerHistory,
+  loadRightTenders,
+  type LoadRightTender,
+  type InsertLoadRightTender,
 } from "@shared/schema";
 import { db, queryWithRetry } from "./db";
 import { eq, desc, and, sql, not } from "drizzle-orm";
@@ -188,6 +191,15 @@ export interface IStorage {
   markAsHeard(driverId: string, markerId: number, loadId?: string): Promise<void>;
   toggleRoadTour(driverId: string, enabled: boolean): Promise<User | undefined>;
   getRoadTourStatus(driverId: string): Promise<{ enabled: boolean; lastHeardMarkerId: string | null }>;
+
+  // LoadRight integration operations
+  getLoadRightTenders(status?: string): Promise<LoadRightTender[]>;
+  getLoadRightTender(id: string): Promise<LoadRightTender | undefined>;
+  getLoadRightTenderByLoadNumber(loadNumber: string): Promise<LoadRightTender | undefined>;
+  createLoadRightTender(tender: InsertLoadRightTender): Promise<LoadRightTender>;
+  updateLoadRightTender(id: string, updates: Partial<InsertLoadRightTender>): Promise<LoadRightTender>;
+  acceptLoadRightTender(tenderId: string, loadId: string): Promise<LoadRightTender>;
+  deleteTender(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1691,6 +1703,72 @@ export class DatabaseStorage implements IStorage {
       enabled: user?.roadTourEnabled || false,
       lastHeardMarkerId: user?.roadTourLastHeardMarkerId || null,
     };
+  }
+
+  // LoadRight integration operations
+  async getLoadRightTenders(status?: string): Promise<LoadRightTender[]> {
+    const conditions = status ? eq(loadRightTenders.status, status) : undefined;
+    const tenders = await db
+      .select()
+      .from(loadRightTenders)
+      .where(conditions)
+      .orderBy(desc(loadRightTenders.syncedAt));
+    return tenders;
+  }
+
+  async getLoadRightTender(id: string): Promise<LoadRightTender | undefined> {
+    const [tender] = await db
+      .select()
+      .from(loadRightTenders)
+      .where(eq(loadRightTenders.id, id))
+      .limit(1);
+    return tender;
+  }
+
+  async getLoadRightTenderByLoadNumber(loadNumber: string): Promise<LoadRightTender | undefined> {
+    const [tender] = await db
+      .select()
+      .from(loadRightTenders)
+      .where(eq(loadRightTenders.loadNumber, loadNumber))
+      .limit(1);
+    return tender;
+  }
+
+  async createLoadRightTender(tender: InsertLoadRightTender): Promise<LoadRightTender> {
+    const [newTender] = await db
+      .insert(loadRightTenders)
+      .values(tender)
+      .returning();
+    return newTender;
+  }
+
+  async updateLoadRightTender(id: string, updates: Partial<InsertLoadRightTender>): Promise<LoadRightTender> {
+    const [updatedTender] = await db
+      .update(loadRightTenders)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(loadRightTenders.id, id))
+      .returning();
+    return updatedTender;
+  }
+
+  async acceptLoadRightTender(tenderId: string, loadId: string): Promise<LoadRightTender> {
+    const [acceptedTender] = await db
+      .update(loadRightTenders)
+      .set({
+        status: 'accepted',
+        loadId: loadId,
+        acceptedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(loadRightTenders.id, tenderId))
+      .returning();
+    return acceptedTender;
+  }
+
+  async deleteTender(id: string): Promise<void> {
+    await db
+      .delete(loadRightTenders)
+      .where(eq(loadRightTenders.id, id));
   }
 }
 
