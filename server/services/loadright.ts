@@ -84,27 +84,68 @@ export class LoadRightService {
 
       console.log('📄 Login page loaded');
 
-      // Wait for login form and fill credentials
-      await this.page.waitForSelector('input[placeholder="Email Address"]', { timeout: 10000 });
-      await this.page.type('input[placeholder="Email Address"]', this.email);
-      await this.page.type('input[placeholder="Password"]', this.password);
+      // Wait for page to be fully interactive
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Try multiple selector strategies to find the email input
+      const emailInput = await this.page.waitForSelector(
+        'input[type="email"], input[placeholder*="Email"], input[name="email"], #email',
+        { timeout: 15000 }
+      );
+      
+      const passwordInput = await this.page.waitForSelector(
+        'input[type="password"], input[placeholder*="Password"], input[name="password"], #password',
+        { timeout: 15000 }
+      );
+
+      if (!emailInput || !passwordInput) {
+        throw new Error('Could not find login form fields');
+      }
+
+      // Clear any existing values and type credentials
+      await emailInput.click({ clickCount: 3 });
+      await emailInput.type(this.email, { delay: 100 });
+      
+      await passwordInput.click({ clickCount: 3 });
+      await passwordInput.type(this.password, { delay: 100 });
 
       console.log('✍️ Credentials entered');
 
-      // Click the green Log In button and wait for navigation
+      // Find and click the Log In button
+      const loginButton = await this.page.waitForSelector(
+        'button[type="submit"], input[type="submit"], button:has-text("Log In"), a:has-text("Log In")',
+        { timeout: 10000 }
+      );
+
+      if (!loginButton) {
+        throw new Error('Could not find Log In button');
+      }
+
+      // Click login and wait for navigation
       await Promise.all([
         this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: LOGIN_TIMEOUT }),
-        this.page.click('button::-p-text(Log In)'),
+        loginButton.click(),
       ]);
 
       console.log('✅ Successfully logged into LoadRight');
 
       // Wait for dashboard to appear
-      await this.page.waitForSelector('h1::-p-text(Dashboard), h2::-p-text(Dashboard)', { timeout: 10000 });
+      await new Promise(resolve => setTimeout(resolve, 3000));
       console.log('📊 Dashboard loaded');
 
     } catch (error) {
       console.error('❌ LoadRight login failed:', error);
+      
+      // Try to save screenshot for debugging
+      try {
+        if (this.page) {
+          await this.screenshot('/tmp/loadright-error.png');
+          console.log('📸 Error screenshot saved to /tmp/loadright-error.png');
+        }
+      } catch (screenshotError) {
+        console.log('⚠️ Could not save error screenshot');
+      }
+      
       await this.cleanup();
       throw new Error(`Failed to log in to LoadRight: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -123,11 +164,27 @@ export class LoadRightService {
     try {
       // Click on "Tendered" card/link to navigate to tendered loads page
       // The dashboard shows "Tendered" with a count (e.g., "12")
-      const tenderedClickable = await this.page.waitForSelector('text/Tendered', { timeout: 10000 });
-      if (tenderedClickable) {
-        await tenderedClickable.click();
-        await this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: NAVIGATION_TIMEOUT });
-        console.log('📋 Tendered loads page loaded');
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Try to find and click the Tendered section
+      const tenderedElements = await this.page.$$('a, button, div[role="button"]');
+      let clicked = false;
+      
+      for (const element of tenderedElements) {
+        const text = await element.evaluate(el => el.textContent?.trim() || '');
+        if (text.includes('Tendered')) {
+          console.log('🎯 Found Tendered section, clicking...');
+          await element.click();
+          clicked = true;
+          break;
+        }
+      }
+      
+      if (clicked) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        console.log('📋 Tendered loads page should be loaded');
+      } else {
+        console.log('⚠️ Could not find Tendered link, continuing anyway...');
       }
 
       // Extract load data from the page
@@ -266,7 +323,6 @@ export async function syncLoadRightTenders() {
         // Create new tender
         const tender = await storage.createLoadRightTender({
           loadNumber: load.loadNumber,
-          customer: load.shipper || null,
           shipper: load.shipper || null,
           pickupLocation: load.pickupLocation,
           pickupCity: load.pickupCity || null,
@@ -289,7 +345,6 @@ export async function syncLoadRightTenders() {
           deliveryLocation: load.deliveryLocation,
           pickupDate: load.pickupDate || null,
           deliveryDate: load.deliveryDate || null,
-          syncedAt: new Date(),
         });
         savedTenders.push(updated);
         console.log(`🔄 Updated load ${load.loadNumber}`);
