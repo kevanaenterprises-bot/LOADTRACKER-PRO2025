@@ -1,4 +1,5 @@
 import puppeteer, { Browser, Page } from 'puppeteer';
+import { storage } from '../storage';
 
 const LOADRIGHT_URL = 'https://carrierportal.loadright.com';
 const LOGIN_TIMEOUT = 30000;
@@ -28,7 +29,7 @@ export interface LoadRightTender {
 
 /**
  * LoadRight Integration Service
- * Logs into carrier portal and scrapes tendered load data
+ * Logs into carrier portal and scrapes tendered load data using actual portal selectors
  */
 export class LoadRightService {
   private browser: Browser | null = null;
@@ -83,20 +84,25 @@ export class LoadRightService {
 
       console.log('📄 Login page loaded');
 
-      // Fill in credentials
-      await this.page.waitForSelector('input[type="email"], input[name="email"]', { timeout: 10000 });
-      await this.page.type('input[type="email"], input[name="email"]', this.email);
-      await this.page.type('input[type="password"], input[name="password"]', this.password);
+      // Wait for login form and fill credentials
+      await this.page.waitForSelector('input[placeholder="Email Address"]', { timeout: 10000 });
+      await this.page.type('input[placeholder="Email Address"]', this.email);
+      await this.page.type('input[placeholder="Password"]', this.password);
 
       console.log('✍️ Credentials entered');
 
-      // Click login button
+      // Click the green Log In button and wait for navigation
       await Promise.all([
         this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: LOGIN_TIMEOUT }),
-        this.page.click('button[type="submit"], input[type="submit"], button:has-text("Log In")'),
+        this.page.click('button::-p-text(Log In)'),
       ]);
 
       console.log('✅ Successfully logged into LoadRight');
+
+      // Wait for dashboard to appear
+      await this.page.waitForSelector('h1::-p-text(Dashboard), h2::-p-text(Dashboard)', { timeout: 10000 });
+      console.log('📊 Dashboard loaded');
+
     } catch (error) {
       console.error('❌ LoadRight login failed:', error);
       await this.cleanup();
@@ -105,7 +111,7 @@ export class LoadRightService {
   }
 
   /**
-   * Fetch all tendered loads from the dashboard
+   * Fetch all tendered loads from the portal
    */
   async getTenderedLoads(): Promise<LoadRightTender[]> {
     if (!this.page) {
@@ -115,57 +121,76 @@ export class LoadRightService {
     console.log('📥 Fetching tendered loads from LoadRight...');
 
     try {
-      // Wait for dashboard to load
-      await this.page.waitForSelector('.dashboard, [class*="Dashboard"], h1:has-text("Dashboard")', {
-        timeout: 10000,
-      });
-
-      console.log('📊 Dashboard loaded');
-
-      // Click on "Tendered" section to view loads
-      const tenderedButton = await this.page.$('a:has-text("Tendered"), button:has-text("Tendered"), [class*="Tendered"]');
-      if (tenderedButton) {
-        await Promise.all([
-          this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: NAVIGATION_TIMEOUT }),
-          tenderedButton.click(),
-        ]);
+      // Click on "Tendered" card/link to navigate to tendered loads page
+      // The dashboard shows "Tendered" with a count (e.g., "12")
+      const tenderedClickable = await this.page.waitForSelector('text/Tendered', { timeout: 10000 });
+      if (tenderedClickable) {
+        await tenderedClickable.click();
+        await this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: NAVIGATION_TIMEOUT });
         console.log('📋 Tendered loads page loaded');
       }
 
       // Extract load data from the page
       const loads = await this.page.evaluate(() => {
-        const loadElements = document.querySelectorAll('[class*="load"], [class*="Load"], tr[data-load], .load-row');
         const tenders: any[] = [];
 
-        loadElements.forEach((element) => {
-          // This is a placeholder - we'll need to inspect the actual HTML structure
-          // to determine the correct selectors for extracting load data
-          const loadNumber = element.querySelector('[class*="load-number"], [class*="loadNumber"]')?.textContent?.trim() || '';
-          const shipper = element.querySelector('[class*="shipper"]')?.textContent?.trim() || '';
+        // Find all load detail sections on the page
+        const loadSections = document.querySelectorAll('div');
+        
+        loadSections.forEach((section) => {
+          const loadNumberElement = section.querySelector('*');
+          const loadNumberText = loadNumberElement?.textContent;
           
-          if (loadNumber) {
-            tenders.push({
-              loadNumber,
-              shipper,
-              pickupLocation: '',
-              pickupCity: '',
-              pickupState: '',
-              pickupDate: '',
-              pickupTime: '',
-              deliveryLocation: '',
-              deliveryCity: '',
-              deliveryState: '',
-              deliveryDate: '',
-              deliveryTime: '',
-              orderNumber: '',
-              pieces: '',
-              miles: '',
-              weight: '',
-              rate: '',
-              notes: '',
-              status: 'tendered',
-            });
-          }
+          // Look for load number pattern (e.g., "Load # 109-40326")
+          const loadMatch = loadNumberText?.match(/Load #\s*(\d+-\d+)/);
+          if (!loadMatch) return;
+
+          const loadNumber = loadMatch[1];
+          
+          // Extract other details from the section
+          const allText = section.textContent || '';
+          
+          // Look for pickup information
+          const pickupMatch = allText.match(/Pick Up\s+([^\n]+)\s+([^\n]+)\s+([^,]+),\s*([A-Z]{2})\s+(\d{5})/);
+          const pickupLocation = pickupMatch ? `${pickupMatch[1]} ${pickupMatch[2]}` : '';
+          const pickupCity = pickupMatch ? pickupMatch[3] : '';
+          const pickupState = pickupMatch ? pickupMatch[4] : '';
+          
+          // Look for delivery information
+          const deliveryMatch = allText.match(/Delivery\s+(\d{2}\/\d{2}\/\d{4})/);
+          const deliveryDate = deliveryMatch ? deliveryMatch[1] : '';
+          
+          // Look for final destination
+          const finalDestMatch = allText.match(/Final Destination\s+([^\n]+)\s+([^\n]+)\s+([^,]+),\s*([A-Z]{2})\s+(\d{5})/);
+          const deliveryLocation = finalDestMatch ? `${finalDestMatch[1]} ${finalDestMatch[2]}` : '';
+          const deliveryCity = finalDestMatch ? finalDestMatch[3] : '';
+          const deliveryState = finalDestMatch ? finalDestMatch[4] : '';
+          
+          // Look for order number
+          const orderMatch = allText.match(/Order Number:\s*(\S+)/);
+          const orderNumber = orderMatch ? orderMatch[1] : '';
+          
+          tenders.push({
+            loadNumber,
+            shipper: '',
+            pickupLocation,
+            pickupCity,
+            pickupState,
+            pickupDate: '',
+            pickupTime: '',
+            deliveryLocation,
+            deliveryCity,
+            deliveryState,
+            deliveryDate,
+            deliveryTime: '',
+            orderNumber,
+            pieces: '',
+            miles: '',
+            weight: '',
+            rate: '',
+            notes: '',
+            status: 'tendered' as const,
+          });
         });
 
         return tenders;
@@ -176,48 +201,6 @@ export class LoadRightService {
     } catch (error) {
       console.error('❌ Failed to fetch tendered loads:', error);
       throw new Error(`Failed to fetch loads: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }
-
-  /**
-   * Accept a tendered load in LoadRight portal
-   */
-  async acceptLoad(loadNumber: string): Promise<void> {
-    if (!this.page) {
-      throw new Error('Not logged in - call login() first');
-    }
-
-    console.log(`✅ Accepting load ${loadNumber} in LoadRight...`);
-
-    try {
-      // Find the load row and click Accept button
-      await this.page.evaluate((loadNum) => {
-        const loadRow = Array.from(document.querySelectorAll('[class*="load"], tr, [data-load]')).find(
-          (el) => el.textContent?.includes(loadNum)
-        );
-
-        if (!loadRow) {
-          throw new Error(`Load ${loadNum} not found`);
-        }
-
-        const acceptButton = loadRow.querySelector(
-          'button:has-text("Accept"), a:has-text("Accept"), [class*="accept"]'
-        ) as HTMLElement;
-
-        if (!acceptButton) {
-          throw new Error('Accept button not found');
-        }
-
-        acceptButton.click();
-      }, loadNumber);
-
-      // Wait for confirmation or navigation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      console.log(`✅ Load ${loadNumber} accepted successfully`);
-    } catch (error) {
-      console.error(`❌ Failed to accept load ${loadNumber}:`, error);
-      throw new Error(`Failed to accept load: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -261,15 +244,70 @@ export class LoadRightService {
 }
 
 /**
- * Helper function to sync loads from LoadRight
+ * Helper function to sync loads from LoadRight and save to database
  */
-export async function syncLoadRightTenders(): Promise<LoadRightTender[]> {
+export async function syncLoadRightTenders() {
   const service = new LoadRightService();
   try {
+    console.log('🔄 Starting LoadRight tender sync...');
+    
     await service.login();
     const loads = await service.getTenderedLoads();
-    return loads;
+    
+    console.log(`📝 Processing ${loads.length} loads...`);
+    
+    // Save each load to the database (avoid duplicates)
+    const savedTenders = [];
+    for (const load of loads) {
+      // Check if we already have this load
+      const existing = await storage.getLoadRightTenderByLoadNumber(load.loadNumber);
+      
+      if (!existing) {
+        // Create new tender
+        const tender = await storage.createLoadRightTender({
+          loadNumber: load.loadNumber,
+          customer: load.shipper || null,
+          shipper: load.shipper || null,
+          pickupLocation: load.pickupLocation,
+          pickupCity: load.pickupCity || null,
+          pickupState: load.pickupState || null,
+          deliveryLocation: load.deliveryLocation,
+          deliveryCity: load.deliveryCity || null,
+          deliveryState: load.deliveryState || null,
+          pickupDate: load.pickupDate || null,
+          deliveryDate: load.deliveryDate || null,
+          rate: load.rate || null,
+          miles: load.miles || null,
+          status: 'tendered',
+        });
+        savedTenders.push(tender);
+        console.log(`✅ Saved load ${load.loadNumber}`);
+      } else if (existing.status !== 'accepted') {
+        // Update existing tender if not yet accepted
+        const updated = await storage.updateLoadRightTender(existing.id, {
+          pickupLocation: load.pickupLocation,
+          deliveryLocation: load.deliveryLocation,
+          pickupDate: load.pickupDate || null,
+          deliveryDate: load.deliveryDate || null,
+          syncedAt: new Date(),
+        });
+        savedTenders.push(updated);
+        console.log(`🔄 Updated load ${load.loadNumber}`);
+      } else {
+        savedTenders.push(existing);
+        console.log(`⏭️ Skipped already-accepted load ${load.loadNumber}`);
+      }
+    }
+    
+    console.log(`✅ Sync complete: ${savedTenders.length} tenders processed`);
+    return savedTenders;
+    
   } finally {
     await service.cleanup();
   }
 }
+
+// Export service instance for direct use
+export const loadRightService = {
+  syncTenders: syncLoadRightTenders,
+};
