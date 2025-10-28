@@ -187,11 +187,9 @@ export class LoadRightService {
       console.log('🔍 Searching for Tendered section...');
       
       // Try clicking using JavaScript evaluation (more reliable than Puppeteer selectors)
-      const clicked = await this.page.evaluate(() => {
+      const result = await this.page.evaluate(() => {
         // Get all clickable elements
         const allElements = Array.from(document.querySelectorAll('a, button, div, span, [onclick]'));
-        
-        console.log(`Found ${allElements.length} elements to search`);
         
         // Look for one containing "Tendered" text
         for (const el of allElements) {
@@ -199,23 +197,35 @@ export class LoadRightService {
           const innerText = (el as HTMLElement).innerText || '';
           
           if (text.includes('Tendered') || innerText.includes('Tendered')) {
-            console.log('Found element with Tendered:', el.tagName, text.slice(0, 50));
-            
             // Click it
             (el as HTMLElement).click();
-            return true;
+            return {
+              clicked: true,
+              elementTag: el.tagName,
+              elementText: text.slice(0, 100),
+              totalElementsSearched: allElements.length
+            };
           }
         }
         
-        return false;
+        return {
+          clicked: false,
+          totalElementsSearched: allElements.length,
+          pageTitle: document.title,
+          bodyText: document.body?.innerText?.slice(0, 500)
+        };
       });
       
-      if (clicked) {
-        console.log('🎯 Clicked Tendered section, waiting for page load...');
+      console.log('📊 Search result:', JSON.stringify(result, null, 2));
+      
+      if (result.clicked) {
+        console.log(`🎯 Clicked ${result.elementTag} with text: ${result.elementText}`);
         await new Promise(resolve => setTimeout(resolve, 5000));
         console.log('📋 Tendered loads page should be loaded');
       } else {
-        console.log('⚠️ Could not find Tendered link, will try to extract from current page...');
+        console.log(`⚠️ Could not find Tendered link among ${result.totalElementsSearched} elements`);
+        console.log(`📄 Page title: ${result.pageTitle}`);
+        console.log(`📝 Body preview: ${result.bodyText?.slice(0, 200)}`);
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
 
@@ -245,7 +255,7 @@ export class LoadRightService {
         
         // Split by common separators and find load numbers
         const loadNumberRegex = /Load #\s*(\d+-\d+)/g;
-        const matches = fullText.matchAll(loadNumberRegex);
+        const matches = Array.from(fullText.matchAll(loadNumberRegex));
         
         for (const match of matches) {
           const loadNumber = match[1];
