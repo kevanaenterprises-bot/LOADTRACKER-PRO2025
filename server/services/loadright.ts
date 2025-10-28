@@ -111,21 +111,39 @@ export class LoadRightService {
 
       console.log('✍️ Credentials entered');
 
-      // Find and click the Log In button
-      const loginButton = await this.page.waitForSelector(
-        'button[type="submit"], input[type="submit"], button:has-text("Log In"), a:has-text("Log In")',
-        { timeout: 10000 }
-      );
+      // Wait a moment for the form to be ready
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Find and click the Log In button by searching for its text
+      const buttonClicked = await this.page.evaluate(() => {
+        // Find all button and link elements
+        const buttons = Array.from(document.querySelectorAll('button, input[type="submit"], a'));
+        
+        // Find the one with "Log In" text
+        for (const btn of buttons) {
+          const text = btn.textContent?.trim() || '';
+          if (text === 'Log In' || text.includes('Log In')) {
+            (btn as HTMLElement).click();
+            return true;
+          }
+        }
+        
+        // Fallback: try to find and click any submit button
+        const submitBtn = document.querySelector('button[type="submit"], input[type="submit"]') as HTMLElement;
+        if (submitBtn) {
+          submitBtn.click();
+          return true;
+        }
+        
+        return false;
+      });
 
-      if (!loginButton) {
-        throw new Error('Could not find Log In button');
+      if (!buttonClicked) {
+        throw new Error('Could not find or click Log In button');
       }
 
-      // Click login and wait for navigation
-      await Promise.all([
-        this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: LOGIN_TIMEOUT }),
-        loginButton.click(),
-      ]);
+      // Wait for navigation after clicking login
+      await this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: LOGIN_TIMEOUT });
 
       console.log('✅ Successfully logged into LoadRight');
 
