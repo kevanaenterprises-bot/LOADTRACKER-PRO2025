@@ -1,0 +1,292 @@
+2025-10-28T01:34:38.723185129Z [inf]  1:34:29 AM [express] GET /api/loadright/tenders 304 in 26ms :: []
+2025-10-28T01:34:38.723191277Z [inf]  🔄 Starting LoadRight sync...
+2025-10-28T01:34:38.723197460Z [inf]  🔄 Starting LoadRight tender sync...
+2025-10-28T01:34:38.723204510Z [inf]  🔐 Logging into LoadRight carrier portal...
+2025-10-28T01:34:40.848617041Z [inf]  📄 Login page loaded
+2025-10-28T01:34:46.716800268Z [inf]  ✍️ Credentials entered
+2025-10-28T01:34:48.753886802Z [inf]  ✅ Successfully logged into LoadRight
+2025-10-28T01:34:51.809039545Z [inf]  📊 Dashboard loaded
+2025-10-28T01:34:51.809044306Z [inf]  📥 Fetching tendered loads from LoadRight...
+2025-10-28T01:34:53.818650404Z [inf]  ⚠️ Could not find Tendered link, continuing anyway...
+2025-10-28T01:34:53.818657067Z [inf]  📄 Page HTML saved to /tmp/loadright-page.html
+2025-10-28T01:34:53.818662469Z [inf]  ✅ Found 0 tendered loads
+2025-10-28T01:34:53.818667863Z [inf]  📝 Processing 0 loads...
+2025-10-28T01:34:53.818674185Z [inf]  ✅ Sync complete: 0 tenders processed
+2025-10-28T01:34:53.818680544Z [inf]  🧹 LoadRight browser session cleaned up
+2025-10-28T01:34:53.818687618Z [inf]  ✅ LoadRight sync complete: 0 tenders synced
+2025-10-28T01:34:53.818694317Z [inf]  1:34:53 AM [express] GET /api/loadright/sync 304 in 15240ms :: {"success":true,"count":0,"tenders":[…
+2025-10-28T01:34:53.867035265Z [inf]  1:34:53 AM [express] GET /api/loadright/tenders 304 in 7ms :: []
+2025-10-28T01:35:13.465134974Z [inf]  1:35:12 AM [express] GET /api/auth/driver-user 200 in 6ms :: {"id":"34366fd7-7b43-47a2-baae-73fcd1f7…
+2025-10-28T01:35:13.465147664Z [inf]  Admin login attempt: {
+2025-10-28T01:35:13.465161869Z [inf]    username: 'Admin',
+2025-10-28T01:35:13.465170603Z [inf]    usernameLength: 5,
+2025-10-28T01:35:13.465177375Z [inf]    password: '[LENGTH:9]',
+2025-10-28T01:35:13.465182671Z [inf]    passwordActual: '"go4fc2024"',
+2025-10-28T01:35:13.465188629Z [inf]    sessionId: 'Kuh-YMksEIGfSlfdQAmScKX6TMVM7Ts4',
+2025-10-28T01:35:13.465201075Z [inf]    hasSession: true
+2025-10-28T01:35:13.465208152Z [inf]  }
+2025-10-28T01:35:13.465214063Z [inf]  Admin credentials matched successfully
+2025-10-28T01:35:13.465221693Z [inf]  Session saved and verified, adminAuth: {
+2025-10-28T01:35:13.465227597Z [inf]    id: 'admin-001',
+2025-10-28T01:35:13.465233053Z [inf]    role: 'admin',
+2025-10-28T01:35:13.465238702Z [inf]    lastName: 'User',
+2025-10-28T01:35:13.465244031Z [inf]    username: 'admin',
+2025-10-28T01:35:13.465249231Z [inf]    firstName: 'Admin'
+2025-10-28T01:35:13.465254706Z [inf]  }
+2025-10-28T01:35:13.465262755Z [inf]  1:35:12 AM [express] POST /api/auth/admin-login 200 in 37ms :: {"message":"Login successful","user":…
+2025-10-28T01:35:13.465268979Z [inf]  Browser auth bypass token requested
+2025-10-28T01:35:13.465275385Z [inf]  1:35:12 AM [express] POST /api/auth/browser-bypass 200 in 5ms :: {"message":"Browser auth bypass tok…
+2025-10-28T01:35:13.465287818Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-10-28T01:35:13.465294466Z [inf]    role: 'driver',
+2025-10-28T01:35:13.465300757Z [inf]    userId: '34366fd7-7b43-47a2-baae-73fcd1f78d47',
+2025-10-28T01:35:13.465306739Z [inf]    lastName: 'OWEN',
+2025-10-28T01:35:13.465313099Z [inf]    username: 'KOWEN',
+2025-10-28T01:35:13.465318845Z [inf]    firstName: 'KEVIN'
+2025-10-28T01:35:13.465324400Z [inf]  }
+2025-10-28T01:35:13.467146631Z [inf]  Authentication failed: No user or expiration
+2025-10-28T01:35:13.467155285Z [inf]  1:35:12 AM [express] GET /api/auth/user 401 in 5ms :: {"message":"Unauthorized"}
+2025-10-28T01:35:13.467160705Z [inf]  Admin user check: {
+2025-10-28T01:35:13.467167398Z [inf]    hasSession: true,
+2025-10-28T01:35:13.467174791Z [inf]    hasAdminAuth: true,
+2025-10-28T01:35:13.467180479Z [inf]    sessionId: 'Kuh-YMksEIGfSlfdQAmScKX6TMVM7Ts4',
+2025-10-28T01:35:13.467186658Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-10-28T01:35:13.467192490Z [inf]    adminAuthData: {
+2025-10-28T01:35:13.467198099Z [inf]      id: 'admin-001',
+2025-10-28T01:35:13.467203606Z [inf]      role: 'admin',
+2025-10-28T01:35:13.467209327Z [inf]      lastName: 'User',
+2025-10-28T01:35:13.467215441Z [inf]      username: 'admin',
+2025-10-28T01:35:13.467221607Z [inf]      firstName: 'Admin'
+2025-10-28T01:35:13.467227108Z [inf]    },
+2025-10-28T01:35:13.467233112Z [inf]    hasBypassToken: false
+2025-10-28T01:35:13.467241568Z [inf]  }
+2025-10-28T01:35:13.467247289Z [inf]  1:35:12 AM [express] GET /api/auth/admin-user 200 in 25ms :: {"id":"admin-001","role":"admin","lastN…
+2025-10-28T01:35:13.467253666Z [inf]  1:35:12 AM [express] GET /api/locations 200 in 9ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01",…
+2025-10-28T01:35:13.467259586Z [inf]  1:35:12 AM [express] GET /api/customers 200 in 40ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8"…
+2025-10-28T01:35:13.467264965Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-28T01:35:13.467270430Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-28T01:35:13.467276151Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-28T01:35:13.467281892Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-28T01:35:13.467287422Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-28T01:35:13.469592460Z [inf]      'priority',             'referer',
+2025-10-28T01:35:13.469601211Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-28T01:35:13.469608454Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-10-28T01:35:13.469616533Z [inf]  1:35:12 AM [express] GET /api/drivers/available 200 in 13ms :: [{"id":"6f06b2ff-1dd4-4966-94ff-5c2bf…
+2025-10-28T01:35:13.469622079Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-10-28T01:35:13.469628464Z [inf]  Bypass check: {
+2025-10-28T01:35:13.469634001Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-10-28T01:35:13.469641918Z [inf]    token: '[PROVIDED]',
+2025-10-28T01:35:13.469646999Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-10-28T01:35:13.469656130Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-10-28T01:35:13.469659969Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-10-28T01:35:13.469667375Z [inf]    isActive: true
+2025-10-28T01:35:13.469673050Z [inf]      'x-request-start'
+2025-10-28T01:35:13.469682159Z [inf]  }
+2025-10-28T01:35:13.469686379Z [inf]    ],
+2025-10-28T01:35:13.469696147Z [inf]  Dashboard stats auth check: {
+2025-10-28T01:35:13.469697656Z [inf]    bypassToken: '[PROVIDED]'
+2025-10-28T01:35:13.469707797Z [inf]  }
+2025-10-28T01:35:13.469711986Z [inf]    hasAdminAuth: true,
+2025-10-28T01:35:13.469717342Z [inf]  1:35:12 AM [express] GET /api/dashboard/stats 200 in 270ms :: {"activeLoads":"9","inTransit":"3","de…
+2025-10-28T01:35:13.469723660Z [inf]    hasReplitAuth: false,
+2025-10-28T01:35:13.469730767Z [inf]    hasTokenBypass: true,
+2025-10-28T01:35:13.469738333Z [inf]    headers: [
+2025-10-28T01:35:13.469744955Z [inf]      'host',                 'user-agent',
+2025-10-28T01:35:13.469751855Z [inf]      'accept',               'accept-encoding',
+2025-10-28T01:35:13.469758022Z [inf]      'accept-language',      'cookie',
+2025-10-28T01:35:13.470713868Z [inf]  📋 ADMIN: Returning 16 loads
+2025-10-28T01:35:13.470720858Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 16 loads
+2025-10-28T01:35:13.470725161Z [inf]  🔥 RETURNING: 16 loads
+2025-10-28T01:35:13.933227504Z [inf]  1:35:13 AM [express] GET /api/invoices 200 in 882ms :: [{"id":"82a6d8c3-9217-4b4a-90f5-a0810a856a93"…
+2025-10-28T01:35:13.933233716Z [inf]  1:35:13 AM [express] GET /api/loads 200 in 1009ms :: [{"id":"1a9ce340-d927-4c33-9c8f-f1ded4cbc26b","…
+2025-10-28T01:35:33.395845444Z [err]  2025-10-28 01:35:23.407 UTC [27] LOG:  checkpoint starting: time
+2025-10-28T01:35:33.395856991Z [err]  2025-10-28 01:35:23.738 UTC [27] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.304 s, sync=0.010 s, total=0.331 s; sync files=4, longest=0.009 s, average=0.003 s; distance=13 kB, estimate=180 kB; lsn=0/47CD078, redo lsn=0/47CD020
+2025-10-28T01:35:33.579638043Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-10-28T01:35:33.579649738Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-10-28T01:35:33.579655407Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-10-28T01:35:33.579659902Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-10-28T01:35:33.579664300Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-10-28T01:35:33.579669503Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-10-28T01:35:33.579674299Z [inf]  📋 ADMIN: Returning 16 loads
+2025-10-28T01:35:33.579679463Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 16 loads
+2025-10-28T01:35:33.579683960Z [inf]  🔥 RETURNING: 16 loads
+2025-10-28T01:35:33.579689070Z [inf]  1:35:31 AM [express] GET /api/loads 200 in 888ms :: [{"id":"1a9ce340-d927-4c33-9c8f-f1ded4cbc26b","n…
+2025-10-28T01:35:35.667622756Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-10-28T01:35:35.667629156Z [inf]  📍 Found 5 loads with tracking enabled
+2025-10-28T01:35:35.667633146Z [inf]    ✅ Load 6022412: GPS at 37.47837456, -94.70541996
+2025-10-28T01:35:35.667637438Z [inf]    ✅ Load 109-40178: GPS at 33.00555264, -96.68362917
+2025-10-28T01:35:35.667644504Z [inf]    ⚠️ Load 109-40282: No GPS data yet
+2025-10-28T01:35:35.667648951Z [inf]    ⚠️ Load 109-40023: No GPS data yet
+2025-10-28T01:35:35.667653443Z [inf]    ⚠️ Load 109-40012: No GPS data yet
+2025-10-28T01:35:36.186734226Z [inf]  1:35:35 AM [express] GET /api/tracking/loads 200 in 17ms :: [{"id":"f54f4379-2bf3-43d5-81d9-ea562b27…
+2025-10-28T01:36:15.752648931Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-10-28T01:36:15.752656228Z [inf]  📍 Found 5 loads with tracking enabled
+2025-10-28T01:36:15.752661010Z [inf]    ✅ Load 6022412: GPS at 37.47837456, -94.70541996
+2025-10-28T01:36:15.752671566Z [inf]    ✅ Load 109-40178: GPS at 33.00555264, -96.68362917
+2025-10-28T01:36:15.752681557Z [inf]    ⚠️ Load 109-40282: No GPS data yet
+2025-10-28T01:36:15.752686198Z [inf]    ⚠️ Load 109-40023: No GPS data yet
+2025-10-28T01:36:15.752691228Z [inf]    ⚠️ Load 109-40012: No GPS data yet
+2025-10-28T01:36:15.752695927Z [inf]  1:36:06 AM [express] GET /api/tracking/loads 304 in 60ms :: [{"id":"f54f4379-2bf3-43d5-81d9-ea562b27…
+2025-10-28T01:36:45.741038695Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-10-28T01:36:45.741045453Z [inf]  📍 Found 5 loads with tracking enabled
+2025-10-28T01:36:45.741050132Z [inf]    ✅ Load 6022412: GPS at 37.47837456, -94.70541996
+2025-10-28T01:36:45.741054225Z [inf]    ✅ Load 109-40178: GPS at 33.00555264, -96.68362917
+2025-10-28T01:36:45.741059054Z [inf]    ⚠️ Load 109-40282: No GPS data yet
+2025-10-28T01:36:45.741064770Z [inf]    ⚠️ Load 109-40023: No GPS data yet
+2025-10-28T01:36:45.741069292Z [inf]    ⚠️ Load 109-40012: No GPS data yet
+2025-10-28T01:36:45.741076006Z [inf]  1:36:36 AM [express] GET /api/tracking/loads 304 in 70ms :: [{"id":"f54f4379-2bf3-43d5-81d9-ea562b27…
+2025-10-28T01:37:15.297939858Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-10-28T01:37:15.297948708Z [inf]  📍 Found 5 loads with tracking enabled
+2025-10-28T01:37:15.297954658Z [inf]    ✅ Load 6022412: GPS at 37.47837456, -94.70541996
+2025-10-28T01:37:15.297961004Z [inf]    ✅ Load 109-40178: GPS at 33.00555264, -96.68362917
+2025-10-28T01:37:15.297966833Z [inf]    ⚠️ Load 109-40282: No GPS data yet
+2025-10-28T01:37:15.297972526Z [inf]    ⚠️ Load 109-40023: No GPS data yet
+2025-10-28T01:37:15.297980245Z [inf]    ⚠️ Load 109-40012: No GPS data yet
+2025-10-28T01:37:15.297992166Z [inf]  1:37:06 AM [express] GET /api/tracking/loads 304 in 59ms :: [{"id":"f54f4379-2bf3-43d5-81d9-ea562b27…
+2025-10-28T01:37:45.296362340Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-10-28T01:37:45.296370665Z [inf]  📍 Found 5 loads with tracking enabled
+2025-10-28T01:37:45.296377045Z [inf]    ✅ Load 6022412: GPS at 37.47837456, -94.70541996
+2025-10-28T01:37:45.296382605Z [inf]    ✅ Load 109-40178: GPS at 33.00555264, -96.68362917
+2025-10-28T01:37:45.296388006Z [inf]    ⚠️ Load 109-40282: No GPS data yet
+2025-10-28T01:37:45.296393404Z [inf]    ⚠️ Load 109-40023: No GPS data yet
+2025-10-28T01:37:45.296402506Z [inf]    ⚠️ Load 109-40012: No GPS data yet
+2025-10-28T01:37:45.296442049Z [inf]  1:37:36 AM [express] GET /api/tracking/loads 304 in 51ms :: [{"id":"f54f4379-2bf3-43d5-81d9-ea562b27…
+2025-10-28T01:38:15.340746075Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-10-28T01:38:15.340750237Z [inf]  📍 Found 5 loads with tracking enabled
+2025-10-28T01:38:15.340754596Z [inf]    ✅ Load 6022412: GPS at 37.47837456, -94.70541996
+2025-10-28T01:38:15.340758727Z [inf]    ✅ Load 109-40178: GPS at 33.00555264, -96.68362917
+2025-10-28T01:38:15.340764123Z [inf]    ⚠️ Load 109-40282: No GPS data yet
+2025-10-28T01:38:15.340769821Z [inf]    ⚠️ Load 109-40023: No GPS data yet
+2025-10-28T01:38:15.340774639Z [inf]    ⚠️ Load 109-40012: No GPS data yet
+2025-10-28T01:38:15.340779982Z [inf]  1:38:07 AM [express] GET /api/tracking/loads 304 in 57ms :: [{"id":"f54f4379-2bf3-43d5-81d9-ea562b27…
+2025-10-28T01:39:17.000000000Z [inf]  Starting Container
+2025-10-28T01:39:18.100299760Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-28T01:39:18.133870371Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-28T01:39:18.133883785Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-28T01:39:18.716187834Z [inf]  Using 'pg' driver for database querying
+2025-10-28T01:39:19.131686263Z [inf]  [⣷] Pulling schema from database...
+2025-10-28T01:39:19.131695222Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-28T01:39:19.131705603Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-28T01:39:19.183433002Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-28T01:39:19.315880389Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-28T01:39:19.439109680Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-10-28T01:39:19.567606397Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-10-28T01:39:20.032998590Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-10-28T01:39:20.205228232Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-28T01:39:20.205237145Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-28T01:39:20.205245432Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-28T01:39:20.205252623Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-28T01:39:20.205260309Z [inf]  [i] No changes detected
+2025-10-28T01:39:20.645452199Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-28T01:39:20.645505656Z [inf]  
+2025-10-28T01:39:20.645512403Z [inf]  > rest-express@1.0.0 start
+2025-10-28T01:39:20.645520134Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-28T01:39:20.645526713Z [inf]  
+2025-10-28T01:39:22.439979478Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-28T01:39:22.059Z
+2025-10-28T01:39:22.439984684Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-28T01:39:22.439992513Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-28T01:39:22.440002225Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-28T01:39:22.440003437Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-28T01:39:22.440026155Z [inf]  🔧 Process ID: 50
+2025-10-28T01:39:22.440035714Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-28T01:39:22.440044985Z [inf]  🔧 Platform: linux
+2025-10-28T01:39:22.440053489Z [inf]  🔧 Architecture: x64
+2025-10-28T01:39:22.440061658Z [inf]  🔧 Memory usage: {
+2025-10-28T01:39:22.440071785Z [inf]    "rss": 183017472,
+2025-10-28T01:39:22.440085141Z [inf]    "heapTotal": 94806016,
+2025-10-28T01:39:22.440095708Z [inf]    "heapUsed": 76510800,
+2025-10-28T01:39:22.440104477Z [inf]    "external": 5163014,
+2025-10-28T01:39:22.440112434Z [inf]    "arrayBuffers": 1531568
+2025-10-28T01:39:22.440121844Z [inf]  }
+2025-10-28T01:39:22.440135010Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-28T01:39:22.440143911Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-28T01:39:22.069Z
+2025-10-28T01:39:22.440152621Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-28T01:39:22.440161757Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-28T01:39:22.069Z
+2025-10-28T01:39:22.440267510Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-28T01:39:22.440273494Z [inf]  ✅ HERE Tracking API initialized
+2025-10-28T01:39:22.440279224Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-28T01:39:22.644029723Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-28T01:39:22.644037117Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-28T01:39:22.644044616Z [inf]  🔧 Validating environment configuration...
+2025-10-28T01:39:22.644051530Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-28T01:39:22.644059174Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-28T01:39:22.644066697Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-28T01:39:22.644075233Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-28T01:39:22.644082615Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-28T01:39:22.644090235Z [inf]  ✅ Database URL configured
+2025-10-28T01:39:22.644098029Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-10-28T01:39:22.644107295Z [inf]  ✅ SMS service (Telnyx) configured
+2025-10-28T01:39:22.644116683Z [inf]  ✅ Session authentication configured
+2025-10-28T01:39:22.644123942Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-28T01:39:22.644131626Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-28T01:39:22.644147084Z [inf]  🔧 Testing database connection...
+2025-10-28T01:39:22.644157477Z [err]  (node:50) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-28T01:39:22.644166288Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-28T01:39:22.644176734Z [inf]  ✅ Database connection successful
+2025-10-28T01:39:22.644186280Z [inf]  📝 Registering application routes...
+2025-10-28T01:39:22.644195861Z [inf]  ✅ Routes registered successfully
+2025-10-28T01:39:22.644205644Z [inf]  📁 Setting up static file serving for production...
+2025-10-28T01:39:22.644214289Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-28T01:39:22.644298366Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-28T01:39:22.644304732Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-28T01:39:22.644311996Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-28T01:39:22.644318477Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-28T01:39:22.644326577Z [inf]  📍 Health check endpoints available:
+2025-10-28T01:39:22.644332940Z [inf]     - GET /api/status (basic status)
+2025-10-28T01:39:22.644339456Z [inf]     - GET /api/health (health check)
+2025-10-28T01:39:22.644346049Z [inf]     - GET /api/ready (readiness check)
+2025-10-28T01:39:22.644354665Z [inf]  1:39:22 AM [express] serving on port 8080
+2025-10-28T01:39:22.644362489Z [inf]  1:39:22 AM [express] GET /api/health 200 in 5ms :: {"status":"ok","timestamp":"2025-10-28T01:39:22.4…
+2025-10-28T01:39:22.644369029Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-10-28T01:39:22.644378614Z [err]      at prepareHeaders (file:///app/node_modules/oauth4webapi/build/index.js:146:42)
+2025-10-28T01:39:22.644385320Z [err]      at performDiscovery (file:///app/node_modules/oauth4webapi/build/index.js:194:21)
+2025-10-28T01:39:22.644392104Z [err]      at Module.discoveryRequest (file:///app/node_modules/oauth4webapi/build/index.js:205:12)
+2025-10-28T01:39:22.644398599Z [err]      at performDiscovery (file:///app/node_modules/openid-client/build/index.js:267:17)
+2025-10-28T01:39:22.644405086Z [err]      at Module.discovery (file:///app/node_modules/openid-client/build/index.js:243:22)
+2025-10-28T01:39:22.644411506Z [err]      at memoize.maxAge (file:///app/dist/index.js:4041:25)
+2025-10-28T01:39:22.644417949Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-10-28T01:39:22.644425341Z [err]      at setupAuth (file:///app/dist/index.js:4113:24)
+2025-10-28T01:39:22.644470274Z [err]      at registerRoutes (file:///app/dist/index.js:5302:11)
+2025-10-28T01:39:22.644478040Z [err]      at startServer (file:///app/dist/index.js:12525:26)
+2025-10-28T01:39:22.644485315Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-10-28T01:39:25.000000000Z [inf]  Stopping Container
+2025-10-28T01:39:34.953909055Z [err]  npm error path /app
+2025-10-28T01:39:34.953927892Z [err]  npm error command failed
+2025-10-28T01:39:34.953935475Z [err]  npm error signal SIGTERM
+2025-10-28T01:39:34.953940544Z [err]  npm error command sh -c NODE_ENV=production node dist/index.js
+2025-10-28T01:39:34.953945838Z [err]  npm error A complete log of this run can be found in: /root/.npm/_logs/2025-10-28T00_30_34_084Z-debug-0.log
+2025-10-28T01:40:24.718320878Z [err]  2025-10-28 01:40:23.837 UTC [27] LOG:  checkpoint starting: time
+2025-10-28T01:40:24.718334247Z [err]  2025-10-28 01:40:24.575 UTC [27] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.704 s, sync=0.014 s, total=0.738 s; sync files=6, longest=0.012 s, average=0.003 s; distance=35 kB, estimate=165 kB; lsn=0/47D5DD8, redo lsn=0/47D5D80
+2025-10-28T01:44:24.714721763Z [inf]    ⚠️ Load 109-40282: No GPS data yet
+2025-10-28T01:44:24.714739014Z [inf]    ⚠️ Load 109-40023: No GPS data yet
+2025-10-28T01:44:24.714748621Z [inf]    ⚠️ Load 109-40012: No GPS data yet
+2025-10-28T01:44:24.714756997Z [inf]  1:44:24 AM [express] GET /api/tracking/loads 304 in 109ms :: [{"id":"f54f4379-2bf3-43d5-81d9-ea562b2…
+2025-10-28T01:44:24.714785988Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-10-28T01:44:24.714798967Z [inf]  📍 Found 5 loads with tracking enabled
+2025-10-28T01:44:24.714813653Z [inf]    ✅ Load 6022412: GPS at 37.47837456, -94.70541996
+2025-10-28T01:44:24.714826366Z [inf]    ✅ Load 109-40178: GPS at 33.00555264, -96.68362917
+2025-10-28T01:44:54.232224623Z [inf]  1:44:51 AM [express] GET /api/loadright/tenders 304 in 8ms :: []
+2025-10-28T01:44:57.817869893Z [inf]  🔄 Starting LoadRight sync...
+2025-10-28T01:44:57.817877161Z [inf]  🔄 Starting LoadRight tender sync...
+2025-10-28T01:44:57.817884926Z [inf]  🔐 Logging into LoadRight carrier portal...
+2025-10-28T01:44:59.707078843Z [inf]  📄 Login page loaded
+2025-10-28T01:45:05.247305218Z [inf]  ✍️ Credentials entered
+2025-10-28T01:45:07.620389982Z [inf]  ✅ Successfully logged into LoadRight
+2025-10-28T01:45:10.726666756Z [inf]  📥 Fetching tendered loads from LoadRight...
+2025-10-28T01:45:10.726765501Z [inf]  📊 Dashboard loaded
+2025-10-28T01:45:12.707030653Z [inf]  ⚠️ Could not find Tendered link, continuing anyway...
+2025-10-28T01:45:12.938178932Z [inf]  📸 Screenshot saved to /tmp/loadright-page.png
+2025-10-28T01:45:12.938194513Z [inf]  📸 Screenshot saved to /tmp/loadright-page.png
+2025-10-28T01:45:12.966904210Z [inf]  📄 Page HTML saved to /tmp/loadright-page.html
+2025-10-28T01:45:12.966912354Z [inf]  📄 Page text length: 24560 characters
+2025-10-28T01:45:12.966920248Z [inf]  🔍 Contains "Load #": false
+2025-10-28T01:45:12.966928362Z [inf]  🔍 Contains "109-": false
+2025-10-28T01:45:12.966936038Z [inf]  🔍 Contains "Tendered": false
+2025-10-28T01:45:12.977779274Z [inf]  ✅ Found 0 tendered loads
+2025-10-28T01:45:12.977790538Z [inf]  📝 Processing 0 loads...
+2025-10-28T01:45:12.977816445Z [inf]  ✅ Sync complete: 0 tenders processed
+2025-10-28T01:45:13.113036115Z [inf]  🧹 LoadRight browser session cleaned up
+2025-10-28T01:45:13.113041782Z [inf]  ✅ LoadRight sync complete: 0 tenders synced
+2025-10-28T01:45:13.149577380Z [inf]  1:45:13 AM [express] GET /api/loadright/sync 304 in 15342ms :: {"success":true,"count":0,"tenders":[…
+2025-10-28T01:45:13.718207706Z [inf]  1:45:13 AM [express] GET /api/loadright/tenders 304 in 8ms :: []
+2025-10-28T01:45:25.330111867Z [err]  2025-10-28 01:45:23.675 UTC [27] LOG:  checkpoint starting: time
+2025-10-28T01:45:25.330117370Z [err]  2025-10-28 01:45:23.997 UTC [27] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.304 s, sync=0.007 s, total=0.323 s; sync files=4, longest=0.006 s, average=0.002 s; distance=9 kB, estimate=150 kB; lsn=0/47D8470, redo lsn=0/47D8418

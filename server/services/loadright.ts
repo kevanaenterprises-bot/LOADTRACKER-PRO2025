@@ -180,29 +180,43 @@ export class LoadRightService {
     console.log('📥 Fetching tendered loads from LoadRight...');
 
     try {
+      // Wait for dashboard to fully render
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       // Click on "Tendered" card/link to navigate to tendered loads page
-      // The dashboard shows "Tendered" with a count (e.g., "12")
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('🔍 Searching for Tendered section...');
       
-      // Try to find and click the Tendered section
-      const tenderedElements = await this.page.$$('a, button, div[role="button"]');
-      let clicked = false;
-      
-      for (const element of tenderedElements) {
-        const text = await element.evaluate(el => el.textContent?.trim() || '');
-        if (text.includes('Tendered')) {
-          console.log('🎯 Found Tendered section, clicking...');
-          await element.click();
-          clicked = true;
-          break;
+      // Try clicking using JavaScript evaluation (more reliable than Puppeteer selectors)
+      const clicked = await this.page.evaluate(() => {
+        // Get all clickable elements
+        const allElements = Array.from(document.querySelectorAll('a, button, div, span, [onclick]'));
+        
+        console.log(`Found ${allElements.length} elements to search`);
+        
+        // Look for one containing "Tendered" text
+        for (const el of allElements) {
+          const text = el.textContent || '';
+          const innerText = (el as HTMLElement).innerText || '';
+          
+          if (text.includes('Tendered') || innerText.includes('Tendered')) {
+            console.log('Found element with Tendered:', el.tagName, text.slice(0, 50));
+            
+            // Click it
+            (el as HTMLElement).click();
+            return true;
+          }
         }
-      }
+        
+        return false;
+      });
       
       if (clicked) {
+        console.log('🎯 Clicked Tendered section, waiting for page load...');
         await new Promise(resolve => setTimeout(resolve, 5000));
         console.log('📋 Tendered loads page should be loaded');
       } else {
-        console.log('⚠️ Could not find Tendered link, continuing anyway...');
+        console.log('⚠️ Could not find Tendered link, will try to extract from current page...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
 
       // Take screenshot for debugging
