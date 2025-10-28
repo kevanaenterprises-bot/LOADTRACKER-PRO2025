@@ -199,11 +199,15 @@ export class LoadRightService {
       }
       
       if (clicked) {
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
         console.log('📋 Tendered loads page should be loaded');
       } else {
         console.log('⚠️ Could not find Tendered link, continuing anyway...');
       }
+
+      // Take screenshot for debugging
+      await this.screenshot('/tmp/loadright-page.png');
+      console.log('📸 Screenshot saved to /tmp/loadright-page.png');
 
       // Save HTML for debugging
       const html = await this.page.content();
@@ -211,68 +215,40 @@ export class LoadRightService {
       await fs.writeFile('/tmp/loadright-page.html', html);
       console.log('📄 Page HTML saved to /tmp/loadright-page.html');
 
-      // Extract load data from the page
+      // Get page text to check what we have
+      const pageText = await this.page.evaluate(() => document.body.textContent || '');
+      console.log(`📄 Page text length: ${pageText.length} characters`);
+      console.log(`🔍 Contains "Load #": ${pageText.includes('Load #')}`);
+      console.log(`🔍 Contains "109-": ${pageText.includes('109-')}`);
+      console.log(`🔍 Contains "Tendered": ${pageText.includes('Tendered')}`);
+
+      // Extract load data from the page - SIMPLIFIED approach
       const loads = await this.page.evaluate(() => {
         const tenders: any[] = [];
         
-        console.log('🔍 Starting load extraction...');
+        // Get all text content on the page
+        const fullText = document.body.innerText || document.body.textContent || '';
         
-        // Get all text content to help debug
-        const pageText = document.body.textContent || '';
-        console.log('Page text length:', pageText.length);
-        console.log('Page contains "Load #":', pageText.includes('Load #'));
-        console.log('Page contains "109-":', pageText.includes('109-'));
-
-        // Find all load detail sections on the page
-        const loadSections = document.querySelectorAll('div');
+        // Split by common separators and find load numbers
+        const loadNumberRegex = /Load #\s*(\d+-\d+)/g;
+        const matches = fullText.matchAll(loadNumberRegex);
         
-        loadSections.forEach((section) => {
-          const loadNumberElement = section.querySelector('*');
-          const loadNumberText = loadNumberElement?.textContent;
-          
-          // Look for load number pattern (e.g., "Load # 109-40326")
-          const loadMatch = loadNumberText?.match(/Load #\s*(\d+-\d+)/);
-          if (!loadMatch) return;
-
-          const loadNumber = loadMatch[1];
-          
-          // Extract other details from the section
-          const allText = section.textContent || '';
-          
-          // Look for pickup information
-          const pickupMatch = allText.match(/Pick Up\s+([^\n]+)\s+([^\n]+)\s+([^,]+),\s*([A-Z]{2})\s+(\d{5})/);
-          const pickupLocation = pickupMatch ? `${pickupMatch[1]} ${pickupMatch[2]}` : '';
-          const pickupCity = pickupMatch ? pickupMatch[3] : '';
-          const pickupState = pickupMatch ? pickupMatch[4] : '';
-          
-          // Look for delivery information
-          const deliveryMatch = allText.match(/Delivery\s+(\d{2}\/\d{2}\/\d{4})/);
-          const deliveryDate = deliveryMatch ? deliveryMatch[1] : '';
-          
-          // Look for final destination
-          const finalDestMatch = allText.match(/Final Destination\s+([^\n]+)\s+([^\n]+)\s+([^,]+),\s*([A-Z]{2})\s+(\d{5})/);
-          const deliveryLocation = finalDestMatch ? `${finalDestMatch[1]} ${finalDestMatch[2]}` : '';
-          const deliveryCity = finalDestMatch ? finalDestMatch[3] : '';
-          const deliveryState = finalDestMatch ? finalDestMatch[4] : '';
-          
-          // Look for order number
-          const orderMatch = allText.match(/Order Number:\s*(\S+)/);
-          const orderNumber = orderMatch ? orderMatch[1] : '';
-          
+        for (const match of matches) {
+          const loadNumber = match[1];
           tenders.push({
             loadNumber,
             shipper: '',
-            pickupLocation,
-            pickupCity,
-            pickupState,
+            pickupLocation: '',
+            pickupCity: '',
+            pickupState: '',
             pickupDate: '',
             pickupTime: '',
-            deliveryLocation,
-            deliveryCity,
-            deliveryState,
-            deliveryDate,
+            deliveryLocation: '',
+            deliveryCity: '',
+            deliveryState: '',
+            deliveryDate: '',
             deliveryTime: '',
-            orderNumber,
+            orderNumber: '',
             pieces: '',
             miles: '',
             weight: '',
@@ -280,7 +256,7 @@ export class LoadRightService {
             notes: '',
             status: 'tendered' as const,
           });
-        });
+        }
 
         return tenders;
       });
