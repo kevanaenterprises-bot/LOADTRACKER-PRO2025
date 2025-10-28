@@ -132,21 +132,26 @@ export default function LoadRightTenders() {
                     <ol className="list-decimal list-inside space-y-1">
                       <li>Open carrierportal.loadright.com in a new tab</li>
                       <li>Log in with your credentials</li>
-                      <li>Press F12 to open Developer Tools</li>
-                      <li>Go to the "Application" tab (or "Storage" in Firefox)</li>
-                      <li>Click "Cookies" → "https://carrierportal.loadright.com"</li>
-                      <li>Find the cookie named "connect.sid" and copy its Value</li>
+                      <li>Press F12 to open Developer Tools (or Option+Cmd+I on Mac)</li>
+                      <li>Go to "Application" tab (Chrome) or "Storage" tab (Safari/Firefox)</li>
+                      <li>Click "Cookies" → "carrierportal.loadright.com"</li>
+                      <li>Find the cookie named <strong>"LspAuthCtxPortal"</strong></li>
+                      <li>Widen the "Value" column to see the full value</li>
+                      <li>Double-click the value to select it, then copy (Cmd+C / Ctrl+C)</li>
                       <li>Paste it below</li>
                     </ol>
+                    <p className="text-muted-foreground text-xs mt-2">
+                      💡 Tip: Chrome's DevTools are easier to use than Safari's. Consider using Chrome for this step.
+                    </p>
                   </div>
                 </AlertDescription>
               </Alert>
 
               <div className="space-y-2">
-                <Label htmlFor="session-cookie">Session Cookie (connect.sid)</Label>
+                <Label htmlFor="session-cookie">Session Cookie (LspAuthCtxPortal)</Label>
                 <Textarea
                   id="session-cookie"
-                  placeholder="Paste your session cookie here (e.g., s%3A...)"
+                  placeholder="Paste the full LspAuthCtxPortal cookie value here..."
                   value={sessionCookie}
                   onChange={(e) => setSessionCookie(e.target.value)}
                   rows={4}
