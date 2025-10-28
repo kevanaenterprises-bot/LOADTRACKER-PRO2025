@@ -187,19 +187,28 @@ export class LoadRightService {
       console.log('🔍 Step 1: Looking for "Menu" button...');
       
       const menuResult = await this.page.evaluate(() => {
-        const allElements = Array.from(document.querySelectorAll('a, button, div, span, li, nav *'));
+        const allElements = Array.from(document.querySelectorAll('button, a, div[role="button"], [onclick], nav *, header *'));
         
         for (const el of allElements) {
           const text = el.textContent || '';
           const innerText = (el as HTMLElement).innerText || '';
+          const ariaLabel = el.getAttribute('aria-label') || '';
+          const className = el.className || '';
           
-          // Look for "Menu" button
-          if (text.trim() === 'Menu' || innerText.trim() === 'Menu' ||
-              text.includes('☰') || innerText.includes('☰')) {
+          // Look for hamburger menu by:
+          // 1. Contains hamburger icon (☰)
+          // 2. aria-label contains "menu"
+          // 3. Common class names like "hamburger", "menu-toggle", "nav-toggle"
+          // 4. Located in header/nav area with button role
+          if (text.includes('☰') || innerText.includes('☰') ||
+              ariaLabel.toLowerCase().includes('menu') ||
+              className.toLowerCase().includes('hamburger') ||
+              className.toLowerCase().includes('menu-toggle') ||
+              className.toLowerCase().includes('nav-toggle')) {
             (el as HTMLElement).click();
             return {
               step: 'menu_clicked',
-              clickedText: text.slice(0, 100)
+              clickedText: text.slice(0, 50) || ariaLabel || className
             };
           }
         }
