@@ -1,0 +1,111 @@
+2025-10-28T18:02:53.000000000Z [inf]  Starting Container
+2025-10-28T18:02:53.895660159Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-28T18:02:54.164913173Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-10-28T18:02:54.164999201Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-10-28T18:02:54.597791657Z [inf]  Using 'pg' driver for database querying
+2025-10-28T18:02:54.871151383Z [inf]  [⣷] Pulling schema from database...
+2025-10-28T18:02:54.934055760Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-28T18:02:55.020795523Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-28T18:02:55.098156371Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-10-28T18:02:55.230984004Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-10-28T18:02:55.397084733Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-10-28T18:02:55.482535016Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-10-28T18:02:55.611277173Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-10-28T18:02:55.892419042Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-10-28T18:02:55.897514893Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-10-28T18:02:55.897521744Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-10-28T18:02:55.945380326Z [inf]  [i] No changes detected
+2025-10-28T18:02:56.073049512Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-10-28T18:02:56.102132916Z [inf]  
+2025-10-28T18:02:56.102145588Z [inf]  > rest-express@1.0.0 start
+2025-10-28T18:02:56.102153769Z [inf]  > NODE_ENV=production node dist/index.js
+2025-10-28T18:02:56.102159743Z [inf]  
+2025-10-28T18:02:57.327764166Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-10-28T18:02:57.334041574Z [inf]    "rss": 215851008,
+2025-10-28T18:02:57.334050370Z [inf]    "heapTotal": 130088960,
+2025-10-28T18:02:57.334056090Z [inf]    "heapUsed": 107226840,
+2025-10-28T18:02:57.334061027Z [inf]    "external": 6676780,
+2025-10-28T18:02:57.334066936Z [inf]    "arrayBuffers": 3045334
+2025-10-28T18:02:57.334072491Z [inf]  }
+2025-10-28T18:02:57.334074021Z [inf]  ✅ HERE Tracking API initialized
+2025-10-28T18:02:57.334077910Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-10-28T18:02:57.334082102Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-10-28T18:02:57.334083770Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-28T18:02:57.333Z
+2025-10-28T18:02:57.334088618Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-28T18:02:57.329Z
+2025-10-28T18:02:57.334094714Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-10-28T18:02:57.334104736Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-10-28T18:02:57.334110588Z [inf]  🔧 Process ID: 53
+2025-10-28T18:02:57.334116432Z [inf]  🔧 Node.js version: v22.11.0
+2025-10-28T18:02:57.334122024Z [inf]  🔧 Platform: linux
+2025-10-28T18:02:57.334129785Z [inf]  🔧 Architecture: x64
+2025-10-28T18:02:57.334135616Z [inf]  🔧 Memory usage: {
+2025-10-28T18:02:57.335042876Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-10-28T18:02:57.335049048Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-28T18:02:57.333Z
+2025-10-28T18:02:57.335053940Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-10-28T18:02:57.335054590Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-10-28T18:02:57.335059159Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-10-28T18:02:57.335063439Z [inf]  ✅ SMS service (Telnyx) configured
+2025-10-28T18:02:57.335064333Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-10-28T18:02:57.335069695Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-10-28T18:02:57.335070822Z [inf]  ✅ Session authentication configured
+2025-10-28T18:02:57.335074468Z [inf]  🔧 Validating environment configuration...
+2025-10-28T18:02:57.335077168Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-10-28T18:02:57.335079818Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-10-28T18:02:57.335083574Z [inf]  🔧 Environment: NODE_ENV=production
+2025-10-28T18:02:57.335085157Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-10-28T18:02:57.335089673Z [inf]  🔧 Testing database connection...
+2025-10-28T18:02:57.335092167Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-10-28T18:02:57.335096977Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-10-28T18:02:57.335102157Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-10-28T18:02:57.335107009Z [inf]  ✅ Database URL configured
+2025-10-28T18:02:57.349352710Z [err]  (node:53) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-10-28T18:02:57.349357575Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-10-28T18:02:57.588077236Z [inf]  ✅ Database connection successful
+2025-10-28T18:02:57.588085172Z [inf]  📝 Registering application routes...
+2025-10-28T18:02:57.597686051Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-10-28T18:02:57.597692069Z [err]      at prepareHeaders (file:///app/node_modules/oauth4webapi/build/index.js:146:42)
+2025-10-28T18:02:57.597697323Z [err]      at performDiscovery (file:///app/node_modules/oauth4webapi/build/index.js:194:21)
+2025-10-28T18:02:57.597702336Z [err]      at Module.discoveryRequest (file:///app/node_modules/oauth4webapi/build/index.js:205:12)
+2025-10-28T18:02:57.597707047Z [err]      at performDiscovery (file:///app/node_modules/openid-client/build/index.js:267:17)
+2025-10-28T18:02:57.597712602Z [err]      at Module.discovery (file:///app/node_modules/openid-client/build/index.js:243:22)
+2025-10-28T18:02:57.597717857Z [err]      at memoize.maxAge (file:///app/dist/index.js:3974:25)
+2025-10-28T18:02:57.597722697Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-10-28T18:02:57.597727354Z [err]      at setupAuth (file:///app/dist/index.js:4046:24)
+2025-10-28T18:02:57.597732701Z [err]      at registerRoutes (file:///app/dist/index.js:5235:11)
+2025-10-28T18:02:57.597738173Z [err]      at startServer (file:///app/dist/index.js:12461:26)
+2025-10-28T18:02:57.597743678Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-10-28T18:02:57.600834081Z [inf]  ✅ Routes registered successfully
+2025-10-28T18:02:57.600838100Z [inf]  📁 Setting up static file serving for production...
+2025-10-28T18:02:57.600842047Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-10-28T18:02:57.600846365Z [inf]  🔍 DEBUG: index.html exists: true
+2025-10-28T18:02:57.600850383Z [inf]  ✅ Static file serving configured (production mode)
+2025-10-28T18:02:57.600854294Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-10-28T18:02:57.601737234Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-10-28T18:02:57.601741041Z [inf]  📍 Health check endpoints available:
+2025-10-28T18:02:57.601744815Z [inf]     - GET /api/status (basic status)
+2025-10-28T18:02:57.601748707Z [inf]     - GET /api/health (health check)
+2025-10-28T18:02:57.601752716Z [inf]     - GET /api/ready (readiness check)
+2025-10-28T18:02:57.619058211Z [inf]  6:02:57 PM [express] serving on port 8080
+2025-10-28T18:02:58.488321996Z [inf]  6:02:58 PM [express] GET /api/health 200 in 3ms :: {"status":"ok","timestamp":"2025-10-28T18:02:58.4…
+2025-10-28T18:03:18.491599680Z [inf]  6:03:14 PM [express] GET /api/loadright/tenders 304 in 10ms :: []
+2025-10-28T18:04:48.521155607Z [inf]  🔄 Starting LoadRight sync...
+2025-10-28T18:04:48.521161921Z [inf]  🔄 Starting LoadRight tender sync...
+2025-10-28T18:04:48.521165730Z [inf]  🔐 Initializing LoadRight with session cookie...
+2025-10-28T18:04:52.475517684Z [inf]  📍 URL: https://carrierportal.loadright.com/
+2025-10-28T18:04:52.475529463Z [inf]  📄 Title: LoadRight - Login - LoadRight Carrier Portal
+2025-10-28T18:04:52.475538643Z [inf]  ✅ LoadRight session initialized successfully
+2025-10-28T18:04:52.475545091Z [inf]  📥 Fetching tendered loads...
+2025-10-28T18:04:54.476098656Z [inf]  🔍 Step 1: Looking for hamburger menu...
+2025-10-28T18:04:54.482028073Z [inf]  📊 Menu click: {"clicked":false,"elementsSearched":27}
+2025-10-28T18:04:54.482036862Z [err]  ❌ Failed to fetch loads: Error: Could not find hamburger menu button. Searched 27 elements.
+2025-10-28T18:04:54.482042694Z [err]      at LoadRightService.getTenderedLoads (file:///app/dist/index.js:3733:19)
+2025-10-28T18:04:54.482047795Z [err]      at async syncLoadRightTenders (file:///app/dist/index.js:3618:21)
+2025-10-28T18:04:54.482052293Z [err]      at async file:///app/dist/index.js:12184:22
+2025-10-28T18:04:54.482057461Z [err]  ❌ LoadRight sync failed: Error: Failed to fetch loads: Could not find hamburger menu button. Searched 27 elements.
+2025-10-28T18:04:54.482064188Z [err]      at LoadRightService.getTenderedLoads (file:///app/dist/index.js:3790:17)
+2025-10-28T18:04:54.482068714Z [err]      at async syncLoadRightTenders (file:///app/dist/index.js:3618:21)
+2025-10-28T18:04:54.482073390Z [err]      at async file:///app/dist/index.js:12184:22
+2025-10-28T18:04:54.780125211Z [inf]  🧹 LoadRight browser session cleaned up
+2025-10-28T18:04:54.780131213Z [inf]  ✅ LoadRight sync complete: 0 tenders synced
+2025-10-28T18:04:54.781962581Z [inf]  6:04:54 PM [express] POST /api/loadright/sync 200 in 7658ms :: {"success":false,"count":0,"tenders":…
+2025-10-28T18:04:54.922269878Z [inf]  6:04:54 PM [express] GET /api/loadright/tenders 304 in 28ms :: []

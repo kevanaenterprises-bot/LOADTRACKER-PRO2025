@@ -92,8 +92,25 @@ export class LoadRightService {
       console.log(`📍 URL: ${currentUrl}`);
       console.log(`📄 Title: ${currentTitle}`);
       
-      if (currentUrl.includes('/login') || currentTitle.toLowerCase().includes('log in')) {
-        throw new Error(`Session cookie expired or invalid. Please log in manually and update cookie.`);
+      // Debug: Check what's actually on the page
+      const pageInfo = await this.page.evaluate(() => {
+        return {
+          bodyText: document.body.innerText.substring(0, 500),
+          hasLoginForm: !!document.querySelector('input[type="password"]'),
+          elementCount: document.querySelectorAll('*').length,
+          hasNav: !!document.querySelector('nav'),
+          hasMenu: !!document.querySelector('[class*="menu"]'),
+        };
+      });
+      
+      console.log('🔍 Page analysis:', JSON.stringify(pageInfo, null, 2));
+      
+      // Save screenshot for debugging
+      await this.screenshot('/tmp/loadright-session.png');
+      console.log('📸 Screenshot saved to /tmp/loadright-session.png');
+      
+      if (pageInfo.hasLoginForm) {
+        throw new Error(`Session cookie is not working - login form still visible. The cookie might be expired, invalid, or LoadRight requires additional authentication. Please log in again and get a fresh cookie.`);
       }
       
       console.log('✅ LoadRight session initialized successfully');
