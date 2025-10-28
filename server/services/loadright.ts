@@ -57,7 +57,7 @@ export class LoadRightService {
     console.log('🔐 Logging into LoadRight carrier portal...');
 
     try {
-      // Launch browser
+      // Launch browser with anti-detection measures
       this.browser = await puppeteer.launch({
         headless: true,
         args: [
@@ -65,16 +65,39 @@ export class LoadRightService {
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
           '--disable-gpu',
+          '--disable-blink-features=AutomationControlled',
+          '--disable-features=IsolateOrigins,site-per-process',
         ],
       });
 
       this.page = await this.browser.newPage();
       
-      // Set viewport and user agent
+      // Set realistic viewport and user agent
       await this.page.setViewport({ width: 1920, height: 1080 });
       await this.page.setUserAgent(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       );
+      
+      // Remove automation indicators
+      await this.page.evaluateOnNewDocument(() => {
+        // Override the navigator.webdriver property
+        Object.defineProperty(navigator, 'webdriver', {
+          get: () => false,
+        });
+        
+        // Mock chrome object
+        (window as any).chrome = {
+          runtime: {},
+        };
+        
+        // Mock permissions
+        const originalQuery = window.navigator.permissions.query;
+        window.navigator.permissions.query = (parameters: any) => (
+          parameters.name === 'notifications' ?
+            Promise.resolve({ state: Notification.permission } as PermissionStatus) :
+            originalQuery(parameters)
+        );
+      });
 
       // Navigate to login page
       await this.page.goto(LOADRIGHT_URL, {
@@ -143,9 +166,13 @@ export class LoadRightService {
       }
 
       // Wait for navigation after clicking login
-      await this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: LOGIN_TIMEOUT });
+      try {
+        await this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: LOGIN_TIMEOUT });
+      } catch (navError) {
+        console.log('⚠️ Navigation timeout - checking if page changed anyway...');
+      }
 
-      // Wait for dashboard to appear
+      // Wait for page to settle
       await new Promise(resolve => setTimeout(resolve, 3000));
       
       // VERIFY LOGIN SUCCEEDED - check we're not still on login page
@@ -155,14 +182,31 @@ export class LoadRightService {
       console.log(`📍 Current URL: ${finalUrl}`);
       console.log(`📄 Current title: ${finalTitle}`);
       
-      // If still on login page, authentication failed
-      if (finalUrl.includes('/login') || finalTitle.toLowerCase().includes('log in') || finalTitle.toLowerCase().includes('login')) {
-        throw new Error(`Login failed - still on login page. URL: ${finalUrl}, Title: ${finalTitle}`);
+      // Check for error messages on the page
+      const errorMessage = await this.page.evaluate(() => {
+        const errorElements = Array.from(document.querySelectorAll('.error, .alert, [class*="error"], [class*="alert"]'));
+        for (const el of errorElements) {
+          const text = el.textContent?.trim();
+          if (text && text.length > 0) {
+            return text;
+          }
+        }
+        return null;
+      });
+      
+      if (errorMessage) {
+        console.log(`❌ Error message on page: ${errorMessage}`);
       }
       
-      // Verify we reached the dashboard or portal
-      if (!finalUrl.includes('loadright.com') || (!finalTitle.includes('Dashboard') && !finalTitle.includes('Portal') && !finalTitle.includes('LoadRight'))) {
-        console.log(`⚠️ Warning: Unexpected page after login. URL: ${finalUrl}, Title: ${finalTitle}`);
+      // If still on login page, authentication failed
+      if (finalUrl.includes('/login') || finalUrl === LOADRIGHT_URL || finalUrl === LOADRIGHT_URL + '/' || 
+          finalTitle.toLowerCase().includes('log in') || finalTitle.toLowerCase().includes('login')) {
+        
+        // Take screenshot for debugging
+        await this.screenshot('/tmp/loadright-login-failed.png');
+        console.log('📸 Login failure screenshot saved');
+        
+        throw new Error(`Login failed - still on login page. URL: ${finalUrl}, Title: ${finalTitle}${errorMessage ? `, Error: ${errorMessage}` : ''}`);
       }
       
       console.log('✅ Successfully logged into LoadRight - dashboard confirmed');
