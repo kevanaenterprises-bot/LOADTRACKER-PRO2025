@@ -8944,21 +8944,26 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
 
   // ===== LOADRIGHT INTEGRATION ROUTES =====
   
-  // Sync loads from LoadRight portal
-  app.get("/api/loadright/sync", async (req, res) => {
+  // Sync loads from LoadRight portal (requires session cookie from manual login)
+  app.post("/api/loadright/sync", async (req, res) => {
     try {
+      const { sessionCookie } = req.body;
+      
+      if (!sessionCookie) {
+        return res.status(400).json({ 
+          success: false,
+          message: "Session cookie required. Please log in to LoadRight manually and provide your session cookie." 
+        });
+      }
+      
       console.log("🔄 Starting LoadRight sync...");
       
-      const { loadRightService } = await import('./services/loadright');
-      const tenders = await loadRightService.syncTenders();
+      const { syncLoadRightTenders } = await import('./services/loadright');
+      const result = await syncLoadRightTenders(sessionCookie);
       
-      console.log(`✅ LoadRight sync complete: ${tenders.length} tenders synced`);
+      console.log(`✅ LoadRight sync complete: ${result.count} tenders synced`);
       
-      res.json({
-        success: true,
-        count: tenders.length,
-        tenders
-      });
+      res.json(result);
     } catch (error: any) {
       console.error("❌ Error syncing LoadRight tenders:", error);
       res.status(500).json({ 

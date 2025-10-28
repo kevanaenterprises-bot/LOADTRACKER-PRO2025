@@ -1,10 +1,15 @@
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, CheckCircle, Truck, MapPin, Calendar, DollarSign } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, RefreshCw, CheckCircle, Truck, MapPin, Calendar, DollarSign, Info } from "lucide-react";
 import { format } from "date-fns";
 
 interface LoadRightTender {
@@ -29,22 +34,21 @@ interface LoadRightTender {
 
 export default function LoadRightTenders() {
   const { toast } = useToast();
+  const [sessionCookie, setSessionCookie] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { data: tenders, isLoading, error } = useQuery<LoadRightTender[]>({
     queryKey: ["/api/loadright/tenders"],
   });
 
   const syncMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch("/api/loadright/sync");
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to sync");
-      }
-      return response.json();
+    mutationFn: async (cookie: string) => {
+      const response = await apiRequest("/api/loadright/sync", "POST", { sessionCookie: cookie });
+      return response;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/loadright/tenders"] });
+      setDialogOpen(false);
       toast({
         title: "Sync Complete",
         description: `Successfully synced ${data.count} tender(s) from LoadRight`,
@@ -58,6 +62,18 @@ export default function LoadRightTenders() {
       });
     },
   });
+
+  const handleSync = () => {
+    if (!sessionCookie.trim()) {
+      toast({
+        title: "Session Cookie Required",
+        description: "Please enter your LoadRight session cookie",
+        variant: "destructive",
+      });
+      return;
+    }
+    syncMutation.mutate(sessionCookie);
+  };
 
   const acceptMutation = useMutation({
     mutationFn: async (tenderId: string) => {
@@ -92,23 +108,81 @@ export default function LoadRightTenders() {
             View and accept tendered loads from LoadRight portal
           </p>
         </div>
-        <Button 
-          onClick={() => syncMutation.mutate()}
-          disabled={syncMutation.isPending}
-          data-testid="button-sync-loadright"
-        >
-          {syncMutation.isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Syncing...
-            </>
-          ) : (
-            <>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button data-testid="button-open-sync-dialog">
               <RefreshCw className="mr-2 h-4 w-4" />
               Sync LoadRight
-            </>
-          )}
-        </Button>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Sync LoadRight Tenders</DialogTitle>
+              <DialogDescription>
+                Log in to LoadRight manually, then paste your session cookie here
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  <div className="space-y-2 text-sm">
+                    <p className="font-semibold">How to get your session cookie:</p>
+                    <ol className="list-decimal list-inside space-y-1">
+                      <li>Open carrierportal.loadright.com in a new tab</li>
+                      <li>Log in with your credentials</li>
+                      <li>Press F12 to open Developer Tools</li>
+                      <li>Go to the "Application" tab (or "Storage" in Firefox)</li>
+                      <li>Click "Cookies" → "https://carrierportal.loadright.com"</li>
+                      <li>Find the cookie named "connect.sid" and copy its Value</li>
+                      <li>Paste it below</li>
+                    </ol>
+                  </div>
+                </AlertDescription>
+              </Alert>
+
+              <div className="space-y-2">
+                <Label htmlFor="session-cookie">Session Cookie (connect.sid)</Label>
+                <Textarea
+                  id="session-cookie"
+                  placeholder="Paste your session cookie here (e.g., s%3A...)"
+                  value={sessionCookie}
+                  onChange={(e) => setSessionCookie(e.target.value)}
+                  rows={4}
+                  data-testid="input-session-cookie"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setDialogOpen(false)}
+                  data-testid="button-cancel-sync"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSync}
+                  disabled={syncMutation.isPending}
+                  data-testid="button-sync-loadright"
+                >
+                  {syncMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Sync Now
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {isLoading ? (
