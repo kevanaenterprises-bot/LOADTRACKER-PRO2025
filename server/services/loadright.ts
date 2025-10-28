@@ -183,49 +183,75 @@ export class LoadRightService {
       // Wait for dashboard to fully render
       await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // Click on "Tendered" card/link to navigate to tendered loads page
-      console.log('🔍 Searching for Tendered section...');
+      // Navigate to Tendered Loads via the navigation menu dropdown
+      console.log('🔍 Looking for navigation menu (Active Loads dropdown)...');
       
-      // Try clicking using JavaScript evaluation (more reliable than Puppeteer selectors)
-      const result = await this.page.evaluate(() => {
-        // Get all clickable elements
-        const allElements = Array.from(document.querySelectorAll('a, button, div, span, [onclick]'));
+      const navResult = await this.page.evaluate(() => {
+        // Step 1: Find and click the "Active Loads" menu item to open dropdown
+        const allElements = Array.from(document.querySelectorAll('a, button, div, span, li, nav *'));
         
-        // Look for one containing "Tendered" text
+        let dropdownOpened = false;
         for (const el of allElements) {
           const text = el.textContent || '';
           const innerText = (el as HTMLElement).innerText || '';
           
-          if (text.includes('Tendered') || innerText.includes('Tendered')) {
-            // Click it
+          // Look for "Active Loads" or similar menu item
+          if (text.includes('Active Loads') || text.includes('Active Load') || 
+              innerText.includes('Active Loads') || innerText.includes('Active Load')) {
+            (el as HTMLElement).click();
+            dropdownOpened = true;
+            return {
+              step: 'dropdown_opened',
+              clickedText: text.slice(0, 100)
+            };
+          }
+        }
+        
+        return {
+          step: 'dropdown_not_found',
+          totalElements: allElements.length
+        };
+      });
+      
+      console.log('📊 Navigation step 1:', JSON.stringify(navResult, null, 2));
+      
+      // Wait for dropdown to appear
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Step 2: Click "Tendered Loads" from the dropdown
+      const tenderedResult = await this.page.evaluate(() => {
+        const allElements = Array.from(document.querySelectorAll('a, button, div, span, li, nav *'));
+        
+        for (const el of allElements) {
+          const text = el.textContent || '';
+          const innerText = (el as HTMLElement).innerText || '';
+          
+          // Look for "Tendered Loads" or just "Tendered"
+          if (text.includes('Tendered Loads') || text.includes('Tendered Load') ||
+              innerText.includes('Tendered Loads') || innerText.includes('Tendered Load')) {
             (el as HTMLElement).click();
             return {
               clicked: true,
-              elementTag: el.tagName,
-              elementText: text.slice(0, 100),
-              totalElementsSearched: allElements.length
+              clickedText: text.slice(0, 100)
             };
           }
         }
         
         return {
           clicked: false,
-          totalElementsSearched: allElements.length,
           pageTitle: document.title,
-          bodyText: document.body?.innerText?.slice(0, 500)
+          bodyPreview: document.body?.innerText?.slice(0, 500)
         };
       });
       
-      console.log('📊 Search result:', JSON.stringify(result, null, 2));
+      console.log('📊 Navigation step 2:', JSON.stringify(tenderedResult, null, 2));
       
-      if (result.clicked) {
-        console.log(`🎯 Clicked ${result.elementTag} with text: ${result.elementText}`);
+      if (tenderedResult.clicked) {
+        console.log(`🎯 Successfully clicked "Tendered Loads" menu item!`);
         await new Promise(resolve => setTimeout(resolve, 5000));
-        console.log('📋 Tendered loads page should be loaded');
+        console.log('📋 Tendered loads page should now be loaded');
       } else {
-        console.log(`⚠️ Could not find Tendered link among ${result.totalElementsSearched} elements`);
-        console.log(`📄 Page title: ${result.pageTitle}`);
-        console.log(`📝 Body preview: ${result.bodyText?.slice(0, 200)}`);
+        console.log(`⚠️ Could not find "Tendered Loads" in dropdown menu`);
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
 

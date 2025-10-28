@@ -1,0 +1,115 @@
+Oct 27, 2025 at 8:50 PM
+Details Build Deploy HTTP
+You reached the start of the range
+Oct 27, 2025 at 8:50 PM
+Starting Container
+npm warn config production Use `--omit=dev` instead.
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/app/drizzle.config.ts'
+Using 'pg' driver for database querying
+[⣷] Pulling schema from database...
+[⣯] Pulling schema from database...
+[⣟] Pulling schema from database...
+[⡿] Pulling schema from database...
+[⢿] Pulling schema from database...
+[⣻] Pulling schema from database...
+[⣽] Pulling schema from database...
+[⣷] Pulling schema from database...
+[⣯] Pulling schema from database...
+[⣟] Pulling schema from database...
+[✓] Pulling schema from database...
+[i] No changes detected
+npm warn config production Use `--omit=dev` instead.
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+✅ HERE Tracking API initialized
+🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-28T01:56:19.534Z
+🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+🔧 Process ID: 54
+🔧 Node.js version: v22.11.0
+🔧 Platform: linux
+🔧 Architecture: x64
+🔧 Memory usage: {
+  "rss": 181313536,
+  "heapTotal": 95068160,
+  "heapUsed": 68036072,
+  "external": 4204721,
+  "arrayBuffers": 532394
+}
+🚨 DEPLOYMENT DEBUG: About to call startServer function
+🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-28T01:56:19.538Z
+🚨 DEPLOYMENT DEBUG: Starting server initialization function
+🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-28T01:56:19.538Z
+🚀 Starting LoadTracker Pro server...
+📊 STARTUP TRACE: Entering main server initialization function
+📊 STARTUP TRACE: Beginning try block for server startup
+✅ Object storage environment variables configured (Google Cloud Storage)
+🔧 Validating environment configuration...
+✅ SMS service (Telnyx) configured
+🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+✅ Session authentication configured
+🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+🚨 DEPLOYMENT DEBUG: PORT type: string
+🔧 Environment: NODE_ENV=production
+🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+🔧 Testing database connection...
+✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+✅ Database URL configured
+(node:54) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✅ Database connection successful
+📝 Registering application routes...
+❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+    at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+    at prepareHeaders (file:///app/node_modules/oauth4webapi/build/index.js:146:42)
+    at setupAuth (file:///app/dist/index.js:4119:24)
+    at performDiscovery (file:///app/node_modules/oauth4webapi/build/index.js:194:21)
+    at registerRoutes (file:///app/dist/index.js:5308:11)
+    at Module.discoveryRequest (file:///app/node_modules/oauth4webapi/build/index.js:205:12)
+    at startServer (file:///app/dist/index.js:12531:26)
+⚠️ Users can still access the app using bypass tokens or driver direct access
+    at performDiscovery (file:///app/node_modules/openid-client/build/index.js:267:17)
+    at Module.discovery (file:///app/node_modules/openid-client/build/index.js:243:22)
+    at memoize.maxAge (file:///app/dist/index.js:4047:25)
+✅ Routes registered successfully
+📁 Setting up static file serving for production...
+🔍 DEBUG: Resolved static path: /app/dist/public
+🔍 DEBUG: index.html exists: true
+✅ Static file serving configured (production mode)
+🌐 Starting HTTP server on 0.0.0.0:8080...
+🎉 LoadTracker Pro is running successfully on port 8080
+📍 Health check endpoints available:
+   - GET /api/status (basic status)
+   - GET /api/health (health check)
+   - GET /api/ready (readiness check)
+1:56:19 AM [express] serving on port 8080
+1:56:19 AM [express] GET /api/health 200 in 4ms :: {"status":"ok","timestamp":"2025-10-28T01:56:19.9…
+1:56:45 AM [express] GET /api/loadright/tenders 304 in 8ms :: []
+🔄 Starting LoadRight sync...
+🔄 Starting LoadRight tender sync...
+🔐 Logging into LoadRight carrier portal...
+📄 Login page loaded
+✍️ Credentials entered
+✅ Successfully logged into LoadRight
+📊 Dashboard loaded
+📥 Fetching tendered loads from LoadRight...
+🔍 Searching for Tendered section...
+⚠️ Could not find Tendered link, will try to extract from current page...
+📸 Screenshot saved to /tmp/loadright-page.png
+📸 Screenshot saved to /tmp/loadright-page.png
+✅ Found 0 tendered loads
+📄 Page HTML saved to /tmp/loadright-page.html
+📄 Page text length: 24560 characters
+📝 Processing 0 loads...
+🔍 Contains "Load #": false
+✅ Sync complete: 0 tenders processed
+🔍 Contains "109-": false
+🔍 Contains "Tendered": false
+🧹 LoadRight browser session cleaned up
+✅ LoadRight sync complete: 0 tenders synced
+1:57:08 AM [express] GET /api/loadright/sync 304 in 18042ms :: {"success":true,"count":0,"tenders":[…
