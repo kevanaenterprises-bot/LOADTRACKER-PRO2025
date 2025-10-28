@@ -1,0 +1,114 @@
+HTTP
+You reached the start of the range
+Oct 28, 2025 at 10:43 AM
+Starting Container
+npm warn config production Use `--omit=dev` instead.
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/app/drizzle.config.ts'
+Using 'pg' driver for database querying
+[⣷] Pulling schema from database...
+[⣯] Pulling schema from database...
+[⣟] Pulling schema from database...
+[⡿] Pulling schema from database...
+[⢿] Pulling schema from database...
+[⣻] Pulling schema from database...
+[⣽] Pulling schema from database...
+[⣷] Pulling schema from database...
+[⣯] Pulling schema from database...
+[✓] Pulling schema from database...
+[i] No changes detected
+npm warn config production Use `--omit=dev` instead.
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+🔧 Architecture: x64
+🔧 Memory usage: {
+  "rss": 220823552,
+  "heapTotal": 130359296,
+⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+  "heapUsed": 106551160,
+✅ HERE Tracking API initialized
+  "external": 6718077,
+🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+  "arrayBuffers": 3086631
+}
+🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-10-28T15:49:07.663Z
+🚨 DEPLOYMENT DEBUG: About to call startServer function
+🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-10-28T15:49:07.666Z
+📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+🚨 DEPLOYMENT DEBUG: Starting server initialization function
+🔧 Process ID: 50
+🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-10-28T15:49:07.667Z
+🔧 Node.js version: v22.11.0
+🚀 Starting LoadTracker Pro server...
+🔧 Platform: linux
+📊 STARTUP TRACE: Entering main server initialization function
+📊 STARTUP TRACE: Beginning try block for server startup
+🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+🔧 Validating environment configuration...
+🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+🚨 DEPLOYMENT DEBUG: PORT type: string
+🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+✅ Database URL configured
+✅ Object storage environment variables configured (Google Cloud Storage)
+✅ SMS service (Telnyx) configured
+✅ Session authentication configured
+🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+🔧 Environment: NODE_ENV=production
+🔧 Testing database connection...
+(node:50) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✅ Database connection successful
+🔍 DEBUG: Resolved static path: /app/dist/public
+📝 Registering application routes...
+❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+🔍 DEBUG: index.html exists: true
+    at prepareHeaders (file:///app/node_modules/oauth4webapi/build/index.js:146:42)
+    at performDiscovery (file:///app/node_modules/oauth4webapi/build/index.js:194:21)
+✅ Static file serving configured (production mode)
+    at Module.discoveryRequest (file:///app/node_modules/oauth4webapi/build/index.js:205:12)
+    at performDiscovery (file:///app/node_modules/openid-client/build/index.js:267:17)
+    at Module.discovery (file:///app/node_modules/openid-client/build/index.js:243:22)
+    at memoize.maxAge (file:///app/dist/index.js:4084:25)
+    at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+    at setupAuth (file:///app/dist/index.js:4156:24)
+    at registerRoutes (file:///app/dist/index.js:5345:11)
+    at startServer (file:///app/dist/index.js:12568:26)
+⚠️ Users can still access the app using bypass tokens or driver direct access
+✅ Routes registered successfully
+📁 Setting up static file serving for production...
+🌐 Starting HTTP server on 0.0.0.0:8080...
+🎉 LoadTracker Pro is running successfully on port 8080
+📍 Health check endpoints available:
+   - GET /api/status (basic status)
+   - GET /api/health (health check)
+   - GET /api/ready (readiness check)
+3:49:07 PM [express] serving on port 8080
+3:49:08 PM [express] GET /api/health 200 in 5ms :: {"status":"ok","timestamp":"2025-10-28T15:49:08.1…
+3:54:02 PM [express] GET /api/loadright/tenders 304 in 35ms :: []
+🔄 Starting LoadRight sync...
+🔄 Starting LoadRight tender sync...
+🔐 Logging into LoadRight carrier portal...
+📄 Login page loaded
+✍️ Credentials entered
+✅ Successfully logged into LoadRight
+📍 Current URL: https://carrierportal.loadright.com/
+📄 Page title: LoadRight - Login - LoadRight Carrier Portal
+📊 Dashboard should be loaded...
+📍 Final URL: https://carrierportal.loadright.com/
+📄 Final title: LoadRight - Login - LoadRight Carrier Portal
+📥 Fetching tendered loads from LoadRight...
+🔍 Step 1: Looking for "Menu" button...
+📊 Menu click result: {
+  "step": "menu_not_found",
+  "totalElements": 27
+}
+🔍 Step 2: Looking for "Active Loads" in menu dropdown...
+📊 Active Loads click result: {
+  "clicked": false,
+  "pageTitle": "LoadRight - Login - LoadRight Carrier Portal",
+  "bodyPreview": " Log In\n\nLoadRight provides leading Load Planning, Shipment Management, and real-time tracking software for Shippers. Carriers can sign up now for FREE to view, accept, assign, dispatch & track loads from LoadRight customers.\n\n•   Assign Your Drivers\n•   Track Your Loads\n•   View The Statuses of the"
+}
+⚠️ Could not find "Active Loads" menu item
