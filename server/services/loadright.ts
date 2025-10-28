@@ -205,9 +205,23 @@ export class LoadRightService {
         console.log('⚠️ Could not find Tendered link, continuing anyway...');
       }
 
+      // Save HTML for debugging
+      const html = await this.page.content();
+      const fs = await import('fs/promises');
+      await fs.writeFile('/tmp/loadright-page.html', html);
+      console.log('📄 Page HTML saved to /tmp/loadright-page.html');
+
       // Extract load data from the page
       const loads = await this.page.evaluate(() => {
         const tenders: any[] = [];
+        
+        console.log('🔍 Starting load extraction...');
+        
+        // Get all text content to help debug
+        const pageText = document.body.textContent || '';
+        console.log('Page text length:', pageText.length);
+        console.log('Page contains "Load #":', pageText.includes('Load #'));
+        console.log('Page contains "109-":', pageText.includes('109-'));
 
         // Find all load detail sections on the page
         const loadSections = document.querySelectorAll('div');
