@@ -145,22 +145,27 @@ export class LoadRightService {
       // Wait for navigation after clicking login
       await this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: LOGIN_TIMEOUT });
 
-      // Check what page we're on after login
-      const currentUrl = this.page.url();
-      const pageTitle = await this.page.title();
-      console.log('✅ Successfully logged into LoadRight');
-      console.log(`📍 Current URL: ${currentUrl}`);
-      console.log(`📄 Page title: ${pageTitle}`);
-
       // Wait for dashboard to appear
       await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // Double-check we're still logged in
+      // VERIFY LOGIN SUCCEEDED - check we're not still on login page
       const finalUrl = this.page.url();
       const finalTitle = await this.page.title();
-      console.log('📊 Dashboard should be loaded...');
-      console.log(`📍 Final URL: ${finalUrl}`);
-      console.log(`📄 Final title: ${finalTitle}`);
+      
+      console.log(`📍 Current URL: ${finalUrl}`);
+      console.log(`📄 Current title: ${finalTitle}`);
+      
+      // If still on login page, authentication failed
+      if (finalUrl.includes('/login') || finalTitle.toLowerCase().includes('log in') || finalTitle.toLowerCase().includes('login')) {
+        throw new Error(`Login failed - still on login page. URL: ${finalUrl}, Title: ${finalTitle}`);
+      }
+      
+      // Verify we reached the dashboard or portal
+      if (!finalUrl.includes('loadright.com') || (!finalTitle.includes('Dashboard') && !finalTitle.includes('Portal') && !finalTitle.includes('LoadRight'))) {
+        console.log(`⚠️ Warning: Unexpected page after login. URL: ${finalUrl}, Title: ${finalTitle}`);
+      }
+      
+      console.log('✅ Successfully logged into LoadRight - dashboard confirmed');
 
     } catch (error) {
       console.error('❌ LoadRight login failed:', error);
@@ -232,6 +237,11 @@ export class LoadRightService {
       
       console.log('📊 Menu click result:', JSON.stringify(menuResult, null, 2));
       
+      // Fail fast if menu wasn't found
+      if (menuResult.step === 'menu_not_found') {
+        throw new Error(`Could not find hamburger menu button on page. Searched ${menuResult.totalElements} elements. Current URL: ${this.page.url()}`);
+      }
+      
       // Wait for dropdown menu to appear
       await new Promise(resolve => setTimeout(resolve, 2000));
       
@@ -265,14 +275,14 @@ export class LoadRightService {
       
       console.log('📊 Active Loads click result:', JSON.stringify(activeLoadsResult, null, 2));
       
-      if (activeLoadsResult.clicked) {
-        console.log(`🎯 Successfully navigated to Active Loads page!`);
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        console.log('📋 Active Loads page loaded (shows accepted + tendered loads)');
-      } else {
-        console.log(`⚠️ Could not find "Active Loads" menu item`);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+      // Fail fast if Active Loads wasn't found
+      if (!activeLoadsResult.clicked) {
+        throw new Error(`Could not find "Active Loads" menu item in dropdown. Page title: ${activeLoadsResult.pageTitle}. Current URL: ${this.page.url()}`);
       }
+      
+      console.log(`🎯 Successfully navigated to Active Loads page!`);
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      console.log('📋 Active Loads page loaded (shows accepted + tendered loads)');
 
       // Take screenshot for debugging
       await this.screenshot('/tmp/loadright-page.png');
