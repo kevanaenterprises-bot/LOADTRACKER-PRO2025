@@ -145,11 +145,22 @@ export class LoadRightService {
       // Wait for navigation after clicking login
       await this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: LOGIN_TIMEOUT });
 
+      // Check what page we're on after login
+      const currentUrl = this.page.url();
+      const pageTitle = await this.page.title();
       console.log('✅ Successfully logged into LoadRight');
+      console.log(`📍 Current URL: ${currentUrl}`);
+      console.log(`📄 Page title: ${pageTitle}`);
 
       // Wait for dashboard to appear
       await new Promise(resolve => setTimeout(resolve, 3000));
-      console.log('📊 Dashboard loaded');
+      
+      // Double-check we're still logged in
+      const finalUrl = this.page.url();
+      const finalTitle = await this.page.title();
+      console.log('📊 Dashboard should be loaded...');
+      console.log(`📍 Final URL: ${finalUrl}`);
+      console.log(`📄 Final title: ${finalTitle}`);
 
     } catch (error) {
       console.error('❌ LoadRight login failed:', error);
