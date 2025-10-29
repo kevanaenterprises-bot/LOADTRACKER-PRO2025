@@ -1,0 +1,121 @@
+LoadTracker Pro was born out of frustration. Our founder, a trucking company owner himself, was tired of paying seven hundred dollars per month for bloated TMS systems that treated customers like ATM machines.
+
+The old way was broken. Want one feature? Pay for a package with three other things you'll never use. Need another feature? That's in a different package. More money. Got two dispatchers? Can't both work at the same time unless you pay for a second seat. Surprise billing every month based on load counts you couldn't predict. Systems designed for profit, not for the people actually running trucks.
+
+We said enough is enough.
+
+LoadTracker Pro is different. Simple, transparent pricing: two hundred forty-nine dollars per month. Unlimited users. Your entire office can work simultaneously. No per-seat charges. Generous free tier with plenty of loads, GPS tracking, and features included before you hit usage overages. Clear overage pricing. You'll always know exactly what you're paying for. No surprise bills. Real-time usage dashboard shows exactly where you stand.
+
+Compare that to seven hundred dollars per month with nickel-and-dime charges for every little thing.
+
+We give you every feature you actually need, and nothing you don't.
+
+Real-time GPS fleet tracking. This isn't some last known location system. This is real tracking. Your drivers activate GPS tracking with one tap on their phone. No special hardware. No expensive tracking devices. Just their phone.
+
+Every thirty seconds, their location updates automatically. You see exactly where every truck is on a live map. Each truck marker shows the driver's name, so you can tell Kevin's truck from Torris's truck at a glance.
+
+The system uses geofencing to automatically detect when a driver arrives at the shipper or receiver. Within one hundred meters of the location, boom, automatic timestamp. When they leave? Another timestamp.
+
+Why does this matter? Detention billing disputes. A customer says your driver arrived at two PM? You've got GPS proof showing ten forty-seven AM. Third-party verified coordinates with accuracy down to three meters. That's legally defensible.
+
+The map also shows weather conditions at each truck's location and nearby diesel fuel stations. Real-time information your drivers and dispatchers can actually use.
+
+Complete load management. Create a load, assign it to a driver, track it from pickup to delivery, all in one place. Support for multiple stops? Check. Complex routing? Check. The system automatically calculates mileage using commercial truck routing from HERE Maps, not car routes that take you under low bridges.
+
+You can use one oh nine numbers, trip numbers, BOL numbers, whatever numbering system works for your operation. It's flexible.
+
+As drivers move through their route, status updates in real-time. You see en route to pickup, at shipper, left shipper, in transit, at receiver, delivered. Every stage tracked.
+
+Driver mobile portal. Your drivers aren't sitting at desks. They're on the road. So we built the interface for phones. Big buttons. Simple screens. Everything they need, nothing they don't.
+
+They can activate GPS tracking with one tap. Upload proof-of-delivery photos straight from their phone camera. Sign documents digitally. See their route on a map.
+
+When they upload a POD, it goes straight to cloud storage, secure, backed up, accessible from the office instantly. No more I'll get you that paperwork when I'm back at the yard next week. It's uploaded before they leave the customer's lot.
+
+Automated invoicing. Here's where it gets good. When a load is marked delivered, LoadTracker Pro can automatically generate an invoice. It pulls in all the details: base rate, detention time with GPS-stamped proof, lumper fees, fuel surcharges, everything.
+
+No more spending hours at month-end trying to remember what happened on load number forty-seven back on the twelfth.
+
+The system tracks payment status too. You can see which invoices are paid, which are pending, which are overdue, all at a glance.
+
+Smart document management. Rate confirmations. Bills of lading. Proof of delivery. Fuel receipts. Every trucking company drowns in paperwork.
+
+LoadTracker Pro handles it with Google Cloud Storage, secure, backed up, accessible anywhere.
+
+But here's the killer feature: OCR. Upload a rate confirmation PDF. The system reads it automatically. No typing. It pulls out the load details, rates, pickup and delivery locations, all extracted automatically using Google's Document AI.
+
+Same with BOL numbers. Take a picture of the BOL, upload it, and the system validates it. That's hours of data entry eliminated.
+
+IFTA reporting made easy. Every quarter, you need IFTA reports. Every quarter, it's a pain.
+
+LoadTracker Pro tracks mileage automatically. As trucks move, the system logs which states they're traveling through using GPS coordinates.
+
+At quarter-end, you get a ready-to-file report with state-by-state mileage breakdown.
+
+Even when a driver is returning empty to the terminal, they can track IFTA miles. The system calculates the route and breaks it down by state.
+
+Odometer readings, GPS validation, everything you need to file confidently.
+
+Driver pay management. Different drivers, different pay structures. Some get percentage of the load. Some get per-mile rates.
+
+LoadTracker Pro handles both.
+
+When you generate an invoice, the system automatically calculates what the driver earned based on their pay structure. You can track direct deposit information, pay history, everything in one place.
+
+No more manual spreadsheets trying to figure out who gets paid what.
+
+Fleet and driver records. Keep complete driver profiles: license numbers, medical card expiration dates, employment dates, direct deposit info. Get alerts when a medical card is about to expire. Stay on top of compliance without Post-It notes on the wall.
+
+Track your trucks too: VIN numbers, odometer readings, service history, maintenance schedules.
+
+The system can alert you when a truck is due for service based on mileage. Preventive maintenance before something breaks on the road.
+
+Accounts receivable aging. Who owes you money? How long have they owed it?
+
+The aging report breaks it down: zero to thirty days, thirty-one to sixty days, sixty-one to ninety days, over ninety days.
+
+Color-coded so you can spot problems at a glance. Red means someone's way overdue.
+
+Customer-level breakdown shows which customers pay on time and which ones you need to chase.
+
+No more digging through spreadsheets wondering where your cash flow went.
+
+Historical marker road tours. This one's just cool. We integrated a database of over two hundred twenty-two thousand historical markers across the country.
+
+As your driver passes near one, the system automatically triggers an audio narration about that piece of history.
+
+Keeps drivers engaged on long hauls. Educational. Interesting. They can choose a male or female AI voice. The system caches the audio in the cloud so it loads fast.
+
+It's not essential to running your business, but your drivers will love it.
+
+Let me recap what makes this different from the big expensive systems.
+
+Unlimited seats. Your whole office works together. No extra charges for adding users. Three dispatchers? Ten? Doesn't matter. One price.
+
+Real GPS tracking. Not last known location from hours ago. Real-time positions updated every thirty seconds with automatic arrival and departure detection.
+
+OCR document processing. Upload a rate con, we read it. Upload a BOL, we validate it. No manual typing.
+
+Mobile-first design. Your drivers can actually use it. Built for phones, works great on desktop too.
+
+Transparent usage dashboard. See your usage versus your free tier limits in real-time. You always know exactly where you stand. No surprises at month-end.
+
+One price. Two hundred forty-nine dollars per month. That's it. No hidden fees, no per-seat charges, no contact sales for enterprise pricing.
+
+Whether you've got five trucks running local two hundred fifty mile runs or fifteen trucks running coast-to-coast, you pay the same flat rate.
+
+Some companies will stay well under the free tier limits. Others will use more and see overages. But you'll always know because the usage dashboard is right there showing you real-time consumption.
+
+The bottom line: LoadTracker Pro gives you everything the seven hundred dollar systems do. GPS tracking, automated invoicing, document management, IFTA reporting, driver management, for two hundred forty-nine dollars per month with unlimited users.
+
+No forced feature bundles. No surprise billing. No paying for stuff you don't need.
+
+Just honest, transparent software built by someone who actually runs trucks and understands your pain.
+
+Ready to stop overpaying for bloated software?
+
+Try LoadTracker Pro risk-free with our instant demo.
+
+Two hundred forty-nine dollars per month. Unlimited users included. Generous free tier with real-time usage tracking. You'll always know exactly where you stand.
+
+LoadTracker Pro. Built by truckers, for truckers.

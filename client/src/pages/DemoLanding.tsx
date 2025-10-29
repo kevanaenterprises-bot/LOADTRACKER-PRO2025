@@ -37,7 +37,7 @@ export default function DemoLanding() {
         });
 
         setTimeout(() => {
-          setLocation("/demo/dashboard");
+          setLocation("/dashboard");
         }, 500);
       }
     } catch (error: any) {
@@ -77,7 +77,7 @@ export default function DemoLanding() {
             Complete Logistics Management for Modern Trucking Companies
           </p>
           <p className="text-lg text-blue-600 dark:text-blue-400 font-semibold" data-testid="text-pricing-preview">
-            Starting at $149/month • No Setup Fees • Cancel Anytime
+            $249/month • Up to 5 Trucks • No Setup Fees • Cancel Anytime
           </p>
         </div>
 
@@ -126,13 +126,12 @@ export default function DemoLanding() {
                 Simple, Transparent Pricing
               </h3>
               <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                <p><strong>Starter:</strong> $149/mo (5 trucks, basic limits)</p>
-                <p><strong>Professional:</strong> $249/mo (15 trucks, higher limits)</p>
-                <p><strong>Enterprise:</strong> $349/mo + usage (25+ trucks, custom limits)</p>
+                <p><strong>$249/month</strong> - Perfect for smaller operations</p>
+                <p>Ideal for up to 5 trucks, but works great up to 15+ trucks</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Once you exceed tier limits, fair overage charges apply - still 60% cheaper than $700/month competitors!
+                </p>
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-3">
-                All overages charged at cost + $25 admin fee. 30-50% cheaper than $700 competitors!
-              </p>
             </div>
           </div>
 
@@ -254,124 +253,86 @@ export default function DemoLanding() {
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4" data-testid="heading-pricing-main">
               100% Transparent Pricing
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300" data-testid="text-pricing-subtitle">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-2" data-testid="text-pricing-subtitle">
               No hidden fees. No surprises. No "call for pricing" BS. Here's exactly what you'll pay.
+            </p>
+            <p className="text-lg text-blue-600 dark:text-blue-400 font-semibold">
+              Built for smaller operations struggling with $700-900/month TMS systems
             </p>
           </div>
 
-          {/* Pricing Tiers */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {/* Starter Tier */}
-            <Card className="border-2 border-gray-200 dark:border-gray-700" data-testid="card-tier-starter">
-              <CardHeader className="text-center pb-4">
-                <CardTitle className="text-2xl mb-2">Starter</CardTitle>
-                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">$149<span className="text-lg text-gray-600 dark:text-gray-400">/mo</span></div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Perfect for small fleets</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 text-sm">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span><strong>Up to 5 trucks</strong></span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>50 rate con scans/month</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>500 SMS notifications/month</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>Unlimited GPS tracking</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>Unlimited invoices</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>Road tour feature included</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Professional Tier */}
-            <Card className="border-2 border-blue-500 dark:border-blue-600 shadow-lg relative" data-testid="card-tier-professional">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                Most Popular
+          {/* Single Pricing Tier */}
+          <div className="max-w-2xl mx-auto mb-12">
+            <Card className="border-2 border-blue-500 dark:border-blue-600 shadow-2xl relative" data-testid="card-tier-main">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-1.5 rounded-full text-sm font-semibold">
+                One Simple Price
               </div>
               <CardHeader className="text-center pb-4">
-                <CardTitle className="text-2xl mb-2">Professional</CardTitle>
-                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">$249<span className="text-lg text-gray-600 dark:text-gray-400">/mo</span></div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Best for growing companies</p>
+                <CardTitle className="text-3xl mb-3">LoadTracker Pro</CardTitle>
+                <div className="text-5xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                  $249<span className="text-2xl text-gray-600 dark:text-gray-400">/month</span>
+                </div>
+                <p className="text-base text-gray-600 dark:text-gray-400 mt-2">Perfect for smaller trucking operations</p>
+                <p className="text-sm font-semibold text-blue-700 dark:text-blue-300 mt-1">Ideal for up to 5 trucks • Works up to 15+ trucks</p>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-3 text-sm">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span><strong>Up to 15 trucks</strong></span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>200 rate con scans/month</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>2,000 SMS notifications/month</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>Unlimited GPS tracking</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>Priority support</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>All Starter features</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
+                  <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
+                    <strong>Built for you</strong> - small operations struggling with $700-900/month systems. 
+                    <br />
+                    You get <strong>everything</strong> with unlimited users. Once you exceed tier limits, fair overage charges apply.
+                  </p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-x-4 gap-y-3">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm"><strong>Unlimited users</strong></span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm"><strong>Unlimited GPS tracking</strong></span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Real-time fleet tracking</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Automated invoicing</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">OCR document scanning</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">IFTA reporting</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Driver mobile portal</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Historical marker tours</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Weather & fuel overlays</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">Fleet maintenance tracking</span>
+                  </div>
+                </div>
 
-            {/* Enterprise Tier */}
-            <Card className="border-2 border-gray-200 dark:border-gray-700" data-testid="card-tier-enterprise">
-              <CardHeader className="text-center pb-4">
-                <CardTitle className="text-2xl mb-2">Enterprise</CardTitle>
-                <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">$349<span className="text-lg text-gray-600 dark:text-gray-400">+</span></div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Large fleets with high volume</p>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 text-sm">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span><strong>25+ trucks</strong></span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>500 rate con scans/month</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>5,000 SMS notifications/month</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>Overage billing at cost + $25</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>24/7 priority support</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span>All Professional features</span>
-                  </li>
-                </ul>
+                <div className="mt-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                  <p className="font-bold text-green-800 dark:text-green-200 text-center">Real Savings</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 text-center mt-1">
+                    $249/mo vs. $700-900/mo = <strong>Save $5,412-$7,812/year</strong>
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -445,7 +406,7 @@ export default function DemoLanding() {
                 <div className="bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg p-4 mt-4">
                   <p className="font-bold text-green-800 dark:text-green-200 text-lg">Real Savings Example:</p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
-                    15-truck fleet: <strong>LoadTracker Pro $249/mo</strong> vs. Competitor $700/mo = <strong>Save $5,412/year</strong>
+                    Small operation (5 trucks): <strong>LoadTracker Pro $249/mo</strong> vs. Competitor $700-900/mo = <strong>Save $5,412-$7,812/year</strong>
                   </p>
                 </div>
               </div>
