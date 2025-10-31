@@ -84,7 +84,7 @@ export default function LoadRightTenders() {
       queryClient.invalidateQueries({ queryKey: ["/api/loads"] });
       toast({
         title: "Tender Accepted",
-        description: `Load ${data.load.loadNumber} created successfully`,
+        description: `Load ${data.load.number109} created successfully`,
       });
     },
     onError: (error: any) => {
@@ -96,8 +96,29 @@ export default function LoadRightTenders() {
     },
   });
 
+  const rejectMutation = useMutation({
+    mutationFn: async (tenderId: string) => {
+      return apiRequest(`/api/loadright/reject/${tenderId}`, 'POST', { reason: 'Not available' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/loadright/tenders"] });
+      toast({
+        title: "Tender Rejected",
+        description: "Tender has been rejected",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Reject Failed",
+        description: error.message || "Failed to reject tender",
+        variant: "destructive",
+      });
+    },
+  });
+
   const pendingTenders = tenders?.filter(t => t.status === 'tendered') || [];
   const acceptedTenders = tenders?.filter(t => t.status === 'accepted') || [];
+  const rejectedTenders = tenders?.filter(t => t.status === 'rejected') || [];
 
   return (
     <div className="container mx-auto p-4 space-y-6">
@@ -309,25 +330,42 @@ export default function LoadRightTenders() {
                         )}
                       </div>
 
-                      {/* Accept Button */}
-                      <Button
-                        className="w-full"
-                        onClick={() => acceptMutation.mutate(tender.id)}
-                        disabled={acceptMutation.isPending}
-                        data-testid={`button-accept-${tender.id}`}
-                      >
-                        {acceptMutation.isPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Accepting...
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Accept Tender
-                          </>
-                        )}
-                      </Button>
+                      {/* Action Buttons */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          variant="default"
+                          onClick={() => acceptMutation.mutate(tender.id)}
+                          disabled={acceptMutation.isPending || rejectMutation.isPending}
+                          data-testid={`button-accept-${tender.id}`}
+                        >
+                          {acceptMutation.isPending ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Accepting...
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Accept
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => rejectMutation.mutate(tender.id)}
+                          disabled={acceptMutation.isPending || rejectMutation.isPending}
+                          data-testid={`button-reject-${tender.id}`}
+                        >
+                          {rejectMutation.isPending ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Rejecting...
+                            </>
+                          ) : (
+                            'Reject'
+                          )}
+                        </Button>
+                      </div>
 
                       <p className="text-xs text-muted-foreground text-center" data-testid={`text-synced-${tender.id}`}>
                         Synced {format(new Date(tender.syncedAt), 'MMM dd, yyyy h:mm a')}
