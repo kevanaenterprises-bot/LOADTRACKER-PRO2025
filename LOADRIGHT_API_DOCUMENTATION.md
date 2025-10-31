@@ -22,15 +22,29 @@ POST https://web-production-153e.up.railway.app/api/loadright/webhook/receive-te
 
 ### Authentication
 
-**Status**: Pending LoadRight configuration
+**Method**: API Key (Header-based)
 
-We support the following authentication methods:
-- API Key (Header-based)
-- HMAC Signature Verification
-- Bearer Token
-- IP Whitelisting
+**Header**: `X-LoadRight-API-Key`
 
-**Please provide** your preferred authentication method and we'll configure it immediately.
+**Example**:
+```http
+POST /api/loadright/webhook/receive-tender HTTP/1.1
+Host: web-production-153e.up.railway.app
+Content-Type: application/json
+X-LoadRight-API-Key: your-api-key-here
+
+{
+  "loadNumber": "109-40340",
+  ...
+}
+```
+
+**Configuration**: 
+- We will provide you with our API key to use when calling our webhook
+- We will configure your API key in our system as `LOADRIGHT_API_KEY` environment variable
+- All requests without a valid API key will be rejected with `401 Unauthorized`
+
+**Note**: If you require a different authentication method (HMAC Signature Verification, Bearer Token, IP Whitelisting, etc.), please let us know and we can implement it. The API key method is currently configured as the default for simplicity and ease of integration.
 
 ### Request Body
 

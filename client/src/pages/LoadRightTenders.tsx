@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, RefreshCw, CheckCircle, Truck, MapPin, Calendar, DollarSign, Info } from "lucide-react";
+import { Loader2, RefreshCw, CheckCircle, Truck, MapPin, Calendar, DollarSign, Info, XCircle } from "lucide-react";
 import { format } from "date-fns";
 
 interface LoadRightTender {
@@ -36,6 +36,9 @@ export default function LoadRightTenders() {
   const { toast } = useToast();
   const [sessionCookie, setSessionCookie] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectingTenderId, setRejectingTenderId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const { data: tenders, isLoading, error } = useQuery<LoadRightTender[]>({
     queryKey: ["/api/loadright/tenders"],
@@ -97,14 +100,17 @@ export default function LoadRightTenders() {
   });
 
   const rejectMutation = useMutation({
-    mutationFn: async (tenderId: string) => {
-      return apiRequest(`/api/loadright/reject/${tenderId}`, 'POST', { reason: 'Not available' });
+    mutationFn: async ({ tenderId, reason }: { tenderId: string; reason: string }) => {
+      return apiRequest(`/api/loadright/reject/${tenderId}`, 'POST', { reason });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/loadright/tenders"] });
+      setRejectDialogOpen(false);
+      setRejectingTenderId(null);
+      setRejectionReason("");
       toast({
         title: "Tender Rejected",
-        description: "Tender has been rejected",
+        description: "Tender has been rejected and LoadRight will be notified",
       });
     },
     onError: (error: any) => {
@@ -115,6 +121,17 @@ export default function LoadRightTenders() {
       });
     },
   });
+
+  const handleRejectClick = (tenderId: string) => {
+    setRejectingTenderId(tenderId);
+    setRejectDialogOpen(true);
+  };
+
+  const handleRejectConfirm = () => {
+    if (rejectingTenderId && rejectionReason.trim()) {
+      rejectMutation.mutate({ tenderId: rejectingTenderId, reason: rejectionReason });
+    }
+  };
 
   const pendingTenders = tenders?.filter(t => t.status === 'tendered') || [];
   const acceptedTenders = tenders?.filter(t => t.status === 'accepted') || [];
@@ -210,6 +227,64 @@ export default function LoadRightTenders() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Reject Tender Dialog */}
+      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Tender</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for rejecting this tender. LoadRight will be notified of your decision.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="rejection-reason">Rejection Reason</Label>
+              <Textarea
+                id="rejection-reason"
+                placeholder="e.g., No trucks available, rate too low, out of service area..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={3}
+                data-testid="input-rejection-reason"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRejectDialogOpen(false);
+                setRejectingTenderId(null);
+                setRejectionReason("");
+              }}
+              data-testid="button-cancel-reject"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRejectConfirm}
+              disabled={!rejectionReason.trim() || rejectMutation.isPending}
+              data-testid="button-confirm-reject"
+            >
+              {rejectMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Rejecting...
+                </>
+              ) : (
+                <>
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Reject Tender
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12" data-testid="loading-tenders">
@@ -352,18 +427,12 @@ export default function LoadRightTenders() {
                         </Button>
                         <Button
                           variant="destructive"
-                          onClick={() => rejectMutation.mutate(tender.id)}
+                          onClick={() => handleRejectClick(tender.id)}
                           disabled={acceptMutation.isPending || rejectMutation.isPending}
                           data-testid={`button-reject-${tender.id}`}
                         >
-                          {rejectMutation.isPending ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Rejecting...
-                            </>
-                          ) : (
-                            'Reject'
-                          )}
+                          <XCircle className="mr-2 h-4 w-4" />
+                          Reject
                         </Button>
                       </div>
 

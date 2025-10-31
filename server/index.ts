@@ -174,6 +174,18 @@ async function startServer() {
     }
     console.log('✅ Database URL configured');
     
+    // LoadRight API key validation (required in production)
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction && !process.env.LOADRIGHT_API_KEY) {
+      throw new Error('Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.');
+    }
+    if (!isProduction && !process.env.LOADRIGHT_API_KEY) {
+      console.warn('⚠️  LoadRight API key not configured. LoadRight webhook will be unprotected in development mode.');
+    }
+    if (process.env.LOADRIGHT_API_KEY) {
+      console.log('✅ LoadRight API key configured');
+    }
+    
     // Object storage validation (warn if missing, don't fail)
     // Support both Replit (PRIVATE_OBJECT_DIR) and Railway (GCS_BUCKET_NAME) environments
     const hasPrivateObjectDir = !!process.env.PRIVATE_OBJECT_DIR;
@@ -260,9 +272,7 @@ async function startServer() {
       res.status(404).json({ error: 'API route not found' });
     });
 
-    // Setup frontend serving based on environment
-    const isProduction = process.env.NODE_ENV === "production";
-    
+    // Setup frontend serving based on environment (using isProduction from earlier validation)
     if (isProduction) {
       console.log('📁 Setting up static file serving for production...');
       const distPath = path.resolve(__dirname, "public");

@@ -9071,7 +9071,12 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       const { tenderId } = req.params;
       const { reason } = req.body;
       
-      console.log(`❌ Rejecting LoadRight tender ${tenderId}...`);
+      // Validate rejection reason is provided
+      if (!reason || !reason.trim()) {
+        return res.status(400).json({ message: "Rejection reason is required" });
+      }
+      
+      console.log(`❌ Rejecting LoadRight tender ${tenderId} - Reason: ${reason}`);
       
       // Get the tender
       const tender = await storage.getLoadRightTender(tenderId);
@@ -9083,8 +9088,8 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
         return res.status(400).json({ message: "Tender already rejected" });
       }
 
-      // Mark tender as rejected
-      const rejectedTender = await storage.rejectLoadRightTender(tenderId, reason);
+      // Mark tender as rejected with the provided reason
+      const rejectedTender = await storage.rejectLoadRightTender(tenderId, reason.trim());
 
       // TODO: Send rejection to LoadRight API when they provide their API details
       // This is where we'll call LoadRight's API to notify them of the rejection
@@ -9106,8 +9111,34 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
   // This endpoint is called BY LoadRight when they tender a load to us
   app.post("/api/loadright/webhook/receive-tender", async (req, res) => {
     try {
-      // TODO: Add authentication here (API key, signature verification, etc.)
-      // once LoadRight provides their webhook authentication method
+      // Authentication: API Key (Header-based) - REQUIRED
+      const apiKey = req.headers['x-loadright-api-key'] as string;
+      const expectedApiKey = process.env.LOADRIGHT_API_KEY;
+      
+      // CRITICAL: API key must be configured - fail in production if missing
+      if (!expectedApiKey) {
+        const isDevelopment = process.env.NODE_ENV === 'development';
+        if (!isDevelopment) {
+          // Production: Reject all requests if API key not configured
+          console.error('🚨 CRITICAL: LOADRIGHT_API_KEY not configured - rejecting webhook request');
+          return res.status(503).json({ 
+            success: false,
+            message: "Service temporarily unavailable - authentication not configured" 
+          });
+        } else {
+          // Development: Allow but warn loudly
+          console.warn('⚠️ WARNING: LOADRIGHT_API_KEY not configured - webhook is unprotected in development mode');
+        }
+      }
+      
+      // Enforce authentication if API key is provided
+      if (expectedApiKey && apiKey !== expectedApiKey) {
+        console.log('❌ Unauthorized webhook attempt - invalid API key');
+        return res.status(401).json({ 
+          success: false,
+          message: "Unauthorized - Invalid API key" 
+        });
+      }
       
       const tenderData = req.body;
       
