@@ -9018,7 +9018,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
 
       // Find or create customer for the tender
       let customerId: string | undefined;
-      const customerName = tender.customer || tender.shipper || 'LoadRight Customer';
+      const customerName = tender.shipper || 'LoadRight Customer';
       
       // Try to find existing customer by name
       const existingCustomers = await storage.getCustomers();
@@ -9062,6 +9062,120 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     } catch (error: any) {
       console.error("❌ Error accepting LoadRight tender:", error);
       res.status(500).json({ message: error.message || "Failed to accept tender" });
+    }
+  });
+
+  // Reject a LoadRight tender
+  app.post("/api/loadright/reject/:tenderId", async (req, res) => {
+    try {
+      const { tenderId } = req.params;
+      const { reason } = req.body;
+      
+      console.log(`❌ Rejecting LoadRight tender ${tenderId}...`);
+      
+      // Get the tender
+      const tender = await storage.getLoadRightTender(tenderId);
+      if (!tender) {
+        return res.status(404).json({ message: "Tender not found" });
+      }
+
+      if (tender.status === 'rejected') {
+        return res.status(400).json({ message: "Tender already rejected" });
+      }
+
+      // Mark tender as rejected
+      const rejectedTender = await storage.rejectLoadRightTender(tenderId, reason);
+
+      // TODO: Send rejection to LoadRight API when they provide their API details
+      // This is where we'll call LoadRight's API to notify them of the rejection
+      // Example: await loadRightAPI.rejectTender(tender.externalTenderId || tender.loadNumber, reason);
+
+      console.log(`✅ Tender rejected: ${tender.loadNumber}`);
+
+      res.json({
+        success: true,
+        tender: rejectedTender
+      });
+    } catch (error: any) {
+      console.error("❌ Error rejecting LoadRight tender:", error);
+      res.status(500).json({ message: error.message || "Failed to reject tender" });
+    }
+  });
+
+  // WEBHOOK: Receive tendered loads from LoadRight
+  // This endpoint is called BY LoadRight when they tender a load to us
+  app.post("/api/loadright/webhook/receive-tender", async (req, res) => {
+    try {
+      // TODO: Add authentication here (API key, signature verification, etc.)
+      // once LoadRight provides their webhook authentication method
+      
+      const tenderData = req.body;
+      
+      console.log(`📥 Received tender webhook from LoadRight:`, tenderData);
+
+      // Validate required fields
+      if (!tenderData.loadNumber) {
+        return res.status(400).json({ 
+          success: false,
+          message: "loadNumber is required" 
+        });
+      }
+
+      // Check if tender already exists
+      const existingTender = await storage.getLoadRightTenderByLoadNumber(tenderData.loadNumber);
+      if (existingTender) {
+        console.log(`⚠️ Tender ${tenderData.loadNumber} already exists, updating...`);
+        
+        // Update existing tender
+        const updatedTender = await storage.updateLoadRightTender(existingTender.id, {
+          ...tenderData,
+          syncedAt: new Date(),
+        });
+        
+        return res.json({
+          success: true,
+          message: "Tender updated",
+          tender: updatedTender
+        });
+      }
+
+      // Create new tender from webhook data
+      const newTender = await storage.createLoadRightTender({
+        loadNumber: tenderData.loadNumber,
+        externalTenderId: tenderData.externalTenderId || tenderData.tenderId,
+        shipper: tenderData.shipper,
+        pickupLocation: tenderData.pickupLocation,
+        pickupCity: tenderData.pickupCity,
+        pickupState: tenderData.pickupState,
+        pickupDate: tenderData.pickupDate,
+        pickupTime: tenderData.pickupTime,
+        deliveryLocation: tenderData.deliveryLocation,
+        deliveryCity: tenderData.deliveryCity,
+        deliveryState: tenderData.deliveryState,
+        deliveryDate: tenderData.deliveryDate,
+        deliveryTime: tenderData.deliveryTime,
+        orderNumber: tenderData.orderNumber,
+        pieces: tenderData.pieces,
+        miles: tenderData.miles,
+        weight: tenderData.weight,
+        rate: tenderData.rate,
+        notes: tenderData.notes,
+        status: 'tendered',
+      });
+
+      console.log(`✅ Tender created: ${newTender.loadNumber}`);
+
+      res.json({
+        success: true,
+        message: "Tender received",
+        tender: newTender
+      });
+    } catch (error: any) {
+      console.error("❌ Error receiving LoadRight tender webhook:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Failed to receive tender" 
+      });
     }
   });
 

@@ -630,6 +630,7 @@ export const visitorTracking = pgTable("visitor_tracking", {
 export const loadRightTenders = pgTable("loadright_tenders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   loadNumber: varchar("load_number").notNull().unique(), // LoadRight load number (e.g., "109-40340")
+  externalTenderId: varchar("external_tender_id"), // LoadRight's internal tender ID (if provided via API)
   shipper: varchar("shipper"), // Shipper company name (e.g., "PCA PLANO")
   pickupLocation: text("pickup_location"),
   pickupCity: varchar("pickup_city"),
@@ -650,7 +651,11 @@ export const loadRightTenders = pgTable("loadright_tenders", {
   status: varchar("status").notNull().default("tendered"), // tendered, accepted, dispatched, rejected
   loadId: varchar("load_id").references(() => loads.id), // Link to created load if accepted
   acceptedAt: timestamp("accepted_at"), // When tender was accepted
+  rejectedAt: timestamp("rejected_at"), // When tender was rejected
   syncedAt: timestamp("synced_at").defaultNow(), // When this tender was pulled from LoadRight
+  responseMethod: varchar("response_method"), // "api" or "manual" - how the response was sent
+  responseSentAt: timestamp("response_sent_at"), // When we sent accept/reject to LoadRight API
+  responseError: text("response_error"), // Any error from LoadRight API
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [

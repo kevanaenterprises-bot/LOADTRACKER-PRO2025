@@ -199,6 +199,7 @@ export interface IStorage {
   createLoadRightTender(tender: InsertLoadRightTender): Promise<LoadRightTender>;
   updateLoadRightTender(id: string, updates: Partial<InsertLoadRightTender>): Promise<LoadRightTender>;
   acceptLoadRightTender(tenderId: string, loadId: string): Promise<LoadRightTender>;
+  rejectLoadRightTender(tenderId: string, reason?: string): Promise<LoadRightTender>;
   deleteTender(id: string): Promise<void>;
 }
 
@@ -1763,6 +1764,20 @@ export class DatabaseStorage implements IStorage {
       .where(eq(loadRightTenders.id, tenderId))
       .returning();
     return acceptedTender;
+  }
+
+  async rejectLoadRightTender(tenderId: string, reason?: string): Promise<LoadRightTender> {
+    const [rejectedTender] = await db
+      .update(loadRightTenders)
+      .set({
+        status: 'rejected',
+        rejectedAt: new Date(),
+        notes: reason || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(loadRightTenders.id, tenderId))
+      .returning();
+    return rejectedTender;
   }
 
   async deleteTender(id: string): Promise<void> {
