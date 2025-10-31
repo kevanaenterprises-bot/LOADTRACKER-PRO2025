@@ -174,16 +174,16 @@ async function startServer() {
     }
     console.log('✅ Database URL configured');
     
-    // LoadRight API key validation (required in production)
+    // LoadRight API key validation (optional - feature disabled if not configured)
     const isProduction = process.env.NODE_ENV === 'production';
-    if (isProduction && !process.env.LOADRIGHT_API_KEY) {
-      throw new Error('Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.');
-    }
-    if (!isProduction && !process.env.LOADRIGHT_API_KEY) {
-      console.warn('⚠️  LoadRight API key not configured. LoadRight webhook will be unprotected in development mode.');
-    }
     if (process.env.LOADRIGHT_API_KEY) {
-      console.log('✅ LoadRight API key configured');
+      console.log('✅ LoadRight integration enabled (API key configured)');
+    } else {
+      if (isProduction) {
+        console.warn('⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.');
+      } else {
+        console.warn('⚠️  LoadRight API key not configured. LoadRight webhooks will be unprotected in development mode.');
+      }
     }
     
     // Object storage validation (warn if missing, don't fail)
