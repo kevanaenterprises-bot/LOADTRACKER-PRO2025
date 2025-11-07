@@ -1,0 +1,777 @@
+2025-11-07T23:26:23.000000000Z [inf]  Starting Container
+2025-11-07T23:26:24.369832566Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:24.369840187Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:26:24.369846188Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:26:24.377491825Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:26:24.526746226Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:26:24.646602697Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:24.765233037Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:25.376933935Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:26:25.376943770Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:26:25.376950051Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:26:25.377017784Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:26:25.483777717Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:26:25.536591810Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:25.664158809Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:25.729551976Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:26:25.777721336Z [inf]  [i] No changes detected
+2025-11-07T23:26:26.373144259Z [inf]  
+2025-11-07T23:26:26.373156600Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:26:26.373164427Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:26:26.373171800Z [inf]  
+2025-11-07T23:26:26.373187758Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:27.570403752Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:26:27.570410913Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:26:27.570418438Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:26:27.570429959Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:26:27.504Z
+2025-11-07T23:26:27.570439554Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:26:27.570447963Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:26:27.570454058Z [inf]  🔧 Process ID: 50
+2025-11-07T23:26:27.570460060Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:26:27.570465996Z [inf]  🔧 Platform: linux
+2025-11-07T23:26:27.570481222Z [inf]  🔧 Architecture: x64
+2025-11-07T23:26:27.570492329Z [inf]  🔧 Memory usage: {
+2025-11-07T23:26:27.570503668Z [inf]    "rss": 178229248,
+2025-11-07T23:26:27.570510375Z [inf]    "heapTotal": 96579584,
+2025-11-07T23:26:27.570516740Z [inf]    "heapUsed": 67887472,
+2025-11-07T23:26:27.570527911Z [inf]    "external": 4204721,
+2025-11-07T23:26:27.570536322Z [inf]    "arrayBuffers": 532394
+2025-11-07T23:26:27.570542508Z [inf]  }
+2025-11-07T23:26:27.570548808Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:26:27.570555094Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:26:27.508Z
+2025-11-07T23:26:27.570562083Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:26:27.570568128Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:26:27.509Z
+2025-11-07T23:26:27.570586104Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:26:27.570595948Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:26:27.573841499Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:26:27.573848011Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:26:27.573855291Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:26:27.573862566Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:26:27.573869192Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:26:27.573876203Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:26:27.573881956Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:26:27.573888574Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:26:27.573894583Z [inf]  ✅ Database URL configured
+2025-11-07T23:26:27.573900583Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:26:27.573906741Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:27.573913043Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:27.573920092Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:27.573926508Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:27.573932594Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:27.573939467Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:27.573945862Z [err]  💥 Error type: object
+2025-11-07T23:26:27.573951759Z [err]  💥 Error name: Error
+2025-11-07T23:26:27.573957664Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:27.573965449Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:27.573971481Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:27.573977706Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:27.573983887Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:27.573989657Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:27.573995886Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:27.574002042Z [err]  💥 Process will exit with code 1
+2025-11-07T23:26:27.574030621Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:26:28.829783825Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:29.664707306Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:26:29.664940623Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:26:30.647363141Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:26:30.647368671Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:26:30.647374816Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:30.647380463Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:30.647614250Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:26:30.776583108Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:26:31.629622254Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:31.629634501Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:31.629645088Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:26:31.629645482Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:26:31.629652242Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:26:31.629654846Z [inf]  [i] No changes detected
+2025-11-07T23:26:31.629658596Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:26:31.691677091Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:31.721923615Z [inf]  
+2025-11-07T23:26:31.721936666Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:26:31.721944179Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:26:31.721949419Z [inf]  
+2025-11-07T23:26:33.703705648Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:26:33.283Z
+2025-11-07T23:26:33.703721599Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:26:33.703722265Z [inf]  🔧 Architecture: x64
+2025-11-07T23:26:33.703735866Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:26:33.703738122Z [inf]  🔧 Memory usage: {
+2025-11-07T23:26:33.703748129Z [inf]    "rss": 182341632,
+2025-11-07T23:26:33.703759633Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:26:33.703763591Z [inf]    "arrayBuffers": 532394
+2025-11-07T23:26:33.703768559Z [inf]    "heapTotal": 97435648,
+2025-11-07T23:26:33.703770285Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:26:33.703777741Z [inf]  }
+2025-11-07T23:26:33.703780180Z [inf]    "heapUsed": 67867024,
+2025-11-07T23:26:33.703790846Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:26:33.703791377Z [inf]    "external": 4204721,
+2025-11-07T23:26:33.703800487Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:26:33.282Z
+2025-11-07T23:26:33.703809846Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:26:33.703815593Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:26:33.703825108Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:26:33.278Z
+2025-11-07T23:26:33.703833450Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:26:33.703841478Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:26:33.703858814Z [inf]  🔧 Process ID: 51
+2025-11-07T23:26:33.703867214Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:26:33.703874666Z [inf]  🔧 Platform: linux
+2025-11-07T23:26:33.709665566Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:26:33.709672471Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:26:33.709678695Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:26:33.709686360Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:26:33.709692410Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:26:33.709698678Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:26:33.709711306Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:26:33.709718040Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:26:33.709724536Z [inf]  ✅ Database URL configured
+2025-11-07T23:26:33.709730867Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:26:33.709737383Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:33.709743193Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:33.709749737Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:33.709755753Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:33.709763971Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:33.709771507Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:33.709777015Z [err]  💥 Error type: object
+2025-11-07T23:26:33.709782961Z [err]  💥 Error name: Error
+2025-11-07T23:26:33.709789122Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:33.709795562Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:33.713447115Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:33.713452903Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:33.713459197Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:33.713464787Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:33.713471576Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:33.713477302Z [err]  💥 Process will exit with code 1
+2025-11-07T23:26:33.713483018Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:26:34.854656294Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:35.584503641Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:26:35.584507873Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:26:36.500705337Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:26:36.500712936Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:26:36.500721655Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:36.500729628Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:36.515102348Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:26:36.645208160Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:26:36.785448980Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:26:36.900731310Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:26:37.585827631Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:26:37.585843820Z [inf]  
+2025-11-07T23:26:37.585964991Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:26:37.585974883Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:37.585982845Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:26:37.585990239Z [inf]  [i] No changes detected
+2025-11-07T23:26:37.586000217Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:37.586007403Z [inf]  
+2025-11-07T23:26:37.586014929Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:26:39.521798760Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:26:39.521804750Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:26:39.521811637Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:26:39.521825056Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:26:39.521834747Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:26:39.003Z
+2025-11-07T23:26:39.521842504Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:26:39.521854224Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:26:39.521862234Z [inf]  🔧 Process ID: 51
+2025-11-07T23:26:39.521871736Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:26:39.521881762Z [inf]  🔧 Platform: linux
+2025-11-07T23:26:39.521889079Z [inf]  🔧 Architecture: x64
+2025-11-07T23:26:39.521896472Z [inf]  🔧 Memory usage: {
+2025-11-07T23:26:39.521906502Z [inf]    "rss": 225230848,
+2025-11-07T23:26:39.521912662Z [inf]    "heapTotal": 131411968,
+2025-11-07T23:26:39.521919725Z [inf]    "heapUsed": 104519936,
+2025-11-07T23:26:39.521924106Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:26:39.521929195Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:26:39.009Z
+2025-11-07T23:26:39.521934090Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:26:39.521939187Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:26:39.009Z
+2025-11-07T23:26:39.521947960Z [inf]    "external": 6719585,
+2025-11-07T23:26:39.521952602Z [inf]    "arrayBuffers": 3047258
+2025-11-07T23:26:39.521957047Z [inf]  }
+2025-11-07T23:26:39.522093642Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:26:39.527557845Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:39.527564434Z [inf]  ✅ Database URL configured
+2025-11-07T23:26:39.527574530Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:26:39.527579789Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:26:39.527583401Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:39.527589339Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:26:39.527591995Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:39.527596670Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:39.527597726Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:26:39.527605377Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:26:39.527610032Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:39.527613872Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:26:39.527620768Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:39.527622158Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:26:39.527656880Z [err]  💥 Error type: object
+2025-11-07T23:26:39.527665328Z [err]  💥 Error name: Error
+2025-11-07T23:26:39.527667037Z [err]  💥 Process will exit with code 1
+2025-11-07T23:26:39.527672209Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:26:39.527682005Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:39.527694714Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:39.527702104Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:39.527718463Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:39.527725470Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:39.527767971Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:26:39.527774345Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:26:39.527780180Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:39.527786678Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:40.663006036Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:41.548166298Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:26:41.548179539Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:26:41.635331396Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:26:41.772154856Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:26:41.884718759Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:42.505567454Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:42.505573973Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:26:42.505578342Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:26:42.505582777Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:26:42.524922541Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:26:42.651801038Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:26:42.783714225Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:42.909633805Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:44.071817005Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:26:44.071830445Z [inf]  [i] No changes detected
+2025-11-07T23:26:44.071846045Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:44.071859492Z [inf]  
+2025-11-07T23:26:44.071893975Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:26:44.071901309Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:26:44.071908325Z [inf]  
+2025-11-07T23:26:45.800322952Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:26:45.800335578Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:26:45.800354553Z [inf]  }
+2025-11-07T23:26:45.800362714Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:26:45.800364549Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:26:45.800374630Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:26:45.399Z
+2025-11-07T23:26:45.800378443Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:26:45.800379470Z [inf]    "rss": 183693312,
+2025-11-07T23:26:45.800383200Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:26:45.800384254Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:26:45.800389294Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:26:45.800392378Z [inf]  🔧 Process ID: 50
+2025-11-07T23:26:45.800396345Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:26:45.399Z
+2025-11-07T23:26:45.800398911Z [inf]    "heapTotal": 98488320,
+2025-11-07T23:26:45.800400969Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:26:45.394Z
+2025-11-07T23:26:45.800401877Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:26:45.800409899Z [inf]  🔧 Platform: linux
+2025-11-07T23:26:45.800410784Z [inf]    "heapUsed": 68843448,
+2025-11-07T23:26:45.800412284Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:26:45.800421684Z [inf]    "external": 4213892,
+2025-11-07T23:26:45.800423134Z [inf]  🔧 Architecture: x64
+2025-11-07T23:26:45.800431993Z [inf]    "arrayBuffers": 541565
+2025-11-07T23:26:45.800432965Z [inf]  🔧 Memory usage: {
+2025-11-07T23:26:45.805637674Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:26:45.805643061Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:26:45.805648687Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:26:45.805654699Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:26:45.805661835Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:26:45.805667685Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:26:45.805673074Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:26:45.805679849Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:26:45.805686902Z [inf]  ✅ Database URL configured
+2025-11-07T23:26:45.805692551Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:26:45.805698919Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:45.805705813Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:45.805713266Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:45.805721309Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:45.805730184Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:45.805735988Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:45.805741214Z [err]  💥 Error type: object
+2025-11-07T23:26:45.805746877Z [err]  💥 Error name: Error
+2025-11-07T23:26:45.805752880Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:45.805761095Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:45.806113002Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:45.806119389Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:45.806124997Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:45.806131410Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:45.806137702Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:45.806144948Z [err]  💥 Process will exit with code 1
+2025-11-07T23:26:45.806150770Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:26:46.814338688Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:47.853952702Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:26:47.853958936Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:26:47.879955448Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:26:48.018853278Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:26:48.722856020Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:48.722860876Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:48.722865127Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:26:48.722869885Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:26:48.722874423Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:26:48.773578015Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:26:48.904369635Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:26:49.038664922Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:49.912865114Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:49.912871440Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:26:49.912877299Z [inf]  [i] No changes detected
+2025-11-07T23:26:49.912883331Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:49.912897278Z [inf]  
+2025-11-07T23:26:49.912907943Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:26:49.912915860Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:26:49.912922617Z [inf]  
+2025-11-07T23:26:51.809915224Z [inf]    "rss": 184999936,
+2025-11-07T23:26:51.809924167Z [inf]    "heapTotal": 98746368,
+2025-11-07T23:26:51.809929716Z [inf]    "heapUsed": 68375320,
+2025-11-07T23:26:51.809979406Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:26:51.809982288Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:26:51.809990550Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:26:51.809990808Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:26:51.239Z
+2025-11-07T23:26:51.809992123Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:26:51.810000845Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:26:51.810002988Z [inf]  🔧 Platform: linux
+2025-11-07T23:26:51.810009265Z [inf]  🔧 Architecture: x64
+2025-11-07T23:26:51.810009781Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:26:51.810015250Z [inf]  🔧 Memory usage: {
+2025-11-07T23:26:51.810018447Z [inf]  🔧 Process ID: 50
+2025-11-07T23:26:51.812985175Z [inf]    "external": 4213692,
+2025-11-07T23:26:51.812999736Z [inf]    "arrayBuffers": 541365
+2025-11-07T23:26:51.813006811Z [inf]  }
+2025-11-07T23:26:51.813012830Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:26:51.813018764Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:26:51.243Z
+2025-11-07T23:26:51.813025106Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:26:51.813031350Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:26:51.244Z
+2025-11-07T23:26:51.813037921Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:26:51.813045960Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:26:51.813319289Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:26:51.813324866Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:26:51.813330264Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:26:51.813335768Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:26:51.813341224Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:26:51.813347637Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:26:51.813353606Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:26:51.813359133Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:26:51.813364917Z [inf]  ✅ Database URL configured
+2025-11-07T23:26:51.813370322Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:26:51.813375441Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:51.813380670Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:51.813386374Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:51.813393413Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:51.813398617Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:51.813404463Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:51.813410329Z [err]  💥 Error type: object
+2025-11-07T23:26:51.813415884Z [err]  💥 Error name: Error
+2025-11-07T23:26:51.813421141Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:51.813426867Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:51.813439564Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:51.813444536Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:51.813450041Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:51.813455833Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:51.813462482Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:51.813467622Z [err]  💥 Process will exit with code 1
+2025-11-07T23:26:51.813473638Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:26:52.767994001Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:53.618252464Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:26:53.618257972Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:26:53.679098208Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:26:53.845363101Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:26:53.961995439Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:54.090572118Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:54.669234401Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:26:54.669245437Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:26:54.669252206Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:26:54.669275130Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:26:54.732787252Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:26:54.858224952Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:54.986032918Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:26:54.996967358Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:26:55.044281011Z [inf]  [i] No changes detected
+2025-11-07T23:26:55.725175771Z [inf]  
+2025-11-07T23:26:55.725187784Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:26:55.725195972Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:26:55.725204837Z [inf]  
+2025-11-07T23:26:55.725257634Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:56.836355195Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:26:56.840893586Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:26:56.840904094Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:26:56.840911176Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:26:56.839Z
+2025-11-07T23:26:56.840917709Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:26:56.840923969Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:26:56.840930520Z [inf]  🔧 Process ID: 52
+2025-11-07T23:26:56.840936532Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:26:56.840960678Z [inf]  🔧 Platform: linux
+2025-11-07T23:26:56.843597017Z [inf]  🔧 Architecture: x64
+2025-11-07T23:26:56.843606185Z [inf]  🔧 Memory usage: {
+2025-11-07T23:26:56.843612891Z [inf]    "rss": 220893184,
+2025-11-07T23:26:56.843630528Z [inf]    "heapTotal": 131411968,
+2025-11-07T23:26:56.843636949Z [inf]    "heapUsed": 104564536,
+2025-11-07T23:26:56.843644737Z [inf]    "external": 6730840,
+2025-11-07T23:26:56.843651217Z [inf]    "arrayBuffers": 3058513
+2025-11-07T23:26:56.843668085Z [inf]  }
+2025-11-07T23:26:56.846357205Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:26:56.846363142Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:26:56.843Z
+2025-11-07T23:26:56.846367847Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:26:56.846371925Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:26:56.844Z
+2025-11-07T23:26:56.846376907Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:26:56.846382415Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:26:56.846387409Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:26:56.846391376Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:26:56.846395944Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:26:56.846400017Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:26:56.846404145Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:26:56.846408996Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:26:56.846413131Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:26:56.846419332Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:26:56.846423627Z [inf]  ✅ Database URL configured
+2025-11-07T23:26:56.846428866Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:26:56.847969251Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:56.847982227Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:56.847989370Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:56.847996522Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:56.848007445Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:56.848042226Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:56.848049989Z [err]  💥 Error type: object
+2025-11-07T23:26:56.848055530Z [err]  💥 Error name: Error
+2025-11-07T23:26:56.848063246Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:56.848068820Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:26:56.848074020Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:26:56.848079217Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:26:56.848084552Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:26:56.848090475Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:26:56.848096742Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:26:56.848102832Z [err]  💥 Process will exit with code 1
+2025-11-07T23:26:56.848108528Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:26:59.082646796Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:26:59.082651833Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:26:59.082657234Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:26:59.871912249Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:26:59.871919648Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:26:59.871925183Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:26:59.912222236Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:27:00.054179514Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:27:00.759922069Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:27:00.759933435Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:27:00.759941290Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:00.760042862Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:27:00.760048913Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:27:00.804796966Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:27:00.839714042Z [inf]  [i] No changes detected
+2025-11-07T23:27:00.994166661Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:01.032248286Z [inf]  
+2025-11-07T23:27:01.032258205Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:27:01.032264561Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:27:01.032270999Z [inf]  
+2025-11-07T23:27:02.874630622Z [inf]  🔧 Memory usage: {
+2025-11-07T23:27:02.874638332Z [inf]    "rss": 218537984,
+2025-11-07T23:27:02.874645331Z [inf]    "heapTotal": 131674112,
+2025-11-07T23:27:02.874652188Z [inf]    "heapUsed": 104692312,
+2025-11-07T23:27:02.874659874Z [inf]    "external": 6728364,
+2025-11-07T23:27:02.874664442Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:27:02.874669781Z [inf]    "arrayBuffers": 3056037
+2025-11-07T23:27:02.874671439Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:27:02.874674951Z [inf]  🔧 Process ID: 50
+2025-11-07T23:27:02.874676162Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:27:02.874679999Z [inf]  }
+2025-11-07T23:27:02.874686192Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:27:02.652Z
+2025-11-07T23:27:02.874687978Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:27:02.874692062Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:27:02.874694857Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:27:02.874699931Z [inf]  🔧 Platform: linux
+2025-11-07T23:27:02.874702490Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:27:02.657Z
+2025-11-07T23:27:02.874704398Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:27:02.874712662Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:27:02.874713567Z [inf]  🔧 Architecture: x64
+2025-11-07T23:27:02.874721597Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:27:02.658Z
+2025-11-07T23:27:02.874746992Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:27:02.874758713Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:27:02.876165671Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:27:02.876170328Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:27:02.876175164Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:27:02.876180270Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:27:02.876185207Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:27:02.876193764Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:27:02.876200727Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:27:02.876206018Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:27:02.876211257Z [inf]  ✅ Database URL configured
+2025-11-07T23:27:02.876216967Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:27:02.876222686Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:02.876228240Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:02.876234410Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:02.876239658Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:02.876244664Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:02.876250296Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:02.876255672Z [err]  💥 Error type: object
+2025-11-07T23:27:02.876263047Z [err]  💥 Error name: Error
+2025-11-07T23:27:02.876268847Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:02.876274414Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:02.876512482Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:02.876518833Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:02.876524474Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:02.876530603Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:02.876537233Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:02.876542752Z [err]  💥 Process will exit with code 1
+2025-11-07T23:27:02.876548755Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:27:04.829213263Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:04.829219260Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:27:04.829225135Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:27:05.706654704Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:05.706664498Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:27:05.706736900Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:27:05.706742579Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:27:05.815328500Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:27:05.946236221Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:27:06.072027166Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:27:06.630160125Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:06.630169626Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:27:06.630176128Z [inf]  [i] No changes detected
+2025-11-07T23:27:06.630220633Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:27:06.630227024Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:27:06.753419912Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:06.809210870Z [inf]  
+2025-11-07T23:27:06.809217315Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:27:06.809223479Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:27:06.809229564Z [inf]  
+2025-11-07T23:27:08.751920433Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:27:08.751926697Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:27:08.751933002Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:27:08.751942362Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:27:08.258Z
+2025-11-07T23:27:08.751949810Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:27:08.751956430Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:27:08.751962419Z [inf]  🔧 Process ID: 50
+2025-11-07T23:27:08.751973279Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:27:08.751981114Z [inf]  🔧 Platform: linux
+2025-11-07T23:27:08.751987611Z [inf]  🔧 Architecture: x64
+2025-11-07T23:27:08.751992957Z [inf]  🔧 Memory usage: {
+2025-11-07T23:27:08.751997963Z [inf]    "rss": 220049408,
+2025-11-07T23:27:08.752002957Z [inf]    "heapTotal": 130363392,
+2025-11-07T23:27:08.752007745Z [inf]    "heapUsed": 107545464,
+2025-11-07T23:27:08.752013196Z [inf]    "external": 6678704,
+2025-11-07T23:27:08.752018600Z [inf]    "arrayBuffers": 3047258
+2025-11-07T23:27:08.752023308Z [inf]  }
+2025-11-07T23:27:08.752028409Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:27:08.752033427Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:27:08.263Z
+2025-11-07T23:27:08.752038137Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:27:08.752044206Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:27:08.264Z
+2025-11-07T23:27:08.752050465Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:27:08.752057157Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:27:08.755086956Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:08.755104218Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:27:08.755109898Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:27:08.755113022Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:27:08.755117588Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:27:08.755119778Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:27:08.755123691Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:27:08.755126019Z [inf]  ✅ Database URL configured
+2025-11-07T23:27:08.755130237Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:27:08.755132189Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:27:08.755139004Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:08.755139523Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:27:08.755145770Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:08.755154393Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:08.755160130Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:08.755166339Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:08.755172661Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:08.755178431Z [err]  💥 Error type: object
+2025-11-07T23:27:08.755184775Z [err]  💥 Error name: Error
+2025-11-07T23:27:08.755191580Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:08.757904107Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:08.757908101Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:08.757912214Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:08.757916061Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:08.757919986Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:08.757924901Z [err]  💥 Process will exit with code 1
+2025-11-07T23:27:08.757929019Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:27:09.715252403Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:10.059955403Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:27:10.059959276Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:27:10.862758445Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:27:10.866929812Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:27:10.986451909Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:11.117893171Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:27:11.713266451Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:27:11.713291076Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:27:11.713301568Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:27:11.713310573Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:27:11.756051648Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:27:11.890053331Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:11.969906684Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:27:12.029050030Z [inf]  [i] No changes detected
+2025-11-07T23:27:12.822837807Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:27:12.822846204Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:27:12.822854344Z [inf]  
+2025-11-07T23:27:12.822879868Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:12.822886598Z [inf]  
+2025-11-07T23:27:14.013860155Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:27:14.013866539Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:27:14.013873525Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:27:14.013880765Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:27:13.975Z
+2025-11-07T23:27:14.013886815Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:27:14.013893424Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:27:14.013900154Z [inf]  🔧 Process ID: 51
+2025-11-07T23:27:14.013907230Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:27:14.013913326Z [inf]  🔧 Platform: linux
+2025-11-07T23:27:14.013921061Z [inf]  🔧 Architecture: x64
+2025-11-07T23:27:14.013927339Z [inf]  🔧 Memory usage: {
+2025-11-07T23:27:14.013937302Z [inf]    "rss": 191688704,
+2025-11-07T23:27:14.013945454Z [inf]    "heapTotal": 100454400,
+2025-11-07T23:27:14.013953141Z [inf]    "heapUsed": 73073968,
+2025-11-07T23:27:14.013960112Z [inf]    "external": 4459838,
+2025-11-07T23:27:14.013997956Z [inf]    "arrayBuffers": 787511
+2025-11-07T23:27:14.014006806Z [inf]  }
+2025-11-07T23:27:14.014014364Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:27:14.014021261Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:27:13.980Z
+2025-11-07T23:27:14.014028403Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:27:14.014035035Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:27:13.981Z
+2025-11-07T23:27:14.014041912Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:27:14.014048236Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:27:14.023320688Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:27:14.023325776Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:27:14.023332795Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:27:14.023338431Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:27:14.023347289Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:27:14.023353949Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:27:14.023359368Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:27:14.023366214Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:27:14.023372854Z [inf]  ✅ Database URL configured
+2025-11-07T23:27:14.023379546Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:27:14.023387747Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:14.023395984Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:14.023402099Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:14.023407518Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:14.023413636Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:14.023420425Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:14.023428115Z [err]  💥 Error type: object
+2025-11-07T23:27:14.023435036Z [err]  💥 Error name: Error
+2025-11-07T23:27:14.023442322Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:14.023450394Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:14.025549754Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:14.025563820Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:14.025571256Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:14.025578609Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:14.025617946Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:14.025634482Z [err]  💥 Process will exit with code 1
+2025-11-07T23:27:14.025648605Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:27:15.836538147Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:15.916577703Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:27:15.916583830Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:27:16.856595535Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:27:16.856606832Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:27:16.856613133Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:16.892016474Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:27:17.016016681Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:27:17.148758973Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:27:17.988364310Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:27:17.988378183Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:27:17.988388891Z [inf]  [i] No changes detected
+2025-11-07T23:27:17.988446649Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:27:17.988454993Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:27:17.988463223Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:27:17.988473930Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:18.021901587Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:18.061537923Z [inf]  
+2025-11-07T23:27:18.061550117Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:27:18.061557752Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:27:18.061565003Z [inf]  
+2025-11-07T23:27:19.970117363Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:27:19.891Z
+2025-11-07T23:27:19.970119798Z [inf]  🔧 Memory usage: {
+2025-11-07T23:27:19.970128556Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:27:19.970130531Z [inf]    "rss": 186359808,
+2025-11-07T23:27:19.970138903Z [inf]    "heapTotal": 100057088,
+2025-11-07T23:27:19.970139634Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:27:19.970146465Z [inf]    "heapUsed": 70227296,
+2025-11-07T23:27:19.970154895Z [inf]    "external": 5245698,
+2025-11-07T23:27:19.970155108Z [inf]  }
+2025-11-07T23:27:19.970163313Z [inf]    "arrayBuffers": 1573371
+2025-11-07T23:27:19.970166921Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:27:19.970172762Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:27:19.891Z
+2025-11-07T23:27:19.970178567Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:27:19.970204171Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:27:19.970210881Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:27:19.970217463Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:27:19.970223576Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:27:19.886Z
+2025-11-07T23:27:19.970232871Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:27:19.970240178Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:27:19.970246332Z [inf]  🔧 Process ID: 50
+2025-11-07T23:27:19.970252392Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:27:19.970257907Z [inf]  🔧 Platform: linux
+2025-11-07T23:27:19.970263392Z [inf]  🔧 Architecture: x64
+2025-11-07T23:27:19.974475985Z [inf]  ✅ Database URL configured
+2025-11-07T23:27:19.974485441Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:27:19.974486368Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:19.974490322Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:27:19.974494903Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:19.974496746Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:27:19.974502597Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:27:19.974503878Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:19.974508534Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:27:19.974515574Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:27:19.974516139Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:19.974517157Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:19.974521553Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:27:19.974526662Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:19.974529666Z [err]  💥 Error type: object
+2025-11-07T23:27:19.974535816Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:27:19.974536131Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:19.974539117Z [err]  💥 Error name: Error
+2025-11-07T23:27:19.974545306Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:27:19.974547004Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:19.976473071Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:19.976479901Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:19.976487220Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:19.976494155Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:19.976501290Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:19.976507743Z [err]  💥 Process will exit with code 1
+2025-11-07T23:27:19.976513687Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:27:21.231994025Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:21.942349023Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-07T23:27:21.942356582Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-07T23:27:22.907631083Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-07T23:27:22.907776320Z [inf]  Using 'pg' driver for database querying
+2025-11-07T23:27:22.907780888Z [inf]  [⣷] Pulling schema from database...
+2025-11-07T23:27:22.907785100Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:22.912955923Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-07T23:27:23.038726498Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-07T23:27:23.171218202Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-07T23:27:23.304922752Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-07T23:27:23.943714282Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-07T23:27:23.943722282Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-07T23:27:23.943728761Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-07T23:27:23.943736011Z [inf]  [i] No changes detected
+2025-11-07T23:27:23.943742945Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-07T23:27:23.943757834Z [inf]  
+2025-11-07T23:27:23.943764223Z [inf]  > rest-express@1.0.0 start
+2025-11-07T23:27:23.943770341Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-07T23:27:23.943776516Z [inf]  
+2025-11-07T23:27:25.376472108Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-07T23:27:26.179352771Z [inf]  ✅ HERE Tracking API initialized
+2025-11-07T23:27:26.179361720Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-07T23:27:26.179370658Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-07T23:27:25.384Z
+2025-11-07T23:27:26.179378936Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-07T23:27:26.179393633Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-07T23:27:26.179402396Z [inf]  🔧 Process ID: 50
+2025-11-07T23:27:26.179410790Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-07T23:27:26.179421007Z [inf]  🔧 Platform: linux
+2025-11-07T23:27:26.179428790Z [inf]  🔧 Architecture: x64
+2025-11-07T23:27:26.179436191Z [inf]  🔧 Memory usage: {
+2025-11-07T23:27:26.179444189Z [inf]    "rss": 188051456,
+2025-11-07T23:27:26.179452409Z [inf]    "heapTotal": 98222080,
+2025-11-07T23:27:26.179460214Z [inf]    "heapUsed": 68092960,
+2025-11-07T23:27:26.179468232Z [inf]    "external": 4204721,
+2025-11-07T23:27:26.179478181Z [inf]    "arrayBuffers": 532394
+2025-11-07T23:27:26.179486271Z [inf]  }
+2025-11-07T23:27:26.179493527Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-07T23:27:26.179501229Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-07T23:27:25.388Z
+2025-11-07T23:27:26.179622723Z [inf]  🔧 Validating environment configuration...
+2025-11-07T23:27:26.179630117Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-07T23:27:26.179636690Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-07T23:27:26.179642610Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-07T23:27:26.179745975Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-07T23:27:26.179758410Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-07T23:27:25.389Z
+2025-11-07T23:27:26.179764584Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-07T23:27:26.179779995Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-07T23:27:26.179795434Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-07T23:27:26.179803024Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-07T23:27:26.179848907Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-07T23:27:26.179857838Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-07T23:27:26.179865472Z [inf]  ✅ Database URL configured
+2025-11-07T23:27:26.179873010Z [err]  💥 DEPLOYMENT DEBUG: Server startup failed in try-catch block
+2025-11-07T23:27:26.179889214Z [err]  💥 Server startup failed: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:26.179897747Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:26.179909356Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:26.179916104Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
+2025-11-07T23:27:26.179922526Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:26.179929676Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:26.179936666Z [err]  💥 Error type: object
+2025-11-07T23:27:26.179942955Z [err]  💥 Error name: Error
+2025-11-07T23:27:26.179949124Z [err]  💥 Error message: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:26.179956540Z [err]  💥 Stack trace: Error: Missing LOADRIGHT_API_KEY environment variable. LoadRight webhook authentication requires an API key in production.
+2025-11-07T23:27:26.179963809Z [err]      at startServer (file:///app/dist/index.js:12548:13)
+2025-11-07T23:27:26.181914271Z [err]      at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:543:26)
+2025-11-07T23:27:26.181926389Z [err]      at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+2025-11-07T23:27:26.181934499Z [err]  💥 Process will exit with code 1
+2025-11-07T23:27:26.181943162Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-07T23:27:26.182079750Z [err]      at file:///app/dist/index.js:12706:1
+2025-11-07T23:27:26.182087233Z [err]      at ModuleJob.run (node:internal/modules/esm/module_job:268:25)
