@@ -275,7 +275,8 @@ async function startServer() {
     // Setup frontend serving based on environment (using isProduction from earlier validation)
     if (isProduction) {
       console.log('📁 Setting up static file serving for production...');
-      const distPath = path.resolve(__dirname, "public");
+      // When using tsx, __dirname is /app/server, so we need to go up one level
+      const distPath = path.resolve(__dirname, "..", "dist", "public");
       console.log('🔍 DEBUG: Resolved static path:', distPath);
       console.log('🔍 DEBUG: index.html exists:', fs.existsSync(path.join(distPath, "index.html")));
       

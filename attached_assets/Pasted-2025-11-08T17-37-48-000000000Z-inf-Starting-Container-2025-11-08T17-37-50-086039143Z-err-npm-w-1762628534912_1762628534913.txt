@@ -1,0 +1,895 @@
+2025-11-08T17:37:48.000000000Z [inf]  Starting Container
+2025-11-08T17:37:50.086039143Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:37:50.086046150Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:37:50.086052192Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:37:50.113295205Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:37:50.268968132Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:37:50.383801157Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:37:51.017652537Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:37:51.017660519Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:37:51.017666824Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:37:51.017673615Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:37:51.017680818Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:37:51.147983227Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:37:51.268019710Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:37:51.396345299Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:37:51.965549050Z [inf]  
+2025-11-08T17:37:51.965562089Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:37:51.965571777Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:37:51.965577470Z [inf]  [i] No changes detected
+2025-11-08T17:37:51.965580138Z [inf]  
+2025-11-08T17:37:51.965584274Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:37:53.092439453Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:37:53.176559300Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:37:53.348757770Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:37:53.348769288Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:37:53.343Z
+2025-11-08T17:37:53.348776554Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:37:53.348782593Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:37:53.348787890Z [inf]  🔧 Process ID: 62
+2025-11-08T17:37:53.348794710Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:37:53.348804969Z [inf]  🔧 Platform: linux
+2025-11-08T17:37:53.348811197Z [inf]  🔧 Architecture: x64
+2025-11-08T17:37:53.348817632Z [inf]  🔧 Memory usage: {
+2025-11-08T17:37:53.348823879Z [inf]    "rss": 247762944,
+2025-11-08T17:37:53.348829450Z [inf]    "heapTotal": 75689984,
+2025-11-08T17:37:53.348835014Z [inf]    "heapUsed": 51750528,
+2025-11-08T17:37:53.348840550Z [inf]    "external": 5451983,
+2025-11-08T17:37:53.348846183Z [inf]    "arrayBuffers": 597630
+2025-11-08T17:37:53.348851899Z [inf]  }
+2025-11-08T17:37:53.352424555Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:37:53.352431909Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:37:53.347Z
+2025-11-08T17:37:53.352438726Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:37:53.352445485Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:37:53.348Z
+2025-11-08T17:37:53.352452279Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:37:53.352458673Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:37:53.352464848Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:37:53.352470795Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:37:53.352477069Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:37:53.352482808Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:37:53.352488929Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:37:53.352503835Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:37:53.352513562Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:37:53.352519372Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:37:53.352525288Z [inf]  ✅ Database URL configured
+2025-11-08T17:37:53.352530678Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:37:53.352536803Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:37:53.352542960Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:37:53.352550745Z [inf]  ✅ Session authentication configured
+2025-11-08T17:37:53.352556567Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:37:53.352562471Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:37:53.358839323Z [inf]  🔧 Testing database connection...
+2025-11-08T17:37:53.358844560Z [err]  (node:62) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:37:53.358850822Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:37:54.091052446Z [inf]  ✅ Database connection successful
+2025-11-08T17:37:54.091058159Z [inf]  📝 Registering application routes...
+2025-11-08T17:37:54.091063185Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:37:54.091068361Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:37:54.091073388Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:37:54.091078340Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:37:54.091083218Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:37:54.091088185Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:37:54.091093859Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:37:54.091098955Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:37:54.091104226Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:37:54.091109370Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:37:54.091115814Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:37:54.091121013Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:37:54.091126150Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:37:54.091131177Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:37:54.091136585Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:37:54.091142117Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:37:54.091147065Z [err]  ❌ Production build directory not found!
+2025-11-08T17:37:54.091152187Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:37:55.134456437Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:37:56.062687068Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:37:56.062694648Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:37:56.168163089Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:37:56.305844519Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:37:56.425971731Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:37:57.046191229Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:37:57.046198686Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:37:57.046298636Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:37:57.046312523Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:37:57.066114260Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:37:57.203878075Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:37:57.352786359Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:37:57.377119047Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:37:57.440547158Z [inf]  [i] No changes detected
+2025-11-08T17:37:58.101287299Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:37:58.101302229Z [inf]  
+2025-11-08T17:37:58.101376103Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:37:58.101384341Z [inf]  
+2025-11-08T17:37:58.101391272Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:37:59.345522846Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:37:59.345530530Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:37:59.345542026Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:37:59.345550585Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:37:59.175Z
+2025-11-08T17:37:59.345557683Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:37:59.345564805Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:37:59.345571681Z [inf]  🔧 Process ID: 63
+2025-11-08T17:37:59.345578029Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:37:59.345584863Z [inf]  🔧 Platform: linux
+2025-11-08T17:37:59.345591103Z [inf]  🔧 Architecture: x64
+2025-11-08T17:37:59.346169713Z [inf]  🔧 Memory usage: {
+2025-11-08T17:37:59.346197137Z [inf]    "rss": 214937600,
+2025-11-08T17:37:59.346205517Z [inf]    "heapTotal": 74645504,
+2025-11-08T17:37:59.346216191Z [inf]    "heapUsed": 55235640,
+2025-11-08T17:37:59.346222441Z [inf]    "external": 5605344,
+2025-11-08T17:37:59.346227358Z [inf]    "arrayBuffers": 646703
+2025-11-08T17:37:59.346232184Z [inf]  }
+2025-11-08T17:37:59.346236423Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:37:59.346241239Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:37:59.180Z
+2025-11-08T17:37:59.346247204Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:37:59.346254348Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:37:59.181Z
+2025-11-08T17:37:59.346260154Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:37:59.346266337Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:37:59.349639359Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:37:59.349643432Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:37:59.349647149Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:37:59.349650901Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:37:59.349654827Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:37:59.349658807Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:37:59.349662854Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:37:59.349667127Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:37:59.349670647Z [inf]  ✅ Database URL configured
+2025-11-08T17:37:59.349674942Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:37:59.349678836Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:37:59.349683000Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:37:59.349687696Z [inf]  ✅ Session authentication configured
+2025-11-08T17:37:59.349695494Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:37:59.349699516Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:37:59.349704339Z [inf]  🔧 Testing database connection...
+2025-11-08T17:37:59.349708729Z [err]  (node:63) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:37:59.349713680Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:37:59.349717525Z [inf]  ✅ Database connection successful
+2025-11-08T17:37:59.349721571Z [inf]  📝 Registering application routes...
+2025-11-08T17:37:59.383110293Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:37:59.383137247Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:37:59.383142779Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:37:59.383146988Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:37:59.383151193Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:37:59.383159080Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:37:59.383163485Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:37:59.383167484Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:37:59.383171509Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:37:59.383176885Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:37:59.383184176Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:37:59.383189923Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:37:59.383235547Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:37:59.383242798Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:37:59.383248742Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:37:59.383254312Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:37:59.383273203Z [err]  ❌ Production build directory not found!
+2025-11-08T17:37:59.383278241Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:38:01.356624217Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:01.419006144Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:38:01.419012056Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:38:02.355804736Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:38:02.355806883Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:02.355813223Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:38:02.424153027Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:02.541616002Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:38:03.254460488Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:38:03.254469508Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:38:03.254477563Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:38:03.254482599Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:03.254539874Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:38:03.314450278Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:03.323115686Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:38:03.374092036Z [inf]  [i] No changes detected
+2025-11-08T17:38:03.546227978Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:04.245673601Z [inf]  
+2025-11-08T17:38:04.245686990Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:38:04.245713841Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:38:04.245722966Z [inf]  
+2025-11-08T17:38:05.139488817Z [inf]  🔧 Process ID: 61
+2025-11-08T17:38:05.139501441Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:38:05.139645685Z [inf]  🔧 Platform: linux
+2025-11-08T17:38:05.139655178Z [inf]  🔧 Architecture: x64
+2025-11-08T17:38:05.139661785Z [inf]  🔧 Memory usage: {
+2025-11-08T17:38:05.139670176Z [inf]    "rss": 215736320,
+2025-11-08T17:38:05.139676079Z [inf]    "heapTotal": 74379264,
+2025-11-08T17:38:05.139681168Z [inf]    "heapUsed": 46266504,
+2025-11-08T17:38:05.139686500Z [inf]    "external": 5236389,
+2025-11-08T17:38:05.139693423Z [inf]    "arrayBuffers": 581246
+2025-11-08T17:38:05.139693839Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:38:05.139700481Z [inf]  }
+2025-11-08T17:38:05.139703513Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:38:05.139707788Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:38:05.139712169Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:38:05.139716556Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:38:05.047Z
+2025-11-08T17:38:05.139721592Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:38:05.042Z
+2025-11-08T17:38:05.139724677Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:38:05.139729357Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:38:05.139735796Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:38:05.048Z
+2025-11-08T17:38:05.139737483Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:38:05.139743527Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:38:05.139749417Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:38:05.175286015Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:38:05.175290159Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:38:05.175296329Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:38:05.175301121Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:38:05.175305269Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:38:05.175309858Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:38:05.175314544Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:38:05.175318723Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:38:05.175322703Z [inf]  ✅ Database URL configured
+2025-11-08T17:38:05.175327969Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:38:05.175332132Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:38:05.175336248Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:38:05.175340537Z [inf]  ✅ Session authentication configured
+2025-11-08T17:38:05.175344947Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:38:05.175349480Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:38:05.175353755Z [inf]  🔧 Testing database connection...
+2025-11-08T17:38:05.175361051Z [err]  (node:61) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:38:05.175366097Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:38:05.185654290Z [inf]  ✅ Database connection successful
+2025-11-08T17:38:05.185664888Z [inf]  📝 Registering application routes...
+2025-11-08T17:38:05.247362121Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:38:05.247367069Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:38:05.247371370Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:38:05.247375476Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:38:05.247379328Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:38:05.247383336Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:38:05.247390029Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:38:05.247394292Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:38:05.247399039Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:38:05.247402931Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:38:05.247407291Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:38:05.247411053Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:38:05.247415731Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:38:05.247419769Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:38:05.247423801Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:38:05.247428383Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:38:05.247433079Z [err]  ❌ Production build directory not found!
+2025-11-08T17:38:05.247437004Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:38:34.656246799Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:34.656261371Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:38:34.656270009Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:38:34.656280461Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:38:34.656286968Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:38:34.656293641Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:34.656299831Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:34.656306355Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:38:34.656315553Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:38:34.656323099Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:38:34.656334124Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:38:34.656340733Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:38:34.656346585Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:34.656351388Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:38:34.677683520Z [inf]  [i] No changes detected
+2025-11-08T17:38:34.816816753Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:34.843821377Z [inf]  
+2025-11-08T17:38:34.843834246Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:38:34.843844347Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:38:34.843852035Z [inf]  
+2025-11-08T17:38:36.488124202Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:38:36.488134093Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:38:36.337Z
+2025-11-08T17:38:36.488134438Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:38:36.332Z
+2025-11-08T17:38:36.488143122Z [inf]    "arrayBuffers": 581246
+2025-11-08T17:38:36.488143192Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:38:36.488149579Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:38:36.488152625Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:38:36.488156976Z [inf]  }
+2025-11-08T17:38:36.488161318Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:38:36.488168866Z [inf]  🔧 Memory usage: {
+2025-11-08T17:38:36.488169230Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:38:36.488177526Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:38:36.337Z
+2025-11-08T17:38:36.488186596Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:38:36.488191778Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:38:36.488194319Z [inf]    "rss": 214528000,
+2025-11-08T17:38:36.488196028Z [inf]  🔧 Process ID: 61
+2025-11-08T17:38:36.488204322Z [inf]    "heapTotal": 77529088,
+2025-11-08T17:38:36.488204925Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:38:36.488212443Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:38:36.488213904Z [inf]    "heapUsed": 47118032,
+2025-11-08T17:38:36.488221578Z [inf]  🔧 Platform: linux
+2025-11-08T17:38:36.488228085Z [inf]    "external": 4938138,
+2025-11-08T17:38:36.488229403Z [inf]  🔧 Architecture: x64
+2025-11-08T17:38:36.492525789Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:38:36.492530800Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:38:36.492535828Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:38:36.492541021Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:38:36.492546231Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:38:36.492551408Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:38:36.492556273Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:38:36.492619204Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:38:36.492626150Z [inf]  ✅ Database URL configured
+2025-11-08T17:38:36.492632919Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:38:36.492640203Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:38:36.492645016Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:38:36.492650286Z [inf]  ✅ Session authentication configured
+2025-11-08T17:38:36.492654870Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:38:36.492659230Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:38:36.492676621Z [inf]  🔧 Testing database connection...
+2025-11-08T17:38:36.492689006Z [err]  (node:61) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:38:36.492695623Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:38:36.492699579Z [inf]  ✅ Database connection successful
+2025-11-08T17:38:36.492703705Z [inf]  📝 Registering application routes...
+2025-11-08T17:38:36.493711087Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:38:36.493723342Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:38:36.493751527Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:38:36.493760545Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:38:36.493768132Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:38:36.493774920Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:38:36.493785825Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:38:36.493792519Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:38:36.493800036Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:38:36.493807702Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:38:36.493814963Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:38:36.493821974Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:38:36.495968531Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:38:36.495980264Z [err]  ❌ Production build directory not found!
+2025-11-08T17:38:36.495990297Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:38:36.496011439Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:38:36.496020112Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:38:36.496027884Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:38:38.484244142Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:38.484249989Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:38:38.484258515Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:38:39.594922988Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:38:39.594926439Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:38:39.594930728Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:39.594934363Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:39.594938102Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:38:39.754789194Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:38:39.858177367Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:38:40.539346253Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:38:40.539353034Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:38:40.539360836Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:40.539367836Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:40.539380572Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:38:40.539395344Z [inf]  [i] No changes detected
+2025-11-08T17:38:40.633060475Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:40.643707372Z [inf]  
+2025-11-08T17:38:40.643719324Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:38:40.643727015Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:38:40.643733031Z [inf]  
+2025-11-08T17:38:41.661189156Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:38:41.874914679Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:38:42.596407433Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:38:42.596417567Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:38:42.596426882Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:38:42.596434100Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:38:42.596437953Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:38:42.596449232Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:38:42.038Z
+2025-11-08T17:38:42.596453598Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:38:42.596456813Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:38:42.596461293Z [inf]  🔧 Process ID: 62
+2025-11-08T17:38:42.596468462Z [inf]    "heapTotal": 73592832,
+2025-11-08T17:38:42.596468931Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:38:42.596477851Z [inf]  🔧 Platform: linux
+2025-11-08T17:38:42.596478767Z [inf]    "heapUsed": 50967480,
+2025-11-08T17:38:42.596486116Z [inf]  🔧 Architecture: x64
+2025-11-08T17:38:42.596487466Z [inf]    "external": 5597336,
+2025-11-08T17:38:42.596495555Z [inf]  🔧 Memory usage: {
+2025-11-08T17:38:42.596496275Z [inf]    "arrayBuffers": 646703
+2025-11-08T17:38:42.596504299Z [inf]    "rss": 214433792,
+2025-11-08T17:38:42.596505777Z [inf]  }
+2025-11-08T17:38:42.596512982Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:38:42.596519136Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:38:42.042Z
+2025-11-08T17:38:42.596525286Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:38:42.596532199Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:38:42.043Z
+2025-11-08T17:38:42.597338919Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:38:42.597344230Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:38:42.597349370Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:38:42.597354453Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:38:42.597359607Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:38:42.597364911Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:38:42.597370153Z [inf]  ✅ Database URL configured
+2025-11-08T17:38:42.597375150Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:38:42.597380167Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:38:42.597385444Z [inf]  ✅ Session authentication configured
+2025-11-08T17:38:42.597390479Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:38:42.597395662Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:38:42.597401239Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:38:42.597407713Z [inf]  🔧 Testing database connection...
+2025-11-08T17:38:42.597413965Z [err]  (node:62) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:38:42.597419097Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:38:42.597425223Z [inf]  ✅ Database connection successful
+2025-11-08T17:38:42.597430406Z [inf]  📝 Registering application routes...
+2025-11-08T17:38:42.597435502Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:38:42.597440782Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:38:42.597446844Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:38:42.598603281Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:38:42.598610972Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:38:42.598618481Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:38:42.598625678Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:38:42.598631485Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:38:42.598637170Z [err]  ❌ Production build directory not found!
+2025-11-08T17:38:42.598643305Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:38:42.598649757Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:38:42.598654074Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:38:42.598658485Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:38:42.598664166Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:38:42.598668276Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:38:42.598672174Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:38:42.598675700Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:38:42.598680048Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:38:44.778767169Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:38:44.778910048Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:44.778916726Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:38:45.619838696Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:38:45.619850003Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:38:45.619856449Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:45.743895245Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:45.870105876Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:38:46.682651937Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:38:46.682662288Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:38:46.682668496Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:46.682674324Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:46.682679652Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:38:46.682786301Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:38:46.682792503Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:38:46.700976380Z [inf]  [i] No changes detected
+2025-11-08T17:38:46.882268936Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:47.618441975Z [inf]  
+2025-11-08T17:38:47.618448067Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:38:47.618453431Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:38:47.618458207Z [inf]  
+2025-11-08T17:38:48.674167788Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:38:48.674176629Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:38:48.674181842Z [inf]  }
+2025-11-08T17:38:48.674186435Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:38:48.674194001Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:38:48.373Z
+2025-11-08T17:38:48.674201375Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:38:48.674210082Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:38:48.674213230Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:38:48.674222164Z [inf]  🔧 Process ID: 63
+2025-11-08T17:38:48.674228125Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:38:48.377Z
+2025-11-08T17:38:48.674233473Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:38:48.674242084Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:38:48.674245307Z [inf]  🔧 Platform: linux
+2025-11-08T17:38:48.674253336Z [inf]  🔧 Architecture: x64
+2025-11-08T17:38:48.674265054Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:38:48.378Z
+2025-11-08T17:38:48.674265235Z [inf]  🔧 Memory usage: {
+2025-11-08T17:38:48.674276813Z [inf]    "rss": 211800064,
+2025-11-08T17:38:48.674280943Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:38:48.674291682Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:38:48.674299359Z [inf]    "heapTotal": 73854976,
+2025-11-08T17:38:48.674309164Z [inf]    "heapUsed": 51466816,
+2025-11-08T17:38:48.674316648Z [inf]    "external": 5492400,
+2025-11-08T17:38:48.674324448Z [inf]    "arrayBuffers": 638511
+2025-11-08T17:38:48.678012694Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:38:48.678019002Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:38:48.678024609Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:38:48.678030689Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:38:48.678036502Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:38:48.678042443Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:38:48.678048935Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:38:48.678055388Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:38:48.678061407Z [inf]  ✅ Database URL configured
+2025-11-08T17:38:48.678067239Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:38:48.678077675Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:38:48.678084080Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:38:48.678092539Z [inf]  ✅ Session authentication configured
+2025-11-08T17:38:48.678098676Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:38:48.678104904Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:38:48.678111992Z [inf]  🔧 Testing database connection...
+2025-11-08T17:38:48.678119291Z [err]  (node:63) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:38:48.678125266Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:38:48.678130933Z [inf]  ✅ Database connection successful
+2025-11-08T17:38:48.678138754Z [inf]  📝 Registering application routes...
+2025-11-08T17:38:48.678144409Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:38:48.679477192Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:38:48.679483700Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:38:48.679489714Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:38:48.679495582Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:38:48.679501151Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:38:48.679506703Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:38:48.679512364Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:38:48.679517827Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:38:48.679525101Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:38:48.679531191Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:38:48.679536970Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:38:48.679542934Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:38:48.679594431Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:38:48.679601141Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:38:48.679606973Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:38:48.679615017Z [err]  ❌ Production build directory not found!
+2025-11-08T17:38:48.679620409Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:38:50.608448819Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:50.977905351Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:38:50.977910767Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:38:51.564146298Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:38:51.670157173Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:38:51.791224515Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:51.919097595Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:52.564662837Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:38:52.564669313Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:38:52.564675551Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:38:52.564681439Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:38:52.564686495Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:38:52.689995885Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:52.808635076Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:38:52.848978920Z [inf]  [i] No changes detected
+2025-11-08T17:38:53.701466723Z [inf]  
+2025-11-08T17:38:53.701588250Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:53.701593407Z [inf]  
+2025-11-08T17:38:53.701599082Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:38:53.701606665Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:38:54.792848683Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:38:54.792862450Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:38:54.646Z
+2025-11-08T17:38:54.792870335Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:38:54.792879985Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:38:54.646Z
+2025-11-08T17:38:54.792886990Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:38:54.792894053Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:38:54.792940236Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:38:54.792947088Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:38:54.792952471Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:38:54.792957511Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:38:54.642Z
+2025-11-08T17:38:54.792963128Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:38:54.792972405Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:38:54.792980693Z [inf]  🔧 Process ID: 65
+2025-11-08T17:38:54.792987290Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:38:54.792991820Z [inf]  🔧 Platform: linux
+2025-11-08T17:38:54.792996955Z [inf]  🔧 Architecture: x64
+2025-11-08T17:38:54.793002259Z [inf]  🔧 Memory usage: {
+2025-11-08T17:38:54.793007386Z [inf]    "rss": 208232448,
+2025-11-08T17:38:54.793011453Z [inf]    "heapTotal": 73330688,
+2025-11-08T17:38:54.793017705Z [inf]    "heapUsed": 48548264,
+2025-11-08T17:38:54.793022143Z [inf]    "external": 5503510,
+2025-11-08T17:38:54.793026490Z [inf]    "arrayBuffers": 597630
+2025-11-08T17:38:54.793031705Z [inf]  }
+2025-11-08T17:38:54.796274813Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:38:54.796280222Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:38:54.796286803Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:38:54.796292207Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:38:54.796298717Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:38:54.796305714Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:38:54.796312006Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:38:54.796317489Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:38:54.796323082Z [inf]  ✅ Database URL configured
+2025-11-08T17:38:54.796328341Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:38:54.796334746Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:38:54.796340643Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:38:54.796346265Z [inf]  ✅ Session authentication configured
+2025-11-08T17:38:54.796352489Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:38:54.796358546Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:38:54.796365177Z [inf]  🔧 Testing database connection...
+2025-11-08T17:38:54.796370999Z [err]  (node:65) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:38:54.796377097Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:38:54.796383047Z [inf]  ✅ Database connection successful
+2025-11-08T17:38:54.796388686Z [inf]  📝 Registering application routes...
+2025-11-08T17:38:54.808902445Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:38:54.808909187Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:38:54.808915314Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:38:54.808921303Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:38:54.808926843Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:38:54.808933045Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:38:54.808939150Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:38:54.808945491Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:38:54.808951066Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:38:54.808958408Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:38:54.808964393Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:38:54.808970437Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:38:54.808976105Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:38:54.808982465Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:38:54.808988392Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:38:54.808993892Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:38:54.808999621Z [err]  ❌ Production build directory not found!
+2025-11-08T17:38:54.809005185Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:38:56.706658704Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:56.827788728Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:38:56.827795527Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:38:57.660851418Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:38:57.660858644Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:38:57.660865443Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:57.751493608Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:38:57.877443890Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:38:58.005380935Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:38:58.757772491Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:38:58.757787798Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:38:58.757796787Z [inf]  [i] No changes detected
+2025-11-08T17:38:58.757861011Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:38:58.757868593Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:38:58.757875739Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:38:58.818658956Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:38:58.861134917Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:38:58.861145823Z [inf]  
+2025-11-08T17:38:58.861163765Z [inf]  
+2025-11-08T17:38:58.861169398Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:39:00.086640674Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:39:00.889660046Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:39:00.889660130Z [inf]    "arrayBuffers": 638511
+2025-11-08T17:39:00.889675404Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:39:00.889678603Z [inf]  }
+2025-11-08T17:39:00.889684561Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:39:00.889690661Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:39:00.552Z
+2025-11-08T17:39:00.889696535Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:39:00.889703618Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:39:00.552Z
+2025-11-08T17:39:00.889710286Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:39:00.889715962Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:39:00.889787567Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:39:00.889793978Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:39:00.889801082Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:39:00.546Z
+2025-11-08T17:39:00.889808531Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:39:00.889814739Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:39:00.889820986Z [inf]  🔧 Process ID: 64
+2025-11-08T17:39:00.889827731Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:39:00.889833853Z [inf]  🔧 Platform: linux
+2025-11-08T17:39:00.889838677Z [inf]  🔧 Architecture: x64
+2025-11-08T17:39:00.889843101Z [inf]  🔧 Memory usage: {
+2025-11-08T17:39:00.889847692Z [inf]    "rss": 211259392,
+2025-11-08T17:39:00.889852252Z [inf]    "heapTotal": 74117120,
+2025-11-08T17:39:00.889857192Z [inf]    "heapUsed": 51669688,
+2025-11-08T17:39:00.889861700Z [inf]    "external": 5483555,
+2025-11-08T17:39:00.893015468Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:39:00.893020451Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:39:00.893025737Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:39:00.893030978Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:39:00.893036561Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:39:00.893043527Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:39:00.893048406Z [inf]  ✅ Database URL configured
+2025-11-08T17:39:00.893055723Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:39:00.893061537Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:39:00.893065674Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:39:00.893069890Z [inf]  ✅ Session authentication configured
+2025-11-08T17:39:00.893073854Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:39:00.893077934Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:39:00.893082476Z [inf]  🔧 Testing database connection...
+2025-11-08T17:39:00.893086650Z [err]  (node:64) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:39:00.893090734Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:39:00.893094725Z [inf]  ✅ Database connection successful
+2025-11-08T17:39:00.893098552Z [inf]  📝 Registering application routes...
+2025-11-08T17:39:00.893102622Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:39:00.893106761Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:39:00.893112888Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:39:00.893512905Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:39:00.893516359Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:39:00.893519947Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:39:00.893523652Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:39:00.893527375Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:39:00.893531266Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:39:00.893535052Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:39:00.893539363Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:39:00.893544708Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:39:00.893550073Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:39:00.893555134Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:39:00.893560283Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:39:00.893565074Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:39:00.893570233Z [err]  ❌ Production build directory not found!
+2025-11-08T17:39:00.893575214Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:39:02.730670548Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:39:02.831005554Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:39:02.831013544Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:39:03.714052117Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:39:03.714057908Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:39:03.714063529Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:39:03.833940182Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:39:03.965762872Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:39:04.090947969Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:39:04.749638900Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:39:04.749651646Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:39:04.749658949Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:39:04.749665576Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:39:04.749671380Z [inf]  [i] No changes detected
+2025-11-08T17:39:04.749791423Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:39:04.902902262Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:39:04.912955263Z [inf]  
+2025-11-08T17:39:04.912983911Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:39:04.912992266Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:39:04.913004510Z [inf]  
+2025-11-08T17:39:06.063512866Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:39:06.753940438Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:39:06.753950509Z [inf]  🔧 Process ID: 62
+2025-11-08T17:39:06.753951580Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:39:06.753956629Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:39:06.753961775Z [inf]  🔧 Platform: linux
+2025-11-08T17:39:06.753971931Z [inf]  🔧 Architecture: x64
+2025-11-08T17:39:06.753979287Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:39:06.753979385Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:39:06.753980975Z [inf]  🔧 Memory usage: {
+2025-11-08T17:39:06.753988241Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:39:06.451Z
+2025-11-08T17:39:06.753990770Z [inf]    "rss": 183382016,
+2025-11-08T17:39:06.753995333Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:39:06.753998542Z [inf]    "external": 4983942,
+2025-11-08T17:39:06.753999452Z [inf]    "heapTotal": 73859072,
+2025-11-08T17:39:06.754006876Z [inf]    "arrayBuffers": 646703
+2025-11-08T17:39:06.754008965Z [inf]    "heapUsed": 54733072,
+2025-11-08T17:39:06.754019168Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:39:06.455Z
+2025-11-08T17:39:06.754022052Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:39:06.754029343Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:39:06.754031852Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:39:06.754033487Z [inf]  }
+2025-11-08T17:39:06.754037639Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:39:06.455Z
+2025-11-08T17:39:06.754041733Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:39:06.754041839Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:39:06.758119844Z [inf]  📝 Registering application routes...
+2025-11-08T17:39:06.758119858Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:39:06.758129800Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:39:06.758131314Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:39:06.758138593Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:39:06.758139672Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:39:06.758147237Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:39:06.758148112Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:39:06.758152079Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:39:06.758156232Z [inf]  ✅ Database URL configured
+2025-11-08T17:39:06.758156565Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:39:06.758161708Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:39:06.758165531Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:39:06.758166850Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:39:06.758169894Z [inf]  🔧 Testing database connection...
+2025-11-08T17:39:06.758175466Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:39:06.758176811Z [err]  (node:62) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:39:06.758183425Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:39:06.758183484Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:39:06.758188921Z [inf]  ✅ Database connection successful
+2025-11-08T17:39:06.758193483Z [inf]  ✅ Session authentication configured
+2025-11-08T17:39:06.759647110Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:39:06.759659528Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:39:06.759667249Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:39:06.759673309Z [err]  ❌ Production build directory not found!
+2025-11-08T17:39:06.759679978Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:39:06.759744393Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:39:06.759750545Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:39:06.759755946Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:39:06.759761347Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:39:06.759767728Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:39:06.759774674Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:39:06.759781370Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:39:06.759788079Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:39:06.759796477Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:39:06.759802505Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:39:08.747687102Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:39:08.988929826Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:39:08.988938582Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:39:09.693642091Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:39:09.693647781Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:39:09.783356205Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:39:09.912049140Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:39:10.034262780Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:39:10.697809473Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:39:10.697815335Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:39:10.697822009Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:39:10.697828207Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:39:10.697832809Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:39:10.774065236Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:39:10.819206540Z [inf]  [i] No changes detected
+2025-11-08T17:39:10.955826226Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:39:10.987209523Z [inf]  
+2025-11-08T17:39:10.987215537Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:39:10.987221260Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:39:10.987229362Z [inf]  
+2025-11-08T17:39:11.979594142Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:39:12.809556064Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:39:12.809561838Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:39:12.809570861Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:39:12.365Z
+2025-11-08T17:39:12.809577364Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:39:12.809585357Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:39:12.809591634Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:39:12.809592451Z [inf]  🔧 Process ID: 62
+2025-11-08T17:39:12.809601282Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:39:12.809608625Z [inf]  🔧 Platform: linux
+2025-11-08T17:39:12.809610556Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:39:12.370Z
+2025-11-08T17:39:12.809617381Z [inf]  🔧 Architecture: x64
+2025-11-08T17:39:12.809619602Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:39:12.809624930Z [inf]  🔧 Memory usage: {
+2025-11-08T17:39:12.809628095Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:39:12.370Z
+2025-11-08T17:39:12.809631583Z [inf]    "rss": 208842752,
+2025-11-08T17:39:12.809636534Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:39:12.809639396Z [inf]    "heapTotal": 74117120,
+2025-11-08T17:39:12.809644564Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:39:12.809647385Z [inf]    "heapUsed": 51802512,
+2025-11-08T17:39:12.809652673Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:39:12.809655443Z [inf]    "external": 5573513,
+2025-11-08T17:39:12.809660381Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:39:12.809666280Z [inf]    "arrayBuffers": 638511
+2025-11-08T17:39:12.809672639Z [inf]  }
+2025-11-08T17:39:12.810451794Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:39:12.810459276Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:39:12.810465391Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:39:12.810471363Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:39:12.810477705Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:39:12.810483513Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:39:12.810488206Z [inf]  ✅ Database URL configured
+2025-11-08T17:39:12.810492509Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:39:12.810497075Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:39:12.810501803Z [inf]  ✅ Session authentication configured
+2025-11-08T17:39:12.810505944Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:39:12.810510628Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:39:12.810515013Z [inf]  🔧 Testing database connection...
+2025-11-08T17:39:12.810518883Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:39:12.810522737Z [err]  (node:62) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:39:12.810526302Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:39:12.810530111Z [inf]  ✅ Database connection successful
+2025-11-08T17:39:12.810534319Z [inf]  📝 Registering application routes...
+2025-11-08T17:39:12.810538935Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:39:12.810542492Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:39:12.810546021Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:39:12.813638799Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:39:12.813643852Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:39:12.813649224Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:39:12.813655461Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:39:12.813661333Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:39:12.813666924Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:39:12.813673593Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:39:12.813678952Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:39:12.813684516Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:39:12.813691046Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:39:12.813695242Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:39:12.813699854Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:39:12.813703655Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:39:12.813707389Z [err]  ❌ Production build directory not found!
+2025-11-08T17:39:12.813711099Z [inf]  🚨 PROCESS EXITING with code: 1
+2025-11-08T17:39:14.108574586Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:39:14.900699867Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T17:39:14.900705215Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T17:39:15.944553184Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T17:39:15.944561937Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T17:39:15.944575920Z [inf]  Using 'pg' driver for database querying
+2025-11-08T17:39:15.944581779Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T17:39:15.944587015Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:39:16.034246825Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T17:39:16.153863687Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T17:39:17.128216932Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T17:39:17.128224891Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T17:39:17.128233121Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T17:39:17.128242490Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T17:39:17.128251030Z [inf]  [i] No changes detected
+2025-11-08T17:39:17.128259442Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T17:39:17.128273828Z [inf]  
+2025-11-08T17:39:17.128284197Z [inf]  > rest-express@1.0.0 start
+2025-11-08T17:39:17.128291377Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-08T17:39:17.128298240Z [inf]  
+2025-11-08T17:39:18.013929931Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T17:39:18.841007815Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T17:39:18.450Z
+2025-11-08T17:39:18.841010815Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T17:39:18.841021237Z [inf]  🔧 Memory usage: {
+2025-11-08T17:39:18.841022399Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T17:39:18.841024706Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T17:39:18.841029151Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T17:39:18.841034422Z [inf]    "rss": 215506944,
+2025-11-08T17:39:18.841043752Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T17:39:18.453Z
+2025-11-08T17:39:18.841045010Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T17:39:18.841045098Z [inf]    "heapTotal": 77787136,
+2025-11-08T17:39:18.841046717Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T17:39:18.841055145Z [inf]    "heapUsed": 47154168,
+2025-11-08T17:39:18.841055437Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T17:39:18.841064133Z [inf]    "external": 5583081,
+2025-11-08T17:39:18.841065233Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T17:39:18.454Z
+2025-11-08T17:39:18.841067658Z [inf]  🔧 Process ID: 61
+2025-11-08T17:39:18.841074149Z [inf]    "arrayBuffers": 581246
+2025-11-08T17:39:18.841075968Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T17:39:18.841077499Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T17:39:18.841082964Z [inf]  }
+2025-11-08T17:39:18.841086127Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T17:39:18.841092055Z [inf]  🔧 Platform: linux
+2025-11-08T17:39:18.841092408Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T17:39:18.841103883Z [inf]  🔧 Architecture: x64
+2025-11-08T17:39:18.844259719Z [inf]  🔧 Validating environment configuration...
+2025-11-08T17:39:18.844266152Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T17:39:18.844272172Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T17:39:18.844278746Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T17:39:18.844285718Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T17:39:18.844334505Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T17:39:18.844342306Z [inf]  ✅ Database URL configured
+2025-11-08T17:39:18.844349376Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T17:39:18.844355774Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T17:39:18.844361861Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T17:39:18.844368098Z [inf]  ✅ Session authentication configured
+2025-11-08T17:39:18.844374705Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T17:39:18.844385534Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T17:39:18.844391842Z [inf]  🔧 Testing database connection...
+2025-11-08T17:39:18.844398444Z [err]  (node:61) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T17:39:18.844403746Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T17:39:18.844409780Z [inf]  ✅ Database connection successful
+2025-11-08T17:39:18.844415808Z [inf]  📝 Registering application routes...
+2025-11-08T17:39:18.844422000Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T17:39:18.844428254Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-08T17:39:18.844434132Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-08T17:39:18.844991850Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-08T17:39:18.844997513Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-08T17:39:18.845004025Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-08T17:39:18.845010093Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-08T17:39:18.845022509Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T17:39:18.845028805Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-08T17:39:18.845034613Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-08T17:39:18.845040504Z [err]      at startServer (/app/server/index.ts:256:26)
+2025-11-08T17:39:18.845046296Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T17:39:18.845052459Z [inf]  ✅ Routes registered successfully
+2025-11-08T17:39:18.845058303Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T17:39:18.845064291Z [inf]  🔍 DEBUG: Resolved static path: /app/server/public
+2025-11-08T17:39:18.845070245Z [inf]  🔍 DEBUG: index.html exists: false
+2025-11-08T17:39:18.845075738Z [err]  ❌ Production build directory not found!
+2025-11-08T17:39:18.845082108Z [inf]  🚨 PROCESS EXITING with code: 1
