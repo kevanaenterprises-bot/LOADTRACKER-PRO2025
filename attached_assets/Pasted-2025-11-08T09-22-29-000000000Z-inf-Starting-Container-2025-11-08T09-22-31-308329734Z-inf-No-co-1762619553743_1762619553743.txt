@@ -1,0 +1,214 @@
+2025-11-08T09:22:29.000000000Z [inf]  Starting Container
+2025-11-08T09:22:31.308329734Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-08T09:22:31.308346064Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-08T09:22:31.308356432Z [inf]  Using 'pg' driver for database querying
+2025-11-08T09:22:31.308365820Z [inf]  [⣷] Pulling schema from database...
+2025-11-08T09:22:31.308460250Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T09:22:31.337994424Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T09:22:31.468555287Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T09:22:31.616365546Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-08T09:22:32.189740252Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-08T09:22:32.189744966Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-08T09:22:32.189749403Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-08T09:22:32.189753608Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-08T09:22:32.271145609Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-08T09:22:32.418480969Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-08T09:22:32.418491697Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-08T09:22:32.418498438Z [inf]  [i] No changes detected
+2025-11-08T09:22:32.534780457Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-08T09:22:32.561076044Z [inf]  
+2025-11-08T09:22:32.561084913Z [inf]  > rest-express@1.0.0 start
+2025-11-08T09:22:32.561091265Z [inf]  > NODE_ENV=production node dist/index.js
+2025-11-08T09:22:32.561097695Z [inf]  
+2025-11-08T09:22:34.226637305Z [inf]  ✅ HERE Tracking API initialized
+2025-11-08T09:22:34.226646569Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-08T09:22:34.226654484Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-08T09:22:34.049Z
+2025-11-08T09:22:34.226659883Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-08T09:22:34.226665097Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-08T09:22:34.226675978Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-08T09:22:34.226677216Z [inf]  🔧 Process ID: 53
+2025-11-08T09:22:34.226687262Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-08T09:22:34.226698816Z [inf]  🔧 Platform: linux
+2025-11-08T09:22:34.226704101Z [inf]  🔧 Architecture: x64
+2025-11-08T09:22:34.226710523Z [inf]  🔧 Memory usage: {
+2025-11-08T09:22:34.226716525Z [inf]    "rss": 178339840,
+2025-11-08T09:22:34.226722962Z [inf]    "heapTotal": 97718272,
+2025-11-08T09:22:34.226728919Z [inf]    "heapUsed": 72305744,
+2025-11-08T09:22:34.226733991Z [inf]    "external": 4419538,
+2025-11-08T09:22:34.226740023Z [inf]    "arrayBuffers": 747211
+2025-11-08T09:22:34.226746004Z [inf]  }
+2025-11-08T09:22:34.226751487Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-08T09:22:34.226756953Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-08T09:22:34.052Z
+2025-11-08T09:22:34.226761851Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-08T09:22:34.226769068Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-08T09:22:34.052Z
+2025-11-08T09:22:34.226774328Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-08T09:22:34.226779346Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-08T09:22:34.229864012Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-08T09:22:34.229868062Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-08T09:22:34.229872016Z [inf]  🔧 Validating environment configuration...
+2025-11-08T09:22:34.229876014Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-08T09:22:34.229880035Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-08T09:22:34.229884743Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-08T09:22:34.229888447Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-08T09:22:34.229892816Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-08T09:22:34.229896624Z [inf]  ✅ Database URL configured
+2025-11-08T09:22:34.229900365Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-08T09:22:34.229904591Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-08T09:22:34.229908388Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-08T09:22:34.229912364Z [inf]  ✅ Session authentication configured
+2025-11-08T09:22:34.229917867Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-08T09:22:34.229921860Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-08T09:22:34.229925617Z [inf]  🔧 Testing database connection...
+2025-11-08T09:22:34.229929426Z [err]  (node:53) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-08T09:22:34.229933432Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-08T09:22:34.287324465Z [inf]  ✅ Database connection successful
+2025-11-08T09:22:34.287333595Z [inf]  📝 Registering application routes...
+2025-11-08T09:22:34.295890298Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-08T09:22:34.295903262Z [err]      at prepareHeaders (file:///app/node_modules/oauth4webapi/build/index.js:146:42)
+2025-11-08T09:22:34.295909966Z [err]      at performDiscovery (file:///app/node_modules/oauth4webapi/build/index.js:194:21)
+2025-11-08T09:22:34.295920399Z [err]      at Module.discoveryRequest (file:///app/node_modules/oauth4webapi/build/index.js:205:12)
+2025-11-08T09:22:34.295926198Z [err]      at performDiscovery (file:///app/node_modules/openid-client/build/index.js:267:17)
+2025-11-08T09:22:34.295932979Z [err]      at Module.discovery (file:///app/node_modules/openid-client/build/index.js:243:22)
+2025-11-08T09:22:34.295939548Z [err]      at memoize.maxAge (file:///app/dist/index.js:4005:25)
+2025-11-08T09:22:34.295945222Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-08T09:22:34.295949626Z [err]      at setupAuth (file:///app/dist/index.js:4077:24)
+2025-11-08T09:22:34.295955753Z [err]      at registerRoutes (file:///app/dist/index.js:5446:11)
+2025-11-08T09:22:34.295959692Z [err]      at startServer (file:///app/dist/index.js:12884:26)
+2025-11-08T09:22:34.295965145Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-08T09:22:34.297970924Z [inf]  ✅ Routes registered successfully
+2025-11-08T09:22:34.297977679Z [inf]  📁 Setting up static file serving for production...
+2025-11-08T09:22:34.297982632Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-11-08T09:22:34.297988126Z [inf]  🔍 DEBUG: index.html exists: true
+2025-11-08T09:22:34.297992834Z [inf]  ✅ Static file serving configured (production mode)
+2025-11-08T09:22:34.297997485Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-11-08T09:22:34.300500026Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-11-08T09:22:34.300508411Z [inf]  📍 Health check endpoints available:
+2025-11-08T09:22:34.300516002Z [inf]     - GET /api/status (basic status)
+2025-11-08T09:22:34.300523358Z [inf]     - GET /api/health (health check)
+2025-11-08T09:22:34.300531301Z [inf]     - GET /api/ready (readiness check)
+2025-11-08T09:22:34.314876730Z [inf]  9:22:34 AM [express] serving on port 8080
+2025-11-08T09:22:35.257926516Z [inf]  9:22:34 AM [express] GET /api/health 200 in 5ms :: {"status":"ok","timestamp":"2025-11-08T09:22:34.6…
+2025-11-08T10:00:48.402574963Z [inf]  Admin login attempt: {
+2025-11-08T10:00:48.402580822Z [inf]    username: 'ADMIN',
+2025-11-08T10:00:48.402586231Z [inf]    usernameLength: 5,
+2025-11-08T10:00:48.402591171Z [inf]    password: '[LENGTH:9]',
+2025-11-08T10:00:48.402595363Z [inf]    passwordActual: '"go4fc2024"',
+2025-11-08T10:00:48.402599993Z [inf]    sessionId: '89FkYp-sRosqkbihElGsgD7zLFCYFZOa',
+2025-11-08T10:00:48.402603891Z [inf]    hasSession: true
+2025-11-08T10:00:48.402608513Z [inf]  }
+2025-11-08T10:00:48.402614173Z [inf]  Admin credentials matched successfully
+2025-11-08T10:00:48.402624377Z [inf]  Session saved and verified, adminAuth: {
+2025-11-08T10:00:48.402628544Z [inf]    id: 'admin-001',
+2025-11-08T10:00:48.402633119Z [inf]    role: 'admin',
+2025-11-08T10:00:48.402637358Z [inf]    lastName: 'User',
+2025-11-08T10:00:48.402641785Z [inf]    username: 'admin',
+2025-11-08T10:00:48.402646021Z [inf]    firstName: 'Admin'
+2025-11-08T10:00:48.402650783Z [inf]  }
+2025-11-08T10:00:48.402654938Z [inf]  10:00:46 AM [express] POST /api/auth/admin-login 200 in 71ms :: {"message":"Login successful","user":…
+2025-11-08T10:00:48.402659378Z [inf]  Browser auth bypass token requested
+2025-11-08T10:00:48.402663318Z [inf]  10:00:46 AM [express] POST /api/auth/browser-bypass 200 in 5ms :: {"message":"Browser auth bypass tok…
+2025-11-08T10:00:48.402667221Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-11-08T10:00:48.402671455Z [inf]    role: 'driver',
+2025-11-08T10:00:48.402675849Z [inf]    userId: '34366fd7-7b43-47a2-baae-73fcd1f78d47',
+2025-11-08T10:00:48.402680364Z [inf]    lastName: 'OWEN',
+2025-11-08T10:00:48.402685288Z [inf]    username: 'KOWEN',
+2025-11-08T10:00:48.402689043Z [inf]    firstName: 'KEVIN'
+2025-11-08T10:00:48.402694995Z [inf]  }
+2025-11-08T10:00:48.402699232Z [inf]  10:00:47 AM [express] GET /api/auth/driver-user 304 in 6ms :: {"id":"34366fd7-7b43-47a2-baae-73fcd1f7…
+2025-11-08T10:00:48.404956486Z [inf]  Authentication failed: No user or expiration
+2025-11-08T10:00:48.404965611Z [inf]  10:00:47 AM [express] GET /api/auth/user 401 in 7ms :: {"message":"Unauthorized"}
+2025-11-08T10:00:48.404970641Z [inf]  Admin user check: {
+2025-11-08T10:00:48.404975328Z [inf]    hasSession: true,
+2025-11-08T10:00:48.404981915Z [inf]    hasAdminAuth: true,
+2025-11-08T10:00:48.404986146Z [inf]    sessionId: '89FkYp-sRosqkbihElGsgD7zLFCYFZOa',
+2025-11-08T10:00:48.404990901Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-11-08T10:00:48.404995422Z [inf]    adminAuthData: {
+2025-11-08T10:00:48.404999409Z [inf]      id: 'admin-001',
+2025-11-08T10:00:48.405003664Z [inf]      role: 'admin',
+2025-11-08T10:00:48.405008377Z [inf]      lastName: 'User',
+2025-11-08T10:00:48.405012502Z [inf]      username: 'admin',
+2025-11-08T10:00:48.405016444Z [inf]      firstName: 'Admin'
+2025-11-08T10:00:48.405021477Z [inf]    },
+2025-11-08T10:00:48.405026217Z [inf]    hasBypassToken: false
+2025-11-08T10:00:48.405030030Z [inf]  }
+2025-11-08T10:00:48.405034416Z [inf]  10:00:47 AM [express] GET /api/auth/admin-user 304 in 46ms :: {"id":"admin-001","role":"admin","lastN…
+2025-11-08T10:00:48.405038693Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-11-08T10:00:48.405044505Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-11-08T10:00:48.405049195Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-11-08T10:00:48.405054231Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-11-08T10:00:48.405059839Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-11-08T10:00:48.405064295Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-11-08T10:00:48.405069137Z [inf]  10:00:47 AM [express] GET /api/customers 304 in 8ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-11-08T10:00:48.405074659Z [inf]  📋 ADMIN: Returning 5 loads
+2025-11-08T10:00:48.405387561Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 5 loads
+2025-11-08T10:00:48.405392943Z [inf]  🔥 RETURNING: 5 loads
+2025-11-08T10:00:48.405397510Z [inf]  10:00:47 AM [express] GET /api/loads 304 in 65ms :: [{"id":"88d3735c-51f6-4905-bcea-057104e5322e","nu…
+2025-11-08T10:00:48.405402673Z [inf]  10:00:47 AM [express] GET /api/locations 304 in 9ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01",…
+2025-11-08T10:00:48.405407907Z [inf]  10:00:47 AM [express] GET /api/invoices 304 in 13ms :: []
+2025-11-08T10:00:48.405412414Z [inf]  Bypass check: {
+2025-11-08T10:00:48.405417299Z [inf]    token: '[PROVIDED]',
+2025-11-08T10:00:48.405421925Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-11-08T10:00:48.405425904Z [inf]    isActive: true
+2025-11-08T10:00:48.405430270Z [inf]  }
+2025-11-08T10:00:48.405436708Z [inf]  Dashboard stats auth check: {
+2025-11-08T10:00:48.405444711Z [inf]    hasAdminAuth: true,
+2025-11-08T10:00:48.405450544Z [inf]    hasReplitAuth: false,
+2025-11-08T10:00:48.405455291Z [inf]    hasTokenBypass: true,
+2025-11-08T10:00:48.405459751Z [inf]    headers: [
+2025-11-08T10:00:48.405464126Z [inf]      'host',                 'user-agent',
+2025-11-08T10:00:48.405468828Z [inf]      'accept',               'accept-encoding',
+2025-11-08T10:00:48.405473076Z [inf]      'accept-language',      'cookie',
+2025-11-08T10:00:48.405477928Z [inf]      'if-none-match',        'referer',
+2025-11-08T10:00:48.405484141Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-11-08T10:00:48.405488952Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-11-08T10:00:48.405493590Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-11-08T10:00:48.405498641Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-11-08T10:00:48.405502896Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-11-08T10:00:48.405507292Z [inf]      'x-request-start'
+2025-11-08T10:00:48.406474247Z [inf]    ],
+2025-11-08T10:00:48.406483688Z [inf]    bypassToken: '[PROVIDED]'
+2025-11-08T10:00:48.406491933Z [inf]  }
+2025-11-08T10:00:48.406497116Z [inf]  10:00:47 AM [express] GET /api/drivers/available 304 in 27ms :: [{"id":"a48dee41-a257-47c5-b5cd-11b60…
+2025-11-08T10:00:48.406504026Z [inf]  10:00:47 AM [express] GET /api/dashboard/stats 304 in 32ms :: {"activeLoads":"3","inTransit":"0","del…
+2025-11-08T10:01:59.001983840Z [err]      at async file:///app/dist/index.js:12619:30
+2025-11-08T10:01:59.001994734Z [err]  ❌ AI Load Advisor error: Error: Failed to generate driver recommendation: targetHeaders.delete is not a function
+2025-11-08T10:01:59.002000835Z [err]      at AILoadAdvisor.getDriverRecommendation (file:///app/dist/index.js:4934:13)
+2025-11-08T10:01:59.002006088Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-11-08T10:01:59.002011769Z [err]      at async file:///app/dist/index.js:12619:30
+2025-11-08T10:01:59.002018394Z [inf]  🤖 AI Load Advisor request: {
+2025-11-08T10:01:59.002024299Z [inf]    pickupCity: '1800 E PLANO PKWY',
+2025-11-08T10:01:59.002034466Z [inf]    deliveryCity: '2079 S FLORES ST',
+2025-11-08T10:01:59.002039678Z [inf]    estimatedMiles: 0,
+2025-11-08T10:01:59.002044085Z [inf]    customerId: '26d47a96-4d70-4942-8757-da8d154116eb'
+2025-11-08T10:01:59.002049328Z [inf]  }
+2025-11-08T10:01:59.002054225Z [inf]  🤖 Using custom OpenAI API key
+2025-11-08T10:01:59.002059454Z [err]  ❌ AI Load Advisor Error: TypeError: targetHeaders.delete is not a function
+2025-11-08T10:01:59.002067835Z [err]      at buildHeaders (file:///app/node_modules/openai/internal/headers.mjs:54:37)
+2025-11-08T10:01:59.002077249Z [err]      at OpenAI.authHeaders (file:///app/node_modules/openai/client.mjs:148:16)
+2025-11-08T10:01:59.002082157Z [err]      at OpenAI.buildHeaders (file:///app/node_modules/openai/client.mjs:475:24)
+2025-11-08T10:01:59.002086755Z [err]      at OpenAI.buildRequest (file:///app/node_modules/openai/client.mjs:444:39)
+2025-11-08T10:01:59.002091301Z [err]      at OpenAI.makeRequest (file:///app/node_modules/openai/client.mjs:240:50)
+2025-11-08T10:01:59.002096493Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-11-08T10:01:59.002100990Z [err]      at async AILoadAdvisor.getDriverRecommendation (file:///app/dist/index.js:4875:26)
+2025-11-08T10:01:59.004060366Z [inf]  10:01:53 AM [express] POST /api/ai/load-advisor 500 in 52ms :: {"message":"Failed to generate driver …
+2025-11-08T16:31:08.598863858Z [inf]  🤖 AI Load Advisor request: {
+2025-11-08T16:31:08.598867731Z [inf]    pickupCity: '1800 E PLANO PKWY',
+2025-11-08T16:31:08.598871928Z [inf]    deliveryCity: '2079 S FLORES ST',
+2025-11-08T16:31:08.598875680Z [inf]    estimatedMiles: 0,
+2025-11-08T16:31:08.598880319Z [inf]    customerId: '26d47a96-4d70-4942-8757-da8d154116eb'
+2025-11-08T16:31:08.598884224Z [inf]  }
+2025-11-08T16:31:08.598887992Z [inf]  🤖 Using custom OpenAI API key
+2025-11-08T16:31:08.598891664Z [err]  ❌ AI Load Advisor Error: TypeError: targetHeaders.delete is not a function
+2025-11-08T16:31:08.598895450Z [err]      at buildHeaders (file:///app/node_modules/openai/internal/headers.mjs:54:37)
+2025-11-08T16:31:08.598900311Z [err]      at OpenAI.authHeaders (file:///app/node_modules/openai/client.mjs:148:16)
+2025-11-08T16:31:08.598904245Z [err]      at OpenAI.buildHeaders (file:///app/node_modules/openai/client.mjs:475:24)
+2025-11-08T16:31:08.598908099Z [err]      at OpenAI.buildRequest (file:///app/node_modules/openai/client.mjs:444:39)
+2025-11-08T16:31:08.598912099Z [err]      at OpenAI.makeRequest (file:///app/node_modules/openai/client.mjs:240:50)
+2025-11-08T16:31:08.598917219Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-11-08T16:31:08.598921026Z [err]      at async AILoadAdvisor.getDriverRecommendation (file:///app/dist/index.js:4875:26)
+2025-11-08T16:31:08.598924683Z [err]      at async file:///app/dist/index.js:12619:30
+2025-11-08T16:31:08.598928292Z [err]  ❌ AI Load Advisor error: Error: Failed to generate driver recommendation: targetHeaders.delete is not a function
+2025-11-08T16:31:08.598932130Z [err]      at AILoadAdvisor.getDriverRecommendation (file:///app/dist/index.js:4934:13)
+2025-11-08T16:31:08.598935802Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-11-08T16:31:08.598939492Z [err]      at async file:///app/dist/index.js:12619:30
+2025-11-08T16:31:08.599023152Z [inf]  4:31:06 PM [express] POST /api/ai/load-advisor 500 in 92ms :: {"message":"Failed to generate driver …
