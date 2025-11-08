@@ -103,7 +103,9 @@ LOAD DETAILS:
 
 AVAILABLE DRIVERS:
 ${driverAnalysis.map((d, i) => `
-Driver ${i + 1}: ${d.name}
+Driver ${i + 1}:
+- ID: ${d.id}
+- Name: ${d.name}
 - Truck: ${d.truckNumber}
 - Company Driver: ${d.isCompanyDriver ? 'Yes (IFTA tracked)' : 'No (Owner-operator)'}
 - Pay Structure: ${d.payRate}
@@ -118,9 +120,11 @@ YOUR TASK:
 3. Provide clear reasoning for your recommendation
 4. List 3-5 key factors that support your choice
 
+IMPORTANT: Use the exact driver ID from the list above in your response.
+
 Respond in this exact JSON format:
 {
-  "recommendedDriverId": "driver-uuid",
+  "recommendedDriverId": "exact-driver-id-from-list-above",
   "confidence": "high|medium|low",
   "reasoning": "2-3 sentence explanation",
   "keyFactors": ["factor 1", "factor 2", "factor 3"]
@@ -153,7 +157,24 @@ Respond in this exact JSON format:
       const recommendedDriver = driverAnalysis.find(d => d.id === recommendation.recommendedDriverId);
       
       if (!recommendedDriver) {
-        throw new Error('AI recommended a driver that does not exist');
+        console.error('❌ AI returned invalid driver ID:', recommendation.recommendedDriverId);
+        console.error('Available driver IDs:', driverAnalysis.map(d => d.id));
+        
+        // Fallback to first available driver if AI returns invalid ID
+        const fallbackDriver = driverAnalysis[0];
+        if (!fallbackDriver) {
+          throw new Error('No drivers available for this load');
+        }
+        
+        console.log('⚠️ Using fallback driver:', fallbackDriver.name);
+        return {
+          driverId: fallbackDriver.id,
+          driverName: fallbackDriver.name,
+          truckNumber: fallbackDriver.truckNumber,
+          confidence: 'low' as const,
+          reasoning: 'AI recommendation was unavailable. This is the first available driver in the system.',
+          keyFactors: ['Fallback recommendation due to AI error', 'Manual review recommended'],
+        };
       }
 
       // Calculate estimated profit if we have enough data
