@@ -37,7 +37,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation, Calendar, Truck } from "lucide-react";
+import { Plus, X, MapPin, Package, ArrowUp, ArrowDown, Route, Navigation, Calendar, Truck, Sparkles } from "lucide-react";
 import { HelpButton } from "@/components/HelpTooltip";
 import { HEREMapView } from "@/components/HEREMapView";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -80,6 +80,10 @@ export default function LoadForm() {
   // HERE Maps route optimization state
   const [optimizedRoute, setOptimizedRoute] = useState<OptimizedRoute | null>(null);
   const [showRouteMap, setShowRouteMap] = useState(false);
+  
+  // AI Load Advisor state
+  const [aiRecommendation, setAiRecommendation] = useState<any>(null);
+  const [showAiDialog, setShowAiDialog] = useState(false);
 
   const { data: locations = [] } = useQuery<any[]>({
     queryKey: ["/api/locations"],
@@ -91,6 +95,24 @@ export default function LoadForm() {
     queryKey: ["/api/customers"],
     retry: false,
     refetchOnWindowFocus: false,
+  });
+
+  // AI Load Advisor mutation
+  const aiAdvisorMutation = useMutation({
+    mutationFn: async (loadDetails: any) => {
+      return await apiRequest("/api/ai/load-advisor", "POST", loadDetails);
+    },
+    onSuccess: (data) => {
+      setAiRecommendation(data);
+      setShowAiDialog(true);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "AI Advisor Unavailable",
+        description: error.message || "Could not get AI recommendation",
+        variant: "destructive",
+      });
+    },
   });
 
   const createLoadMutation = useMutation({
@@ -492,7 +514,41 @@ export default function LoadForm() {
           </div>
         )}
 
-        {/* Step 4: Create Load */}
+        {/* Step 4: AI Load Advisor */}
+        {stops.length > 0 && (
+          <Button 
+            type="button"
+            onClick={() => {
+              const pickupStop = stops.find(s => s.stopType === "pickup");
+              const deliveryStop = stops.find(s => s.stopType === "dropoff");
+              
+              aiAdvisorMutation.mutate({
+                pickupCity: pickupStop?.address,
+                deliveryCity: deliveryStop?.address,
+                estimatedMiles: optimizedRoute?.totalDistance || 0,
+                customerId: selectedCustomerId,
+              });
+            }}
+            disabled={aiAdvisorMutation.isPending}
+            variant="outline"
+            className="w-full text-lg py-6 border-purple-300 bg-purple-50 hover:bg-purple-100 text-purple-700"
+            size="lg"
+          >
+            {aiAdvisorMutation.isPending ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600 mr-2"></div>
+                AI Analyzing...
+              </>
+            ) : (
+              <>
+                <Sparkles className="mr-2 h-5 w-5" />
+                Get AI Driver Suggestion
+              </>
+            )}
+          </Button>
+        )}
+
+        {/* Step 5: Create Load */}
         <Button 
           onClick={handleCreateLoad}
           disabled={createLoadMutation.isPending || stops.length === 0}
@@ -519,6 +575,104 @@ export default function LoadForm() {
         )}
 
       </CardContent>
+
+      {/* AI Recommendation Dialog */}
+      <Dialog open={showAiDialog} onOpenChange={setShowAiDialog}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-purple-700">
+              <Sparkles className="h-6 w-6" />
+              AI Driver Recommendation
+            </DialogTitle>
+            <DialogDescription>
+              AI analyzed your load and driver data to find the best match
+            </DialogDescription>
+          </DialogHeader>
+          
+          {aiRecommendation && (
+            <div className="space-y-4 py-4">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <h3 className="font-semibold text-lg mb-2">Recommended Driver</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Driver:</span>
+                    <span className="font-medium text-lg">{aiRecommendation.driverName}</span>
+                  </div>
+                  {aiRecommendation.truckNumber && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-600">Truck:</span>
+                      <span className="font-medium">{aiRecommendation.truckNumber}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-gray-600">Confidence:</span>
+                    <Badge variant={
+                      aiRecommendation.confidence === 'high' ? 'default' : 
+                      aiRecommendation.confidence === 'medium' ? 'secondary' : 
+                      'outline'
+                    }>
+                      {aiRecommendation.confidence.toUpperCase()}
+                    </Badge>
+                  </div>
+                  {aiRecommendation.estimatedProfit && (
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <span className="text-gray-600">Est. Profit:</span>
+                      <span className="font-bold text-green-600 text-lg">
+                        ${aiRecommendation.estimatedProfit.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-semibold">AI Reasoning</h4>
+                <p className="text-sm text-gray-700">{aiRecommendation.reasoning}</p>
+              </div>
+
+              {aiRecommendation.keyFactors && aiRecommendation.keyFactors.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold">Key Factors</h4>
+                  <ul className="space-y-1">
+                    {aiRecommendation.keyFactors.map((factor: string, index: number) => (
+                      <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                        <span className="text-purple-600 mt-0.5">✓</span>
+                        <span>{factor}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setShowAiDialog(false)}
+                >
+                  Close
+                </Button>
+                <Button 
+                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  onClick={() => {
+                    toast({
+                      title: "Feature Coming Soon",
+                      description: "Auto-assign driver feature will be available in the next update!",
+                    });
+                    setShowAiDialog(false);
+                  }}
+                >
+                  Assign This Driver
+                </Button>
+              </div>
+
+              <p className="text-xs text-gray-500 text-center">
+                💡 This is an AI suggestion. You can choose any driver you prefer.
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

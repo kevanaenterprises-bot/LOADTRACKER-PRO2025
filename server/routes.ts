@@ -10,6 +10,7 @@ import { sendTestNotification, notificationService } from "./notificationService
 import { processRateConfirmationImage } from "./ocrService";
 import { GPSService } from "./gpsService";
 import { aiService } from "./aiService";
+import { aiLoadAdvisor } from "./aiLoadAdvisor";
 import { 
   startLoadTracking, 
   updateDriverLocation, 
@@ -9218,6 +9219,32 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     } catch (error: any) {
       console.error("❌ Error deleting LoadRight tender:", error);
       res.status(500).json({ message: error.message || "Failed to delete tender" });
+    }
+  });
+
+  // AI Load Advisor - Get driver recommendation for a load
+  app.post("/api/ai/load-advisor", async (req, res) => {
+    try {
+      // Check if AI is available
+      const isAvailable = await aiLoadAdvisor.isAvailable();
+      if (!isAvailable) {
+        return res.status(503).json({ 
+          message: "AI Load Advisor is not available. Please contact support." 
+        });
+      }
+
+      const loadDetails = req.body;
+      console.log("🤖 AI Load Advisor request:", loadDetails);
+
+      const recommendation = await aiLoadAdvisor.getDriverRecommendation(loadDetails);
+      
+      console.log("✅ AI Load Advisor recommendation:", recommendation);
+      res.json(recommendation);
+    } catch (error: any) {
+      console.error("❌ AI Load Advisor error:", error);
+      res.status(500).json({ 
+        message: error.message || "Failed to get AI recommendation" 
+      });
     }
   });
 
