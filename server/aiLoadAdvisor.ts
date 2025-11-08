@@ -3,11 +3,6 @@ import { db } from './db';
 import { users, loads, trucks } from '../shared/schema';
 import { eq, and, sql } from 'drizzle-orm';
 
-const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
-});
-
 interface LoadDetails {
   pickupLocation?: string;
   pickupCity?: string;
@@ -30,8 +25,28 @@ interface DriverRecommendation {
 }
 
 export class AILoadAdvisor {
+  private getOpenAIClient(): OpenAI {
+    const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+    const baseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+    
+    if (!apiKey || !baseURL) {
+      throw new Error('AI Load Advisor is not configured. API keys are only available in development.');
+    }
+    
+    return new OpenAI({
+      apiKey,
+      baseURL,
+    });
+  }
+
   async getDriverRecommendation(loadDetails: LoadDetails): Promise<DriverRecommendation> {
     try {
+      // Check if AI is available before proceeding
+      if (!this.isAvailableSync()) {
+        throw new Error('AI Load Advisor is not available in this environment');
+      }
+      
+      const openai = this.getOpenAIClient();
       // Fetch all active drivers with their trucks and recent load history
       const drivers = await db
         .select({
@@ -206,8 +221,12 @@ Respond in this exact JSON format:
     }
   }
 
-  async isAvailable(): Promise<boolean> {
+  private isAvailableSync(): boolean {
     return !!(process.env.AI_INTEGRATIONS_OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_BASE_URL);
+  }
+
+  async isAvailable(): Promise<boolean> {
+    return this.isAvailableSync();
   }
 }
 
