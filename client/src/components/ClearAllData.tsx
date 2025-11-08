@@ -72,12 +72,14 @@ export default function ClearAllData() {
               <li><strong>All loads</strong> (and all related stops, status history)</li>
               <li><strong>All invoices</strong> (paid and unpaid)</li>
               <li><strong>All customers</strong></li>
-              <li><strong>All drivers</strong></li>
+              <li><strong>All drivers and users</strong></li>
               <li><strong>All trucks</strong> (and service records)</li>
-              <li><strong>All documents</strong> (BOLs, PODs, rate confirmations)</li>
               <li><strong>All LoadRight tenders</strong></li>
               <li><strong>All locations and rates</strong></li>
+              <li><strong>All GPS tracking data</strong></li>
+              <li><strong>All chat messages</strong></li>
               <li><strong>All notification logs</strong></li>
+              <li><strong>All road tour history</strong></li>
               <li><strong>Everything in your database!</strong></li>
             </ul>
             <p className="mt-3 font-bold text-red-600">
@@ -118,8 +120,8 @@ export default function ClearAllData() {
               <div className="space-y-2">
                 <div className="font-medium text-green-800">Database cleared successfully!</div>
                 <div className="text-sm text-green-700">
-                  Deleted: {results.loads || 0} loads, {results.invoices || 0} invoices, {results.customers || 0} customers, 
-                  {results.drivers || 0} drivers, {results.trucks || 0} trucks, and all related data.
+                  All data deleted: loads, invoices, customers, users, trucks, tenders, locations, rates, 
+                  tracking data, chat messages, and all related records.
                 </div>
                 <div className="text-sm text-green-700 font-medium">
                   System is now ready for fresh testing.

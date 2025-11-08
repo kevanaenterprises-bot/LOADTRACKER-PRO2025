@@ -9242,27 +9242,33 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       // Delete all data in correct order (respecting foreign key constraints)
       const results = {
         notificationLogs: 0,
-        statusHistory: 0,
+        loadStatusHistory: 0,
         fuelReceipts: 0,
         loadStops: 0,
-        documents: 0,
+        trackingPings: 0,
+        chatMessages: 0,
         invoices: 0,
         loads: 0,
         loadRightTenders: 0,
-        truckServices: 0,
+        truckServiceRecords: 0,
         trucks: 0,
-        drivers: 0,
+        users: 0,
         customers: 0,
         rates: 0,
         locations: 0,
+        bolNumbers: 0,
+        markerHistory: 0,
+        apiUsageLogs: 0,
+        demoSessions: 0,
+        visitorTracking: 0,
       };
 
-      // Use raw SQL to delete everything efficiently
+      // Use raw SQL to delete everything efficiently (in dependency order)
       await db.execute(sql`DELETE FROM notification_log`);
       results.notificationLogs = 1;
       
-      await db.execute(sql`DELETE FROM status_history`);
-      results.statusHistory = 1;
+      await db.execute(sql`DELETE FROM load_status_history`);
+      results.loadStatusHistory = 1;
       
       await db.execute(sql`DELETE FROM fuel_receipts`);
       results.fuelReceipts = 1;
@@ -9270,8 +9276,11 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       await db.execute(sql`DELETE FROM load_stops`);
       results.loadStops = 1;
       
-      await db.execute(sql`DELETE FROM documents`);
-      results.documents = 1;
+      await db.execute(sql`DELETE FROM tracking_pings`);
+      results.trackingPings = 1;
+      
+      await db.execute(sql`DELETE FROM chat_messages`);
+      results.chatMessages = 1;
       
       await db.execute(sql`DELETE FROM invoices`);
       results.invoices = 1;
@@ -9282,14 +9291,14 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       await db.execute(sql`DELETE FROM loadright_tenders`);
       results.loadRightTenders = 1;
       
-      await db.execute(sql`DELETE FROM truck_services`);
-      results.truckServices = 1;
+      await db.execute(sql`DELETE FROM truck_service_records`);
+      results.truckServiceRecords = 1;
       
       await db.execute(sql`DELETE FROM trucks`);
       results.trucks = 1;
       
-      await db.execute(sql`DELETE FROM drivers`);
-      results.drivers = 1;
+      await db.execute(sql`DELETE FROM users`);
+      results.users = 1;
       
       await db.execute(sql`DELETE FROM customers`);
       results.customers = 1;
@@ -9299,6 +9308,21 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       
       await db.execute(sql`DELETE FROM locations`);
       results.locations = 1;
+      
+      await db.execute(sql`DELETE FROM bol_numbers`);
+      results.bolNumbers = 1;
+      
+      await db.execute(sql`DELETE FROM marker_history`);
+      results.markerHistory = 1;
+      
+      await db.execute(sql`DELETE FROM api_usage_logs`);
+      results.apiUsageLogs = 1;
+      
+      await db.execute(sql`DELETE FROM demo_sessions`);
+      results.demoSessions = 1;
+      
+      await db.execute(sql`DELETE FROM visitor_tracking`);
+      results.visitorTracking = 1;
 
       console.log("✅ ALL DATA CLEARED SUCCESSFULLY");
       console.log("Results:", results);
