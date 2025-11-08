@@ -1145,6 +1145,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json(req.user);
     }
     
+    // Check admin session (office staff username/password login)
+    const adminUser = (req.session as any)?.adminAuth;
+    if (adminUser) {
+      console.log("✅ ADMIN SESSION USER FOUND:", adminUser);
+      return res.json({
+        id: adminUser.id,
+        email: adminUser.username + "@office.local", // Provide email for compatibility
+        firstName: adminUser.firstName,
+        lastName: adminUser.lastName,
+        role: adminUser.role,
+        username: adminUser.username,
+        authType: "admin_session"
+      });
+    }
+    
     // Check bypass token
     const bypassToken = req.headers['x-bypass-token'];
     
@@ -1161,7 +1176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     // No auth found
-    console.log("❌ USER AUTH: No Replit user or valid bypass token");
+    console.log("❌ USER AUTH: No Replit user, admin session, or valid bypass token");
     res.status(401).json({ message: "Unauthorized" });
   });
 
