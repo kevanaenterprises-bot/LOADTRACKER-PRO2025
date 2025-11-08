@@ -26,17 +26,29 @@ interface DriverRecommendation {
 
 export class AILoadAdvisor {
   private getOpenAIClient(): OpenAI {
-    const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
-    const baseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
+    // Try Replit AI Integration first (development)
+    const replitApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
+    const replitBaseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
     
-    if (!apiKey || !baseURL) {
-      throw new Error('AI Load Advisor is not configured. API keys are only available in development.');
+    if (replitApiKey && replitBaseURL) {
+      console.log('🤖 Using Replit AI Integration for OpenAI');
+      return new OpenAI({
+        apiKey: replitApiKey,
+        baseURL: replitBaseURL,
+      });
     }
     
-    return new OpenAI({
-      apiKey,
-      baseURL,
-    });
+    // Fall back to custom OpenAI API key (production)
+    const customApiKey = process.env.OPENAI_API_KEY;
+    
+    if (customApiKey) {
+      console.log('🤖 Using custom OpenAI API key');
+      return new OpenAI({
+        apiKey: customApiKey,
+      });
+    }
+    
+    throw new Error('AI Load Advisor is not configured. Please add OPENAI_API_KEY to your secrets.');
   }
 
   async getDriverRecommendation(loadDetails: LoadDetails): Promise<DriverRecommendation> {
@@ -222,7 +234,10 @@ Respond in this exact JSON format:
   }
 
   private isAvailableSync(): boolean {
-    return !!(process.env.AI_INTEGRATIONS_OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_BASE_URL);
+    // Check if either Replit AI Integration or custom OpenAI key is available
+    const hasReplitIntegration = !!(process.env.AI_INTEGRATIONS_OPENAI_API_KEY && process.env.AI_INTEGRATIONS_OPENAI_BASE_URL);
+    const hasCustomKey = !!process.env.OPENAI_API_KEY;
+    return hasReplitIntegration || hasCustomKey;
   }
 
   async isAvailable(): Promise<boolean> {
