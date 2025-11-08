@@ -9221,7 +9221,7 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
-  // Clear ALL data - Testing tool (admin only)
+  // Clear load-related data - Testing tool (admin only)
   app.post("/api/system/clear-all-data", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
     if (hasAuth) {
@@ -9233,13 +9233,13 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     try {
       const { confirmationText } = req.body;
       
-      if (confirmationText !== "DELETE EVERYTHING") {
+      if (confirmationText !== "DELETE LOAD DATA") {
         return res.status(400).json({ message: "Invalid confirmation text" });
       }
 
-      console.log("🗑️🗑️🗑️ CLEARING ALL DATA - TESTING MODE 🗑️🗑️🗑️");
+      console.log("🗑️🗑️🗑️ CLEARING LOAD DATA - TESTING MODE 🗑️🗑️🗑️");
 
-      // Delete all data in correct order (respecting foreign key constraints)
+      // Delete load-related data only (KEEP: customers, locations, users/drivers, trucks, rates)
       const results = {
         notificationLogs: 0,
         loadStatusHistory: 0,
@@ -9250,20 +9250,11 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
         invoices: 0,
         loads: 0,
         loadRightTenders: 0,
-        truckServiceRecords: 0,
-        trucks: 0,
-        users: 0,
-        customers: 0,
-        rates: 0,
-        locations: 0,
         bolNumbers: 0,
         markerHistory: 0,
-        apiUsageLogs: 0,
-        demoSessions: 0,
-        visitorTracking: 0,
       };
 
-      // Use raw SQL to delete everything efficiently (in dependency order)
+      // Use raw SQL to delete load-related data (in dependency order)
       await db.execute(sql`DELETE FROM notification_log`);
       results.notificationLogs = 1;
       
@@ -9291,50 +9282,24 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
       await db.execute(sql`DELETE FROM loadright_tenders`);
       results.loadRightTenders = 1;
       
-      await db.execute(sql`DELETE FROM truck_service_records`);
-      results.truckServiceRecords = 1;
-      
-      await db.execute(sql`DELETE FROM trucks`);
-      results.trucks = 1;
-      
-      await db.execute(sql`DELETE FROM users`);
-      results.users = 1;
-      
-      await db.execute(sql`DELETE FROM customers`);
-      results.customers = 1;
-      
-      await db.execute(sql`DELETE FROM rates`);
-      results.rates = 1;
-      
-      await db.execute(sql`DELETE FROM locations`);
-      results.locations = 1;
-      
       await db.execute(sql`DELETE FROM bol_numbers`);
       results.bolNumbers = 1;
       
       await db.execute(sql`DELETE FROM marker_history`);
       results.markerHistory = 1;
-      
-      await db.execute(sql`DELETE FROM api_usage_logs`);
-      results.apiUsageLogs = 1;
-      
-      await db.execute(sql`DELETE FROM demo_sessions`);
-      results.demoSessions = 1;
-      
-      await db.execute(sql`DELETE FROM visitor_tracking`);
-      results.visitorTracking = 1;
 
-      console.log("✅ ALL DATA CLEARED SUCCESSFULLY");
+      console.log("✅ LOAD DATA CLEARED SUCCESSFULLY");
       console.log("Results:", results);
+      console.log("✅ Kept: customers, locations, drivers, trucks, rates");
 
       res.json({
         success: true,
-        message: "All data has been permanently deleted",
+        message: "Load data has been permanently deleted. Master data (customers, locations, drivers, trucks, rates) preserved.",
         results
       });
     } catch (error: any) {
-      console.error("❌ Error clearing all data:", error);
-      res.status(500).json({ message: error.message || "Failed to clear all data" });
+      console.error("❌ Error clearing load data:", error);
+      res.status(500).json({ message: error.message || "Failed to clear load data" });
     }
   });
 

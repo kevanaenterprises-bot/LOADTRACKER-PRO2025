@@ -22,28 +22,26 @@ export default function ClearAllData() {
     onSuccess: (data) => {
       setResults(data);
       setConfirmationText("");
-      // Invalidate all queries to refresh the entire UI
       queryClient.invalidateQueries();
       toast({
-        title: "Database Cleared",
-        description: "All data has been permanently deleted from the system",
-        variant: "destructive",
+        title: "Load Data Cleared",
+        description: "All loads and related data deleted. Master data preserved.",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Clear Failed",
-        description: error.message || "Failed to clear database",
+        description: error.message || "Failed to clear load data",
         variant: "destructive",
       });
     },
   });
 
   const handleClearAll = () => {
-    if (confirmationText !== "DELETE EVERYTHING") {
+    if (confirmationText !== "DELETE LOAD DATA") {
       toast({
         title: "Invalid confirmation",
-        description: "Please type exactly: DELETE EVERYTHING",
+        description: "Please type exactly: DELETE LOAD DATA",
         variant: "destructive",
       });
       return;
@@ -53,51 +51,51 @@ export default function ClearAllData() {
   };
 
   return (
-    <Card className="border-red-200">
-      <CardHeader className="bg-red-50">
-        <CardTitle className="flex items-center gap-2 text-red-600">
+    <Card className="border-orange-200">
+      <CardHeader className="bg-orange-50">
+        <CardTitle className="flex items-center gap-2 text-orange-600">
           <Database className="h-5 w-5" />
-          Clear All Data - Testing Tool
+          Clear Load Data - Testing Tool
         </CardTitle>
-        <p className="text-sm text-red-600 font-medium">
-          ⚠️ DANGER ZONE - This will permanently delete ALL data from your entire system!
+        <p className="text-sm text-orange-600 font-medium">
+          🗑️ Delete all load-related data while keeping your master data setup
         </p>
       </CardHeader>
       <CardContent className="space-y-4 pt-6">
-        <Alert className="border-red-200 bg-red-50">
-          <AlertTriangle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-900">
-            <strong>WARNING: This action will permanently delete:</strong>
+        <Alert className="border-orange-200 bg-orange-50">
+          <AlertTriangle className="h-4 w-4 text-orange-600" />
+          <AlertDescription className="text-orange-900">
+            <strong>This will permanently delete:</strong>
             <ul className="mt-2 list-disc list-inside text-sm space-y-1">
               <li><strong>All loads</strong> (and all related stops, status history)</li>
               <li><strong>All invoices</strong> (paid and unpaid)</li>
-              <li><strong>All customers</strong></li>
-              <li><strong>All drivers and users</strong></li>
-              <li><strong>All trucks</strong> (and service records)</li>
               <li><strong>All LoadRight tenders</strong></li>
-              <li><strong>All locations and rates</strong></li>
               <li><strong>All GPS tracking data</strong></li>
+              <li><strong>All fuel receipts</strong></li>
               <li><strong>All chat messages</strong></li>
               <li><strong>All notification logs</strong></li>
+              <li><strong>All BOL numbers</strong></li>
               <li><strong>All road tour history</strong></li>
-              <li><strong>Everything in your database!</strong></li>
             </ul>
-            <p className="mt-3 font-bold text-red-600">
-              THIS CANNOT BE UNDONE! Use only for testing when you need a completely fresh start.
+            <p className="mt-3 font-bold text-green-700">
+              ✅ KEEPS: Customers, Locations, Drivers, Trucks, and Rates
+            </p>
+            <p className="mt-2 text-sm text-orange-700">
+              THIS CANNOT BE UNDONE! Perfect for testing new loads with your existing setup.
             </p>
           </AlertDescription>
         </Alert>
 
         <div className="space-y-3">
           <Label htmlFor="clear-confirmation" className="text-base font-medium">
-            To confirm, type exactly: <code className="bg-red-100 px-2 py-1 rounded text-red-600 font-mono">DELETE EVERYTHING</code>
+            To confirm, type exactly: <code className="bg-orange-100 px-2 py-1 rounded text-orange-600 font-mono">DELETE LOAD DATA</code>
           </Label>
           <Input
             id="clear-confirmation"
             value={confirmationText}
             onChange={(e) => setConfirmationText(e.target.value)}
             placeholder="Type confirmation text here..."
-            className="border-red-300 focus:border-red-500 focus:ring-red-500"
+            className="border-orange-300 focus:border-orange-500 focus:ring-orange-500"
             data-testid="input-clear-confirmation"
           />
         </div>
@@ -106,25 +104,27 @@ export default function ClearAllData() {
           variant="destructive"
           size="lg"
           onClick={handleClearAll}
-          disabled={confirmationText !== "DELETE EVERYTHING" || clearAllMutation.isPending}
-          className="w-full bg-red-600 hover:bg-red-700"
+          disabled={confirmationText !== "DELETE LOAD DATA" || clearAllMutation.isPending}
+          className="w-full bg-orange-600 hover:bg-orange-700"
           data-testid="button-clear-all-data"
         >
           <Trash2 className="mr-2 h-5 w-5" />
-          {clearAllMutation.isPending ? "Deleting Everything..." : "DELETE ALL DATA"}
+          {clearAllMutation.isPending ? "Deleting Load Data..." : "DELETE LOAD DATA"}
         </Button>
 
         {results && (
           <Alert className="bg-green-50 border-green-200">
             <AlertDescription>
               <div className="space-y-2">
-                <div className="font-medium text-green-800">Database cleared successfully!</div>
+                <div className="font-medium text-green-800">Load data cleared successfully!</div>
                 <div className="text-sm text-green-700">
-                  All data deleted: loads, invoices, customers, users, trucks, tenders, locations, rates, 
-                  tracking data, chat messages, and all related records.
+                  Deleted: All loads, invoices, tenders, tracking data, fuel receipts, chat messages, and related records.
+                </div>
+                <div className="text-sm text-green-700 font-bold">
+                  ✅ Preserved: All customers, locations, drivers, trucks, and rates.
                 </div>
                 <div className="text-sm text-green-700 font-medium">
-                  System is now ready for fresh testing.
+                  Ready for fresh load testing with your existing setup!
                 </div>
               </div>
             </AlertDescription>
@@ -133,8 +133,9 @@ export default function ClearAllData() {
 
         <Alert>
           <AlertDescription className="text-sm text-gray-600">
-            <strong>When to use this:</strong> Use this tool when starting a new round of testing and you want a completely 
-            clean database. This is perfect for testing the full workflow from scratch with real data.
+            <strong>When to use this:</strong> Use this tool when you want to test new loads from scratch without 
+            having to recreate all your customers, locations, drivers, and trucks. Perfect for testing the full load 
+            workflow with real contract data.
           </AlertDescription>
         </Alert>
       </CardContent>

@@ -467,9 +467,9 @@ export default function Dashboard() {
                 <i className="fas fa-trash text-lg md:text-base text-red-600"></i>
                 <span className="text-center leading-tight">Ghost Load Cleanup</span>
               </TabsTrigger>
-              <TabsTrigger value="clearall" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-red-700 hover:text-red-900 font-semibold min-h-[60px] touch-target bg-red-100 border-2 border-red-300">
-                <i className="fas fa-database text-lg md:text-base text-red-700"></i>
-                <span className="text-center leading-tight">Clear ALL Data</span>
+              <TabsTrigger value="clearall" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-orange-700 hover:text-orange-900 font-semibold min-h-[60px] touch-target bg-orange-100 border-2 border-orange-300">
+                <i className="fas fa-broom text-lg md:text-base text-orange-700"></i>
+                <span className="text-center leading-tight">Clear Load Data</span>
               </TabsTrigger>
             </TabsList>
             
@@ -515,9 +515,9 @@ export default function Dashboard() {
                 <i className="fas fa-trash text-xl text-red-600"></i>
                 <span className="text-center leading-tight">Cleanup</span>
               </TabsTrigger>
-              <TabsTrigger value="clearall" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target bg-red-100 border-2 border-red-300">
-                <i className="fas fa-database text-xl text-red-700"></i>
-                <span className="text-center leading-tight">Clear ALL</span>
+              <TabsTrigger value="clearall" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target bg-orange-100 border-2 border-orange-300">
+                <i className="fas fa-broom text-xl text-orange-700"></i>
+                <span className="text-center leading-tight">Clear Loads</span>
               </TabsTrigger>
             </TabsList>
           </div>
