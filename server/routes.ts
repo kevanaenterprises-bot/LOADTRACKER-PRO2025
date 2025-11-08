@@ -9221,6 +9221,99 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     }
   });
 
+  // Clear ALL data - Testing tool (admin only)
+  app.post("/api/system/clear-all-data", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Admin authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { confirmationText } = req.body;
+      
+      if (confirmationText !== "DELETE EVERYTHING") {
+        return res.status(400).json({ message: "Invalid confirmation text" });
+      }
+
+      console.log("🗑️🗑️🗑️ CLEARING ALL DATA - TESTING MODE 🗑️🗑️🗑️");
+
+      // Delete all data in correct order (respecting foreign key constraints)
+      const results = {
+        notificationLogs: 0,
+        statusHistory: 0,
+        fuelReceipts: 0,
+        loadStops: 0,
+        documents: 0,
+        invoices: 0,
+        loads: 0,
+        loadRightTenders: 0,
+        truckServices: 0,
+        trucks: 0,
+        drivers: 0,
+        customers: 0,
+        rates: 0,
+        locations: 0,
+      };
+
+      // Use raw SQL to delete everything efficiently
+      await db.execute(sql`DELETE FROM notification_log`);
+      results.notificationLogs = 1;
+      
+      await db.execute(sql`DELETE FROM status_history`);
+      results.statusHistory = 1;
+      
+      await db.execute(sql`DELETE FROM fuel_receipts`);
+      results.fuelReceipts = 1;
+      
+      await db.execute(sql`DELETE FROM load_stops`);
+      results.loadStops = 1;
+      
+      await db.execute(sql`DELETE FROM documents`);
+      results.documents = 1;
+      
+      await db.execute(sql`DELETE FROM invoices`);
+      results.invoices = 1;
+      
+      await db.execute(sql`DELETE FROM loads`);
+      results.loads = 1;
+      
+      await db.execute(sql`DELETE FROM loadright_tenders`);
+      results.loadRightTenders = 1;
+      
+      await db.execute(sql`DELETE FROM truck_services`);
+      results.truckServices = 1;
+      
+      await db.execute(sql`DELETE FROM trucks`);
+      results.trucks = 1;
+      
+      await db.execute(sql`DELETE FROM drivers`);
+      results.drivers = 1;
+      
+      await db.execute(sql`DELETE FROM customers`);
+      results.customers = 1;
+      
+      await db.execute(sql`DELETE FROM rates`);
+      results.rates = 1;
+      
+      await db.execute(sql`DELETE FROM locations`);
+      results.locations = 1;
+
+      console.log("✅ ALL DATA CLEARED SUCCESSFULLY");
+      console.log("Results:", results);
+
+      res.json({
+        success: true,
+        message: "All data has been permanently deleted",
+        results
+      });
+    } catch (error: any) {
+      console.error("❌ Error clearing all data:", error);
+      res.status(500).json({ message: error.message || "Failed to clear all data" });
+    }
+  });
+
   // Create and return HTTP server
   const server = createServer(app);
   return server;

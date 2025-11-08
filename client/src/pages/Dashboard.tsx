@@ -24,6 +24,7 @@ import RateManagement from "@/components/RateManagement";
 import { CacheDebugger } from "@/components/CacheDebugger";
 import { PaidInvoices } from "@/components/PaidInvoices";
 import GhostLoadCleanup from "@/components/GhostLoadCleanup";
+import ClearAllData from "@/components/ClearAllData";
 import TruckForm from "@/components/TruckForm";
 import TruckTable from "@/components/TruckTable";
 import { TruckServiceManagement } from "@/components/TruckServiceManagement";
@@ -87,7 +88,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading, authType } = useMainAuth();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "trucks" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices" | "cleanup">("loads");
+  const [activeTab, setActiveTab] = useState<"loads" | "drivers" | "trucks" | "ocr" | "tracking" | "customers" | "locations" | "rates" | "paid-invoices" | "cleanup" | "clearall">("loads");
   const [driverDialogOpen, setDriverDialogOpen] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [rateDialogOpen, setRateDialogOpen] = useState(false);
@@ -466,6 +467,10 @@ export default function Dashboard() {
                 <i className="fas fa-trash text-lg md:text-base text-red-600"></i>
                 <span className="text-center leading-tight">Ghost Load Cleanup</span>
               </TabsTrigger>
+              <TabsTrigger value="clearall" className="flex flex-col md:flex-row items-center gap-1 md:gap-2 p-2 md:p-3 text-xs md:text-sm h-auto text-red-700 hover:text-red-900 font-semibold min-h-[60px] touch-target bg-red-100 border-2 border-red-300">
+                <i className="fas fa-database text-lg md:text-base text-red-700"></i>
+                <span className="text-center leading-tight">Clear ALL Data</span>
+              </TabsTrigger>
             </TabsList>
             
             {/* Mobile: Horizontal scrolling tabs */}
@@ -509,6 +514,10 @@ export default function Dashboard() {
               <TabsTrigger value="cleanup" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target">
                 <i className="fas fa-trash text-xl text-red-600"></i>
                 <span className="text-center leading-tight">Cleanup</span>
+              </TabsTrigger>
+              <TabsTrigger value="clearall" className="flex flex-col items-center gap-1 p-3 text-xs font-semibold min-h-[70px] min-w-[80px] touch-target bg-red-100 border-2 border-red-300">
+                <i className="fas fa-database text-xl text-red-700"></i>
+                <span className="text-center leading-tight">Clear ALL</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -983,6 +992,10 @@ export default function Dashboard() {
           {/* Ghost Load Cleanup Tab */}
           <TabsContent value="cleanup" className="mt-6">
             <GhostLoadCleanup />
+          </TabsContent>
+
+          <TabsContent value="clearall" className="mt-6">
+            <ClearAllData />
           </TabsContent>
 
         </Tabs>
