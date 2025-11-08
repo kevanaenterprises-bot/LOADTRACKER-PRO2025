@@ -35,6 +35,8 @@ export class AILoadAdvisor {
       return new OpenAI({
         apiKey: replitApiKey,
         baseURL: replitBaseURL,
+        defaultHeaders: {},
+        dangerouslyAllowBrowser: false,
       });
     }
     
@@ -45,6 +47,8 @@ export class AILoadAdvisor {
       console.log('🤖 Using custom OpenAI API key');
       return new OpenAI({
         apiKey: customApiKey,
+        defaultHeaders: {},
+        dangerouslyAllowBrowser: false,
       });
     }
     
