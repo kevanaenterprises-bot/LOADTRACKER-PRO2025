@@ -1,0 +1,513 @@
+2025-11-09T22:02:31.000000000Z [inf]  Starting Container
+2025-11-09T22:02:32.129394275Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-09T22:02:32.438772597Z [inf]  No config path provided, using default 'drizzle.config.ts'
+2025-11-09T22:02:32.438779970Z [inf]  Reading config file '/app/drizzle.config.ts'
+2025-11-09T22:02:33.135183561Z [inf]  Using 'pg' driver for database querying
+2025-11-09T22:02:33.135190507Z [inf]  [⣷] Pulling schema from database...
+2025-11-09T22:02:33.232467840Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-09T22:02:33.371193921Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-09T22:02:33.482813513Z [inf]  [2K[1G[⡿] Pulling schema from database...
+2025-11-09T22:02:33.614590933Z [inf]  [2K[1G[⢿] Pulling schema from database...
+2025-11-09T22:02:33.970484599Z [inf]  [2K[1G[⣻] Pulling schema from database...
+2025-11-09T22:02:34.153037362Z [inf]  [2K[1G[⣽] Pulling schema from database...
+2025-11-09T22:02:34.153042320Z [inf]  [2K[1G[⣷] Pulling schema from database...
+2025-11-09T22:02:34.153047108Z [inf]  [2K[1G[⣯] Pulling schema from database...
+2025-11-09T22:02:34.325493957Z [inf]  [2K[1G[⣟] Pulling schema from database...
+2025-11-09T22:02:34.325645091Z [inf]  [2K[1G[✓] Pulling schema from database...
+2025-11-09T22:02:34.372113437Z [inf]  [i] No changes detected
+2025-11-09T22:02:34.524029632Z [err]  npm warn config production Use `--omit=dev` instead.
+2025-11-09T22:02:34.565464592Z [inf]  
+2025-11-09T22:02:34.565468477Z [inf]  > rest-express@1.0.0 start
+2025-11-09T22:02:34.565472253Z [inf]  > NODE_ENV=production tsx server/index.ts
+2025-11-09T22:02:34.565476343Z [inf]  
+2025-11-09T22:02:35.652829857Z [err]  ⚠️ REPLIT_DOMAINS not set. Setting default domain for deployment.
+2025-11-09T22:02:36.139791607Z [inf]  ✅ HERE Tracking API initialized
+2025-11-09T22:02:36.139800525Z [inf]  📊 STARTUP TRACE: Beginning try block for server startup
+2025-11-09T22:02:36.139801111Z [inf]    "arrayBuffers": 646703
+2025-11-09T22:02:36.139801433Z [inf]  🔧 Process ID: 63
+2025-11-09T22:02:36.139804727Z [inf]  🚨 DEPLOYMENT DEBUG: server/index.ts file loaded and executing - Railway Auth Fix Deploy
+2025-11-09T22:02:36.139812620Z [inf]  🔧 Node.js version: v22.11.0
+2025-11-09T22:02:36.139813030Z [inf]  🚨 DEPLOYMENT DEBUG: Inside try block - server startup beginning
+2025-11-09T22:02:36.139813866Z [inf]  🚨 DEPLOYMENT DEBUG: Current timestamp: 2025-11-09T22:02:36.019Z
+2025-11-09T22:02:36.139816076Z [inf]  }
+2025-11-09T22:02:36.139821602Z [inf]  🔧 Platform: linux
+2025-11-09T22:02:36.139823284Z [inf]  🚨 DEPLOYMENT DEBUG: Process environment: { nodeEnv: 'production', port: '8080', hasDatabase: true }
+2025-11-09T22:02:36.139826225Z [inf]  🚨 DEPLOYMENT DEBUG: About to call startServer function
+2025-11-09T22:02:36.139831212Z [inf]  🔧 Architecture: x64
+2025-11-09T22:02:36.139832928Z [inf]  🚨 DEPLOYMENT DEBUG: Pre-execution timestamp: 2025-11-09T22:02:36.022Z
+2025-11-09T22:02:36.139835120Z [inf]  📁 SERVER FILE EXECUTING: server/index.ts loaded successfully
+2025-11-09T22:02:36.139835602Z [inf]    "heapTotal": 71503872,
+2025-11-09T22:02:36.139840623Z [inf]  🔧 Memory usage: {
+2025-11-09T22:02:36.139841813Z [inf]  🚨 DEPLOYMENT DEBUG: Starting server initialization function
+2025-11-09T22:02:36.139847273Z [inf]  🚀 Starting LoadTracker Pro server...
+2025-11-09T22:02:36.139849621Z [inf]    "rss": 245288960,
+2025-11-09T22:02:36.139851245Z [inf]  🚨 DEPLOYMENT DEBUG: Function entry timestamp: 2025-11-09T22:02:36.023Z
+2025-11-09T22:02:36.139860431Z [inf]    "heapUsed": 52887760,
+2025-11-09T22:02:36.139861990Z [inf]  📊 STARTUP TRACE: Entering main server initialization function
+2025-11-09T22:02:36.139868763Z [inf]    "external": 4947133,
+2025-11-09T22:02:36.142848427Z [inf]  🔧 Validating environment configuration...
+2025-11-09T22:02:36.142853347Z [inf]  🚨 DEPLOYMENT DEBUG: Validating PORT environment variable
+2025-11-09T22:02:36.142857210Z [inf]  🚨 DEPLOYMENT DEBUG: Raw PORT value: 8080
+2025-11-09T22:02:36.142865881Z [inf]  🚨 DEPLOYMENT DEBUG: PORT type: string
+2025-11-09T22:02:36.142872284Z [inf]  🚨 DEPLOYMENT DEBUG: Parsed PORT value: 8080
+2025-11-09T22:02:36.142881478Z [inf]  ✅ DEPLOYMENT DEBUG: PORT validation successful: 8080
+2025-11-09T22:02:36.142887779Z [inf]  ✅ Database URL configured
+2025-11-09T22:02:36.142893479Z [err]  ⚠️  LoadRight API key not configured. LoadRight webhook endpoints will return 503 Service Unavailable.
+2025-11-09T22:02:36.142898784Z [inf]  ✅ Object storage environment variables configured (Google Cloud Storage)
+2025-11-09T22:02:36.142904689Z [inf]  ✅ SMS service (Telnyx) configured
+2025-11-09T22:02:36.142909974Z [inf]  ✅ Session authentication configured
+2025-11-09T22:02:36.142916269Z [inf]  🔧 Configuration validated: PORT=8080, HOST=0.0.0.0
+2025-11-09T22:02:36.142925958Z [inf]  🔧 Environment: NODE_ENV=production
+2025-11-09T22:02:36.142931533Z [inf]  🔧 Testing database connection...
+2025-11-09T22:02:36.142936679Z [err]  (node:63) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2025-11-09T22:02:36.142942147Z [err]  (Use `node --trace-deprecation ...` to show where the warning was created)
+2025-11-09T22:02:36.182299158Z [inf]  ✅ Database connection successful
+2025-11-09T22:02:36.394274873Z [inf]  🕐 Starting AI test scheduler (runs every 12 hours)
+2025-11-09T22:02:36.394278736Z [inf]  ✅ AI test scheduler started (runs every 12 hours)
+2025-11-09T22:02:36.394282624Z [inf]  📝 Registering application routes...
+2025-11-09T22:02:36.446042607Z [err]      at memoized (/app/node_modules/memoizee/lib/configure-map.js:81:23)
+2025-11-09T22:02:36.446054732Z [err]      at setupAuth (/app/server/replitAuth.ts:113:24)
+2025-11-09T22:02:36.446074473Z [err]      at registerRoutes (/app/server/routes.ts:397:11)
+2025-11-09T22:02:36.446080766Z [err]      at startServer (/app/server/index.ts:267:26)
+2025-11-09T22:02:36.446086799Z [err]  ⚠️ Users can still access the app using bypass tokens or driver direct access
+2025-11-09T22:02:36.446100572Z [err]  ❌ Authentication setup failed - app will continue without Replit Auth: TypeError: input.entries is not a function
+2025-11-09T22:02:36.446106460Z [err]      at prepareHeaders (/app/node_modules/oauth4webapi/src/index.ts:1165:38)
+2025-11-09T22:02:36.446112186Z [err]      at performDiscovery (/app/node_modules/oauth4webapi/src/index.ts:1239:19)
+2025-11-09T22:02:36.446118740Z [err]      at Module.discoveryRequest (/app/node_modules/oauth4webapi/src/index.ts:1273:10)
+2025-11-09T22:02:36.446124518Z [err]      at performDiscovery (/app/node_modules/openid-client/src/index.ts:1361:15)
+2025-11-09T22:02:36.446130416Z [err]      at Module.discovery (/app/node_modules/openid-client/src/index.ts:1280:20)
+2025-11-09T22:02:36.446136250Z [err]      at memoize.maxAge (/app/server/replitAuth.ts:30:25)
+2025-11-09T22:02:36.449490429Z [inf]  ✅ Routes registered successfully
+2025-11-09T22:02:36.449495109Z [inf]  📁 Setting up static file serving for production...
+2025-11-09T22:02:36.449499678Z [inf]  🔍 DEBUG: Resolved static path: /app/dist/public
+2025-11-09T22:02:36.449505381Z [inf]  🔍 DEBUG: index.html exists: true
+2025-11-09T22:02:36.449510434Z [inf]  ✅ Static file serving configured (production mode)
+2025-11-09T22:02:36.449517742Z [inf]  🌐 Starting HTTP server on 0.0.0.0:8080...
+2025-11-09T22:02:36.449523198Z [inf]  🎉 LoadTracker Pro is running successfully on port 8080
+2025-11-09T22:02:36.449527888Z [inf]  📍 Health check endpoints available:
+2025-11-09T22:02:36.449625136Z [inf]     - GET /api/status (basic status)
+2025-11-09T22:02:36.449643776Z [inf]     - GET /api/health (health check)
+2025-11-09T22:02:36.449649672Z [inf]     - GET /api/ready (readiness check)
+2025-11-09T22:02:36.470793461Z [inf]  10:02:36 PM [express] serving on port 8080
+2025-11-09T22:02:36.472810399Z [inf]  ⏰ Last test ran 70 minutes ago. Next test in 650 minutes.
+2025-11-09T22:02:36.585151637Z [inf]  10:02:36 PM [express] GET /api/health 200 in 6ms :: {"status":"ok","timestamp":"2025-11-09T22:02:36.5…
+2025-11-09T22:02:56.586373376Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:02:56.586379110Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:02:56.586384013Z [inf]  10:02:53 PM [express] GET /api/tracking/loads 304 in 46ms :: []
+2025-11-09T22:03:36.605652385Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:03:36.605658936Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:03:36.605663338Z [inf]  10:03:31 PM [express] GET /api/tracking/loads 304 in 57ms :: []
+2025-11-09T22:04:06.612296738Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:04:06.612301480Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:04:06.612306574Z [inf]  10:04:01 PM [express] GET /api/tracking/loads 304 in 58ms :: []
+2025-11-09T22:04:36.616997045Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:04:36.617008614Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:04:36.617013490Z [inf]  10:04:32 PM [express] GET /api/tracking/loads 304 in 46ms :: []
+2025-11-09T22:05:06.617862966Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:05:06.617884053Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:05:06.617889464Z [inf]  10:05:03 PM [express] GET /api/tracking/loads 304 in 53ms :: []
+2025-11-09T22:05:36.290937078Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:05:36.290947342Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:05:36.290953941Z [inf]  10:05:33 PM [express] GET /api/tracking/loads 304 in 50ms :: []
+2025-11-09T22:06:16.302862513Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:06:16.302869842Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:06:16.302874385Z [inf]  10:06:13 PM [express] GET /api/tracking/loads 304 in 65ms :: []
+2025-11-09T22:06:46.295931517Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:06:46.295940586Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:06:46.295946621Z [inf]  10:06:43 PM [express] GET /api/tracking/loads 304 in 65ms :: []
+2025-11-09T22:07:26.298466045Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:07:26.298470145Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:07:26.298476585Z [inf]  10:07:22 PM [express] GET /api/tracking/loads 304 in 56ms :: []
+2025-11-09T22:07:56.334580804Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:07:56.334587929Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:07:56.334592942Z [inf]  10:07:52 PM [express] GET /api/tracking/loads 304 in 65ms :: []
+2025-11-09T22:08:36.037252479Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:08:36.037257534Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:08:36.037263866Z [inf]  10:08:31 PM [express] GET /api/tracking/loads 304 in 77ms :: []
+2025-11-09T22:09:06.034442092Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:09:06.034448798Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:09:06.034453227Z [inf]  10:09:05 PM [express] GET /api/tracking/loads 304 in 47ms :: []
+2025-11-09T22:09:46.106231577Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:09:46.106236015Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:09:46.106240367Z [inf]  10:09:36 PM [express] GET /api/tracking/loads 304 in 47ms :: []
+2025-11-09T22:10:36.165474833Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:10:36.165479831Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:10:36.165484742Z [inf]  10:10:27 PM [express] GET /api/tracking/loads 304 in 48ms :: []
+2025-11-09T22:11:06.267823106Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:11:06.267827608Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:11:06.267832513Z [inf]  10:11:00 PM [express] GET /api/tracking/loads 304 in 63ms :: []
+2025-11-09T22:11:35.968647741Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:11:35.968655624Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:11:35.968662268Z [inf]  10:11:31 PM [express] GET /api/tracking/loads 304 in 55ms :: []
+2025-11-09T22:12:26.005173114Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:12:26.005177593Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:12:26.005183309Z [inf]  10:12:21 PM [express] GET /api/tracking/loads 304 in 45ms :: []
+2025-11-09T22:12:56.008381250Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:12:56.008385677Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:12:56.008390127Z [inf]  10:12:52 PM [express] GET /api/tracking/loads 304 in 65ms :: []
+2025-11-09T22:13:26.026595755Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:13:26.026601091Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:13:26.026609061Z [inf]  10:13:23 PM [express] GET /api/tracking/loads 304 in 57ms :: []
+2025-11-09T22:13:45.642679220Z [inf]      lastName: 'User',
+2025-11-09T22:13:45.642690383Z [inf]  Admin login attempt: {
+2025-11-09T22:13:45.642698575Z [inf]    username: 'ADMIN',
+2025-11-09T22:13:45.642704079Z [inf]    username: 'admin',
+2025-11-09T22:13:45.642706193Z [inf]    usernameLength: 5,
+2025-11-09T22:13:45.642712477Z [inf]    password: '[LENGTH:9]',
+2025-11-09T22:13:45.642721793Z [inf]    firstName: 'Admin'
+2025-11-09T22:13:45.642722551Z [inf]    passwordActual: '"go4fc2024"',
+2025-11-09T22:13:45.642733505Z [inf]    sessionId: '89FkYp-sRosqkbihElGsgD7zLFCYFZOa',
+2025-11-09T22:13:45.642733988Z [inf]  }
+2025-11-09T22:13:45.642741859Z [inf]    hasSession: true
+2025-11-09T22:13:45.642744971Z [inf]  10:13:38 PM [express] POST /api/auth/admin-login 200 in 12ms :: {"message":"Login successful","user":…
+2025-11-09T22:13:45.642753167Z [inf]  }
+2025-11-09T22:13:45.642754472Z [inf]  Browser auth bypass token requested
+2025-11-09T22:13:45.642761956Z [inf]  Admin credentials matched successfully
+2025-11-09T22:13:45.642765233Z [inf]  10:13:38 PM [express] POST /api/auth/browser-bypass 200 in 5ms :: {"message":"Browser auth bypass tok…
+2025-11-09T22:13:45.642769246Z [inf]  Session saved and verified, adminAuth: {
+2025-11-09T22:13:45.642774689Z [inf]    id: 'admin-001',
+2025-11-09T22:13:45.642783636Z [inf]    role: 'admin',
+2025-11-09T22:13:45.642787937Z [inf]  Admin user check: {
+2025-11-09T22:13:45.642798199Z [inf]    hasSession: true,
+2025-11-09T22:13:45.642802021Z [inf]    lastName: 'User',
+2025-11-09T22:13:45.642808995Z [inf]    hasAdminAuth: true,
+2025-11-09T22:13:45.642814998Z [inf]    sessionId: '89FkYp-sRosqkbihElGsgD7zLFCYFZOa',
+2025-11-09T22:13:45.642821247Z [inf]    sessionData: [ 'cookie', 'adminAuth', 'driverAuth' ],
+2025-11-09T22:13:45.642827069Z [inf]    adminAuthData: {
+2025-11-09T22:13:45.642833483Z [inf]      id: 'admin-001',
+2025-11-09T22:13:45.642839571Z [inf]      role: 'admin',
+2025-11-09T22:13:45.644252100Z [inf]    firstName: 'KEVIN'
+2025-11-09T22:13:45.644263316Z [inf]  }
+2025-11-09T22:13:45.644263921Z [inf]  🔍 Query parameters: { status: undefined, excludePaid: false }
+2025-11-09T22:13:45.644271629Z [inf]  10:13:38 PM [express] GET /api/auth/driver-user 304 in 47ms :: {"id":"34366fd7-7b43-47a2-baae-73fcd1f…
+2025-11-09T22:13:45.644275838Z [inf]  🔥 ADMIN: Getting all loads (no filters)
+2025-11-09T22:13:45.644278909Z [inf]      username: 'admin',
+2025-11-09T22:13:45.644281028Z [inf]  🔥 ADMIN MODE: Getting loads with filters
+2025-11-09T22:13:45.644282200Z [inf]  10:13:39 PM [express] GET /api/locations 200 in 9ms :: [{"id":"66e05793-9c5c-4f3c-a605-45883be55a01",…
+2025-11-09T22:13:45.644288979Z [inf]      firstName: 'Admin'
+2025-11-09T22:13:45.644290715Z [inf]  10:13:39 PM [express] GET /api/customers 304 in 8ms :: [{"id":"ae3cfa46-a50a-4283-abc8-d612e0a5b4d8",…
+2025-11-09T22:13:45.644296808Z [inf]    },
+2025-11-09T22:13:45.644299151Z [inf]  🔥 API LOADS ROUTE HIT! This might be intercepting Kevin's request!
+2025-11-09T22:13:45.644303621Z [inf]    hasBypassToken: false
+2025-11-09T22:13:45.644307072Z [inf]  🔥 API LOADS HANDLER CALLED!
+2025-11-09T22:13:45.644312265Z [inf]  }
+2025-11-09T22:13:45.644315458Z [inf]  🔥 ADMIN SESSION DETECTED
+2025-11-09T22:13:45.644319397Z [inf]  10:13:38 PM [express] GET /api/auth/admin-user 304 in 5ms :: {"id":"admin-001","role":"admin","lastNa…
+2025-11-09T22:13:45.644325335Z [inf]  Authentication failed: No user or expiration
+2025-11-09T22:13:45.644331135Z [inf]  10:13:38 PM [express] GET /api/auth/user 401 in 5ms :: {"message":"Unauthorized"}
+2025-11-09T22:13:45.644336385Z [inf]  ✅ DRIVER SESSION FOUND: {
+2025-11-09T22:13:45.644342044Z [inf]    role: 'driver',
+2025-11-09T22:13:45.644347471Z [inf]    userId: '34366fd7-7b43-47a2-baae-73fcd1f78d47',
+2025-11-09T22:13:45.644352404Z [inf]    lastName: 'OWEN',
+2025-11-09T22:13:45.644357413Z [inf]    username: 'KOWEN',
+2025-11-09T22:13:45.646115331Z [inf]      'x-forwarded-proto',    'x-railway-edge',
+2025-11-09T22:13:45.646129878Z [inf]  Bypass check: {
+2025-11-09T22:13:45.646129954Z [inf]      'x-railway-request-id', 'x-real-ip',
+2025-11-09T22:13:45.646141164Z [inf]      'x-request-start'
+2025-11-09T22:13:45.646146190Z [inf]    token: '[PROVIDED]',
+2025-11-09T22:13:45.646151079Z [inf]    ],
+2025-11-09T22:13:45.646157587Z [inf]    expected: 'LOADTRACKER_BYPASS_2025',
+2025-11-09T22:13:45.646162977Z [inf]    bypassToken: '[PROVIDED]'
+2025-11-09T22:13:45.646169454Z [inf]    isActive: true
+2025-11-09T22:13:45.646174033Z [inf]  }
+2025-11-09T22:13:45.646181452Z [inf]  }
+2025-11-09T22:13:45.646185294Z [inf]  10:13:39 PM [express] GET /api/dashboard/stats 304 in 16ms :: {"activeLoads":"4","inTransit":"0","del…
+2025-11-09T22:13:45.646194461Z [inf]  Dashboard stats auth check: {
+2025-11-09T22:13:45.646196614Z [inf]  10:13:39 PM [express] GET /api/drivers/available 304 in 32ms :: [{"id":"a48dee41-a257-47c5-b5cd-11b60…
+2025-11-09T22:13:45.646208204Z [inf]    hasAdminAuth: true,
+2025-11-09T22:13:45.646208639Z [inf]  10:13:39 PM [express] GET /api/invoices 304 in 79ms :: [{"id":"cc1bdfc7-0802-4e26-942e-a38efcda1387",…
+2025-11-09T22:13:45.646217994Z [inf]    hasReplitAuth: false,
+2025-11-09T22:13:45.646224755Z [inf]    hasTokenBypass: true,
+2025-11-09T22:13:45.646230696Z [inf]    headers: [
+2025-11-09T22:13:45.646236071Z [inf]      'host',                 'user-agent',
+2025-11-09T22:13:45.646246352Z [inf]      'accept',               'accept-encoding',
+2025-11-09T22:13:45.646252273Z [inf]      'accept-language',      'cookie',
+2025-11-09T22:13:45.646258860Z [inf]      'if-none-match',        'referer',
+2025-11-09T22:13:45.646264703Z [inf]      'sec-fetch-dest',       'sec-fetch-mode',
+2025-11-09T22:13:45.646271087Z [inf]      'sec-fetch-site',       'x-bypass-token',
+2025-11-09T22:13:45.646277738Z [inf]      'x-forwarded-for',      'x-forwarded-host',
+2025-11-09T22:13:45.648208517Z [inf]  📋 ADMIN: Returning 7 loads
+2025-11-09T22:13:45.648215066Z [inf]  🔒 FINAL SECURITY CHECK: User role="admin", userId="undefined", returning 7 loads
+2025-11-09T22:13:45.648219812Z [inf]  🔥 RETURNING: 7 loads
+2025-11-09T22:13:45.648224697Z [inf]  10:13:39 PM [express] GET /api/loads 304 in 127ms :: [{"id":"88d3735c-51f6-4905-bcea-057104e5322e","n…
+2025-11-09T22:13:45.648228897Z [inf]  10:13:41 PM [express] GET /api/office-staff 304 in 8ms :: [{"id":"e31e8ded-7b59-42e4-a26a-964efcb4d40…
+2025-11-09T22:13:46.244327964Z [inf]  🗑️  Deleting user fac92422-cb54-49dc-8f25-3b693dde2534: Found 1 demo sessions to clean up
+2025-11-09T22:13:46.246109295Z [inf]     - Cleaned up visitor tracking for demo session 3eb9e9a3-ff3c-475c-829b-d77c78f89787
+2025-11-09T22:13:46.248055665Z [inf]     - Deleted 1 demo sessions
+2025-11-09T22:13:46.249970258Z [inf]  ✅ User fac92422-cb54-49dc-8f25-3b693dde2534 deleted successfully
+2025-11-09T22:13:46.262795049Z [inf]  10:13:46 PM [express] DELETE /api/office-staff/fac92422-cb54-49dc-8f25-3b693dde2534 200 in 24ms :: {"…
+2025-11-09T22:13:46.550415686Z [inf]  10:13:46 PM [express] GET /api/office-staff 200 in 6ms :: [{"id":"e31e8ded-7b59-42e4-a26a-964efcb4d40…
+2025-11-09T22:13:51.554725914Z [inf]  🗑️  Deleting user e31e8ded-7b59-42e4-a26a-964efcb4d40a: Found 1 demo sessions to clean up
+2025-11-09T22:13:51.554730532Z [inf]     - Cleaned up visitor tracking for demo session 775dd4ab-663c-464b-85ea-70ba74d44905
+2025-11-09T22:13:51.554735058Z [inf]     - Deleted 1 demo sessions
+2025-11-09T22:13:51.556592925Z [inf]  ✅ User e31e8ded-7b59-42e4-a26a-964efcb4d40a deleted successfully
+2025-11-09T22:13:51.563023836Z [inf]  10:13:51 PM [express] DELETE /api/office-staff/e31e8ded-7b59-42e4-a26a-964efcb4d40a 200 in 19ms :: {"…
+2025-11-09T22:13:52.048962833Z [inf]  10:13:51 PM [express] GET /api/office-staff 200 in 11ms :: [{"id":"f340b79c-7616-48b9-9f5a-4de8fc5872…
+2025-11-09T22:13:53.346384380Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:13:53.346391678Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:13:53.347176433Z [inf]  10:13:53 PM [express] GET /api/tracking/loads 304 in 10ms :: []
+2025-11-09T22:13:56.048722169Z [inf]     - Cleaned up visitor tracking for demo session c6635aa9-4c7c-457a-bc3e-38b22474c803
+2025-11-09T22:13:56.048731856Z [inf]     - Deleted 1 demo sessions
+2025-11-09T22:13:56.048737869Z [inf]  ✅ User f340b79c-7616-48b9-9f5a-4de8fc58729d deleted successfully
+2025-11-09T22:13:56.048742414Z [inf]  10:13:55 PM [express] DELETE /api/office-staff/f340b79c-7616-48b9-9f5a-4de8fc58729d 200 in 19ms :: {"…
+2025-11-09T22:13:56.048965485Z [inf]  🗑️  Deleting user f340b79c-7616-48b9-9f5a-4de8fc58729d: Found 1 demo sessions to clean up
+2025-11-09T22:13:56.075100844Z [inf]  10:13:56 PM [express] GET /api/office-staff 200 in 8ms :: [{"id":"58ff263c-01b8-43ee-a59f-aadec8f5cf2…
+2025-11-09T22:14:02.627418986Z [inf]  10:14:02 PM [express] GET /api/trucks/service-alerts 304 in 15ms :: []
+2025-11-09T22:14:02.636724382Z [inf]  10:14:02 PM [express] GET /api/trucks 304 in 22ms :: [{"id":"466a6b5c-ff57-4eb7-992d-87b619a9489b","t…
+2025-11-09T22:14:32.634726683Z [inf]     Has private key: true
+2025-11-09T22:14:32.634734235Z [inf]     Private key length: 1704
+2025-11-09T22:14:32.634738670Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:14:32.634739936Z [inf]     Private key starts with: -----BEGIN PRIVATE KEY-----
+2025-11-09T22:14:32.634745786Z [inf]  MI
+2025-11-09T22:14:32.634746646Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:14:32.634751223Z [inf]  10:14:23 PM [express] GET /api/tracking/loads 304 in 22ms :: []
+2025-11-09T22:14:32.634755663Z [inf]  📄 Processing document for OCR: Load_Confirmation_6022448_20251028183903.pdf application/pdf 63977
+2025-11-09T22:14:32.634764205Z [inf]     Private key has \n escapes: false
+2025-11-09T22:14:32.634765337Z [inf]  📄 Google Cloud Config Validation: {
+2025-11-09T22:14:32.634771160Z [inf]     Private key has actual newlines: true
+2025-11-09T22:14:32.634771811Z [inf]    projectId: 'load-track...',
+2025-11-09T22:14:32.634779939Z [inf]    processorId: '29341b7f43...',
+2025-11-09T22:14:32.634780440Z [inf]  🔧 Initializing Document AI client...
+2025-11-09T22:14:32.634785968Z [inf]    location: 'us',
+2025-11-09T22:14:32.634789054Z [inf]     Endpoint: us-documentai.googleapis.com
+2025-11-09T22:14:32.634792798Z [inf]    hasCredentials: true,
+2025-11-09T22:14:32.634797894Z [inf]    credentialsLength: 2387
+2025-11-09T22:14:32.634802054Z [inf]  }
+2025-11-09T22:14:32.634806399Z [inf]  📄 Calling Document AI extraction...
+2025-11-09T22:14:32.634810819Z [inf]  🔐 Parsing Google credentials...
+2025-11-09T22:14:32.634814995Z [inf]     Credentials length: 2387
+2025-11-09T22:14:32.634819083Z [inf]  ✅ Credentials parsed successfully
+2025-11-09T22:14:32.634823362Z [inf]     Project ID from creds: load-tracker-pro-2025
+2025-11-09T22:14:32.634827799Z [inf]     Client email: loadtracker-ocr@load-tracker-pro-2025.iam.gserviceaccount.com
+2025-11-09T22:14:32.636019261Z [inf]     Project ID: load-tracker-pro-2025
+2025-11-09T22:14:32.636024567Z [inf]     Location: us
+2025-11-09T22:14:32.706474017Z [inf]  ✅ Document AI client initialized successfully
+2025-11-09T22:14:32.706478735Z [inf]  🔍 Processing document with Google Document AI...
+2025-11-09T22:14:32.706483266Z [inf]     Processor: projects/load-tracker-pro-2025/locations/us/processors/29341b7f43a0d2ff
+2025-11-09T22:14:32.706487664Z [inf]     MIME type: application/pdf
+2025-11-09T22:14:32.706491958Z [inf]     File size: 63977 bytes
+2025-11-09T22:14:32.797367158Z [err]      at <anonymous> (/app/node_modules/@grpc/grpc-js/src/resolving-call.ts:170:24)
+2025-11-09T22:14:32.797377124Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2025-11-09T22:14:32.797384494Z [err]  for call at
+2025-11-09T22:14:32.797384824Z [err]  ❌ Google Document AI error: Error: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:32.797390227Z [err]      at ServiceClientImpl.makeUnaryRequest (/app/node_modules/@grpc/grpc-js/src/client.ts:325:42)
+2025-11-09T22:14:32.797396673Z [err]      at ServiceClientImpl.<anonymous> (/app/node_modules/@grpc/grpc-js/src/make-client.ts:189:15)
+2025-11-09T22:14:32.797400413Z [err]      at callErrorFromStatus (/app/node_modules/@grpc/grpc-js/src/call.ts:84:17)
+2025-11-09T22:14:32.797405681Z [err]      at /app/node_modules/@google-cloud/documentai/build/src/v1/document_processor_service_client.js:279:29
+2025-11-09T22:14:32.797408528Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client.ts:360:55)
+2025-11-09T22:14:32.797412605Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/timeout.js:44:16
+2025-11-09T22:14:32.797418651Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client-interceptors.ts:466:34)
+2025-11-09T22:14:32.797419589Z [err]      at repeat (/app/node_modules/google-gax/build/src/normalCalls/retries.js:114:25)
+2025-11-09T22:14:32.797427378Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/retries.js:156:13
+2025-11-09T22:14:32.797427676Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client-interceptors.ts:424:48)
+2025-11-09T22:14:32.797434970Z [err]      at OngoingCallPromise.call (/app/node_modules/google-gax/build/src/call.js:70:27)
+2025-11-09T22:14:32.797443053Z [err]      at NormalApiCaller.call (/app/node_modules/google-gax/build/src/normalCalls/normalApiCaller.js:34:19)
+2025-11-09T22:14:32.798949699Z [err]      at async <anonymous> (/app/server/routes.ts:7364:29)
+2025-11-09T22:14:32.798965702Z [err]    },
+2025-11-09T22:14:32.798974490Z [err]    note: 'Exception occurred in retry method that was not classified as transient'
+2025-11-09T22:14:32.798980871Z [err]  }
+2025-11-09T22:14:32.798985918Z [err]  ❌ Error details: {
+2025-11-09T22:14:32.798990275Z [err]    "code": 2,
+2025-11-09T22:14:32.798995241Z [err]    "details": "Getting metadata from plugin failed with error: headers.has is not a function",
+2025-11-09T22:14:32.798997515Z [err]      at /app/node_modules/google-gax/build/src/createApiCall.js:110:30 {
+2025-11-09T22:14:32.799000729Z [err]    "metadata": {},
+2025-11-09T22:14:32.799005329Z [err]    code: 2,
+2025-11-09T22:14:32.799007475Z [err]    "note": "Exception occurred in retry method that was not classified as transient"
+2025-11-09T22:14:32.799011695Z [err]    details: 'Getting metadata from plugin failed with error: headers.has is not a function',
+2025-11-09T22:14:32.799013423Z [err]  }
+2025-11-09T22:14:32.799017578Z [err]    metadata: Metadata {
+2025-11-09T22:14:32.799019428Z [err]  ❌ OCR extraction error: Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:32.799024102Z [err]      internalRepr: Map(0) {},
+2025-11-09T22:14:32.799028138Z [err]      at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)
+2025-11-09T22:14:32.799031183Z [err]      opaqueData: Map(0) {},
+2025-11-09T22:14:32.799035360Z [err]      at async <anonymous> (/app/server/routes.ts:7364:29)
+2025-11-09T22:14:32.799037075Z [err]      options: {}
+2025-11-09T22:14:32.799042168Z [err]  ❌ Error stack: Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:32.799048258Z [err]      at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)
+2025-11-09T22:14:32.799715202Z [err]  ❌ Error type: Error
+2025-11-09T22:14:32.799720209Z [err]  ❌ Error object keys: []
+2025-11-09T22:14:32.799724458Z [err]  ❌ Error details: {
+2025-11-09T22:14:32.799728726Z [err]    "stack": "Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function\n    at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)\n    at async <anonymous> (/app/server/routes.ts:7364:29)",
+2025-11-09T22:14:32.799733042Z [err]    "message": "Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function"
+2025-11-09T22:14:32.799737567Z [err]  }
+2025-11-09T22:14:32.799741804Z [inf]  10:14:32 PM [express] POST /api/ocr/extract 500 in 1098ms :: {"message":"Failed to extract data from …
+2025-11-09T22:14:40.690756386Z [inf]  📄 Processing document for OCR: Load_Confirmation_6022448_20251028183903.pdf application/pdf 63977
+2025-11-09T22:14:40.690765149Z [inf]  📄 Google Cloud Config Validation: {
+2025-11-09T22:14:40.690771084Z [inf]    projectId: 'load-track...',
+2025-11-09T22:14:40.690776318Z [inf]    processorId: '29341b7f43...',
+2025-11-09T22:14:40.690781313Z [inf]    location: 'us',
+2025-11-09T22:14:40.690787016Z [inf]    hasCredentials: true,
+2025-11-09T22:14:40.690792950Z [inf]    credentialsLength: 2387
+2025-11-09T22:14:40.690798700Z [inf]  }
+2025-11-09T22:14:40.690803722Z [inf]  📄 Calling Document AI extraction...
+2025-11-09T22:14:40.690808862Z [inf]  🔍 Processing document with Google Document AI...
+2025-11-09T22:14:40.690814204Z [inf]     Processor: projects/load-tracker-pro-2025/locations/us/processors/29341b7f43a0d2ff
+2025-11-09T22:14:40.690819788Z [inf]     MIME type: application/pdf
+2025-11-09T22:14:40.690825162Z [inf]     File size: 63977 bytes
+2025-11-09T22:14:40.698694779Z [err]      at ServiceClientImpl.<anonymous> (/app/node_modules/@grpc/grpc-js/src/make-client.ts:189:15)
+2025-11-09T22:14:40.698703840Z [err]      at /app/node_modules/@google-cloud/documentai/build/src/v1/document_processor_service_client.js:279:29
+2025-11-09T22:14:40.698705150Z [err]  ❌ Google Document AI error: Error: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:40.698710387Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/timeout.js:44:16
+2025-11-09T22:14:40.698711261Z [err]      at callErrorFromStatus (/app/node_modules/@grpc/grpc-js/src/call.ts:84:17)
+2025-11-09T22:14:40.698717278Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client.ts:360:55)
+2025-11-09T22:14:40.698718321Z [err]      at repeat (/app/node_modules/google-gax/build/src/normalCalls/retries.js:114:25)
+2025-11-09T22:14:40.698723042Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client-interceptors.ts:466:34)
+2025-11-09T22:14:40.698724342Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/retries.js:156:13
+2025-11-09T22:14:40.698728850Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client-interceptors.ts:424:48)
+2025-11-09T22:14:40.698731130Z [err]      at OngoingCallPromise.call (/app/node_modules/google-gax/build/src/call.js:70:27)
+2025-11-09T22:14:40.698735068Z [err]      at <anonymous> (/app/node_modules/@grpc/grpc-js/src/resolving-call.ts:170:24)
+2025-11-09T22:14:40.698736884Z [err]      at NormalApiCaller.call (/app/node_modules/google-gax/build/src/normalCalls/normalApiCaller.js:34:19)
+2025-11-09T22:14:40.698740232Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2025-11-09T22:14:40.698745305Z [err]  for call at
+2025-11-09T22:14:40.698752937Z [err]      at ServiceClientImpl.makeUnaryRequest (/app/node_modules/@grpc/grpc-js/src/client.ts:325:42)
+2025-11-09T22:14:40.700906934Z [err]      opaqueData: Map(0) {},
+2025-11-09T22:14:40.700908167Z [err]      at async <anonymous> (/app/server/routes.ts:7364:29)
+2025-11-09T22:14:40.700915479Z [err]  ❌ Error stack: Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:40.700915773Z [err]      options: {}
+2025-11-09T22:14:40.700922142Z [err]    },
+2025-11-09T22:14:40.700922267Z [err]      at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)
+2025-11-09T22:14:40.700929634Z [err]    "details": "Getting metadata from plugin failed with error: headers.has is not a function",
+2025-11-09T22:14:40.700929829Z [err]    note: 'Exception occurred in retry method that was not classified as transient'
+2025-11-09T22:14:40.700930527Z [err]      at async <anonymous> (/app/server/routes.ts:7364:29)
+2025-11-09T22:14:40.700936449Z [err]  }
+2025-11-09T22:14:40.700940758Z [err]    "metadata": {},
+2025-11-09T22:14:40.700943787Z [err]  ❌ Error details: {
+2025-11-09T22:14:40.700948093Z [err]    "note": "Exception occurred in retry method that was not classified as transient"
+2025-11-09T22:14:40.700951658Z [err]    "code": 2,
+2025-11-09T22:14:40.700954326Z [err]  }
+2025-11-09T22:14:40.700962837Z [err]  ❌ OCR extraction error: Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:40.700965066Z [err]      at /app/node_modules/google-gax/build/src/createApiCall.js:110:30 {
+2025-11-09T22:14:40.700974896Z [err]      at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)
+2025-11-09T22:14:40.700977521Z [err]    code: 2,
+2025-11-09T22:14:40.700986929Z [err]    details: 'Getting metadata from plugin failed with error: headers.has is not a function',
+2025-11-09T22:14:40.700995496Z [err]    metadata: Metadata {
+2025-11-09T22:14:40.701002755Z [err]      internalRepr: Map(0) {},
+2025-11-09T22:14:40.702479339Z [err]  ❌ Error type: Error
+2025-11-09T22:14:40.702490330Z [err]  ❌ Error object keys: []
+2025-11-09T22:14:40.702495036Z [err]  ❌ Error details: {
+2025-11-09T22:14:40.702499831Z [err]    "stack": "Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function\n    at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)\n    at async <anonymous> (/app/server/routes.ts:7364:29)",
+2025-11-09T22:14:40.702504364Z [err]    "message": "Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function"
+2025-11-09T22:14:40.702510183Z [err]  }
+2025-11-09T22:14:40.702514061Z [inf]  10:14:40 PM [express] POST /api/ocr/extract 500 in 484ms :: {"message":"Failed to extract data from d…
+2025-11-09T22:14:48.225112234Z [inf]     Processor: projects/load-tracker-pro-2025/locations/us/processors/29341b7f43a0d2ff
+2025-11-09T22:14:48.225132833Z [inf]     MIME type: application/pdf
+2025-11-09T22:14:48.225141993Z [inf]     File size: 63977 bytes
+2025-11-09T22:14:48.225153823Z [inf]  📄 Processing document for OCR: Load_Confirmation_6022448_20251028183903.pdf application/pdf 63977
+2025-11-09T22:14:48.225157873Z [inf]  📄 Google Cloud Config Validation: {
+2025-11-09T22:14:48.225162352Z [inf]    projectId: 'load-track...',
+2025-11-09T22:14:48.225166303Z [inf]    processorId: '29341b7f43...',
+2025-11-09T22:14:48.225170323Z [inf]    location: 'us',
+2025-11-09T22:14:48.225174553Z [inf]    hasCredentials: true,
+2025-11-09T22:14:48.225179070Z [inf]    credentialsLength: 2387
+2025-11-09T22:14:48.225183177Z [inf]  }
+2025-11-09T22:14:48.225187512Z [inf]  📄 Calling Document AI extraction...
+2025-11-09T22:14:48.225192078Z [inf]  🔍 Processing document with Google Document AI...
+2025-11-09T22:14:48.226715801Z [err]  ❌ Google Document AI error: Error: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:48.226720263Z [err]      at callErrorFromStatus (/app/node_modules/@grpc/grpc-js/src/call.ts:84:17)
+2025-11-09T22:14:48.226724306Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client.ts:360:55)
+2025-11-09T22:14:48.226728772Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client-interceptors.ts:466:34)
+2025-11-09T22:14:48.226733476Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client-interceptors.ts:424:48)
+2025-11-09T22:14:48.226737470Z [err]      at <anonymous> (/app/node_modules/@grpc/grpc-js/src/resolving-call.ts:170:24)
+2025-11-09T22:14:48.226743535Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2025-11-09T22:14:48.226747986Z [err]  for call at
+2025-11-09T22:14:48.226780613Z [err]      at ServiceClientImpl.makeUnaryRequest (/app/node_modules/@grpc/grpc-js/src/client.ts:325:42)
+2025-11-09T22:14:48.226791959Z [err]      at ServiceClientImpl.<anonymous> (/app/node_modules/@grpc/grpc-js/src/make-client.ts:189:15)
+2025-11-09T22:14:48.226799980Z [err]      at /app/node_modules/@google-cloud/documentai/build/src/v1/document_processor_service_client.js:279:29
+2025-11-09T22:14:48.226807213Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/timeout.js:44:16
+2025-11-09T22:14:48.226815529Z [err]      at repeat (/app/node_modules/google-gax/build/src/normalCalls/retries.js:114:25)
+2025-11-09T22:14:48.226825890Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/retries.js:156:13
+2025-11-09T22:14:48.226832654Z [err]      at OngoingCallPromise.call (/app/node_modules/google-gax/build/src/call.js:70:27)
+2025-11-09T22:14:48.226838302Z [err]      at NormalApiCaller.call (/app/node_modules/google-gax/build/src/normalCalls/normalApiCaller.js:34:19)
+2025-11-09T22:14:48.227535658Z [err]      at /app/node_modules/google-gax/build/src/createApiCall.js:110:30 {
+2025-11-09T22:14:48.227543504Z [err]    },
+2025-11-09T22:14:48.227544740Z [err]    code: 2,
+2025-11-09T22:14:48.227553848Z [err]    note: 'Exception occurred in retry method that was not classified as transient'
+2025-11-09T22:14:48.227554208Z [err]    "metadata": {},
+2025-11-09T22:14:48.227554707Z [err]    details: 'Getting metadata from plugin failed with error: headers.has is not a function',
+2025-11-09T22:14:48.227562845Z [err]    "note": "Exception occurred in retry method that was not classified as transient"
+2025-11-09T22:14:48.227565727Z [err]  ❌ OCR extraction error: Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:48.227566248Z [err]    metadata: Metadata {
+2025-11-09T22:14:48.227575831Z [err]      internalRepr: Map(0) {},
+2025-11-09T22:14:48.227576260Z [err]      at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)
+2025-11-09T22:14:48.227576275Z [err]  }
+2025-11-09T22:14:48.227584390Z [err]  ❌ Error details: {
+2025-11-09T22:14:48.227587000Z [err]      at async <anonymous> (/app/server/routes.ts:7364:29)
+2025-11-09T22:14:48.227589214Z [err]      opaqueData: Map(0) {},
+2025-11-09T22:14:48.227596144Z [err]  ❌ Error stack: Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:48.227598229Z [err]    "code": 2,
+2025-11-09T22:14:48.227598496Z [err]      options: {}
+2025-11-09T22:14:48.227603564Z [err]      at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)
+2025-11-09T22:14:48.227606732Z [err]    "details": "Getting metadata from plugin failed with error: headers.has is not a function",
+2025-11-09T22:14:48.227614284Z [err]  }
+2025-11-09T22:14:48.227620645Z [err]      at async <anonymous> (/app/server/routes.ts:7364:29)
+2025-11-09T22:14:48.228469769Z [err]  ❌ Error type: Error
+2025-11-09T22:14:48.228476298Z [err]  ❌ Error object keys: []
+2025-11-09T22:14:48.228482610Z [err]  ❌ Error details: {
+2025-11-09T22:14:48.228488678Z [err]    "stack": "Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function\n    at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)\n    at async <anonymous> (/app/server/routes.ts:7364:29)",
+2025-11-09T22:14:48.228494042Z [err]    "message": "Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function"
+2025-11-09T22:14:48.228499420Z [err]  }
+2025-11-09T22:14:48.231457061Z [inf]  10:14:48 PM [express] POST /api/ocr/extract 500 in 482ms :: {"message":"Failed to extract data from d…
+2025-11-09T22:14:54.211415308Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:14:54.211426818Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:14:54.217737341Z [inf]  10:14:54 PM [express] GET /api/tracking/loads 304 in 34ms :: []
+2025-11-09T22:14:55.229548828Z [inf]  📄 Processing document for OCR: Load_Confirmation_6022448_20251028183903.pdf application/pdf 63977
+2025-11-09T22:14:55.229552906Z [inf]  📄 Google Cloud Config Validation: {
+2025-11-09T22:14:55.229558207Z [inf]    projectId: 'load-track...',
+2025-11-09T22:14:55.229574393Z [inf]    processorId: '29341b7f43...',
+2025-11-09T22:14:55.229579512Z [inf]    location: 'us',
+2025-11-09T22:14:55.229584045Z [inf]    hasCredentials: true,
+2025-11-09T22:14:55.229588176Z [inf]    credentialsLength: 2387
+2025-11-09T22:14:55.230997336Z [inf]  }
+2025-11-09T22:14:55.231007320Z [inf]  📄 Calling Document AI extraction...
+2025-11-09T22:14:55.231013807Z [inf]  🔍 Processing document with Google Document AI...
+2025-11-09T22:14:55.231019497Z [inf]     Processor: projects/load-tracker-pro-2025/locations/us/processors/29341b7f43a0d2ff
+2025-11-09T22:14:55.231025853Z [inf]     MIME type: application/pdf
+2025-11-09T22:14:55.231031871Z [inf]     File size: 63977 bytes
+2025-11-09T22:14:55.231037103Z [err]  ❌ Google Document AI error: Error: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:55.231043892Z [err]      at callErrorFromStatus (/app/node_modules/@grpc/grpc-js/src/call.ts:84:17)
+2025-11-09T22:14:55.231050547Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client.ts:360:55)
+2025-11-09T22:14:55.231056604Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client-interceptors.ts:466:34)
+2025-11-09T22:14:55.231062893Z [err]      at Object.onReceiveStatus (/app/node_modules/@grpc/grpc-js/src/client-interceptors.ts:424:48)
+2025-11-09T22:14:55.231068517Z [err]      at <anonymous> (/app/node_modules/@grpc/grpc-js/src/resolving-call.ts:170:24)
+2025-11-09T22:14:55.231076045Z [err]      at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2025-11-09T22:14:55.231082295Z [err]  for call at
+2025-11-09T22:14:55.231500022Z [err]      at ServiceClientImpl.makeUnaryRequest (/app/node_modules/@grpc/grpc-js/src/client.ts:325:42)
+2025-11-09T22:14:55.231504431Z [err]      at ServiceClientImpl.<anonymous> (/app/node_modules/@grpc/grpc-js/src/make-client.ts:189:15)
+2025-11-09T22:14:55.231508498Z [err]      at /app/node_modules/@google-cloud/documentai/build/src/v1/document_processor_service_client.js:279:29
+2025-11-09T22:14:55.231512638Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/timeout.js:44:16
+2025-11-09T22:14:55.231517806Z [err]      at repeat (/app/node_modules/google-gax/build/src/normalCalls/retries.js:114:25)
+2025-11-09T22:14:55.231521858Z [err]      at /app/node_modules/google-gax/build/src/normalCalls/retries.js:156:13
+2025-11-09T22:14:55.231526461Z [err]      at OngoingCallPromise.call (/app/node_modules/google-gax/build/src/call.js:70:27)
+2025-11-09T22:14:55.231530458Z [err]      at NormalApiCaller.call (/app/node_modules/google-gax/build/src/normalCalls/normalApiCaller.js:34:19)
+2025-11-09T22:14:55.231534706Z [err]      at /app/node_modules/google-gax/build/src/createApiCall.js:110:30 {
+2025-11-09T22:14:55.231539090Z [err]    code: 2,
+2025-11-09T22:14:55.231543496Z [err]    details: 'Getting metadata from plugin failed with error: headers.has is not a function',
+2025-11-09T22:14:55.231547790Z [err]    metadata: Metadata {
+2025-11-09T22:14:55.231552002Z [err]      internalRepr: Map(0) {},
+2025-11-09T22:14:55.231556241Z [err]      opaqueData: Map(0) {},
+2025-11-09T22:14:55.231560328Z [err]      options: {}
+2025-11-09T22:14:55.231564073Z [err]    },
+2025-11-09T22:14:55.231567948Z [err]    note: 'Exception occurred in retry method that was not classified as transient'
+2025-11-09T22:14:55.231572076Z [err]  }
+2025-11-09T22:14:55.231576175Z [err]  ❌ Error details: {
+2025-11-09T22:14:55.231580265Z [err]    "code": 2,
+2025-11-09T22:14:55.231585529Z [err]    "details": "Getting metadata from plugin failed with error: headers.has is not a function",
+2025-11-09T22:14:55.231673809Z [err]    "metadata": {},
+2025-11-09T22:14:55.231678809Z [err]    "note": "Exception occurred in retry method that was not classified as transient"
+2025-11-09T22:14:55.231683847Z [err]  }
+2025-11-09T22:14:55.231688953Z [err]  ❌ OCR extraction error: Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:55.231694725Z [err]      at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)
+2025-11-09T22:14:55.231700394Z [err]      at async <anonymous> (/app/server/routes.ts:7364:29)
+2025-11-09T22:14:55.231705487Z [err]  ❌ Error stack: Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function
+2025-11-09T22:14:55.231710881Z [err]      at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)
+2025-11-09T22:14:55.231716323Z [err]      at async <anonymous> (/app/server/routes.ts:7364:29)
+2025-11-09T22:14:55.231722213Z [err]  ❌ Error type: Error
+2025-11-09T22:14:55.231727412Z [err]  ❌ Error object keys: []
+2025-11-09T22:14:55.231734416Z [err]  ❌ Error details: {
+2025-11-09T22:14:55.231739981Z [err]    "stack": "Error: Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function\n    at extractLoadDataFromDocument (/app/server/googleDocumentAI.ts:161:11)\n    at async <anonymous> (/app/server/routes.ts:7364:29)",
+2025-11-09T22:14:55.231746662Z [err]    "message": "Document AI processing failed: 2 UNKNOWN: Getting metadata from plugin failed with error: headers.has is not a function"
+2025-11-09T22:14:55.233019432Z [err]  }
+2025-11-09T22:14:55.233026137Z [inf]  10:14:54 PM [express] POST /api/ocr/extract 500 in 482ms :: {"message":"Failed to extract data from d…
+2025-11-09T22:15:24.912522289Z [inf]  📍 Tracking endpoint reached - fetching active loads with GPS data
+2025-11-09T22:15:24.912528041Z [inf]  📍 Found 0 loads with tracking enabled
+2025-11-09T22:15:24.912532064Z [inf]  10:15:24 PM [express] GET /api/tracking/loads 304 in 50ms :: []
