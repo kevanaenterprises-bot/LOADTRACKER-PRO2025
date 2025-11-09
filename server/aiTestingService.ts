@@ -1,5 +1,5 @@
 import { db } from './db';
-import { testRuns, testResults, users, loads, customers, locations, trucks } from '../shared/schema';
+import { testRuns, testResults, users, loads, customers, locations, trucks, invoices } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 
 interface TestResult {
@@ -41,6 +41,8 @@ export class AITestingService {
       await this.testDocumentManagement();
       await this.testInvoicing();
       await this.testDriverPortal();
+      await this.testUserManagement();
+      await this.testHEREMapsIntegration();
 
       // Calculate results
       const passed = this.results.filter(r => r.status === 'passed').length;
@@ -177,8 +179,39 @@ export class AITestingService {
         return { status: 'awaiting_invoicing' };
       });
 
-      // Cleanup: Delete test load
+      // Test 5: Invoice Creation and Finalization (BUG FIX TEST)
+      await this.runTest(category, 'Invoice Workflow to Payment', async () => {
+        if (!testLoadId) throw new Error('No test load available');
+
+        // Get DatabaseStorage instance
+        const { storage } = await import('./storage');
+        
+        // Create invoice for the load
+        const invoice = await storage.findOrCreateInvoiceForLoad(testLoadId);
+        
+        // Finalize the invoice (should auto-update load status)
+        await storage.finalizeInvoice(invoice.id);
+        
+        // Verify load status was updated to awaiting_payment
+        const updatedLoad = await storage.getLoad(testLoadId);
+        if (!updatedLoad) throw new Error('Load not found after invoice finalization');
+        
+        if (updatedLoad.status !== 'awaiting_payment') {
+          throw new Error(`Load status should be awaiting_payment after invoice finalization, got: ${updatedLoad.status}`);
+        }
+        
+        return { 
+          invoiceId: invoice.id,
+          loadStatus: updatedLoad.status,
+          workflowFixed: true 
+        };
+      });
+
+      // Cleanup: Delete test invoice and load
       if (testLoadId) {
+        // Delete invoice first
+        await db.delete(invoices).where(eq(invoices.loadId, testLoadId)).catch(() => {});
+        // Then delete load
         await db.delete(loads).where(eq(loads.id, testLoadId));
       }
 
@@ -392,6 +425,142 @@ export class AITestingService {
         .limit(5);
 
       return { driverId: driver.id, loadCount: driverLoads.length };
+    });
+  }
+
+  private async testUserManagement() {
+    console.log('🧪 Testing: User Management');
+    const category = 'user_management';
+    let testUserId: string | null = null;
+    let testLoadId: string | null = null;
+
+    try {
+      // Test delete user with dependencies (BUG FIX TEST) - DETERMINISTIC VERSION
+      await this.runTest(category, 'Delete User with Load Dependencies', async () => {
+        // Get storage instance
+        const { storage } = await import('./storage');
+        
+        // Create a test driver
+        const [testDriver] = await db.insert(users).values({
+          username: `test-driver-${Date.now()}`,
+          password: 'test-password',
+          role: 'driver',
+          firstName: 'Test',
+          lastName: 'Driver'
+        }).returning();
+        
+        testUserId = testDriver.id;
+        
+        // Create a test load assigned to this driver
+        const [customer] = await db.select().from(customers).limit(1);
+        const [location] = await db.select().from(locations).limit(1);
+        
+        if (!customer || !location) {
+          throw new Error('Missing test data: customer or location not found');
+        }
+        
+        const [testLoad] = await db.insert(loads).values({
+          number109: `TEST-USER-${Date.now()}`,
+          customerId: customer.id,
+          locationId: location.id,
+          driverId: testDriver.id,
+          status: 'driver_assigned',
+          estimatedMiles: "100",
+        }).returning();
+        
+        testLoadId = testLoad.id;
+        
+        // Attempt to delete user with loads - should throw error
+        let errorThrown = false;
+        let errorMessage = '';
+        
+        try {
+          await storage.deleteUser(testDriver.id);
+        } catch (error) {
+          errorThrown = true;
+          errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        }
+        
+        if (!errorThrown) {
+          throw new Error('Delete user should have thrown error for user with loads');
+        }
+        
+        if (!errorMessage.includes('loads assigned')) {
+          throw new Error(`Expected error about loads, got: ${errorMessage}`);
+        }
+        
+        return { 
+          errorPrevented: true,
+          errorMessage,
+          bugFixed: true 
+        };
+      });
+
+      // Cleanup: Delete test data
+      if (testLoadId) {
+        await db.delete(loads).where(eq(loads.id, testLoadId)).catch(() => {});
+      }
+      if (testUserId) {
+        await db.delete(users).where(eq(users.id, testUserId)).catch(() => {});
+      }
+
+    } catch (error) {
+      console.error('User management test error:', error);
+      // Cleanup on error
+      if (testLoadId) {
+        await db.delete(loads).where(eq(loads.id, testLoadId)).catch(() => {});
+      }
+      if (testUserId) {
+        await db.delete(users).where(eq(users.id, testUserId)).catch(() => {});
+      }
+    }
+  }
+
+  private async testHEREMapsIntegration() {
+    console.log('🧪 Testing: HERE Maps Integration');
+    const category = 'here_maps';
+
+    await this.runTest(category, 'HERE Maps API Configuration', async () => {
+      const hasApiKey = !!process.env.HERE_API_KEY;
+      
+      if (!hasApiKey) {
+        // API key missing - verify error handling works
+        const { getTruckRouteWithStateMileage } = await import('./hereRoutingService');
+        const result = await getTruckRouteWithStateMileage(32.7767, -96.7970, 30.2672, -97.7431);
+        
+        if (result !== null) {
+          throw new Error('HERE Maps should return null when API key is missing');
+        }
+        
+        return { apiKeyMissing: true, errorHandlingWorks: true };
+      }
+      
+      return { apiKeyConfigured: true };
+    });
+
+    await this.runTest(category, 'Route Calculation with Valid Coordinates', async () => {
+      if (!process.env.HERE_API_KEY) {
+        return { skipped: true, reason: 'API key not configured' };
+      }
+      
+      const { getTruckRouteWithStateMileage } = await import('./hereRoutingService');
+      const result = await getTruckRouteWithStateMileage(
+        32.7767, -96.7970,  // Dallas
+        30.2672, -97.7431   // Austin
+      );
+      
+      if (!result) {
+        throw new Error('HERE Maps route calculation failed');
+      }
+      
+      if (result.totalMiles <= 0) {
+        throw new Error('Invalid total miles calculated');
+      }
+      
+      return { 
+        totalMiles: result.totalMiles,
+        statesInRoute: Object.keys(result.milesByState) 
+      };
     });
   }
 

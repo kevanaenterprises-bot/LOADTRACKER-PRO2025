@@ -4531,6 +4531,11 @@ Reply YES to confirm acceptance or NO to decline.`
         return res.status(400).json({ message: "Invoice has no associated load" });
       }
       
+      // BUG FIX: Finalize invoice BEFORE sending email
+      // This ensures load status updates even if email fails
+      await storage.finalizeInvoice(invoice.id);
+      console.log(`✅ Invoice ${invoice.invoiceNumber} finalized (load status auto-updated if needed)`);
+      
       const load = await storage.getLoad(invoice.loadId);
       if (!load) {
         return res.status(404).json({ message: "Load not found for invoice" });
@@ -4558,11 +4563,8 @@ Reply YES to confirm acceptance or NO to decline.`
         html: emailHTML
       });
       
-      // WORKFLOW FIX: Move load to awaiting_payment when invoice is actually emailed
-      if (load.status === "awaiting_invoicing") {
-        await storage.updateLoadStatus(load.id, "awaiting_payment");
-        console.log(`📧 Invoice emailed - Load ${load.number109} moved from AWAITING_INVOICING to AWAITING_PAYMENT`);
-      }
+      // NOTE: Status update now happens in storage.finalizeInvoice() called before email
+      // This ensures the workflow progresses even if email fails
       
       res.json({ 
         message: "Invoice email sent successfully",
@@ -4621,6 +4623,11 @@ Reply YES to confirm acceptance or NO to decline.`
       if (!invoice) {
         return res.status(404).json({ message: "Invoice not found" });
       }
+
+      // BUG FIX: Finalize invoice BEFORE sending email
+      // This ensures load status updates even if email fails
+      await storage.finalizeInvoice(invoice.id);
+      console.log(`✅ Invoice ${invoice.invoiceNumber} finalized (load status auto-updated if needed)`);
 
       // Get load data (either from loadId parameter or from invoice)
       let load;
@@ -4887,16 +4894,8 @@ Reply YES to confirm acceptance or NO to decline.`
         attachments
       });
       
-      // ✅ WORKFLOW AUTOMATION: Auto-transition from "awaiting_invoicing" to "awaiting_payment" after successful email
-      if (load.status === "awaiting_invoicing") {
-        try {
-          await storage.updateLoadStatus(load.id, "awaiting_payment");
-          console.log(`🔄 WORKFLOW AUTO-TRANSITION: Load ${load.number109} moved from AWAITING_INVOICING → AWAITING_PAYMENT after successful email`);
-        } catch (statusError) {
-          console.error(`❌ Failed to auto-transition load status for ${load.number109}:`, statusError);
-          // Don't fail the email response if status update fails
-        }
-      }
+      // NOTE: Status update now happens in storage.finalizeInvoice() called before email
+      // This ensures the workflow progresses even if email fails
       
       res.json({
         message: "Complete document package emailed successfully",
