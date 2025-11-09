@@ -15,6 +15,8 @@ import {
   historicalMarkers,
   markerHistory,
   fuelReceipts,
+  demoSessions,
+  visitorTracking,
   type User,
   type UpsertUser,
   type Location,
@@ -300,8 +302,35 @@ export class DatabaseStorage implements IStorage {
       throw new Error('Cannot delete user: User has loads assigned. Please reassign or remove loads first.');
     }
     
-    // Safe to delete now - other dependencies (like rates) don't have foreign keys to users
-    await db.delete(users).where(eq(users.id, userId));
+    // BUG FIX: Cascade-delete demo_sessions and visitor_tracking before deleting user
+    // Demo sessions are temporary sandbox accounts that should be cleaned up automatically
+    await db.transaction(async (tx) => {
+      // Get all demo sessions for this user
+      const userDemoSessions = await tx
+        .select()
+        .from(demoSessions)
+        .where(eq(demoSessions.demoUserId, userId));
+      
+      console.log(`🗑️  Deleting user ${userId}: Found ${userDemoSessions.length} demo sessions to clean up`);
+      
+      // Delete visitor tracking records linked to these demo sessions
+      for (const session of userDemoSessions) {
+        await tx
+          .delete(visitorTracking)
+          .where(eq(visitorTracking.demoSessionId, session.id));
+        console.log(`   - Cleaned up visitor tracking for demo session ${session.id}`);
+      }
+      
+      // Delete all demo sessions for this user
+      if (userDemoSessions.length > 0) {
+        await tx.delete(demoSessions).where(eq(demoSessions.demoUserId, userId));
+        console.log(`   - Deleted ${userDemoSessions.length} demo sessions`);
+      }
+      
+      // Finally, delete the user
+      await tx.delete(users).where(eq(users.id, userId));
+      console.log(`✅ User ${userId} deleted successfully`);
+    });
   }
 
   async getLocations(): Promise<Location[]> {

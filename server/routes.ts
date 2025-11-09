@@ -7317,16 +7317,50 @@ Reply YES to confirm acceptance or NO to decline.`
       }
 
       console.log("📄 Processing document for OCR:", req.file.originalname, req.file.mimetype, req.file.size);
-      console.log("📄 Google Cloud Config Check:", {
-        hasProjectId: !!process.env.GOOGLE_CLOUD_PROJECT_ID,
-        hasProcessorId: !!process.env.GOOGLE_DOCUMENT_AI_PROCESSOR_ID,
-        hasCredentials: !!process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON,
-        credentialsLength: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON?.length || 0
+      
+      // ENHANCED: Detailed credential validation for Railway debugging
+      const projectId = process.env.GOOGLE_CLOUD_PROJECT_ID;
+      const processorId = process.env.GOOGLE_DOCUMENT_AI_PROCESSOR_ID;
+      const location = process.env.GOOGLE_DOCUMENT_AI_LOCATION || 'us';
+      const credentialsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+      
+      console.log("📄 Google Cloud Config Validation:", {
+        projectId: projectId ? `${projectId.substring(0, 10)}...` : 'MISSING',
+        processorId: processorId ? `${processorId.substring(0, 10)}...` : 'MISSING',
+        location: location,
+        hasCredentials: !!credentialsJson,
+        credentialsLength: credentialsJson?.length || 0
       });
+      
+      // Validate required environment variables
+      if (!projectId) {
+        console.error('❌ GOOGLE_CLOUD_PROJECT_ID is not set');
+        return res.status(500).json({ 
+          message: 'OCR service misconfigured: Missing project ID',
+          error: 'GOOGLE_CLOUD_PROJECT_ID environment variable not set'
+        });
+      }
+      
+      if (!processorId) {
+        console.error('❌ GOOGLE_DOCUMENT_AI_PROCESSOR_ID is not set');
+        return res.status(500).json({ 
+          message: 'OCR service misconfigured: Missing processor ID',
+          error: 'GOOGLE_DOCUMENT_AI_PROCESSOR_ID environment variable not set'
+        });
+      }
+      
+      if (!credentialsJson) {
+        console.error('❌ GOOGLE_APPLICATION_CREDENTIALS_JSON is not set');
+        return res.status(500).json({ 
+          message: 'OCR service misconfigured: Missing credentials',
+          error: 'GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable not set'
+        });
+      }
       
       // Import Google Document AI service
       const { extractLoadDataFromDocument } = await import('./googleDocumentAI');
       
+      console.log("📄 Calling Document AI extraction...");
       const extractedData = await extractLoadDataFromDocument(req.file.buffer, req.file.mimetype);
       
       console.log("✅ OCR extraction successful:", {
@@ -7338,21 +7372,34 @@ Reply YES to confirm acceptance or NO to decline.`
     } catch (error) {
       console.error('❌ OCR extraction error:', error);
       console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error('❌ Error type:', error?.constructor?.name);
+      
+      // ENHANCED: Log detailed error information for Railway debugging
+      if (error && typeof error === 'object') {
+        console.error('❌ Error object keys:', Object.keys(error));
+        console.error('❌ Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      }
       
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       const statusCode = errorMessage.includes('quality') || errorMessage.includes('resolution') ? 400 : 500;
       
+      // Return detailed error message for debugging
       res.status(statusCode).json({ 
         message: errorMessage.includes('quality') || errorMessage.includes('resolution') 
           ? errorMessage 
-          : 'Failed to extract data from document. Please ensure the image is clear and try again.',
+          : `Failed to extract data from document. ${errorMessage}`,
         error: errorMessage,
+        errorType: error?.constructor?.name || 'Unknown',
         suggestions: errorMessage.includes('quality') ? [
           'Take photo in better lighting',
           'Use a scanner instead of camera',
           'Ensure image is in focus',
           'Upload a higher resolution image'
-        ] : []
+        ] : [
+          'Check that all Google Document AI credentials are configured',
+          'Verify processor ID matches your Google Cloud project',
+          'Ensure the file format is supported (PDF, PNG, JPEG, GIF, WebP)'
+        ]
       });
     }
   });
