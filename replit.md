@@ -6,11 +6,16 @@ LoadTracker Pro is a comprehensive logistics management system designed to optim
 ## Recent Changes (November 2025)
 
 ### Critical Bug Fixes
-1. **Invoice Workflow Fix** - Loads now automatically move from "awaiting_invoicing" to "awaiting_payment" when invoices are finalized, regardless of email delivery success. This ensures the workflow always progresses even if email fails. The status update logic was moved into `storage.finalizeInvoice()` to be the single source of truth.
 
-2. **Delete Office Staff Fix** - Added dependency checking to prevent foreign key constraint errors when deleting users. The system now verifies users don't have assigned loads before deletion and provides a clear error message if they do.
+#### November 9, 2025 - Demo Sessions Cascade Delete
+1. **Delete Office Staff Fix (Enhanced)** - Fixed foreign key constraint error when deleting users with demo sessions. The system now cascade-deletes demo_sessions and visitor_tracking records in a transaction before removing the user. This resolves issues where duplicate accounts couldn't be deleted due to hidden dependencies in the demo/trial system. Transaction ensures data integrity while cleaning up temporary sandbox data automatically.
 
-3. **AI Testing Enhancements** - Expanded test coverage to catch the above bugs:
+2. **OCR Scanner Production Diagnostics** - Enhanced error logging for Google Document AI OCR failures on Railway. Added detailed environment variable validation (project ID, processor ID, credentials) with specific error messages for missing configuration. Removed credential preview from logs for security. This helps diagnose production OCR failures that don't appear in development.
+
+#### Previous Fixes
+3. **Invoice Workflow Fix** - Loads now automatically move from "awaiting_invoicing" to "awaiting_payment" when invoices are finalized, regardless of email delivery success. This ensures the workflow always progresses even if email fails. The status update logic was moved into `storage.finalizeInvoice()` to be the single source of truth.
+
+4. **AI Testing Enhancements** - Expanded test coverage to catch the above bugs:
    - Added deterministic invoice workflow test (create → finalize → verify status update to awaiting_payment)
    - Added user deletion dependency test (creates test driver + load, verifies deletion fails)
    - Added HERE Maps integration tests (validates API key handling and error responses)
