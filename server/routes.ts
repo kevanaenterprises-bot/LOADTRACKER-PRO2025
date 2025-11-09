@@ -2345,9 +2345,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       await storage.deleteUser(req.params.id);
       res.json({ message: "Office staff deleted successfully" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting office staff:", error);
-      res.status(500).json({ message: "Failed to delete office staff" });
+      // Return the specific error message (e.g., "User has loads assigned")
+      res.status(400).json({ message: error?.message || "Failed to delete office staff" });
     }
   });
 
