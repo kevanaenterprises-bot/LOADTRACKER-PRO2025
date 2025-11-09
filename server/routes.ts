@@ -40,7 +40,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
-import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users, pricingTiers, customerSubscriptions, testRuns, testResults, type InsertLoadStop } from "@shared/schema";
+import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users, pricingTiers, customerSubscriptions, testRuns, testResults, fuelPriceCache, type InsertLoadStop } from "@shared/schema";
 import { PDFDocument } from 'pdf-lib';
 
 // Bypass secret for testing and mobile auth
@@ -9467,6 +9467,95 @@ function generatePODSectionHTML(podImages: Array<{content: Buffer, type: string}
     } catch (error: any) {
       console.error("❌ Error clearing load data:", error);
       res.status(500).json({ message: error.message || "Failed to clear load data" });
+    }
+  });
+
+  // Fuel Prices API - Real-time diesel prices with region-aware caching
+  app.get("/api/fuel/prices", async (req, res) => {
+    try {
+      const { latitude, longitude, maxDistance = 50 } = req.query;
+      
+      if (!latitude || !longitude) {
+        return res.status(400).json({ message: "Latitude and longitude required" });
+      }
+
+      const lat = parseFloat(latitude as string);
+      const lng = parseFloat(longitude as string);
+      const apiKey = process.env.BARCHART_API_KEY;
+      const today = new Date().toISOString().split('T')[0];
+
+      // Round coordinates to 0.5 degree grid for regional caching (approx 30-35 miles)
+      const regionLat = Math.round(lat * 2) / 2; // Round to nearest 0.5
+      const regionLng = Math.round(lng * 2) / 2;
+      const cacheKey = `${regionLat},${regionLng}`;
+
+      console.log(`🔍 Checking cache for region ${cacheKey} (request: ${lat.toFixed(3)}, ${lng.toFixed(3)})`);
+
+      // Check cache first (24h TTL via cacheDate + region)
+      const cachedPrices = await db
+        .select()
+        .from(fuelPriceCache)
+        .where(sql`cache_date = ${today} AND station_id LIKE ${cacheKey + ':%'}`)
+        .execute();
+
+      if (cachedPrices.length > 0) {
+        console.log(`✅ Fuel prices served from cache (${cachedPrices.length} stations for region ${cacheKey})`);
+        return res.json({ stations: cachedPrices, source: "cache", region: cacheKey });
+      }
+
+      // Fetch from Barchart if API key available
+      if (!apiKey) {
+        console.log("⚠️ BARCHART_API_KEY not configured - returning empty fuel prices");
+        return res.json({ 
+          stations: [], 
+          source: "none",
+          message: "Barchart API key not configured. Sign up at barchart.com/ondemand" 
+        });
+      }
+
+      console.log(`🔄 Fetching diesel prices from Barchart (${latitude}, ${longitude}, ${maxDistance}mi)`);
+      
+      const url = `https://ondemand.websol.barchart.com/getFuelPrices.json?apikey=${apiKey}&latitude=${latitude}&longitude=${longitude}&maxDistance=${maxDistance}&productName=USLD&maxLocations=25`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Barchart API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const stations = [];
+
+      // Clear existing cache for this region+date to avoid duplicates
+      await db.delete(fuelPriceCache)
+        .where(sql`cache_date = ${today} AND station_id LIKE ${cacheKey + ':%'}`)
+        .execute();
+
+      // Process and cache results
+      if (data.results) {
+        for (const station of data.results) {
+          const stationData = {
+            stationId: `${cacheKey}:${station.locationId || station.latitude + ',' + station.longitude}`,
+            stationName: station.name || "Unknown Station",
+            address: station.address || "",
+            latitude: station.latitude?.toString() || lat.toString(),
+            longitude: station.longitude?.toString() || lng.toString(),
+            dieselPrice: station.price?.toString() || "0",
+            currency: "USD",
+            lastUpdated: new Date(),
+            cacheDate: today,
+          };
+
+          // Insert fresh data
+          await db.insert(fuelPriceCache).values(stationData).execute();
+          stations.push(stationData);
+        }
+      }
+
+      console.log(`✅ Fetched and cached ${stations.length} diesel stations for region ${cacheKey}`);
+      res.json({ stations, source: "api", region: cacheKey });
+    } catch (error: any) {
+      console.error("❌ Fuel prices error:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch fuel prices" });
     }
   });
 

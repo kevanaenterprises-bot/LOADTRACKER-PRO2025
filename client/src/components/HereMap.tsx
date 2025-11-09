@@ -91,10 +91,9 @@ export default function HereMap() {
     }
   };
 
-  // Fetch diesel fuel stations using HERE Places API
+  // Fetch real-time diesel fuel prices via Barchart OnDemand API (with 24h caching)
   const fetchFuelPrices = async () => {
-    const apiKey = import.meta.env.VITE_HERE_MAPS_API_KEY;
-    if (!apiKey || !loads || loads.length === 0) {
+    if (!loads || loads.length === 0) {
       return;
     }
     
@@ -112,22 +111,35 @@ export default function HereMap() {
       const avgLat = activeLocs.reduce((sum, l) => sum + parseFloat(l.currentLatitude!), 0) / activeLocs.length;
       const avgLng = activeLocs.reduce((sum, l) => sum + parseFloat(l.currentLongitude!), 0) / activeLocs.length;
       
+      console.log(`🔄 Fetching diesel prices for region: ${avgLat.toFixed(4)}, ${avgLng.toFixed(4)}`);
+      
       const response = await fetch(
-        `https://discover.search.hereapi.com/v1/discover?at=${avgLat},${avgLng}&q=diesel+fuel+station&limit=5&apiKey=${apiKey}`
+        `/api/fuel/prices?latitude=${avgLat}&longitude=${avgLng}&maxDistance=100`,
+        { credentials: 'include' }
       );
+      
+      if (!response.ok) {
+        console.warn('Fuel prices API unavailable');
+        return;
+      }
+      
       const data = await response.json();
       const stations: FuelPrices = {};
       
-      // Display station names and addresses instead of prices (HERE doesn't provide real-time fuel pricing)
-      data.items?.forEach((station: any) => {
-        const name = station.title || 'Unknown Station';
-        const address = station.address?.label || 'Address not available';
-        stations[name] = address;
-      });
+      if (data.stations && data.stations.length > 0) {
+        console.log(`✅ Got ${data.stations.length} diesel stations (source: ${data.source})`);
+        data.stations.forEach((station: any) => {
+          const price = parseFloat(station.dieselPrice || "0");
+          const priceText = price > 0 ? `$${price.toFixed(3)}/gal` : 'Price unavailable';
+          stations[station.stationName] = `${priceText} - ${station.address}`;
+        });
+      } else {
+        console.log(`ℹ️ ${data.message || 'No diesel prices available'}`);
+      }
       
       setFuelPrices(stations);
     } catch (error) {
-      console.error("Fuel station fetch error:", error);
+      console.error("Fuel prices error:", error);
     }
   };
 

@@ -66,6 +66,7 @@ export default function RateManagement() {
 
   const { data: rates = [], isLoading } = useQuery<Rate[]>({
     queryKey: ["/api/rates"],
+    queryFn: () => apiRequest("/api/rates", "GET"),
   });
 
   const createMutation = useMutation({

@@ -67,6 +67,7 @@ export function TruckServiceManagement() {
   // Fetch service records for selected truck
   const { data: serviceRecords = [] } = useQuery<ServiceRecord[]>({
     queryKey: ["/api/trucks", selectedTruck?.id, "service-records"],
+    queryFn: () => apiRequest(`/api/trucks/${selectedTruck!.id}/service-records`, "GET"),
     enabled: !!selectedTruck,
   });
 
