@@ -287,6 +287,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteUser(userId: string): Promise<void> {
+    // BUG FIX: Check for dependencies before deleting to prevent foreign key constraint errors
+    
+    // Check if user has any loads assigned as driver
+    const userLoads = await db
+      .select()
+      .from(loads)
+      .where(eq(loads.driverId, userId))
+      .limit(1);
+    
+    if (userLoads.length > 0) {
+      throw new Error('Cannot delete user: User has loads assigned. Please reassign or remove loads first.');
+    }
+    
+    // Safe to delete now - other dependencies (like rates) don't have foreign keys to users
     await db.delete(users).where(eq(users.id, userId));
   }
 
@@ -1346,6 +1360,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async finalizeInvoice(invoiceId: string): Promise<Invoice> {
+    // Get the invoice first to find the loadId
+    const [invoice] = await db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.id, invoiceId))
+      .limit(1);
+    
+    if (!invoice) {
+      throw new Error(`Invoice ${invoiceId} not found`);
+    }
+    
+    // Finalize the invoice
     const [finalizedInvoice] = await db
       .update(invoices)
       .set({
@@ -1354,6 +1380,17 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(invoices.id, invoiceId))
       .returning();
+    
+    // BUG FIX: Always update load status when invoice is finalized, regardless of email success
+    // This ensures loads move to awaiting_payment even if email fails
+    if (invoice.loadId) {
+      const load = await this.getLoad(invoice.loadId);
+      if (load && load.status === "awaiting_invoicing") {
+        await this.updateLoadStatus(invoice.loadId, "awaiting_payment");
+        console.log(`✅ WORKFLOW FIX: Load ${load.number109} auto-moved from awaiting_invoicing → awaiting_payment after invoice finalization`);
+      }
+    }
+    
     return finalizedInvoice;
   }
 
