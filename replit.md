@@ -7,16 +7,18 @@ LoadTracker Pro is a comprehensive logistics management system designed to optim
 
 ### Critical Bug Fixes
 
-#### November 9, 2025 - Bug Fixes and Real-Time Diesel Fuel Pricing
-1. **Real-Time Diesel Fuel Pricing Integration** - Implemented Barchart OnDemand API integration with intelligent region-aware caching to display live diesel fuel prices on the fleet map. The system uses a 0.5-degree geographic grid (approximately 30-35 miles) to cache prices for 24 hours, minimizing API costs while ensuring accurate regional pricing. Cache queries filter by both date AND region to prevent cross-region contamination. Displays station names, addresses, and current diesel prices in $/gallon format. Requires BARCHART_API_KEY environment variable (~$150/month base plan + usage).
+#### November 9, 2025 - WAZE Traffic Alerts Integration & Cost Reduction
+1. **WAZE Traffic Alerts Integration** - Replaced expensive fuel pricing and weather APIs with WAZE real-time traffic alerts via RapidAPI. Displays accidents, hazards, and police alerts on the fleet map with color-coded markers (🚗 red for accidents, ⚠️ orange for hazards, 🚔 blue for police). Toggle button shows/hides alerts with detailed popup info. Alert panel displays top 5 alerts with descriptions. Fetches alerts in 50km radius around active loads. Requires RAPIDAPI_WAZE_KEY environment variable (free tier available, then paid plans based on usage).
 
-2. **Truck Service History Query Fix** - Fixed the truck service history display by replacing broken 3-element array query with explicit queryFn and segmented cache keys `["/api/trucks", truckId, "service-records"]`. Cache invalidation now properly matches the segmented key structure for reliable updates.
+2. **Removed Expensive Features** - Eliminated Barchart OnDemand fuel pricing (~$150/month) and HERE Weather API calls to significantly reduce operational costs while maintaining essential fleet tracking functionality.
 
-3. **Rates Management Query Fix** - Added explicit queryFn to rates query in RateManagement component to ensure reliable API calls when fetching, editing, and deleting rate records.
+3. **Truck Service History Query Fix** - Fixed the truck service history display by replacing broken 3-element array query with explicit queryFn and segmented cache keys `["/api/trucks", truckId, "service-records"]`. Cache invalidation now properly matches the segmented key structure for reliable updates.
 
-4. **Delete Office Staff Fix (Enhanced)** - Fixed foreign key constraint error when deleting users with demo sessions. The system now cascade-deletes demo_sessions and visitor_tracking records in a transaction before removing the user. This resolves issues where duplicate accounts couldn't be deleted due to hidden dependencies in the demo/trial system. Transaction ensures data integrity while cleaning up temporary sandbox data automatically.
+4. **Rates Management Query Fix** - Added explicit queryFn to rates query in RateManagement component to ensure reliable API calls when fetching, editing, and deleting rate records.
 
-5. **OCR Scanner Production Diagnostics** - Enhanced error logging for Google Document AI OCR failures on Railway. Added detailed environment variable validation (project ID, processor ID, credentials) with specific error messages for missing configuration. Removed credential preview from logs for security. This helps diagnose production OCR failures that don't appear in development.
+5. **Delete Office Staff Fix (Enhanced)** - Fixed foreign key constraint error when deleting users with demo sessions. The system now cascade-deletes demo_sessions and visitor_tracking records in a transaction before removing the user. This resolves issues where duplicate accounts couldn't be deleted due to hidden dependencies in the demo/trial system. Transaction ensures data integrity while cleaning up temporary sandbox data automatically.
+
+6. **OCR Scanner Production Diagnostics** - Enhanced error logging for Google Document AI OCR failures on Railway. Added detailed environment variable validation (project ID, processor ID, credentials) with specific error messages for missing configuration. Removed credential preview from logs for security. This helps diagnose production OCR failures that don't appear in development.
 
 #### Previous Fixes
 3. **Invoice Workflow Fix** - Loads now automatically move from "awaiting_invoicing" to "awaiting_payment" when invoices are finalized, regardless of email delivery success. This ensures the workflow always progresses even if email fails. The status update logic was moved into `storage.finalizeInvoice()` to be the single source of truth.
@@ -45,8 +47,8 @@ The frontend uses React with TypeScript, `shadcn/ui` (built on Radix UI), and Ta
 - **GPS Tracking**: Automatic GPS tracking for real-time location updates and status changes.
 - **Load Management**: Comprehensive lifecycle tracking, including multiple stops, flexible load number formats, and automated status updates.
 - **Communication**: Telnyx for SMS notifications, Resend for email delivery.
-- **Interactive Mapping**: HERE Maps JavaScript SDK v3.1 for real-time fleet tracking, weather overlays, and real-time diesel fuel pricing.
-- **Fuel Pricing**: Barchart OnDemand API integration with region-aware caching (0.5-degree grid, 24h TTL) for live diesel prices.
+- **Interactive Mapping**: HERE Maps JavaScript SDK v3.1 for real-time fleet tracking with WAZE traffic alerts integration.
+- **Traffic Alerts**: RapidAPI WAZE integration for real-time accident, hazard, and police alerts displayed on fleet map.
 - **IFTA Reporting**: Advanced odometer-based mileage tracking with state-by-state breakdown using HERE Maps API v8.
 - **Road Tour System**: GPS-triggered audio tours with a hybrid voice system (Revoicer and ElevenLabs on-demand TTS) and Google Cloud Storage caching.
 - **AI Integration**: OpenAI integration via Replit AI Integrations for AI-powered features (billed to Replit credits, no API key management required).
@@ -57,7 +59,7 @@ The frontend uses React with TypeScript, `shadcn/ui` (built on Radix UI), and Ta
 - **Driver Portal**: Mobile-optimized interface for status updates, document uploads, and GPS tracking, including fuel receipt tracking and optional customer dropdown for load creation. Drivers can also track IFTA miles when returning to the terminal without a load, with route calculation and state-by-state IFTA mileage breakdown.
 - **Automated Invoicing**: Generation of invoices based on completed loads with detailed breakdowns.
 - **Document Management**: BOL validation, POD collection (supporting multiple documents per load), and secure storage with OCR for rate confirmation processing.
-- **Real-Time Fleet Map**: Interactive HERE Maps dashboard showing active loads, truck markers, routes, weather, and real-time diesel fuel prices with station locations.
+- **Real-Time Fleet Map**: Interactive HERE Maps dashboard showing active loads, truck markers, routes, and WAZE traffic alerts (accidents, hazards, police).
 - **Driver Records**: Enhanced management with direct deposit banking fields, employment dates, and license/medical expiration tracking.
 - **Truck Service Management**: Comprehensive tracking with odometer readings, service history, and maintenance alerts.
 - **IFTA Reporting Dashboard**: Dedicated page displaying summary metrics, state-by-state mileage breakdown, and individual load details.
@@ -80,9 +82,8 @@ The frontend uses React with TypeScript, `shadcn/ui` (built on Radix UI), and Ta
 - **Telnyx**: SMS API.
 - **Resend**: Transactional email API.
 - **Google Cloud Document AI**: OCR service.
-- **HERE Weather API**: Real-time weather observations.
 - **HERE Maps API v8**: Truck routing and mileage breakdown.
 - **HERE Maps JavaScript SDK v3.1**: Interactive mapping.
-- **Barchart OnDemand API**: Real-time diesel fuel pricing data with 24h regional caching.
+- **RapidAPI WAZE API**: Real-time traffic alerts (accidents, hazards, police) displayed on fleet map.
 - **ElevenLabs**: On-demand Text-to-Speech generation.
 - **OpenAI**: GPT-4o-mini for AI-powered driver recommendations (via Replit AI Integrations).

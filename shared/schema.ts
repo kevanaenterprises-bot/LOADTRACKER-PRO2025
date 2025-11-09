@@ -744,26 +744,6 @@ export const insertTestResultSchema = createInsertSchema(testResults).omit({
   createdAt: true,
 });
 
-// Fuel price cache table for Barchart OnDemand API results
-export const fuelPriceCache = pgTable("fuel_price_cache", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  stationId: varchar("station_id").notNull(),
-  stationName: varchar("station_name").notNull(),
-  address: text("address"),
-  latitude: decimal("latitude", { precision: 10, scale: 8 }),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }),
-  dieselPrice: decimal("diesel_price", { precision: 6, scale: 3 }), // e.g., 3.899
-  currency: varchar("currency").default("USD"),
-  lastUpdated: timestamp("last_updated").notNull(),
-  cacheDate: varchar("cache_date").notNull(), // YYYY-MM-DD for daily cache key
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const insertFuelPriceCacheSchema = createInsertSchema(fuelPriceCache).omit({
-  id: true,
-  createdAt: true,
-});
-
 // New types
 export type InsertPricingTier = z.infer<typeof insertPricingTierSchema>;
 export type PricingTier = typeof pricingTiers.$inferSelect;
@@ -781,8 +761,6 @@ export type InsertTestRun = z.infer<typeof insertTestRunSchema>;
 export type TestRun = typeof testRuns.$inferSelect;
 export type InsertTestResult = z.infer<typeof insertTestResultSchema>;
 export type TestResult = typeof testResults.$inferSelect;
-export type InsertFuelPriceCache = z.infer<typeof insertFuelPriceCacheSchema>;
-export type FuelPriceCache = typeof fuelPriceCache.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {

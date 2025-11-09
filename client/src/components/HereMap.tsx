@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation, RefreshCw, Truck, Building2, Cloud, DollarSign } from "lucide-react";
+import { MapPin, Navigation, RefreshCw, Truck, Building2, AlertTriangle } from "lucide-react";
 
 interface LoadWithDriverLocation {
   id: string;
@@ -30,14 +30,15 @@ interface LoadWithDriverLocation {
   shipperLongitude?: string;
 }
 
-interface WeatherData {
-  temp: number;
-  description: string;
-  icon: string;
-}
-
-interface FuelPrices {
-  [stationName: string]: string; // Station name -> address
+interface WazeAlert {
+  type: string; // ACCIDENT, HAZARD, POLICE, etc.
+  subtype?: string;
+  latitude: number;
+  longitude: number;
+  reportDescription?: string;
+  street?: string;
+  city?: string;
+  reliability?: number;
 }
 
 declare global {
@@ -50,11 +51,10 @@ export default function HereMap() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<Map<string, any>>(new Map());
+  const alertMarkersRef = useRef<Map<string, any>>(new Map());
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [showWeather, setShowWeather] = useState(false);
-  const [showFuelPrices, setShowFuelPrices] = useState(false);
-  const [weather, setWeather] = useState<Map<string, WeatherData>>(new Map());
-  const [fuelPrices, setFuelPrices] = useState<FuelPrices>({});
+  const [showWazeAlerts, setShowWazeAlerts] = useState(false);
+  const [wazeAlerts, setWazeAlerts] = useState<WazeAlert[]>([]);
   const platformRef = useRef<any>(null);
   const uiRef = useRef<any>(null);
 
@@ -65,40 +65,14 @@ export default function HereMap() {
     refetchIntervalInBackground: true,
   });
 
-  // Fetch weather data using HERE Weather API
-  const fetchWeather = async (lat: number, lon: number, loadId: string) => {
-    const apiKey = import.meta.env.VITE_HERE_MAPS_API_KEY;
-    if (!apiKey) {
-      console.warn("HERE Maps API key not configured");
+  // Fetch real-time traffic alerts via WAZE API (RapidAPI)
+  const fetchWazeAlerts = async () => {
+    if (!loads || loads.length === 0 || !showWazeAlerts) {
       return;
     }
     
     try {
-      const response = await fetch(
-        `https://weather.ls.hereapi.com/weather/1.0/report.json?product=observation&latitude=${lat}&longitude=${lon}&oneobservation=true&apiKey=${apiKey}`
-      );
-      const data = await response.json();
-      const obs = data.observations?.location?.[0]?.observation?.[0];
-      if (obs) {
-        setWeather(prev => new Map(prev).set(loadId, {
-          temp: Math.round((parseFloat(obs.temperature) * 9/5) + 32), // Convert C to F
-          description: obs.description || obs.skyDescription || 'Clear',
-          icon: obs.iconName || '01d'
-        }));
-      }
-    } catch (error) {
-      console.error("Weather fetch error:", error);
-    }
-  };
-
-  // Fetch real-time diesel fuel prices via Barchart OnDemand API (with 24h caching)
-  const fetchFuelPrices = async () => {
-    if (!loads || loads.length === 0) {
-      return;
-    }
-    
-    try {
-      // Get average position of all active loads for regional fuel search
+      // Get average position of all active loads for regional alert search
       const activeLocs = loads.filter(l => {
         if (!l.currentLatitude || !l.currentLongitude) return false;
         const lat = parseFloat(l.currentLatitude);
@@ -111,35 +85,30 @@ export default function HereMap() {
       const avgLat = activeLocs.reduce((sum, l) => sum + parseFloat(l.currentLatitude!), 0) / activeLocs.length;
       const avgLng = activeLocs.reduce((sum, l) => sum + parseFloat(l.currentLongitude!), 0) / activeLocs.length;
       
-      console.log(`🔄 Fetching diesel prices for region: ${avgLat.toFixed(4)}, ${avgLng.toFixed(4)}`);
+      console.log(`🚨 Fetching WAZE traffic alerts for region: ${avgLat.toFixed(4)}, ${avgLng.toFixed(4)}`);
       
       const response = await fetch(
-        `/api/fuel/prices?latitude=${avgLat}&longitude=${avgLng}&maxDistance=100`,
+        `/api/waze/alerts?latitude=${avgLat}&longitude=${avgLng}&radius=50`,
         { credentials: 'include' }
       );
       
       if (!response.ok) {
-        console.warn('Fuel prices API unavailable');
+        console.warn('WAZE API unavailable');
         return;
       }
       
       const data = await response.json();
-      const stations: FuelPrices = {};
       
-      if (data.stations && data.stations.length > 0) {
-        console.log(`✅ Got ${data.stations.length} diesel stations (source: ${data.source})`);
-        data.stations.forEach((station: any) => {
-          const price = parseFloat(station.dieselPrice || "0");
-          const priceText = price > 0 ? `$${price.toFixed(3)}/gal` : 'Price unavailable';
-          stations[station.stationName] = `${priceText} - ${station.address}`;
-        });
+      if (data.alerts && data.alerts.length > 0) {
+        console.log(`✅ Got ${data.alerts.length} WAZE traffic alerts`);
+        setWazeAlerts(data.alerts);
       } else {
-        console.log(`ℹ️ ${data.message || 'No diesel prices available'}`);
+        console.log(`ℹ️ ${data.message || 'No traffic alerts in this area'}`);
+        setWazeAlerts([]);
       }
-      
-      setFuelPrices(stations);
     } catch (error) {
-      console.error("Fuel prices error:", error);
+      console.error("WAZE alerts error:", error);
+      setWazeAlerts([]);
     }
   };
 
@@ -376,11 +345,6 @@ export default function HereMap() {
       // Add to valid coords
       validCoords.push({ lat, lng });
 
-      // Fetch weather if enabled
-      if (showWeather) {
-        fetchWeather(lat, lng, load.id);
-      }
-
       // Create truck marker with driver name label
       const driverInitials = load.driver 
         ? `${load.driver.firstName.charAt(0)}${load.driver.lastName.charAt(0)}`
@@ -423,7 +387,6 @@ export default function HereMap() {
       const truckMarker = new H.map.DomMarker({ lat, lng }, { icon: truckIcon });
       
       // Create popup content
-      const weatherInfo = weather.get(load.id);
       const popupContent = `
         <div style="padding: 12px; min-width: 220px; font-family: system-ui;">
           <h3 style="font-weight: bold; font-size: 18px; margin-bottom: 8px;">Load ${load.number109}</h3>
@@ -433,9 +396,6 @@ export default function HereMap() {
             <div><strong>Destination:</strong> ${load.location?.name}</div>
             <div><strong>City/State:</strong> ${load.location?.city}, ${load.location?.state}</div>
             ${load.driver?.phoneNumber ? `<div><strong>Phone:</strong> ${load.driver.phoneNumber}</div>` : ''}
-            ${weatherInfo ? `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
-              <strong>Weather:</strong> ${weatherInfo.temp}°F, ${weatherInfo.description}
-            </div>` : ''}
           </div>
         </div>
       `;
@@ -523,14 +483,78 @@ export default function HereMap() {
     } else {
       console.warn('⚠️ No valid GPS coordinates found - map not centered');
     }
-  }, [loads, showWeather]); // Removed 'weather' - it shouldn't trigger marker re-rendering
+  }, [loads]);
 
-  // Fetch fuel prices when enabled
+  // Fetch WAZE alerts when enabled and add markers to map
   useEffect(() => {
-    if (showFuelPrices) {
-      fetchFuelPrices();
+    if (showWazeAlerts && loads && loads.length > 0) {
+      fetchWazeAlerts();
     }
-  }, [showFuelPrices]);
+  }, [showWazeAlerts, loads]);
+
+  // Render WAZE alert markers on map
+  useEffect(() => {
+    if (!mapInstanceRef.current || !window.H || !uiRef.current) return;
+    
+    const map = mapInstanceRef.current;
+    const H = window.H;
+    const ui = uiRef.current;
+    
+    // Clear existing alert markers
+    alertMarkersRef.current.forEach(marker => map.removeObject(marker));
+    alertMarkersRef.current.clear();
+    
+    if (!showWazeAlerts || wazeAlerts.length === 0) return;
+    
+    // Add WAZE alert markers
+    wazeAlerts.forEach((alert, index) => {
+      const alertIcon = new H.map.DomIcon(`
+        <div style="
+          background-color: ${alert.type === 'ACCIDENT' ? '#ef4444' : alert.type === 'HAZARD' ? '#f59e0b' : '#3b82f6'};
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          border: 2px solid white;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+        ">
+          ${alert.type === 'ACCIDENT' ? '🚗' : alert.type === 'HAZARD' ? '⚠️' : '🚔'}
+        </div>
+      `);
+      
+      const alertMarker = new H.map.DomMarker(
+        { lat: alert.latitude, lng: alert.longitude },
+        { icon: alertIcon }
+      );
+      
+      const alertContent = `
+        <div style="padding: 10px; min-width: 180px;">
+          <h4 style="font-weight: bold; margin-bottom: 6px; color: ${alert.type === 'ACCIDENT' ? '#ef4444' : alert.type === 'HAZARD' ? '#f59e0b' : '#3b82f6'}">
+            ${alert.type}${alert.subtype ? ` - ${alert.subtype}` : ''}
+          </h4>
+          <div style="font-size: 13px;">
+            ${alert.reportDescription ? `<div><strong>Report:</strong> ${alert.reportDescription}</div>` : ''}
+            ${alert.street ? `<div><strong>Location:</strong> ${alert.street}</div>` : ''}
+            ${alert.city ? `<div><strong>City:</strong> ${alert.city}</div>` : ''}
+          </div>
+        </div>
+      `;
+      
+      alertMarker.addEventListener('tap', () => {
+        const bubble = new H.ui.InfoBubble(
+          { lat: alert.latitude, lng: alert.longitude },
+          { content: alertContent }
+        );
+        ui.addBubble(bubble);
+      });
+      
+      map.addObject(alertMarker);
+      alertMarkersRef.current.set(`alert-${index}`, alertMarker);
+    });
+  }, [showWazeAlerts, wazeAlerts]);
 
   const activeLoads = loads?.filter(load => 
     load.trackingEnabled && 
@@ -549,24 +573,14 @@ export default function HereMap() {
           </CardTitle>
           <div className="flex items-center gap-2">
             <Button
-              variant={showWeather ? "default" : "outline"}
+              variant={showWazeAlerts ? "default" : "outline"}
               size="sm"
-              onClick={() => setShowWeather(!showWeather)}
+              onClick={() => setShowWazeAlerts(!showWazeAlerts)}
               className="flex items-center gap-1"
-              data-testid="button-toggle-weather"
+              data-testid="button-toggle-waze"
             >
-              <Cloud className="w-4 h-4" />
-              Weather
-            </Button>
-            <Button
-              variant={showFuelPrices ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowFuelPrices(!showFuelPrices)}
-              className="flex items-center gap-1"
-              data-testid="button-toggle-fuel"
-            >
-              <DollarSign className="w-4 h-4" />
-              Fuel
+              <AlertTriangle className="w-4 h-4" />
+              Traffic Alerts
             </Button>
             <Button
               variant="outline"
@@ -646,19 +660,34 @@ export default function HereMap() {
                 </div>
               )}
 
-              {showFuelPrices && Object.keys(fuelPrices).length > 0 && (
-                <div className="mt-6 p-3 bg-blue-50 rounded-lg">
+              {showWazeAlerts && wazeAlerts.length > 0 && (
+                <div className="mt-6 p-3 bg-orange-50 rounded-lg">
                   <h4 className="font-medium mb-2 text-sm flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    Nearby Diesel Stations
+                    <AlertTriangle className="w-4 h-4 text-orange-600" />
+                    WAZE Traffic Alerts ({wazeAlerts.length})
                   </h4>
                   <div className="space-y-2 text-xs">
-                    {Object.entries(fuelPrices).slice(0, 5).map(([station, address]) => (
-                      <div key={station} className="border-b pb-1 last:border-0">
-                        <div className="font-medium">{station}</div>
-                        <div className="text-gray-600">{address}</div>
+                    {wazeAlerts.slice(0, 5).map((alert, idx) => (
+                      <div key={idx} className="border-b pb-2 last:border-0">
+                        <div className="font-medium flex items-center gap-1">
+                          <span style={{
+                            color: alert.type === 'ACCIDENT' ? '#ef4444' : alert.type === 'HAZARD' ? '#f59e0b' : '#3b82f6'
+                          }}>
+                            {alert.type === 'ACCIDENT' ? '🚗' : alert.type === 'HAZARD' ? '⚠️' : '🚔'}
+                          </span>
+                          {alert.type}{alert.subtype ? ` - ${alert.subtype}` : ''}
+                        </div>
+                        {alert.street && <div className="text-gray-600 ml-5">{alert.street}</div>}
+                        {alert.reportDescription && (
+                          <div className="text-gray-500 ml-5 italic">{alert.reportDescription}</div>
+                        )}
                       </div>
                     ))}
+                    {wazeAlerts.length > 5 && (
+                      <div className="text-center text-gray-500 pt-1">
+                        +{wazeAlerts.length - 5} more alerts on map
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
