@@ -40,7 +40,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
-import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users, pricingTiers, customerSubscriptions, type InsertLoadStop } from "@shared/schema";
+import { loads, locations, loadStops, rates, invoiceCounter, demoSessions, visitorTracking, customers, users, pricingTiers, customerSubscriptions, testRuns, testResults, type InsertLoadStop } from "@shared/schema";
 import { PDFDocument } from 'pdf-lib';
 
 // Bypass secret for testing and mobile auth
@@ -1995,6 +1995,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Admin logout error:", error);
       res.status(500).json({ message: "Logout failed" });
+    }
+  });
+
+  // AI Testing System endpoints
+  app.post("/api/ai-testing/run", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const userId = (req.session as any)?.adminAuth?.id || req.user?.id;
+      const { aiTestingService } = await import('./aiTestingService');
+      const testRunId = await aiTestingService.runComprehensiveTests(userId);
+      res.json({ testRunId, message: "Test run started successfully" });
+    } catch (error) {
+      console.error("Error running AI tests:", error);
+      res.status(500).json({ message: "Failed to run AI tests" });
+    }
+  });
+
+  app.get("/api/ai-testing/latest", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { aiTestingService } = await import('./aiTestingService');
+      const latestRun = await aiTestingService.getLatestTestRun();
+      res.json(latestRun);
+    } catch (error) {
+      console.error("Error fetching latest test run:", error);
+      res.status(500).json({ message: "Failed to fetch latest test run" });
+    }
+  });
+
+  app.get("/api/ai-testing/history", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const runs = await db.select()
+        .from(testRuns)
+        .orderBy(desc(testRuns.startedAt))
+        .limit(20);
+      res.json(runs);
+    } catch (error) {
+      console.error("Error fetching test history:", error);
+      res.status(500).json({ message: "Failed to fetch test history" });
+    }
+  });
+
+  app.get("/api/ai-testing/results/:runId", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const { runId } = req.params;
+      const results = await db.select()
+        .from(testResults)
+        .where(eq(testResults.testRunId, runId));
+      res.json(results);
+    } catch (error) {
+      console.error("Error fetching test results:", error);
+      res.status(500).json({ message: "Failed to fetch test results" });
     }
   });
 

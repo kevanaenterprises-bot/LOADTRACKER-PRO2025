@@ -251,6 +251,17 @@ async function startServer() {
       console.log('🔧 Server will continue starting - database will be retried on first request');
     }
     
+    // Start AI test scheduler (runs every 12 hours)
+    if (isProduction) {
+      try {
+        const { testScheduler } = await import('./testScheduler');
+        testScheduler.start();
+        console.log('✅ AI test scheduler started (runs every 12 hours)');
+      } catch (schedulerError) {
+        console.error('⚠️ Failed to start test scheduler:', schedulerError);
+      }
+    }
+    
     // Register routes with enhanced error handling
     console.log('📝 Registering application routes...');
     const server = await registerRoutes(app);
