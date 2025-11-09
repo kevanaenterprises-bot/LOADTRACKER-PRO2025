@@ -626,6 +626,42 @@ export const visitorTracking = pgTable("visitor_tracking", {
   index("IDX_visitor_visited").on(table.visitedAt.desc()),
 ]);
 
+// AI Testing System - tracks automated test runs and results
+export const testRuns = pgTable("test_runs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  triggerType: varchar("trigger_type").notNull(), // "scheduled" or "manual"
+  triggeredBy: varchar("triggered_by"), // User ID if manual trigger
+  status: varchar("status").notNull().default("running"), // "running", "completed", "failed"
+  totalTests: integer("total_tests").default(0),
+  passedTests: integer("passed_tests").default(0),
+  failedTests: integer("failed_tests").default(0),
+  duration: integer("duration"), // Duration in milliseconds
+  aiAnalysis: text("ai_analysis"), // AI-generated summary of issues found
+  aiRecommendations: jsonb("ai_recommendations").$type<string[]>(), // AI-suggested fixes
+  alertsSent: boolean("alerts_sent").default(false), // Whether failure alerts were sent
+  startedAt: timestamp("started_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+}, (table) => [
+  index("IDX_test_runs_started").on(table.startedAt.desc()),
+  index("IDX_test_runs_status").on(table.status),
+]);
+
+export const testResults = pgTable("test_results", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  testRunId: varchar("test_run_id").references(() => testRuns.id).notNull(),
+  testCategory: varchar("test_category").notNull(), // "load_workflow", "maps", "ifta", "gps", etc.
+  testName: varchar("test_name").notNull(), // Specific test name
+  status: varchar("status").notNull(), // "passed", "failed", "skipped"
+  duration: integer("duration"), // Duration in milliseconds
+  errorMessage: text("error_message"), // Error details if failed
+  stackTrace: text("stack_trace"), // Full stack trace if failed
+  metadata: jsonb("metadata").$type<Record<string, any>>(), // Additional test data
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_test_results_run").on(table.testRunId),
+  index("IDX_test_results_status").on(table.status),
+]);
+
 // LoadRight integration - tracks tendered loads from LoadRight carrier portal
 export const loadRightTenders = pgTable("loadright_tenders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -698,6 +734,16 @@ export const insertLoadRightTenderSchema = createInsertSchema(loadRightTenders).
   syncedAt: true,
 });
 
+export const insertTestRunSchema = createInsertSchema(testRuns).omit({
+  id: true,
+  startedAt: true,
+});
+
+export const insertTestResultSchema = createInsertSchema(testResults).omit({
+  id: true,
+  createdAt: true,
+});
+
 // New types
 export type InsertPricingTier = z.infer<typeof insertPricingTierSchema>;
 export type PricingTier = typeof pricingTiers.$inferSelect;
@@ -711,6 +757,10 @@ export type InsertVisitorTracking = z.infer<typeof insertVisitorTrackingSchema>;
 export type VisitorTracking = typeof visitorTracking.$inferSelect;
 export type InsertLoadRightTender = z.infer<typeof insertLoadRightTenderSchema>;
 export type LoadRightTender = typeof loadRightTenders.$inferSelect;
+export type InsertTestRun = z.infer<typeof insertTestRunSchema>;
+export type TestRun = typeof testRuns.$inferSelect;
+export type InsertTestResult = z.infer<typeof insertTestResultSchema>;
+export type TestResult = typeof testResults.$inferSelect;
 
 // Extended types with relations
 export type LoadWithDetails = Load & {
