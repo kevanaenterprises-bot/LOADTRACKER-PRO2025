@@ -1,4 +1,3 @@
-import OpenAI from 'openai';
 import { db } from './db';
 import { users, loads, trucks } from '../shared/schema';
 import { eq, and, sql } from 'drizzle-orm';
@@ -25,19 +24,17 @@ interface DriverRecommendation {
 }
 
 export class AILoadAdvisor {
-  private getOpenAIClient(): OpenAI {
+  private getOpenAIConfig(): { apiKey: string; baseURL: string } {
     // Try Replit AI Integration first (development)
     const replitApiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY;
     const replitBaseURL = process.env.AI_INTEGRATIONS_OPENAI_BASE_URL;
     
     if (replitApiKey && replitBaseURL) {
       console.log('🤖 Using Replit AI Integration for OpenAI');
-      return new OpenAI({
+      return {
         apiKey: replitApiKey,
         baseURL: replitBaseURL,
-        defaultHeaders: {},
-        dangerouslyAllowBrowser: false,
-      });
+      };
     }
     
     // Fall back to custom OpenAI API key (production)
@@ -45,14 +42,38 @@ export class AILoadAdvisor {
     
     if (customApiKey) {
       console.log('🤖 Using custom OpenAI API key');
-      return new OpenAI({
+      return {
         apiKey: customApiKey,
-        defaultHeaders: {},
-        dangerouslyAllowBrowser: false,
-      });
+        baseURL: 'https://api.openai.com/v1',
+      };
     }
     
     throw new Error('AI Load Advisor is not configured. Please add OPENAI_API_KEY to your secrets.');
+  }
+
+  private async callOpenAI(messages: any[]): Promise<any> {
+    const config = this.getOpenAIConfig();
+    
+    const response = await fetch(`${config.baseURL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages,
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenAI API error: ${response.status} ${errorText}`);
+    }
+
+    return response.json();
   }
 
   async getDriverRecommendation(loadDetails: LoadDetails): Promise<DriverRecommendation> {
@@ -62,7 +83,6 @@ export class AILoadAdvisor {
         throw new Error('AI Load Advisor is not available in this environment');
       }
       
-      const openai = this.getOpenAIClient();
       // Fetch all active drivers with their trucks and recent load history
       const drivers = await db
         .select({
@@ -161,21 +181,16 @@ Respond in this exact JSON format:
   "keyFactors": ["factor 1", "factor 2", "factor 3"]
 }`;
 
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert logistics advisor specializing in driver assignment optimization for trucking companies. You analyze driver performance, availability, and cost-efficiency to make optimal recommendations.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.3,
-        response_format: { type: 'json_object' }
-      });
+      const completion = await this.callOpenAI([
+        {
+          role: 'system',
+          content: 'You are an expert logistics advisor specializing in driver assignment optimization for trucking companies. You analyze driver performance, availability, and cost-efficiency to make optimal recommendations.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ]);
 
       const aiResponse = completion.choices[0]?.message?.content;
       if (!aiResponse) {
