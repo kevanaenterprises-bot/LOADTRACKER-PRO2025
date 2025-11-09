@@ -571,6 +571,14 @@ export default function Dashboard() {
                       <i className="fas fa-shipping-fast text-orange-600"></i>
                       LoadRight
                     </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setLocation("/admin-test-dashboard")}
+                      className="flex items-center gap-2 bg-purple-50 border-purple-200 text-purple-800 hover:bg-purple-100"
+                      data-testid="button-ai-testing"
+                    >
+                      🤖 AI Testing
+                    </Button>
                   </div>
                 </div>
                 <LoadsTable />
