@@ -57,10 +57,12 @@ export class AITestingService {
         aiRecommendations = analysis.recommendations;
       }
 
-      // Update test run
+      // Update test run with proper status
+      const finalStatus = failed > 0 ? 'failed' : 'passed';
+      
       await db.update(testRuns)
         .set({
-          status: 'completed',
+          status: finalStatus,
           totalTests: this.results.length,
           passedTests: passed,
           failedTests: failed,

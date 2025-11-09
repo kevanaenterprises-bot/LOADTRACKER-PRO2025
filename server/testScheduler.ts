@@ -11,7 +11,7 @@ class TestScheduler {
   // Run tests every 12 hours (in milliseconds)
   private readonly INTERVAL = 12 * 60 * 60 * 1000;
 
-  start() {
+  async start() {
     if (this.intervalId) {
       console.log('⚠️ Test scheduler already running');
       return;
@@ -19,13 +19,37 @@ class TestScheduler {
 
     console.log('🕐 Starting AI test scheduler (runs every 12 hours)');
     
-    // Run immediately on startup
-    this.runScheduledTest();
+    // Check when last test ran
+    const lastTest = await this.getLastTestRun();
+    const timeSinceLastTest = lastTest && lastTest.startedAt
+      ? Date.now() - new Date(lastTest.startedAt).getTime()
+      : Infinity;
 
-    // Then run every 12 hours
+    // Only run immediately if no test in last 12 hours
+    if (timeSinceLastTest >= this.INTERVAL) {
+      console.log('⏰ No recent test found, running initial test...');
+      this.runScheduledTest();
+    } else {
+      const nextRunIn = Math.ceil((this.INTERVAL - timeSinceLastTest) / 1000 / 60);
+      console.log(`⏰ Last test ran ${Math.floor(timeSinceLastTest / 1000 / 60)} minutes ago. Next test in ${nextRunIn} minutes.`);
+    }
+
+    // Schedule recurring tests every 12 hours
     this.intervalId = setInterval(() => {
       this.runScheduledTest();
     }, this.INTERVAL);
+  }
+
+  private async getLastTestRun() {
+    try {
+      const [lastRun] = await db.select()
+        .from(testRuns)
+        .orderBy(desc(testRuns.startedAt))
+        .limit(1);
+      return lastRun || null;
+    } catch (error) {
+      return null;
+    }
   }
 
   stop() {
