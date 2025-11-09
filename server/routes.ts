@@ -2008,7 +2008,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }, async (req, res) => {
     try {
-      const userId = (req.session as any)?.adminAuth?.id || req.user?.id;
+      const userId = (req.session as any)?.adminAuth?.id || (req.user as any)?.id;
       const { aiTestingService } = await import('./aiTestingService');
       const testRunId = await aiTestingService.runComprehensiveTests(userId);
       res.json({ testRunId, message: "Test run started successfully" });

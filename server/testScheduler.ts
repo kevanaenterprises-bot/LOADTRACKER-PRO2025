@@ -54,7 +54,7 @@ class TestScheduler {
         .where(desc(testRuns.startedAt))
         .limit(1);
 
-      if (testRun && testRun.failedTests > 0 && !testRun.alertsSent) {
+      if (testRun && (testRun.failedTests ?? 0) > 0 && !testRun.alertsSent) {
         await this.sendFailureAlert(testRun);
       }
 
