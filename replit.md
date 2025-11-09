@@ -3,6 +3,19 @@
 ## Overview
 LoadTracker Pro is a comprehensive logistics management system designed to optimize operations for transportation companies. It streamlines load dispatch, driver coordination, and automates invoicing. Key capabilities include real-time status tracking, robust document management, and distinct user interfaces for office staff and drivers. The system also features advanced GPS-triggered audio tours for drivers, leveraging a database of over 222,969 historical markers. The project aims to significantly enhance operational efficiency, offering competitive pricing compared to existing market solutions.
 
+## Recent Changes (November 2025)
+
+### Critical Bug Fixes
+1. **Invoice Workflow Fix** - Loads now automatically move from "awaiting_invoicing" to "awaiting_payment" when invoices are finalized, regardless of email delivery success. This ensures the workflow always progresses even if email fails. The status update logic was moved into `storage.finalizeInvoice()` to be the single source of truth.
+
+2. **Delete Office Staff Fix** - Added dependency checking to prevent foreign key constraint errors when deleting users. The system now verifies users don't have assigned loads before deletion and provides a clear error message if they do.
+
+3. **AI Testing Enhancements** - Expanded test coverage to catch the above bugs:
+   - Added deterministic invoice workflow test (create → finalize → verify status update to awaiting_payment)
+   - Added user deletion dependency test (creates test driver + load, verifies deletion fails)
+   - Added HERE Maps integration tests (validates API key handling and error responses)
+   - All tests now create their own test data to ensure reliable, repeatable results
+
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
