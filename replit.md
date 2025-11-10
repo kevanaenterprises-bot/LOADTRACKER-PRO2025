@@ -22,6 +22,8 @@ LoadTracker Pro is a comprehensive logistics management system designed to optim
 
 7. **Delete Operations Cache Bug Fix** - Fixed critical bug where deleting rates and locations would succeed in the database but show error messages in the UI. The `apiRequest` function was attempting to parse JSON from `204 No Content` responses (which have no body), causing exceptions. This prevented cache invalidation, leaving stale deleted items visible until manual page refresh. Now properly handles 204 responses by returning null instead of attempting JSON parsing. This fixes delete operations for all endpoints returning 204 status codes.
 
+8. **AI Testing Dashboard Display Fix** - Fixed "Latest Test Run" card showing outdated test results from 11/9/2025 instead of the most recent test runs. The `getLatestTestRun()` method was ordering by `startedAt` in ascending order (oldest first) instead of descending order (newest first). Changed to `orderBy(desc(testRuns.startedAt))` to match the pattern used in the test history endpoint. Dashboard now correctly displays the most recent test run with accurate timestamps and results.
+
 #### Previous Fixes
 3. **Invoice Workflow Fix** - Loads now automatically move from "awaiting_invoicing" to "awaiting_payment" when invoices are finalized, regardless of email delivery success. This ensures the workflow always progresses even if email fails. The status update logic was moved into `storage.finalizeInvoice()` to be the single source of truth.
 
