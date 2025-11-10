@@ -20,6 +20,8 @@ LoadTracker Pro is a comprehensive logistics management system designed to optim
 
 6. **OCR Scanner Production Diagnostics** - Enhanced error logging for Google Document AI OCR failures on Railway. Added detailed environment variable validation (project ID, processor ID, credentials) with specific error messages for missing configuration. Removed credential preview from logs for security. This helps diagnose production OCR failures that don't appear in development.
 
+7. **Delete Operations Cache Bug Fix** - Fixed critical bug where deleting rates and locations would succeed in the database but show error messages in the UI. The `apiRequest` function was attempting to parse JSON from `204 No Content` responses (which have no body), causing exceptions. This prevented cache invalidation, leaving stale deleted items visible until manual page refresh. Now properly handles 204 responses by returning null instead of attempting JSON parsing. This fixes delete operations for all endpoints returning 204 status codes.
+
 #### Previous Fixes
 3. **Invoice Workflow Fix** - Loads now automatically move from "awaiting_invoicing" to "awaiting_payment" when invoices are finalized, regardless of email delivery success. This ensures the workflow always progresses even if email fails. The status update logic was moved into `storage.finalizeInvoice()` to be the single source of truth.
 

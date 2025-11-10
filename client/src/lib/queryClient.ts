@@ -33,6 +33,12 @@ export async function apiRequest(
     throw new Error(`${res.status}: ${errorText}`);
   }
   
+  // Handle 204 No Content responses (e.g., DELETE requests)
+  if (res.status === 204) {
+    console.log(`✅ API Success: ${method} ${url} (No Content)`);
+    return null;
+  }
+  
   const result = await res.json();
   console.log(`✅ API Success: ${method} ${url}`);
   return result;
