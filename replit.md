@@ -7,6 +7,17 @@ LoadTracker Pro is a comprehensive logistics management system designed to optim
 
 ### Critical Bug Fixes
 
+#### November 10, 2025 - AI Testing Schedule & Invoice Email Enhancements
+1. **AI Testing Schedule Update** - Changed automated testing from every 12 hours to daily at midnight (Eastern Time) using node-cron scheduler. This prevents excessive test runs while ensuring daily quality checks. Test schedule configured with cron expression '0 0 * * *' for single midnight execution.
+
+2. **Invoice Email Multi-Recipient Enhancement** - Implemented dual-recipient email workflow for invoices:
+   - When customer email selected from dropdown → TO customer email + CC kevin@go4fc.com + gofarmsbills@gmail.com
+   - When manual email entered after selecting customer → TO manual email + CC customer email + kevin@go4fc.com + gofarmsbills@gmail.com
+   - Frontend tracks customer email separately via `selectedCustomerEmail` state
+   - Backend accepts `toEmail` and `ccEmails[]` parameters (backward compatible with old `emailAddress` parameter)
+
+3. **Email CC List Update** - Changed default invoice CC recipients from accounting@go4fc.com to kevin@go4fc.com (plus gofarmsbills@gmail.com). This ensures the right people receive invoice copies.
+
 #### November 9, 2025 - WAZE Traffic Alerts Integration & Cost Reduction
 1. **WAZE Traffic Alerts Integration** - Replaced expensive fuel pricing and weather APIs with WAZE real-time traffic alerts via RapidAPI. Displays accidents, hazards, and police alerts on the fleet map with color-coded markers (🚗 red for accidents, ⚠️ orange for hazards, 🚔 blue for police). Toggle button shows/hides alerts with detailed popup info. Alert panel displays top 5 alerts with descriptions. Fetches alerts in 50km radius around active loads. Requires RAPIDAPI_WAZE_KEY environment variable (free tier available, then paid plans based on usage).
 
@@ -56,7 +67,7 @@ The frontend uses React with TypeScript, `shadcn/ui` (built on Radix UI), and Ta
 - **IFTA Reporting**: Advanced odometer-based mileage tracking with state-by-state breakdown using HERE Maps API v8.
 - **Road Tour System**: GPS-triggered audio tours with a hybrid voice system (Revoicer and ElevenLabs on-demand TTS) and Google Cloud Storage caching.
 - **AI Integration**: OpenAI integration via Replit AI Integrations for AI-powered features (billed to Replit credits, no API key management required).
-- **AI Testing Assistant**: Automated quality assurance system running comprehensive tests every 12 hours. Tests critical workflows (load creation → payment), GPS tracking, IFTA calculations, maps, document management, and driver portal functionality. Features AI-powered failure analysis using GPT-4o-mini, email alerts for test failures, manual test triggering via admin dashboard, and detailed test history tracking.
+- **AI Testing Assistant**: Automated quality assurance system running comprehensive tests daily at midnight (Eastern Time). Tests critical workflows (load creation → payment), GPS tracking, IFTA calculations, maps, document management, and driver portal functionality. Features AI-powered failure analysis using GPT-4o-mini, email alerts for test failures, manual test triggering via admin dashboard, and detailed test history tracking.
 
 ### Feature Specifications
 - **Load Management**: Create, track, and update loads with real-time status, driver assignment, and auto-calculated mileage.
@@ -75,7 +86,7 @@ The frontend uses React with TypeScript, `shadcn/ui` (built on Radix UI), and Ta
 - **Branding Hierarchy**: Clear separation between software vendor (Turtle Logistics) and customer (Go 4 Farms & Cattle) branding across demo pages, internal systems, invoices, and emails.
 - **LoadRight Integration**: Automated load tendering workflow with Puppeteer-based portal scraping. Features include manual sync button to fetch tendered loads, one-click acceptance creating loads in the system (no driver assignment required at acceptance), and complete tender tracking with status management.
 - **AI Load Advisor**: Intelligent driver recommendation system that analyzes load details (pickup/delivery locations, estimated miles) and driver data (location, recent performance, pay structure) to suggest the optimal driver for each load. Uses OpenAI GPT-4o-mini for analysis. Features confidence scoring (high/medium/low), estimated profit calculations, detailed reasoning, and key decision factors. Accessible via purple "Get AI Driver Suggestion" button in LoadForm after adding stops.
-- **AI Testing Assistant**: Proactive quality assurance system that automatically tests the entire application every 12 hours. Comprehensive test coverage includes complete load workflow (create → assign → deliver → invoice → payment), GPS tracking validation, IFTA mileage calculations, maps integration, document management (GCS + OCR), invoicing accuracy, and driver portal functionality. When tests fail, GPT-4o-mini analyzes the failures and provides actionable recommendations. Email alerts notify admins of issues before customers discover them. Admin dashboard provides real-time test status, pass/fail metrics, AI-generated insights, manual test triggering, and complete test history. Accessible at /admin-test-dashboard.
+- **AI Testing Assistant**: Proactive quality assurance system that automatically tests the entire application daily at midnight (Eastern Time). Comprehensive test coverage includes complete load workflow (create → assign → deliver → invoice → payment), GPS tracking validation, IFTA mileage calculations, maps integration, document management (GCS + OCR), invoicing accuracy, and driver portal functionality. When tests fail, GPT-4o-mini analyzes the failures and provides actionable recommendations. Email alerts notify admins of issues before customers discover them. Admin dashboard provides real-time test status, pass/fail metrics, AI-generated insights, manual test triggering, and complete test history. Accessible at /admin-test-dashboard.
 
 ## External Dependencies
 
