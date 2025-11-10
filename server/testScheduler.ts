@@ -3,41 +3,29 @@ import { sendEmail } from './emailService';
 import { db } from './db';
 import { testRuns } from '../shared/schema';
 import { desc } from 'drizzle-orm';
+import * as cron from 'node-cron';
 
 class TestScheduler {
-  private intervalId: NodeJS.Timeout | null = null;
+  private cronTask: ReturnType<typeof cron.schedule> | null = null;
   private isRunning = false;
 
-  // Run tests every 12 hours (in milliseconds)
-  private readonly INTERVAL = 12 * 60 * 60 * 1000;
-
   async start() {
-    if (this.intervalId) {
+    if (this.cronTask) {
       console.log('⚠️ Test scheduler already running');
       return;
     }
 
-    console.log('🕐 Starting AI test scheduler (runs every 12 hours)');
+    console.log('🕐 Starting AI test scheduler (runs daily at midnight)');
     
-    // Check when last test ran
-    const lastTest = await this.getLastTestRun();
-    const timeSinceLastTest = lastTest && lastTest.startedAt
-      ? Date.now() - new Date(lastTest.startedAt).getTime()
-      : Infinity;
-
-    // Only run immediately if no test in last 12 hours
-    if (timeSinceLastTest >= this.INTERVAL) {
-      console.log('⏰ No recent test found, running initial test...');
+    // Schedule tests to run at midnight every day (12:00 AM)
+    // Cron format: '0 0 * * *' = minute hour day month dayOfWeek
+    this.cronTask = cron.schedule('0 0 * * *', () => {
       this.runScheduledTest();
-    } else {
-      const nextRunIn = Math.ceil((this.INTERVAL - timeSinceLastTest) / 1000 / 60);
-      console.log(`⏰ Last test ran ${Math.floor(timeSinceLastTest / 1000 / 60)} minutes ago. Next test in ${nextRunIn} minutes.`);
-    }
+    }, {
+      timezone: "America/New_York" // Adjust to your timezone
+    });
 
-    // Schedule recurring tests every 12 hours
-    this.intervalId = setInterval(() => {
-      this.runScheduledTest();
-    }, this.INTERVAL);
+    console.log('✅ Test scheduler configured to run daily at midnight');
   }
 
   private async getLastTestRun() {
@@ -53,9 +41,9 @@ class TestScheduler {
   }
 
   stop() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
+    if (this.cronTask) {
+      this.cronTask.stop();
+      this.cronTask = null;
       console.log('🛑 Test scheduler stopped');
     }
   }

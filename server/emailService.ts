@@ -48,7 +48,7 @@ export async function sendEmail({ to, subject, html, cc = [], bcc = [], attachme
       console.log(`📧 Resend Email attempt ${attempt}/${MAX_RETRIES} to ${to}`);
       
       // Always include both in-house email addresses in CC
-      const ccList = [...cc, 'accounting@go4fc.com', 'gofarmsbills@gmail.com'];
+      const ccList = [...cc, 'kevin@go4fc.com', 'gofarmsbills@gmail.com'];
       
       // Check total attachment size to prevent server overload
       const totalAttachmentSize = attachments.reduce((total, att) => total + att.content.length, 0);
