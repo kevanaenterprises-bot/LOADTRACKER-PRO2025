@@ -4600,9 +4600,12 @@ Reply YES to confirm acceptance or NO to decline.`
   }, async (req, res) => {
     try {
       const invoiceIdOrNumber = req.params.id;
-      const { emailAddress, loadId } = req.body;
+      const { toEmail, emailAddress, ccEmails = [], loadId } = req.body;
+      
+      // Support both old and new parameter names for backward compatibility
+      const primaryEmail = toEmail || emailAddress;
 
-      if (!emailAddress) {
+      if (!primaryEmail) {
         return res.status(400).json({ message: "Email address is required" });
       }
 
@@ -4881,17 +4884,20 @@ Reply YES to confirm acceptance or NO to decline.`
       }];
       
       console.log(`📧 Final email summary for ${identifierLabel}:`);
-      console.log(`  - To: ${emailAddress}`);
+      console.log(`  - To: ${primaryEmail}`);
+      console.log(`  - CC: ${ccEmails.join(', ')}` + (ccEmails.length > 0 ? ' (plus kevin@go4fc.com, gofarmsbills@gmail.com)' : ' (kevin@go4fc.com, gofarmsbills@gmail.com)'));
       console.log(`  - Attachments: ${attachments.length}`);
       attachments.forEach((att, index) => {
         console.log(`    ${index + 1}. ${att.filename} (${att.content.length} bytes, ${att.contentType})`);
       });
       
       // Send email with all attachments
+      // ccEmails are customer/additional recipients; sendEmail will add kevin@go4fc.com + gofarmsbills@gmail.com automatically
       const emailResult = await sendEmail({
-        to: emailAddress,
+        to: primaryEmail,
         subject,
         html: emailHTML,
+        cc: ccEmails, // Pass additional CC recipients (e.g., customer email when manual email is used)
         attachments
       });
       

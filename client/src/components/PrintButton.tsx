@@ -27,6 +27,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const [isEmailing, setIsEmailing] = useState(false);
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState("");
+  const [selectedCustomerEmail, setSelectedCustomerEmail] = useState(""); // Track customer email separately from dropdown selection
 
   const handlePrintInvoice = async () => {
     setIsPrinting(true);
@@ -377,10 +378,21 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
         loadPodDocumentPath: load?.podDocumentPath || 'none'
       });
       
+      // Prepare email recipients per new multi-recipient logic
+      let toEmail = finalEmailAddress;
+      let ccEmails: string[] = [];
+      
+      // If custom email is entered AND a customer was previously selected, add customer to CC
+      if (selectedEmail === 'custom' && emailAddress && selectedCustomerEmail) {
+        toEmail = emailAddress;
+        ccEmails = [selectedCustomerEmail];
+      }
+      
       // Send complete document package - invoice + POD/BOL + rate confirmation (if available)
-      // Backend will prioritize invoice.podSnapshot over object storage fetching
+      // Backend will add kevin@go4fc.com and gofarmsbills@gmail.com to CC automatically
       await apiRequest(`/api/invoices/${invoiceIdentifier}/email-complete-package`, "POST", {
-        emailAddress: finalEmailAddress,
+        toEmail,
+        ccEmails,
         loadId: loadId,
       });
 
@@ -459,6 +471,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                             className="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
                             onClick={() => {
                               setSelectedEmail(customer.email);
+                              setSelectedCustomerEmail(customer.email); // Also track customer email separately
                               setShowCustomerDropdown(false);
                             }}
                             data-testid={`customer-option-${customer.id}`}

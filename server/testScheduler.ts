@@ -3,10 +3,10 @@ import { sendEmail } from './emailService';
 import { db } from './db';
 import { testRuns } from '../shared/schema';
 import { desc } from 'drizzle-orm';
-import * as cron from 'node-cron';
+import cron, { ScheduledTask } from 'node-cron';
 
 class TestScheduler {
-  private cronTask: ReturnType<typeof cron.schedule> | null = null;
+  private cronTask: ScheduledTask | null = null;
   private isRunning = false;
 
   async start() {
