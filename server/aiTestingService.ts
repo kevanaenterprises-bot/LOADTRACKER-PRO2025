@@ -1,6 +1,6 @@
 import { db } from './db';
 import { testRuns, testResults, users, loads, customers, locations, trucks, invoices } from '../shared/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 
 interface TestResult {
   category: string;
@@ -795,7 +795,7 @@ export class AITestingService {
   async getLatestTestRun(): Promise<any> {
     const [latestRun] = await db.select()
       .from(testRuns)
-      .orderBy(testRuns.startedAt)
+      .orderBy(desc(testRuns.startedAt))
       .limit(1);
 
     if (!latestRun) {
