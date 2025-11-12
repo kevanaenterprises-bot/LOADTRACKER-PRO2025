@@ -86,6 +86,7 @@ export const loads = pgTable("loads", {
   tripNumber: varchar("trip_number"),
   bolDocumentPath: varchar("bol_document_path"),
   podDocumentPath: varchar("pod_document_path"),
+  rateConfirmationDocumentPath: varchar("rate_confirmation_document_path"), // Comma-separated GCS object keys for multiple rate confirmations
   signatureURL: varchar("signature_url"),
   signedAt: timestamp("signed_at"),
   extraStops: decimal("extra_stops", { precision: 10, scale: 2 }).default("0.00"), // Extra stops charge amount
