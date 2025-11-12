@@ -4853,6 +4853,79 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`⚠️ No BOL document path available for ${identifierLabel}`);
       }
       
+      // ALSO collect Rate Confirmation documents if available
+      console.log(`🔍 EMAIL DEBUG: Checking Rate Confirmation for ${identifierLabel}`);
+      console.log(`🔍 Load rateConfirmationDocumentPath: "${load.rateConfirmationDocumentPath}"`);
+      
+      if (load.rateConfirmationDocumentPath) {
+        try {
+          console.log(`📧 Fetching rate confirmation from GCS: ${load.rateConfirmationDocumentPath}`);
+          
+          const objectStorageService = new ObjectStorageService();
+          const normalizedPath = objectStorageService.normalizeObjectEntityPath(load.rateConfirmationDocumentPath);
+          const rateConfFile = await objectStorageService.getObjectEntityFile(normalizedPath);
+          const [metadata] = await rateConfFile.getMetadata();
+          
+          // Read the file content into a buffer
+          const chunks: Buffer[] = [];
+          const stream = rateConfFile.createReadStream();
+          
+          await new Promise<void>((resolve, reject) => {
+            stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+            stream.on('error', reject);
+            stream.on('end', resolve);
+          });
+          
+          const rateConfBuffer = Buffer.concat(chunks);
+          const rateContentType = metadata.contentType || 'application/pdf';
+          
+          console.log(`📧 Rate confirmation fetched:`, {
+            contentType: rateContentType,
+            bufferSize: `${Math.round(rateConfBuffer.length / 1024)}KB`,
+            isImage: rateContentType.startsWith('image/'),
+            isPDF: rateContentType === 'application/pdf'
+          });
+          
+          // Add rate confirmation to the documents array
+          if (rateContentType.startsWith('image/')) {
+            try {
+              const { compressImageForPDF } = await import('./emailService');
+              const compressedBuffer = await compressImageForPDF(rateConfBuffer, rateContentType, 800);
+              podDocuments.push({
+                content: compressedBuffer,
+                type: 'image/jpeg'
+              });
+              console.log(`✅ Rate confirmation: Compressed ${rateContentType} (${Math.round(rateConfBuffer.length / 1024)}KB -> ${Math.round(compressedBuffer.length / 1024)}KB)`);
+            } catch (compressionError) {
+              console.error(`❌ Compression failed for rate confirmation:`, compressionError);
+              console.log(`⚠️ Adding original uncompressed rate confirmation`);
+              podDocuments.push({
+                content: rateConfBuffer,
+                type: rateContentType
+              });
+            }
+          } else {
+            // PDF rate confirmations go in as-is
+            podDocuments.push({
+              content: rateConfBuffer,
+              type: rateContentType
+            });
+            console.log(`✅ Rate confirmation: ${rateContentType} (${Math.round(rateConfBuffer.length / 1024)}KB) - added for merge`);
+          }
+          
+          console.log(`✅ After adding Rate Confirmation: Total ${podDocuments.length} document(s) (POD + BOL + Rate Conf) for merging:`, {
+            total: podDocuments.length,
+            types: podDocuments.map(p => p.type),
+            totalSize: `${Math.round(podDocuments.reduce((sum, p) => sum + p.content.length, 0) / 1024)}KB`
+          });
+        } catch (rateConfError) {
+          console.error(`❌ Failed to fetch rate confirmation from GCS:`, rateConfError);
+          console.log(`⚠️ Continuing without rate confirmation in email`);
+        }
+      } else {
+        console.log(`⚠️ No rate confirmation available for ${identifierLabel}`);
+      }
+      
       // Step 3: Use PDF merge utility to create ONE combined PDF
       let combinedPDF;
       try {
@@ -7786,6 +7859,74 @@ Reply YES to confirm acceptance or NO to decline.`
           generatePODSectionHTML([{content: pdf.content, type: pdf.type}], load.number109).replace('POD', `POD (PDF ${index + 1})`)
         ).join('');
         previewHTML = previewHTML.replace('</body>', `${pdfNotesHTML}</body>`);
+      }
+      
+      // RATE CONFIRMATION HANDLING - Fetch and display rate confirmation if available
+      const rateConfirmations: Array<{content: Buffer, type: string, filename: string}> = [];
+      if (load.rateConfirmationDocumentPath) {
+        console.log(`📄 Rate confirmation found for load ${load.number109}: ${load.rateConfirmationDocumentPath}`);
+        
+        try {
+          const objectStorageService = new ObjectStorageService();
+          
+          // Normalize the path and get the file from GCS
+          const normalizedPath = objectStorageService.normalizeObjectEntityPath(load.rateConfirmationDocumentPath);
+          const rateConfFile = await objectStorageService.getObjectEntityFile(normalizedPath);
+          const [metadata] = await rateConfFile.getMetadata();
+          
+          // Read the file content into a buffer
+          const chunks: Buffer[] = [];
+          const stream = rateConfFile.createReadStream();
+          
+          await new Promise<void>((resolve, reject) => {
+            stream.on('data', (chunk: Buffer) => chunks.push(chunk));
+            stream.on('error', reject);
+            stream.on('end', resolve);
+          });
+          
+          const rateConfBuffer = Buffer.concat(chunks);
+          const rateContentType = metadata.contentType || 'application/pdf';
+          
+          rateConfirmations.push({
+            content: rateConfBuffer,
+            type: rateContentType,
+            filename: `RateConfirmation-${load.number109}.pdf`
+          });
+          
+          // If it's an image, embed it in the preview
+          if (rateContentType.startsWith('image/')) {
+            const rateConfSectionHTML = `
+              <div style="page-break-before: always; padding: 20px;">
+                <h2 style="margin: 0 0 20px 0; font-size: 24px; color: #333;">Rate Confirmation</h2>
+                <div style="border: 2px solid #ddd; padding: 10px; background: #f9f9f9;">
+                  <img src="data:${rateContentType};base64,${rateConfBuffer.toString('base64')}" 
+                       style="max-width: 100%; height: auto; display: block;" 
+                       alt="Rate Confirmation" />
+                </div>
+              </div>
+            `;
+            previewHTML = previewHTML.replace('</body>', `${rateConfSectionHTML}</body>`);
+            console.log(`✅ Rate confirmation image embedded in print preview`);
+          } else {
+            // For PDFs, add a note
+            const rateConfNoteHTML = `
+              <div style="page-break-before: always; padding: 20px;">
+                <h2 style="margin: 0 0 20px 0; font-size: 24px; color: #333;">Rate Confirmation</h2>
+                <div style="border: 2px solid #4CAF50; padding: 20px; background: #f1f8e9; border-radius: 4px;">
+                  <p style="margin: 0; font-size: 16px; color: #333;">
+                    📎 Rate Confirmation PDF attached (will be included in email)
+                  </p>
+                </div>
+              </div>
+            `;
+            previewHTML = previewHTML.replace('</body>', `${rateConfNoteHTML}</body>`);
+            console.log(`📎 Rate confirmation PDF noted in print preview`);
+          }
+        } catch (fetchError) {
+          console.error(`❌ Failed to fetch rate confirmation from GCS:`, fetchError);
+        }
+      } else {
+        console.log(`⚠️ No rate confirmation available for load ${load.number109}`);
       }
 
       res.json({
