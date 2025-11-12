@@ -4952,13 +4952,38 @@ Reply YES to confirm acceptance or NO to decline.`
 
       console.log(`🖼️ Processing rate confirmation image for load ${load.number109}...`);
 
-      // Process the image with OCR
+      // Step 1: Upload the file to Google Cloud Storage
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const fileName = `rate-confirmation-${load.number109}-${timestamp}.pdf`;
+      
+      // Convert base64 to buffer
+      const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+      
+      // Determine content type
+      let contentType = 'application/pdf';
+      if (imageBase64.startsWith('data:image/jpeg') || imageBase64.startsWith('data:image/jpg')) {
+        contentType = 'image/jpeg';
+      } else if (imageBase64.startsWith('data:image/png')) {
+        contentType = 'image/png';
+      }
+      
+      // Upload to GCS
+      console.log(`📤 Uploading rate confirmation to GCS: ${fileName}`);
+      await objectStorageService.uploadFile(fileName, buffer, contentType);
+      const rateConfirmationPath = `${objectStorageService.getPrivateObjectDir()}/${fileName}`;
+      console.log(`✅ Rate confirmation uploaded to: ${rateConfirmationPath}`);
+
+      // Step 2: Process the image with OCR
       const ocrResults = await processRateConfirmationImage(imageBase64);
       
       console.log(`📝 OCR Results for load ${load.number109}:`, ocrResults);
 
-      // Update load with OCR data
-      const updateData: any = {};
+      // Step 3: Update load with both OCR data AND file path
+      const updateData: any = {
+        rateConfirmationDocumentPath: rateConfirmationPath
+      };
       
       if (ocrResults.poNumber) {
         updateData.poNumber = ocrResults.poNumber;
