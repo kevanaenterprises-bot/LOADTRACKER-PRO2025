@@ -771,3 +771,76 @@ export type LoadWithDetails = Load & {
   invoice?: Invoice;
   stops?: LoadStop[];
 };
+
+// Rate Confirmation Generator Schema (for outbound rate confirmations)
+export const rateConfirmationAccessorialSchema = z.object({
+  lineType: z.string(),
+  description: z.string(),
+  amount: z.coerce.number().nonnegative(),
+});
+
+export const rateConfirmationRequestSchema = z.object({
+  // Metadata
+  rateConfirmationNumber: z.string().optional(),
+  preparedBy: z.string().optional(),
+  issueDate: z.coerce.date().or(z.string()),
+  loadId: z.string().optional(), // Optional link to existing load
+  
+  // Customer information
+  customerId: z.string().optional(),
+  customerName: z.string().min(1, "Customer name is required"),
+  contactName: z.string().optional(),
+  contactEmail: z.string().email().optional().or(z.literal("")),
+  contactPhone: z.string().optional(),
+  billingAddress: z.string().optional(),
+  
+  // Equipment details
+  powerUnit: z.string().optional(),
+  trailerType: z.string().optional(),
+  temperatureRequirement: z.string().optional(),
+  equipmentNotes: z.string().optional(),
+  
+  // Pickup information
+  pickupLocationId: z.string().optional(),
+  pickupLocationName: z.string().optional(),
+  pickupAddress: z.string().optional(),
+  pickupDate: z.coerce.date().or(z.string()),
+  pickupTimeWindowStart: z.string().optional(),
+  pickupTimeWindowEnd: z.string().optional(),
+  pickupContact: z.string().optional(),
+  pickupInstructions: z.string().optional(),
+  
+  // Delivery information
+  deliveryLocationId: z.string().optional(),
+  deliveryLocationName: z.string().optional(),
+  deliveryAddress: z.string().optional(),
+  deliveryDate: z.coerce.date().or(z.string()),
+  deliveryTimeWindowStart: z.string().optional(),
+  deliveryTimeWindowEnd: z.string().optional(),
+  deliveryContact: z.string().optional(),
+  deliveryInstructions: z.string().optional(),
+  
+  // Load details
+  loadNumber: z.string().optional(),
+  poNumber: z.string().optional(),
+  commodity: z.string().optional(),
+  weight: z.string().optional(),
+  estimatedMiles: z.coerce.number().nonnegative().optional(),
+  
+  // Financial information
+  baseRate: z.coerce.number().nonnegative(),
+  ratePerMile: z.coerce.number().nonnegative().optional(),
+  fuelSurcharge: z.coerce.number().nonnegative().optional(),
+  accessorials: z.array(rateConfirmationAccessorialSchema).optional().default([]),
+  totalRate: z.coerce.number().nonnegative(),
+  paymentTerms: z.string().optional(),
+  notes: z.string().optional(),
+  
+  // Email options (for backend processing)
+  sendEmail: z.boolean().optional().default(false),
+  recipientEmail: z.string().email().optional().or(z.literal("")),
+  ccEmails: z.array(z.string().email()).optional().default([]),
+});
+
+export type RateConfirmationAccessorial = z.infer<typeof rateConfirmationAccessorialSchema>;
+export type RateConfirmationRequest = z.infer<typeof rateConfirmationRequestSchema>;
