@@ -116,6 +116,12 @@ export default function RateConfirmationGenerator() {
     form.setValue("totalRate", total);
   };
 
+  // Auto-update total whenever financial fields change
+  // Use JSON.stringify for deep comparison of accessorials array
+  useEffect(() => {
+    updateTotal();
+  }, [baseRate, fuelSurcharge, JSON.stringify(accessorials)]);
+
   // Handle location selection and auto-fill address
   const handlePickupLocationChange = (locationId: string) => {
     form.setValue("pickupLocationId", locationId);

@@ -32,10 +32,12 @@ import {
   insertFuelReceiptSchema,
   insertChatMessageSchema,
   insertInvoiceSchema,
+  rateConfirmationRequestSchema,
   type Load,
   type User,
   type Location,
   type InsertInvoice,
+  type RateConfirmationRequest,
   invoices
 } from "@shared/schema";
 import { db } from "./db";
@@ -5106,6 +5108,117 @@ Reply YES to confirm acceptance or NO to decline.`
     }
   });
 
+  // Rate Confirmation Generator endpoint - generates PDF and optionally emails it
+  app.post("/api/rate-confirmations/generate", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || 
+                    !!(req.session as any)?.driverAuth || 
+                    req.headers['x-bypass-token'] === BYPASS_SECRET;
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      console.log('📄 Rate confirmation generation request received');
+      
+      // Validate request body using schema
+      const validationResult = rateConfirmationRequestSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        console.error('❌ Validation failed:', validationResult.error);
+        return res.status(400).json({
+          message: "Invalid request data",
+          errors: validationResult.error.errors
+        });
+      }
+      
+      const data = validationResult.data;
+      console.log('✅ Request data validated:', {
+        customerName: data.customerName,
+        sendEmail: data.sendEmail,
+        recipientEmail: data.recipientEmail,
+        rateConfirmationNumber: data.rateConfirmationNumber || 'DRAFT'
+      });
+      
+      // Generate HTML template
+      const html = generateRateConfirmationHTML(data);
+      console.log(`📝 Generated HTML template (${html.length} characters)`);
+      
+      // Import PDF generation service
+      const { generatePDF, sendEmail: sendEmailService } = await import('./emailService');
+      
+      // Generate PDF from HTML
+      console.log('🔄 Converting HTML to PDF...');
+      const pdfBuffer = await generatePDF(html);
+      console.log(`✅ PDF generated successfully (${pdfBuffer.length} bytes)`);
+      
+      // Handle email sending or file download
+      if (data.sendEmail && data.recipientEmail) {
+        console.log(`📧 Sending rate confirmation email to: ${data.recipientEmail}`);
+        
+        const subject = `Rate Confirmation ${data.rateConfirmationNumber || 'Draft'} - GO 4 Farms & Cattle`;
+        const emailBody = `
+          <p>Dear ${data.customerName},</p>
+          <p>Please find attached the rate confirmation for the shipment details below:</p>
+          <ul>
+            <li><strong>RC #:</strong> ${data.rateConfirmationNumber || 'DRAFT'}</li>
+            <li><strong>Pickup:</strong> ${data.pickupLocationName || 'N/A'} on ${formatDate(data.pickupDate)}</li>
+            <li><strong>Delivery:</strong> ${data.deliveryLocationName || 'N/A'} on ${formatDate(data.deliveryDate)}</li>
+            <li><strong>Total Rate:</strong> ${formatCurrency(data.totalRate)}</li>
+          </ul>
+          <p>If you have any questions, please don't hesitate to contact us.</p>
+          <p>Best regards,<br>GO 4 Farms & Cattle<br>214-878-1230</p>
+        `;
+        
+        // Send email with PDF attachment
+        const emailResult = await sendEmailService({
+          to: data.recipientEmail,
+          subject,
+          html: emailBody,
+          cc: data.ccEmails && data.ccEmails.length > 0 ? data.ccEmails : undefined,
+          attachments: [{
+            filename: `rate-confirmation-${data.rateConfirmationNumber || 'draft'}.pdf`,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }]
+        });
+        
+        console.log(`✅ Rate confirmation email sent successfully to ${data.recipientEmail}`);
+        
+        res.json({
+          success: true,
+          message: "Rate confirmation generated and emailed successfully",
+          emailSent: true,
+          recipientEmail: data.recipientEmail,
+          ccEmails: data.ccEmails || [],
+          messageId: emailResult.messageId,
+          rateConfirmationNumber: data.rateConfirmationNumber || 'DRAFT',
+          pdfSize: pdfBuffer.length
+        });
+        
+      } else {
+        // Return PDF for download
+        console.log('📥 Returning PDF for download');
+        
+        const filename = `rate-confirmation-${data.rateConfirmationNumber || 'draft'}.pdf`;
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.setHeader('Content-Length', pdfBuffer.length);
+        res.send(pdfBuffer);
+        
+        console.log(`✅ PDF ready for download: ${filename} (${pdfBuffer.length} bytes)`);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error generating rate confirmation:', error);
+      res.status(500).json({
+        message: "Failed to generate rate confirmation",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   // Status update route
   app.patch("/api/loads/:loadId/status", (req, res, next) => {
     const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || 
@@ -7960,6 +8073,418 @@ Reply YES to confirm acceptance or NO to decline.`
 // Helper function to get file extension
 function getFileExtension(filename: string): string {
   return filename.split('.').pop()?.toLowerCase() || '';
+}
+
+// Helper function to format dates for display
+function formatDate(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+}
+
+// Helper function to format currency
+function formatCurrency(amount: number | undefined | null): string {
+  if (amount === undefined || amount === null) return '$0.00';
+  return `$${amount.toFixed(2)}`;
+}
+
+// Generate rate confirmation HTML template
+function generateRateConfirmationHTML(data: RateConfirmationRequest): string {
+  const issueDate = formatDate(data.issueDate);
+  const pickupDate = formatDate(data.pickupDate);
+  const deliveryDate = formatDate(data.deliveryDate);
+  
+  // Calculate accessorials total
+  const accessorialsTotal = data.accessorials?.reduce((sum, acc) => sum + acc.amount, 0) || 0;
+  
+  // Build accessorials table rows if they exist
+  const accessorialsHTML = data.accessorials && data.accessorials.length > 0 ? `
+    <tr>
+      <th colspan="2" style="background-color: #f5f5f5; padding: 12px; text-align: left; font-weight: bold;">Accessorials</th>
+    </tr>
+    ${data.accessorials.map(acc => `
+    <tr>
+      <td style="border: 1px solid #ddd; padding: 12px;">${acc.description}</td>
+      <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${formatCurrency(acc.amount)}</td>
+    </tr>
+    `).join('')}
+  ` : '';
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Rate Confirmation ${data.rateConfirmationNumber || 'Draft'}</title>
+      <style>
+        @page {
+          size: letter;
+          margin: 0.5in;
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 20px;
+          line-height: 1.6;
+          width: 100%;
+          min-height: 100vh;
+          box-sizing: border-box;
+        }
+        .header {
+          text-align: center;
+          border-bottom: 3px solid #2d5aa0;
+          padding-bottom: 20px;
+          margin-bottom: 30px;
+        }
+        .company-name {
+          font-size: 32px;
+          font-weight: bold;
+          color: #2d5aa0;
+          margin-bottom: 8px;
+        }
+        .company-info {
+          font-size: 14px;
+          color: #666;
+          line-height: 1.4;
+        }
+        .document-title {
+          font-size: 28px;
+          font-weight: bold;
+          color: #333;
+          margin: 30px 0 20px 0;
+          text-align: center;
+        }
+        .meta-info {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+          padding: 15px;
+          background-color: #f9f9f9;
+          border: 1px solid #ddd;
+        }
+        .section {
+          margin-bottom: 25px;
+        }
+        .section-title {
+          font-size: 18px;
+          font-weight: bold;
+          color: #2d5aa0;
+          margin-bottom: 12px;
+          border-bottom: 2px solid #2d5aa0;
+          padding-bottom: 5px;
+        }
+        .info-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+          margin-bottom: 15px;
+        }
+        .info-item {
+          padding: 8px;
+        }
+        .info-label {
+          font-weight: bold;
+          color: #555;
+          margin-bottom: 4px;
+        }
+        .info-value {
+          color: #333;
+        }
+        .details-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 20px 0;
+        }
+        .details-table th,
+        .details-table td {
+          border: 1px solid #ddd;
+          padding: 12px;
+          text-align: left;
+        }
+        .details-table th {
+          background-color: #2d5aa0;
+          color: white;
+          font-weight: bold;
+        }
+        .total-row {
+          font-weight: bold;
+          background-color: #f0f0f0;
+          font-size: 18px;
+        }
+        .notes-section {
+          margin-top: 30px;
+          padding: 15px;
+          background-color: #fffef0;
+          border-left: 4px solid #2d5aa0;
+        }
+        .footer {
+          margin-top: 40px;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+          border-top: 1px solid #ddd;
+          padding-top: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <!-- Header -->
+      <div class="header">
+        <div class="company-name">GO 4 Farms & Cattle</div>
+        <div class="company-info">
+          1510 Crystal Valley Way<br>
+          Melissa, TX 75454<br>
+          Phone: 214-878-1230 | Email: kevin@go4fc.com
+        </div>
+      </div>
+
+      <!-- Document Title -->
+      <div class="document-title">RATE CONFIRMATION</div>
+
+      <!-- Meta Information -->
+      <div class="meta-info">
+        <div>
+          <strong>RC #:</strong> ${data.rateConfirmationNumber || 'DRAFT'}<br>
+          <strong>Date:</strong> ${issueDate}
+        </div>
+        <div style="text-align: right;">
+          ${data.loadNumber ? `<strong>Load #:</strong> ${data.loadNumber}<br>` : ''}
+          ${data.preparedBy ? `<strong>Prepared By:</strong> ${data.preparedBy}` : ''}
+        </div>
+      </div>
+
+      <!-- Customer Information -->
+      <div class="section">
+        <div class="section-title">Customer Information</div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">Company Name:</div>
+            <div class="info-value" data-testid="text-customer-name">${data.customerName}</div>
+          </div>
+          ${data.contactName ? `
+          <div class="info-item">
+            <div class="info-label">Contact Name:</div>
+            <div class="info-value">${data.contactName}</div>
+          </div>
+          ` : ''}
+          ${data.contactEmail ? `
+          <div class="info-item">
+            <div class="info-label">Email:</div>
+            <div class="info-value">${data.contactEmail}</div>
+          </div>
+          ` : ''}
+          ${data.contactPhone ? `
+          <div class="info-item">
+            <div class="info-label">Phone:</div>
+            <div class="info-value">${data.contactPhone}</div>
+          </div>
+          ` : ''}
+        </div>
+        ${data.billingAddress ? `
+        <div class="info-item">
+          <div class="info-label">Billing Address:</div>
+          <div class="info-value">${data.billingAddress}</div>
+        </div>
+        ` : ''}
+      </div>
+
+      <!-- Pickup Information -->
+      <div class="section">
+        <div class="section-title">Pickup Details</div>
+        <div class="info-grid">
+          ${data.pickupLocationName ? `
+          <div class="info-item">
+            <div class="info-label">Location:</div>
+            <div class="info-value" data-testid="text-pickup-location">${data.pickupLocationName}</div>
+          </div>
+          ` : ''}
+          <div class="info-item">
+            <div class="info-label">Date:</div>
+            <div class="info-value" data-testid="text-pickup-date">${pickupDate}</div>
+          </div>
+          ${data.pickupTimeWindowStart || data.pickupTimeWindowEnd ? `
+          <div class="info-item">
+            <div class="info-label">Time Window:</div>
+            <div class="info-value">${data.pickupTimeWindowStart || ''} - ${data.pickupTimeWindowEnd || ''}</div>
+          </div>
+          ` : ''}
+        </div>
+        ${data.pickupAddress ? `
+        <div class="info-item">
+          <div class="info-label">Address:</div>
+          <div class="info-value">${data.pickupAddress}</div>
+        </div>
+        ` : ''}
+        ${data.pickupContact ? `
+        <div class="info-item">
+          <div class="info-label">Contact:</div>
+          <div class="info-value">${data.pickupContact}</div>
+        </div>
+        ` : ''}
+        ${data.pickupInstructions ? `
+        <div class="info-item">
+          <div class="info-label">Instructions:</div>
+          <div class="info-value">${data.pickupInstructions}</div>
+        </div>
+        ` : ''}
+      </div>
+
+      <!-- Delivery Information -->
+      <div class="section">
+        <div class="section-title">Delivery Details</div>
+        <div class="info-grid">
+          ${data.deliveryLocationName ? `
+          <div class="info-item">
+            <div class="info-label">Location:</div>
+            <div class="info-value" data-testid="text-delivery-location">${data.deliveryLocationName}</div>
+          </div>
+          ` : ''}
+          <div class="info-item">
+            <div class="info-label">Date:</div>
+            <div class="info-value" data-testid="text-delivery-date">${deliveryDate}</div>
+          </div>
+          ${data.deliveryTimeWindowStart || data.deliveryTimeWindowEnd ? `
+          <div class="info-item">
+            <div class="info-label">Time Window:</div>
+            <div class="info-value">${data.deliveryTimeWindowStart || ''} - ${data.deliveryTimeWindowEnd || ''}</div>
+          </div>
+          ` : ''}
+        </div>
+        ${data.deliveryAddress ? `
+        <div class="info-item">
+          <div class="info-label">Address:</div>
+          <div class="info-value">${data.deliveryAddress}</div>
+        </div>
+        ` : ''}
+        ${data.deliveryContact ? `
+        <div class="info-item">
+          <div class="info-label">Contact:</div>
+          <div class="info-value">${data.deliveryContact}</div>
+        </div>
+        ` : ''}
+        ${data.deliveryInstructions ? `
+        <div class="info-item">
+          <div class="info-label">Instructions:</div>
+          <div class="info-value">${data.deliveryInstructions}</div>
+        </div>
+        ` : ''}
+      </div>
+
+      <!-- Load & Equipment Information -->
+      <div class="section">
+        <div class="section-title">Load & Equipment Details</div>
+        <div class="info-grid">
+          ${data.poNumber ? `
+          <div class="info-item">
+            <div class="info-label">PO Number:</div>
+            <div class="info-value">${data.poNumber}</div>
+          </div>
+          ` : ''}
+          ${data.commodity ? `
+          <div class="info-item">
+            <div class="info-label">Commodity:</div>
+            <div class="info-value">${data.commodity}</div>
+          </div>
+          ` : ''}
+          ${data.weight ? `
+          <div class="info-item">
+            <div class="info-label">Weight:</div>
+            <div class="info-value">${data.weight}</div>
+          </div>
+          ` : ''}
+          ${data.estimatedMiles ? `
+          <div class="info-item">
+            <div class="info-label">Estimated Miles:</div>
+            <div class="info-value">${data.estimatedMiles}</div>
+          </div>
+          ` : ''}
+          ${data.powerUnit ? `
+          <div class="info-item">
+            <div class="info-label">Power Unit:</div>
+            <div class="info-value">${data.powerUnit}</div>
+          </div>
+          ` : ''}
+          ${data.trailerType ? `
+          <div class="info-item">
+            <div class="info-label">Trailer Type:</div>
+            <div class="info-value">${data.trailerType}</div>
+          </div>
+          ` : ''}
+          ${data.temperatureRequirement ? `
+          <div class="info-item">
+            <div class="info-label">Temperature:</div>
+            <div class="info-value">${data.temperatureRequirement}</div>
+          </div>
+          ` : ''}
+        </div>
+        ${data.equipmentNotes ? `
+        <div class="info-item">
+          <div class="info-label">Equipment Notes:</div>
+          <div class="info-value">${data.equipmentNotes}</div>
+        </div>
+        ` : ''}
+      </div>
+
+      <!-- Rate Breakdown -->
+      <div class="section">
+        <div class="section-title">Rate Breakdown</div>
+        <table class="details-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th style="text-align: right;">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-testid="text-base-rate-label">Base Rate</td>
+              <td style="text-align: right;" data-testid="text-base-rate">${formatCurrency(data.baseRate)}</td>
+            </tr>
+            ${data.ratePerMile ? `
+            <tr>
+              <td>Rate per Mile</td>
+              <td style="text-align: right;">${formatCurrency(data.ratePerMile)}/mile</td>
+            </tr>
+            ` : ''}
+            ${data.fuelSurcharge ? `
+            <tr>
+              <td>Fuel Surcharge</td>
+              <td style="text-align: right;" data-testid="text-fuel-surcharge">${formatCurrency(data.fuelSurcharge)}</td>
+            </tr>
+            ` : ''}
+            ${accessorialsHTML}
+            <tr class="total-row">
+              <td>TOTAL RATE</td>
+              <td style="text-align: right;" data-testid="text-total-rate">${formatCurrency(data.totalRate)}</td>
+            </tr>
+          </tbody>
+        </table>
+        ${data.paymentTerms ? `
+        <div class="info-item">
+          <div class="info-label">Payment Terms:</div>
+          <div class="info-value">${data.paymentTerms}</div>
+        </div>
+        ` : ''}
+      </div>
+
+      <!-- Notes Section -->
+      ${data.notes ? `
+      <div class="notes-section">
+        <div class="info-label">Notes:</div>
+        <div class="info-value">${data.notes}</div>
+      </div>
+      ` : ''}
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>This rate confirmation is subject to the terms and conditions outlined in the carrier agreement.</p>
+        <p>Thank you for your business!</p>
+      </div>
+    </body>
+    </html>
+  `;
 }
 
 // Helper function to compute invoice context (delivery location and BOL/POD text)
