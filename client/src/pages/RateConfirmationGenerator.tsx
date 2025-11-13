@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Plus, X, Download, Mail } from "lucide-react";
+import { useMainAuth } from "@/hooks/useMainAuth";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -37,8 +39,37 @@ import { cn } from "@/lib/utils";
 
 export default function RateConfirmationGenerator() {
   const { toast } = useToast();
+  const { isAuthenticated, isLoading, authType } = useMainAuth();
+  const [, setLocation] = useLocation();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to access rate confirmations",
+        variant: "destructive",
+      });
+      setLocation("/admin-login");
+    }
+  }, [isAuthenticated, isLoading, toast, setLocation]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const form = useForm<RateConfirmationRequest>({
     resolver: zodResolver(rateConfirmationRequestSchema),
