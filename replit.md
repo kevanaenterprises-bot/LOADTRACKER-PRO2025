@@ -46,6 +46,7 @@ The frontend uses React with TypeScript, `shadcn/ui` (built on Radix UI), and Ta
 - **LoadRight Integration**: Automated load tendering workflow with Puppeteer-based portal scraping, manual sync, and one-click acceptance.
 - **AI Load Advisor**: Intelligent driver recommendation system using OpenAI GPT-4o-mini, analyzing load and driver data for optimal suggestions, with confidence scoring, estimated profit, and detailed reasoning.
 - **AI Testing Assistant**: Proactive quality assurance testing entire application daily, covering critical workflows, GPS, IFTA, maps, document management, invoicing, and driver portal. Provides AI-generated insights for failures and email alerts.
+- **Outbound Rate Confirmation Generator**: Professional rate confirmation creation tool with fillable fields for dates, pickup/delivery details, location/customer dropdowns with auto-population, equipment specifications, rate breakdown with auto-calculation, accessorial charges, and one-click PDF generation or email delivery to customers with CC support.
 
 ## External Dependencies
 
