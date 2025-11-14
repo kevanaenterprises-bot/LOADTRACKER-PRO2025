@@ -242,86 +242,17 @@ export default function RateConfirmationGenerator() {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Rate Confirmation Generator</h1>
-        <p className="text-muted-foreground mt-2">
-          Create professional rate confirmations for Go 4 Farms & Cattle
-        </p>
+      {/* Company Header */}
+      <div className="mb-6 text-center border-b pb-4">
+        <h1 className="text-3xl font-bold">GO 4 Farms & Cattle</h1>
+        <p className="text-lg mt-1">1915 Espinoza Dr</p>
+        <p className="text-lg">Carrollton, TX 75010-4002</p>
+        <p className="text-lg">(903) 803-7500</p>
       </div>
 
       <Form {...form}>
         <form className="space-y-6">
-          {/* Metadata Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Document Information</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-3">
-              <FormField
-                control={form.control}
-                name="rateConfirmationNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Rate Confirmation #</FormLabel>
-                    <FormControl>
-                      <Input placeholder="RC-001" {...field} data-testid="input-rate-conf-number" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="issueDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Issue Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                            data-testid="button-issue-date"
-                          >
-                            {field.value ? format(new Date(field.value), "PPP") : <span>Pick a date</span>}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value ? new Date(field.value) : undefined}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="preparedBy"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Prepared By</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your name" {...field} data-testid="input-prepared-by" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Customer Information */}
+          {/* Customer Information - Moved to top */}
           <Card>
             <CardHeader>
               <CardTitle>Customer Information</CardTitle>
@@ -411,6 +342,76 @@ export default function RateConfirmationGenerator() {
                     <FormLabel>Billing Address</FormLabel>
                     <FormControl>
                       <Input placeholder="123 Main St, City, ST 12345" {...field} data-testid="input-billing-address" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Document Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Document Information</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-4 md:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="rateConfirmationNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Rate Confirmation #</FormLabel>
+                    <FormControl>
+                      <Input placeholder="RC-001" {...field} data-testid="input-rate-conf-number" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="issueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Issue Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                            data-testid="button-issue-date"
+                          >
+                            {field.value ? format(new Date(field.value), "PPP") : <span>Pick a date</span>}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ? new Date(field.value) : undefined}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="preparedBy"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prepared By</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Your name" {...field} data-testid="input-prepared-by" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
