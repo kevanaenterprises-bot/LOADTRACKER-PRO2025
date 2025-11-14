@@ -252,10 +252,10 @@ export default function RateConfirmationGenerator() {
 
       <Form {...form}>
         <form className="space-y-6">
-          {/* Customer Information - Moved to top */}
+          {/* Carrier Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Customer Information</CardTitle>
+              <CardTitle>Carrier Information</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <FormField
@@ -263,11 +263,11 @@ export default function RateConfirmationGenerator() {
                 name="customerId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Select Customer</FormLabel>
+                    <FormLabel>Select Carrier</FormLabel>
                     <Select onValueChange={handleCustomerChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-customer">
-                          <SelectValue placeholder="Choose a customer" />
+                          <SelectValue placeholder="Choose a carrier" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -287,61 +287,9 @@ export default function RateConfirmationGenerator() {
                 name="customerName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Customer Name *</FormLabel>
+                    <FormLabel>Carrier Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Company name" {...field} data-testid="input-customer-name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contactName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contact Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="John Doe" {...field} data-testid="input-contact-name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contactEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contact Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="contact@company.com" {...field} data-testid="input-contact-email" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="contactPhone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contact Phone</FormLabel>
-                    <FormControl>
-                      <Input placeholder="(555) 123-4567" {...field} data-testid="input-contact-phone" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="billingAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Billing Address</FormLabel>
-                    <FormControl>
-                      <Input placeholder="123 Main St, City, ST 12345" {...field} data-testid="input-billing-address" />
+                      <Input placeholder="Carrier company name" {...field} data-testid="input-customer-name" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
