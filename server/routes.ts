@@ -27,6 +27,7 @@ import {
   insertRateSchema,
   insertUserSchema,
   insertCustomerSchema,
+  insertCarrierSchema,
   insertTruckSchema,
   insertTruckServiceRecordSchema,
   insertFuelReceiptSchema,
@@ -2425,6 +2426,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting customer:", error);
       res.status(500).json({ message: "Failed to delete customer" });
+    }
+  });
+
+  // Carrier management endpoints
+  app.get("/api/carriers", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const carriers = await storage.getCarriers();
+      res.json(carriers);
+    } catch (error) {
+      console.error("Error fetching carriers:", error);
+      res.status(500).json({ message: "Failed to fetch carriers" });
+    }
+  });
+
+  app.post("/api/carriers", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const validatedData = insertCarrierSchema.parse(req.body);
+      const carrier = await storage.createCarrier(validatedData);
+      res.json(carrier);
+    } catch (error: any) {
+      console.error("Error creating carrier:", error);
+      if (error?.name === 'ZodError') {
+        res.status(400).json({ message: "Invalid carrier data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: error?.message || "Failed to create carrier" });
+      }
+    }
+  });
+
+  app.put("/api/carriers/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      const carrier = await storage.updateCarrier(req.params.id, req.body);
+      res.json(carrier);
+    } catch (error) {
+      console.error("Error updating carrier:", error);
+      res.status(500).json({ message: "Failed to update carrier" });
+    }
+  });
+
+  app.delete("/api/carriers/:id", (req, res, next) => {
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || isBypassActive(req);
+    if (hasAuth) {
+      next();
+    } else {
+      res.status(401).json({ message: "Authentication required" });
+    }
+  }, async (req, res) => {
+    try {
+      await storage.deleteCarrier(req.params.id);
+      res.json({ message: "Carrier deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting carrier:", error);
+      res.status(500).json({ message: "Failed to delete carrier" });
     }
   });
 

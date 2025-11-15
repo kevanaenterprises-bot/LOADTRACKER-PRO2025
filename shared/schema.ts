@@ -228,6 +228,24 @@ export const customers = pgTable("customers", {
   phone: varchar("phone"),
 });
 
+// Carriers table for trucking companies
+export const carriers = pgTable("carriers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  contactName: varchar("contact_name"),
+  contactEmail: varchar("contact_email"),
+  contactPhone: varchar("contact_phone"),
+  mcNumber: varchar("mc_number"), // Motor Carrier Number
+  dotNumber: varchar("dot_number"), // DOT Number
+  address: text("address"),
+  city: varchar("city"),
+  state: varchar("state"),
+  zipCode: varchar("zip_code"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Invoice counter for sequential numbering
 export const invoiceCounter = pgTable("invoice_counter", {
   id: serial("id").primaryKey(),
@@ -425,6 +443,12 @@ export const insertCustomerSchema = createInsertSchema(customers).omit({
   updatedAt: true,
 });
 
+export const insertCarrierSchema = createInsertSchema(carriers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertInvoiceSchema = createInsertSchema(invoices).omit({
   id: true,
   generatedAt: true,
@@ -517,6 +541,8 @@ export type InsertRate = z.infer<typeof insertRateSchema>;
 export type Rate = typeof rates.$inferSelect;
 export type InsertCustomer = z.infer<typeof insertCustomerSchema>;
 export type Customer = typeof customers.$inferSelect;
+export type InsertCarrier = z.infer<typeof insertCarrierSchema>;
+export type Carrier = typeof carriers.$inferSelect;
 export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
 export type Invoice = typeof invoices.$inferSelect;
 export type LoadStatusHistoryEntry = typeof loadStatusHistory.$inferSelect;

@@ -6,6 +6,7 @@ import {
   bolNumbers,
   rates,
   customers,
+  carriers,
   invoiceCounter,
   invoices,
   loadStatusHistory,
@@ -32,6 +33,8 @@ import {
   type InsertRate,
   type Customer,
   type InsertCustomer,
+  type Carrier,
+  type InsertCarrier,
   type Invoice,
   type InsertInvoice,
   type LoadStatusHistoryEntry,
@@ -123,6 +126,13 @@ export interface IStorage {
   createCustomer(customer: InsertCustomer): Promise<Customer>;
   updateCustomer(id: string, updates: Partial<Customer>): Promise<Customer>;
   deleteCustomer(id: string): Promise<void>;
+
+  // Carrier operations
+  getCarriers(): Promise<Carrier[]>;
+  getCarrier(id: string): Promise<Carrier | undefined>;
+  createCarrier(carrier: InsertCarrier): Promise<Carrier>;
+  updateCarrier(id: string, updates: Partial<Carrier>): Promise<Carrier>;
+  deleteCarrier(id: string): Promise<void>;
 
   // Invoice operations
   createInvoice(invoice: InsertInvoice): Promise<Invoice>;
@@ -1151,6 +1161,40 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCustomer(id: string): Promise<void> {
     await db.delete(customers).where(eq(customers.id, id));
+  }
+
+  // Carrier operations
+  async getCarriers(): Promise<Carrier[]> {
+    return await db
+      .select()
+      .from(carriers)
+      .orderBy(carriers.name);
+  }
+
+  async getCarrier(id: string): Promise<Carrier | undefined> {
+    const [carrier] = await db
+      .select()
+      .from(carriers)
+      .where(eq(carriers.id, id));
+    return carrier;
+  }
+
+  async createCarrier(carrier: InsertCarrier): Promise<Carrier> {
+    const [newCarrier] = await db.insert(carriers).values(carrier).returning();
+    return newCarrier;
+  }
+
+  async updateCarrier(id: string, updates: Partial<Carrier>): Promise<Carrier> {
+    const [updatedCarrier] = await db
+      .update(carriers)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(carriers.id, id))
+      .returning();
+    return updatedCarrier;
+  }
+
+  async deleteCarrier(id: string): Promise<void> {
+    await db.delete(carriers).where(eq(carriers.id, id));
   }
 
   async createInvoice(invoice: InsertInvoice): Promise<Invoice> {

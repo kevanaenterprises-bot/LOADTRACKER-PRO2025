@@ -34,7 +34,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { rateConfirmationRequestSchema, type RateConfirmationRequest, type Location, type Customer } from "@shared/schema";
+import { rateConfirmationRequestSchema, type RateConfirmationRequest, type Location, type Carrier } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
 export default function RateConfirmationGenerator() {
@@ -92,9 +92,9 @@ export default function RateConfirmationGenerator() {
     queryKey: ["/api/locations"],
   });
 
-  // Fetch customers for dropdown
-  const { data: customers = [] } = useQuery<Customer[]>({
-    queryKey: ["/api/customers"],
+  // Fetch carriers for dropdown
+  const { data: carriers = [] } = useQuery<Carrier[]>({
+    queryKey: ["/api/carriers"],
   });
 
   // Watch financial fields to auto-calculate total
@@ -145,14 +145,12 @@ export default function RateConfirmationGenerator() {
     }
   };
 
-  // Handle customer selection
-  const handleCustomerChange = (customerId: string) => {
-    form.setValue("customerId", customerId);
-    const customer = customers.find(c => c.id === customerId);
-    if (customer) {
-      form.setValue("customerName", customer.name);
-      form.setValue("contactEmail", customer.email || "");
-      form.setValue("contactPhone", customer.phone || "");
+  // Handle carrier selection
+  const handleCarrierChange = (carrierId: string) => {
+    form.setValue("customerId", carrierId);
+    const carrier = carriers.find(c => c.id === carrierId);
+    if (carrier) {
+      form.setValue("customerName", carrier.name);
     }
   };
 
@@ -264,16 +262,16 @@ export default function RateConfirmationGenerator() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Select Carrier</FormLabel>
-                    <Select onValueChange={handleCustomerChange} value={field.value}>
+                    <Select onValueChange={handleCarrierChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger data-testid="select-customer">
+                        <SelectTrigger data-testid="select-carrier">
                           <SelectValue placeholder="Choose a carrier" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {customers.map((customer) => (
-                          <SelectItem key={customer.id} value={customer.id}>
-                            {customer.name}
+                        {carriers.map((carrier) => (
+                          <SelectItem key={carrier.id} value={carrier.id}>
+                            {carrier.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

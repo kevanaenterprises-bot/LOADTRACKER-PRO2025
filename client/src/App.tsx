@@ -18,6 +18,7 @@ import TTSGenerator from "@/pages/TTSGenerator";
 import LoadRightTenders from "@/pages/LoadRightTenders";
 import AdminTestDashboard from "@/pages/AdminTestDashboard";
 import RateConfirmationGenerator from "@/pages/RateConfirmationGenerator";
+import Carriers from "@/pages/Carriers";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/tts-generator" component={TTSGenerator} />
       <Route path="/loadright" component={LoadRightTenders} />
       <Route path="/rate-confirmations" component={RateConfirmationGenerator} />
+      <Route path="/carriers" component={Carriers} />
       <Route path="/admin-test-dashboard" component={AdminTestDashboard} />
       <Route path="/driver-portal" component={DriverPortal} />
       <Route path="/driver" component={DriverPortal} />
