@@ -409,8 +409,18 @@ export default function Dashboard() {
           <CacheDebugger />
         </div>
         
-        {/* Driver Debug Button - Smaller on mobile */}
-        <div className="mt-2 sm:mt-4 flex justify-center">
+        {/* Quick Action Buttons - Smaller on mobile */}
+        <div className="mt-2 sm:mt-4 flex justify-center gap-2 sm:gap-3 flex-wrap">
+          <Button 
+            onClick={() => window.location.href = '/carriers'}
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 border-blue-200 text-blue-800 hover:bg-blue-100 text-xs sm:text-sm px-2 sm:px-4"
+            data-testid="button-carriers"
+          >
+            <i className="fas fa-building mr-1 sm:mr-2"></i>
+            <span className="hidden sm:inline">Carrier Management</span><span className="sm:hidden">Carriers</span>
+          </Button>
           <Button 
             onClick={() => window.open('/driver-debug-test', '_blank')}
             variant="outline"

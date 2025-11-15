@@ -26,6 +26,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { insertCarrierSchema, type Carrier, type InsertCarrier } from "@shared/schema";
+import { CarrierLeaseAgreement } from "@/components/CarrierLeaseAgreement";
 
 export default function Carriers() {
   const { toast } = useToast();
@@ -164,16 +165,18 @@ export default function Carriers() {
           <h1 className="text-3xl font-bold">Carrier Management</h1>
           <p className="text-muted-foreground mt-2">Manage trucking carriers for rate confirmations</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          setIsDialogOpen(open);
-          if (!open) resetForm();
-        }}>
-          <DialogTrigger asChild>
-            <Button data-testid="button-add-carrier">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Carrier
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <CarrierLeaseAgreement />
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) resetForm();
+          }}>
+            <DialogTrigger asChild>
+              <Button data-testid="button-add-carrier">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Carrier
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingCarrier ? "Edit Carrier" : "Add New Carrier"}</DialogTitle>
