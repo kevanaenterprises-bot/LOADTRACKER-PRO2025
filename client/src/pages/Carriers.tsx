@@ -304,6 +304,7 @@ export default function Carriers() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {carriersLoading ? (

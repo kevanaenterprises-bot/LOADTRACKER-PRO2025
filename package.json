@@ -81,6 +81,7 @@
     "framer-motion": "^11.13.1",
     "google-auth-library": "^10.3.0",
     "google-gax": "^4.6.1",
+    "html2pdf.js": "^0.12.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.453.0",
     "memoizee": "^0.4.17",
