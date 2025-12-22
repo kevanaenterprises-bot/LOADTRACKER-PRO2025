@@ -763,30 +763,29 @@ function generateInvoiceHTML(invoice: any, load: any): string {
           Times recorded automatically via GPS geofencing technology. No manual driver input - legally verifiable timestamps.
         </div>
         
-        ${load?.shipperInTime || load?.shipperOutTime ? `
         <div style="margin-bottom: 15px; padding: 12px; background-color: white; border: 1px solid #bae6fd; border-radius: 4px;">
           <div style="font-weight: 600; color: #1e40af; margin-bottom: 8px; font-size: 14px;">📦 SHIPPER / PICKUP LOCATION</div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
               <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Arrived (In)</div>
               <div style="font-size: 14px; color: #1f2937; font-weight: 500;">
-                ${load.shipperInTime ? new Date(load.shipperInTime).toLocaleString('en-US', { 
+                ${load?.shipperInTime ? new Date(load.shipperInTime).toLocaleString('en-US', { 
                   month: '2-digit', day: '2-digit', year: 'numeric', 
                   hour: '2-digit', minute: '2-digit', hour12: true 
-                }) : 'Not recorded'}
+                }) : '<span style="color: #9ca3af; font-style: italic;">Pending GPS verification</span>'}
               </div>
             </div>
             <div>
               <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Departed (Out)</div>
               <div style="font-size: 14px; color: #1f2937; font-weight: 500;">
-                ${load.shipperOutTime ? new Date(load.shipperOutTime).toLocaleString('en-US', { 
+                ${load?.shipperOutTime ? new Date(load.shipperOutTime).toLocaleString('en-US', { 
                   month: '2-digit', day: '2-digit', year: 'numeric', 
                   hour: '2-digit', minute: '2-digit', hour12: true 
-                }) : 'Not recorded'}
+                }) : '<span style="color: #9ca3af; font-style: italic;">Pending GPS verification</span>'}
               </div>
             </div>
           </div>
-          ${load.shipperInTime && load.shipperOutTime ? `
+          ${load?.shipperInTime && load?.shipperOutTime ? `
             <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb;">
               <span style="font-size: 12px; color: #059669; font-weight: 600;">
                 Time at Shipper: ${Math.round((new Date(load.shipperOutTime).getTime() - new Date(load.shipperInTime).getTime()) / (1000 * 60))} minutes
@@ -794,32 +793,30 @@ function generateInvoiceHTML(invoice: any, load: any): string {
             </div>
           ` : ''}
         </div>
-        ` : ''}
         
-        ${load?.receiverInTime || load?.receiverOutTime ? `
         <div style="margin-bottom: 15px; padding: 12px; background-color: white; border: 1px solid #bae6fd; border-radius: 4px;">
           <div style="font-weight: 600; color: #1e40af; margin-bottom: 8px; font-size: 14px;">📍 RECEIVER / DELIVERY LOCATION</div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
               <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Arrived (In)</div>
               <div style="font-size: 14px; color: #1f2937; font-weight: 500;">
-                ${load.receiverInTime ? new Date(load.receiverInTime).toLocaleString('en-US', { 
+                ${load?.receiverInTime ? new Date(load.receiverInTime).toLocaleString('en-US', { 
                   month: '2-digit', day: '2-digit', year: 'numeric', 
                   hour: '2-digit', minute: '2-digit', hour12: true 
-                }) : 'Not recorded'}
+                }) : '<span style="color: #9ca3af; font-style: italic;">Pending GPS verification</span>'}
               </div>
             </div>
             <div>
               <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Departed (Out)</div>
               <div style="font-size: 14px; color: #1f2937; font-weight: 500;">
-                ${load.receiverOutTime ? new Date(load.receiverOutTime).toLocaleString('en-US', { 
+                ${load?.receiverOutTime ? new Date(load.receiverOutTime).toLocaleString('en-US', { 
                   month: '2-digit', day: '2-digit', year: 'numeric', 
                   hour: '2-digit', minute: '2-digit', hour12: true 
-                }) : 'Not recorded'}
+                }) : '<span style="color: #9ca3af; font-style: italic;">Pending GPS verification</span>'}
               </div>
             </div>
           </div>
-          ${load.receiverInTime && load.receiverOutTime ? `
+          ${load?.receiverInTime && load?.receiverOutTime ? `
             <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb;">
               <span style="font-size: 12px; color: #059669; font-weight: 600;">
                 Time at Receiver: ${Math.round((new Date(load.receiverOutTime).getTime() - new Date(load.receiverInTime).getTime()) / (1000 * 60))} minutes
@@ -827,7 +824,6 @@ function generateInvoiceHTML(invoice: any, load: any): string {
             </div>
           ` : ''}
         </div>
-        ` : ''}
         
         ${load?.stops && load.stops.length > 0 ? `
         <div style="border-top: 1px solid #bae6fd; padding-top: 12px; margin-top: 12px;">
@@ -862,11 +858,6 @@ function generateInvoiceHTML(invoice: any, load: any): string {
         </div>
         ` : ''}
         
-        ${!load?.shipperInTime && !load?.shipperOutTime && !load?.receiverInTime && !load?.receiverOutTime && (!load?.stops || load.stops.length === 0) ? `
-        <div style="text-align: center; padding: 20px; color: #9ca3af; font-style: italic;">
-          GPS timestamps will be recorded automatically when driver enters/exits geofenced locations.
-        </div>
-        ` : ''}
       </div>
 
       <div class="total-section">
