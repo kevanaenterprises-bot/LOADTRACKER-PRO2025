@@ -23,6 +23,10 @@ export interface ExtractedLoadData {
   companyName?: string;
   pickupAddress?: string;
   deliveryAddress?: string;
+  pickupCompanyName?: string;
+  deliveryCompanyName?: string;
+  rate?: string;
+  freightAmount?: string;
   confidence: number;
   rawText?: string;
 }
@@ -99,6 +103,10 @@ Return ONLY a JSON object with these fields:
 - companyName: Any company name found
 - pickupAddress: Pickup location (even just city is helpful)
 - deliveryAddress: Delivery location (even just city is helpful)
+- pickupCompanyName: The shipper/pickup company name
+- deliveryCompanyName: The consignee/delivery company name
+- rate: The freight rate/amount (look for "Rate:", "Total:", "Line Haul:", dollar amounts like $1,500.00)
+- freightAmount: Same as rate - the total freight charge amount
 - confidence: Your confidence score (BE GENEROUS - even poor images often have usable data)
 - rawText: ALL text you can extract, even if unclear
 
@@ -137,6 +145,10 @@ IMPORTANT: Even a 0.3 confidence extraction is valuable! Users can verify and co
           companyName: extractedData.companyName || null,
           pickupAddress: extractedData.pickupAddress || null,
           deliveryAddress: extractedData.deliveryAddress || null,
+          pickupCompanyName: extractedData.pickupCompanyName || null,
+          deliveryCompanyName: extractedData.deliveryCompanyName || null,
+          rate: extractedData.rate || extractedData.freightAmount || null,
+          freightAmount: extractedData.freightAmount || extractedData.rate || null,
           confidence: Math.max(0, Math.min(1, extractedData.confidence || 0.5)),
           rawText: extractedData.rawText || extractedText
         };
@@ -201,6 +213,29 @@ IMPORTANT: Even a 0.3 confidence extraction is valuable! Users can verify and co
       if (!fallbackData.pickupAddress) fallbackData.pickupAddress = address;
       else if (!fallbackData.deliveryAddress) fallbackData.deliveryAddress = address;
       fallbackData.confidence = Math.max(fallbackData.confidence, 0.5);
+    }
+    
+    // Try to find rate/freight amount - look for dollar amounts near rate-related keywords
+    const ratePatterns = [
+      /\b(?:rate|total|line\s*haul|freight|amount)\s*:?\s*\$?\s*([\d,]+(?:\.\d{2})?)\b/i,
+      /\$\s*([\d,]+(?:\.\d{2})?)\b/,  // Any dollar amount
+      /\b([\d,]+\.\d{2})\s*(?:total|rate|freight)?\b/i,  // Decimal number that looks like money
+    ];
+    
+    for (const pattern of ratePatterns) {
+      const match = extractedText.match(pattern);
+      if (match) {
+        const rateValue = match[1].replace(/,/g, '');
+        const parsedRate = parseFloat(rateValue);
+        // Only accept reasonable freight rates ($100 - $50,000)
+        if (!isNaN(parsedRate) && parsedRate >= 100 && parsedRate <= 50000) {
+          fallbackData.rate = parsedRate.toFixed(2);
+          fallbackData.freightAmount = parsedRate.toFixed(2);
+          fallbackData.confidence = Math.max(fallbackData.confidence, 0.5);
+          console.log(`💰 Fallback OCR extracted rate: $${fallbackData.rate}`);
+          break;
+        }
+      }
     }
     
     return fallbackData;

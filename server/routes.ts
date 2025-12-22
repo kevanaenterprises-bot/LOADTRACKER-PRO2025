@@ -7772,6 +7772,19 @@ Reply YES to confirm acceptance or NO to decline.`
         }
       }
 
+      // Parse and clean the rate from OCR data
+      let tripRate: string | null = null;
+      const rawRate = extractedData.rate || extractedData.freightAmount;
+      if (rawRate) {
+        // Clean up rate string: remove $, commas, spaces and parse as number
+        const cleanedRate = rawRate.toString().replace(/[$,\s]/g, '');
+        const parsedRate = parseFloat(cleanedRate);
+        if (!isNaN(parsedRate) && parsedRate > 0) {
+          tripRate = parsedRate.toFixed(2);
+          console.log(`💰 OCR extracted rate: $${tripRate} from raw value: "${rawRate}"`);
+        }
+      }
+
       // Create the load with extracted data
       const loadData = {
         number109,
@@ -7783,6 +7796,7 @@ Reply YES to confirm acceptance or NO to decline.`
         deliveryAddress: extractedData.deliveryAddress || null,
         companyName: extractedData.companyName || null,
         estimatedMiles: calculatedMiles,
+        tripRate: tripRate, // Set rate from OCR extraction
         extraStops: "0.00",
         lumperCharge: "0.00",
         driverId: null,
@@ -7798,7 +7812,8 @@ Reply YES to confirm acceptance or NO to decline.`
       
       console.log("✅ Generated load from OCR:", newLoad.number109, {
         stops: stops.length,
-        miles: calculatedMiles
+        miles: calculatedMiles,
+        tripRate: tripRate
       });
       
       res.json({
