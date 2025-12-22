@@ -754,45 +754,120 @@ function generateInvoiceHTML(invoice: any, load: any): string {
         </tbody>
       </table>
 
-      ${load?.stops && load.stops.length > 0 ? `
-      <div style="margin-bottom: 30px; padding: 15px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px;">
-        <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #374151;">Pickup & Delivery Times</h3>
-        ${load.stops.map((stop: any) => `
-          <div style="margin-bottom: 12px; padding-bottom: 12px; ${stop !== load.stops[load.stops.length - 1] ? 'border-bottom: 1px solid #e5e7eb;' : ''}">
-            <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">
-              ${stop.stopType === 'pickup' ? '📦 Pickup' : '📍 Delivery'}: ${stop.companyName || stop.address || 'N/A'}
+      <div style="margin-bottom: 30px; padding: 15px; background-color: #f0f9ff; border: 2px solid #0284c7; border-radius: 6px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+          <h3 style="margin: 0; font-size: 16px; color: #0369a1; font-weight: bold;">GPS-Verified Arrival & Departure Times</h3>
+          <span style="background-color: #0284c7; color: white; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600;">GEOFENCE VERIFIED</span>
+        </div>
+        <div style="font-size: 11px; color: #0369a1; margin-bottom: 15px; padding: 8px; background-color: #e0f2fe; border-radius: 4px;">
+          Times recorded automatically via GPS geofencing technology. No manual driver input - legally verifiable timestamps.
+        </div>
+        
+        ${load?.shipperInTime || load?.shipperOutTime ? `
+        <div style="margin-bottom: 15px; padding: 12px; background-color: white; border: 1px solid #bae6fd; border-radius: 4px;">
+          <div style="font-weight: 600; color: #1e40af; margin-bottom: 8px; font-size: 14px;">📦 SHIPPER / PICKUP LOCATION</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Arrived (In)</div>
+              <div style="font-size: 14px; color: #1f2937; font-weight: 500;">
+                ${load.shipperInTime ? new Date(load.shipperInTime).toLocaleString('en-US', { 
+                  month: '2-digit', day: '2-digit', year: 'numeric', 
+                  hour: '2-digit', minute: '2-digit', hour12: true 
+                }) : 'Not recorded'}
+              </div>
             </div>
-            ${stop.arrivedAt ? `
-              <div style="font-size: 14px; color: #4b5563;">
-                <strong>In:</strong> ${new Date(stop.arrivedAt).toLocaleString('en-US', { 
-                  month: '2-digit', 
-                  day: '2-digit', 
-                  year: 'numeric', 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  hour12: true 
-                })}
+            <div>
+              <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Departed (Out)</div>
+              <div style="font-size: 14px; color: #1f2937; font-weight: 500;">
+                ${load.shipperOutTime ? new Date(load.shipperOutTime).toLocaleString('en-US', { 
+                  month: '2-digit', day: '2-digit', year: 'numeric', 
+                  hour: '2-digit', minute: '2-digit', hour12: true 
+                }) : 'Not recorded'}
               </div>
-            ` : ''}
-            ${stop.departedAt ? `
-              <div style="font-size: 14px; color: #4b5563;">
-                <strong>Out:</strong> ${new Date(stop.departedAt).toLocaleString('en-US', { 
-                  month: '2-digit', 
-                  day: '2-digit', 
-                  year: 'numeric', 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  hour12: true 
-                })}
-              </div>
-            ` : ''}
-            ${!stop.arrivedAt && !stop.departedAt ? `
-              <div style="font-size: 14px; color: #9ca3af;">Times not recorded</div>
-            ` : ''}
+            </div>
           </div>
-        `).join('')}
+          ${load.shipperInTime && load.shipperOutTime ? `
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb;">
+              <span style="font-size: 12px; color: #059669; font-weight: 600;">
+                Time at Shipper: ${Math.round((new Date(load.shipperOutTime).getTime() - new Date(load.shipperInTime).getTime()) / (1000 * 60))} minutes
+              </span>
+            </div>
+          ` : ''}
+        </div>
+        ` : ''}
+        
+        ${load?.receiverInTime || load?.receiverOutTime ? `
+        <div style="margin-bottom: 15px; padding: 12px; background-color: white; border: 1px solid #bae6fd; border-radius: 4px;">
+          <div style="font-weight: 600; color: #1e40af; margin-bottom: 8px; font-size: 14px;">📍 RECEIVER / DELIVERY LOCATION</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Arrived (In)</div>
+              <div style="font-size: 14px; color: #1f2937; font-weight: 500;">
+                ${load.receiverInTime ? new Date(load.receiverInTime).toLocaleString('en-US', { 
+                  month: '2-digit', day: '2-digit', year: 'numeric', 
+                  hour: '2-digit', minute: '2-digit', hour12: true 
+                }) : 'Not recorded'}
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px;">Departed (Out)</div>
+              <div style="font-size: 14px; color: #1f2937; font-weight: 500;">
+                ${load.receiverOutTime ? new Date(load.receiverOutTime).toLocaleString('en-US', { 
+                  month: '2-digit', day: '2-digit', year: 'numeric', 
+                  hour: '2-digit', minute: '2-digit', hour12: true 
+                }) : 'Not recorded'}
+              </div>
+            </div>
+          </div>
+          ${load.receiverInTime && load.receiverOutTime ? `
+            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e5e7eb;">
+              <span style="font-size: 12px; color: #059669; font-weight: 600;">
+                Time at Receiver: ${Math.round((new Date(load.receiverOutTime).getTime() - new Date(load.receiverInTime).getTime()) / (1000 * 60))} minutes
+              </span>
+            </div>
+          ` : ''}
+        </div>
+        ` : ''}
+        
+        ${load?.stops && load.stops.length > 0 ? `
+        <div style="border-top: 1px solid #bae6fd; padding-top: 12px; margin-top: 12px;">
+          <div style="font-size: 12px; color: #6b7280; margin-bottom: 10px; font-weight: 600;">Additional Stops:</div>
+          ${load.stops.map((stop: any) => `
+            <div style="margin-bottom: 10px; padding: 10px; background-color: white; border: 1px solid #e5e7eb; border-radius: 4px;">
+              <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px; font-size: 13px;">
+                ${stop.stopType === 'pickup' ? '📦' : '📍'} ${stop.companyName || stop.address || 'N/A'}
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+                <div>
+                  <span style="color: #6b7280;">In:</span> 
+                  <span style="color: #1f2937; font-weight: 500;">
+                    ${stop.arrivedAt ? new Date(stop.arrivedAt).toLocaleString('en-US', { 
+                      month: '2-digit', day: '2-digit', year: 'numeric', 
+                      hour: '2-digit', minute: '2-digit', hour12: true 
+                    }) : 'Not recorded'}
+                  </span>
+                </div>
+                <div>
+                  <span style="color: #6b7280;">Out:</span> 
+                  <span style="color: #1f2937; font-weight: 500;">
+                    ${stop.departedAt ? new Date(stop.departedAt).toLocaleString('en-US', { 
+                      month: '2-digit', day: '2-digit', year: 'numeric', 
+                      hour: '2-digit', minute: '2-digit', hour12: true 
+                    }) : 'Not recorded'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+        
+        ${!load?.shipperInTime && !load?.shipperOutTime && !load?.receiverInTime && !load?.receiverOutTime && (!load?.stops || load.stops.length === 0) ? `
+        <div style="text-align: center; padding: 20px; color: #9ca3af; font-style: italic;">
+          GPS timestamps will be recorded automatically when driver enters/exits geofenced locations.
+        </div>
+        ` : ''}
       </div>
-      ` : ''}
 
       <div class="total-section">
         <div style="font-size: 16px; margin-bottom: 10px;">
