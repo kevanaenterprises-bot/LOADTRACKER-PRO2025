@@ -3385,6 +3385,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (lastDeliveryStop && lastDeliveryStop.locationId) {
           validatedData.locationId = lastDeliveryStop.locationId;
           console.log("Load creation - setting main locationId to LAST delivery stop for rate lookup:", lastDeliveryStop.locationId);
+          
+          // AUTO-SET RATE: Look up rate from database based on delivery location
+          if (!validatedData.tripRate || parseFloat(validatedData.tripRate?.toString() || "0") <= 0) {
+            const deliveryLocation = await storage.getLocation(lastDeliveryStop.locationId);
+            if (deliveryLocation && deliveryLocation.city && deliveryLocation.state) {
+              const rate = await storage.getRateByLocation(deliveryLocation.city, deliveryLocation.state);
+              if (rate) {
+                validatedData.tripRate = rate.flatRate.toString();
+                console.log(`💰 AUTO-SET tripRate from rates database: $${rate.flatRate} for ${deliveryLocation.city}, ${deliveryLocation.state}`);
+              } else {
+                console.log(`⚠️ No rate found in database for ${deliveryLocation.city}, ${deliveryLocation.state}`);
+              }
+            }
+          }
         }
       }
 
