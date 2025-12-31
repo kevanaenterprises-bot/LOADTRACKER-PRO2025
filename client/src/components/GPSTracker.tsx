@@ -76,7 +76,8 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
       return;
     }
 
-    // Request high accuracy location updates every 30 seconds
+    // Request high accuracy location updates
+    // Increased timeout to 30 seconds for mobile devices that take longer to get GPS fix
     const id = navigator.geolocation.watchPosition(
       (position) => {
         const newPosition: GeolocationPosition = {
@@ -92,19 +93,45 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
         updateLocationMutation.mutate(newPosition);
       },
       (error) => {
-        console.error('Geolocation error:', error);
-        if (error.code === error.PERMISSION_DENIED) {
-          setPermissionStatus('denied');
-          toast({
-            title: 'GPS Permission Denied',
-            description: 'Please enable location access to use automatic tracking.',
-            variant: 'destructive',
-          });
+        console.error('Geolocation error:', error.code, error.message);
+        
+        // Handle all error types with specific messages
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            setPermissionStatus('denied');
+            toast({
+              title: 'Location Permission Denied',
+              description: 'Please allow location access in your browser/phone settings, then refresh the page.',
+              variant: 'destructive',
+            });
+            break;
+          case error.POSITION_UNAVAILABLE:
+            // GPS signal issue - don't change permission status, try again
+            toast({
+              title: 'GPS Signal Unavailable',
+              description: 'Unable to get your location. Please ensure you have a clear view of the sky or move to a better location.',
+              variant: 'destructive',
+            });
+            break;
+          case error.TIMEOUT:
+            // Timeout - GPS took too long, usually works on retry
+            toast({
+              title: 'GPS Timeout',
+              description: 'Getting your location is taking longer than expected. Please wait or try moving to an area with better signal.',
+              variant: 'destructive',
+            });
+            break;
+          default:
+            toast({
+              title: 'Location Error',
+              description: `Unable to get location: ${error.message || 'Unknown error'}`,
+              variant: 'destructive',
+            });
         }
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 30000, // 30 seconds - more time for mobile GPS to get a fix
         maximumAge: 30000, // Cache for 30 seconds
       }
     );
