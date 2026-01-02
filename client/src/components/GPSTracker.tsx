@@ -52,16 +52,32 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
   });
 
   // Mutation to update location
+  const [lastLocationError, setLastLocationError] = useState<string | null>(null);
+  const [locationUpdateCount, setLocationUpdateCount] = useState(0);
+  
   const updateLocationMutation = useMutation({
     mutationFn: async (position: GeolocationPosition) => {
+      console.log(`📍 Sending GPS update to server: ${position.latitude}, ${position.longitude}`);
       return await apiRequest(`/api/loads/${load.id}/location`, 'POST', {
         latitude: position.latitude,
         longitude: position.longitude,
         accuracy: position.accuracy,
       });
     },
-    onError: (error) => {
-      console.error('Failed to update location:', error);
+    onSuccess: (data) => {
+      console.log('✅ GPS location saved to server:', data);
+      setLastLocationError(null);
+      setLocationUpdateCount(prev => prev + 1);
+    },
+    onError: (error: any) => {
+      const errorMsg = error?.message || error?.toString() || 'Unknown error';
+      console.error('❌ Failed to update location:', errorMsg);
+      setLastLocationError(errorMsg);
+      toast({
+        title: 'GPS Sync Issue',
+        description: 'Location captured but failed to sync to server. Will retry.',
+        variant: 'destructive',
+      });
     },
   });
 
@@ -256,17 +272,28 @@ export default function GPSTracker({ load, driverId }: GPSTrackerProps) {
 
         {/* Current Location Info */}
         {currentPosition && (
-          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className={`p-4 rounded-lg border ${lastLocationError ? 'bg-yellow-50 border-yellow-200' : 'bg-green-50 border-green-200'}`}>
             <div className="flex items-center">
-              <MapPin className="w-5 h-5 text-green-600 mr-2" />
-              <div>
-                <h4 className="font-medium text-green-800">GPS Active</h4>
-                <p className="text-sm text-green-700">
+              <MapPin className={`w-5 h-5 mr-2 ${lastLocationError ? 'text-yellow-600' : 'text-green-600'}`} />
+              <div className="flex-1">
+                <h4 className={`font-medium ${lastLocationError ? 'text-yellow-800' : 'text-green-800'}`}>
+                  GPS Active {locationUpdateCount > 0 && `(${locationUpdateCount} synced)`}
+                </h4>
+                <p className={`text-sm ${lastLocationError ? 'text-yellow-700' : 'text-green-700'}`}>
                   Last updated: {new Date().toLocaleTimeString()}
                   <br />
                   Accuracy: ±{Math.round(currentPosition.accuracy)}m
+                  {lastLocationError && (
+                    <>
+                      <br />
+                      <span className="text-red-600">Sync error: {lastLocationError}</span>
+                    </>
+                  )}
                 </p>
               </div>
+              {updateLocationMutation.isPending && (
+                <div className="animate-pulse text-blue-500 text-xs">Syncing...</div>
+              )}
             </div>
           </div>
         )}
