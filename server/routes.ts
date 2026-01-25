@@ -5782,7 +5782,13 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`💰 Using tripRate from load: $${flatRate}`);
       } else if (load.location?.city && load.location?.state) {
         // Look up rate from rates table based on delivery location
-        const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+        // Sanitize city names for exact matching
+    const sanitizeCity = (city: string) => city.trim().toLowerCase();
+    const cityA = sanitizeCity(load.location.city || '');
+    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx';
+    const lookupCity = isSanAntonio ? 'San Antonio' : (load.location.city || '');
+    
+    const rate = await storage.getRateByLocation(lookupCity, load.location.state || '');
         if (rate) {
           flatRate = parseFloat(rate.flatRate.toString());
           console.log(`💰 Looked up rate for ${load.location.city}, ${load.location.state}: $${flatRate}`);
@@ -6010,7 +6016,13 @@ Reply YES to confirm acceptance or NO to decline.`
         try {
           // Get rate for the location
           if (load.location?.city && load.location?.state) {
-            const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+            // Sanitize city names for exact matching
+    const sanitizeCity = (city: string) => city.trim().toLowerCase();
+    const cityA = sanitizeCity(load.location.city || '');
+    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx';
+    const lookupCity = isSanAntonio ? 'San Antonio' : (load.location.city || '');
+    
+    const rate = await storage.getRateByLocation(lookupCity, load.location.state || '');
             
             if (rate) {
               // Calculate invoice amount
@@ -6123,7 +6135,13 @@ Reply YES to confirm acceptance or NO to decline.`
       for (const load of problemLoads) {
         // Generate invoice if missing (similar to backfill logic)
         if (load.location?.city && load.location?.state) {
-          const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+          // Sanitize city names for exact matching
+    const sanitizeCity = (city: string) => city.trim().toLowerCase();
+    const cityA = sanitizeCity(load.location.city || '');
+    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx';
+    const lookupCity = isSanAntonio ? 'San Antonio' : (load.location.city || '');
+    
+    const rate = await storage.getRateByLocation(lookupCity, load.location.state || '');
           if (rate) {
             const flatRate = parseFloat(rate.flatRate.toString());
             const lumperCharge = parseFloat(load.lumperCharge?.toString() || "0");
@@ -7103,7 +7121,13 @@ Reply YES to confirm acceptance or NO to decline.`
       }
 
       // Get rate for the location
-      const rate = await storage.getRateByLocation(load.location.city, load.location.state);
+      // Sanitize city names for exact matching
+    const sanitizeCity = (city: string) => city.trim().toLowerCase();
+    const cityA = sanitizeCity(load.location.city || '');
+    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx';
+    const lookupCity = isSanAntonio ? 'San Antonio' : (load.location.city || '');
+    
+    const rate = await storage.getRateByLocation(lookupCity, load.location.state || '');
       if (!rate) {
         return res.status(400).json({ message: "Rate not found for this location" });
       }
@@ -8025,8 +8049,18 @@ Reply YES to confirm acceptance or NO to decline.`
       const podImages: Array<{content: Buffer, type: string}> = [];
       
       // FIXED: Get ALL POD snapshots for multi-POD loads (print preview)
-      const allPodSnapshots = await getAllPodSnapshots(invoice, load.podDocumentPath || undefined);
+      const podDocumentPath = load.podDocumentPath || undefined;
+      const allPodSnapshots = await getAllPodSnapshots(invoice, podDocumentPath);
       const pdfPods: Array<{content: Buffer, type: string, filename: string}> = [];
+      
+      console.log(`🔍 DEBUG San Antonio POD check:`, {
+        loadId: load.id,
+        city: load.location?.city,
+        podDocumentPath,
+        foundSnapshots: allPodSnapshots.length,
+        invoiceId: invoice.id,
+        hasPodSnapshotInInvoice: !!invoice.podSnapshot
+      });
       
       if (allPodSnapshots.length > 0) {
         console.log(`🖨️ Using ${allPodSnapshots.length} POD(s) for print preview: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
