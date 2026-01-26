@@ -6881,9 +6881,20 @@ Reply YES to confirm acceptance or NO to decline.`
       console.log(`🚛 IFTA Data - Truck: ${iftaTruckNumber}, Odometer: ${odometerReading}, Fuel: ${fuelGallons || 'N/A'}gal, Amount: $${fuelAmount || 'N/A'}`);
       
       // Update load with POD document path
-      console.log(`📄 Calling storage.updateLoadPOD...`);
+      console.log(`📄 Calling storage.updateLoadPOD for load ${req.params.id} with path: ${podDocumentURL}`);
       const load = await storage.updateLoadPOD(req.params.id, podDocumentURL);
-      console.log(`✅ POD saved for load: ${load.number109}`);
+      
+      if (!load) {
+        console.error(`❌ storage.updateLoadPOD returned null for load ${req.params.id}`);
+        return res.status(500).json({ message: "Failed to update load with POD path" });
+      }
+
+      // Verify the update actually happened
+      if (!load.podDocumentPath || !load.podDocumentPath.includes(podDocumentURL)) {
+        console.error(`❌ POD path update verification failed. Current path: ${load.podDocumentPath}, Expected to include: ${podDocumentURL}`);
+      }
+
+      console.log(`✅ POD saved for load: ${load.number109}. New path: ${load.podDocumentPath}`);
 
       // Get previous odometer reading for this truck
       console.log(`🚛 Looking up previous odometer reading for truck ${iftaTruckNumber}...`);

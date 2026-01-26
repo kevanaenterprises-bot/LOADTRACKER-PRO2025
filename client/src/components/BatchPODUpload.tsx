@@ -132,10 +132,18 @@ export function BatchPODUpload({ loadId, loadNumber, onUploadComplete }: BatchPO
 
       if (!uploadResponse.ok) {
         const errorData = await uploadResponse.json().catch(() => ({ message: "Upload failed" }));
+        console.error("❌ Direct upload failed:", errorData);
         throw new Error(errorData.message || `Upload failed: ${uploadResponse.status}`);
       }
 
-      const { publicPath } = await uploadResponse.json();
+      const uploadData = await uploadResponse.json();
+      console.log("✅ Direct upload response:", uploadData);
+      const publicPath = uploadData.publicPath;
+
+      if (!publicPath) {
+        console.error("❌ No publicPath in upload response:", uploadData);
+        throw new Error("Server returned success but no file path was provided");
+      }
 
       // Update progress
       setFiles(prev => prev.map(f => 
