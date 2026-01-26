@@ -5783,9 +5783,10 @@ Reply YES to confirm acceptance or NO to decline.`
       } else if (load.location?.city && load.location?.state) {
         // Look up rate from rates table based on delivery location
         // Sanitize city names for exact matching
-    const sanitizeCity = (city: string) => city.trim().toLowerCase();
+    const sanitizeCity = (city: string) => (city || '').trim().toLowerCase();
     const cityA = sanitizeCity(load.location.city || '');
-    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx';
+    // Standardize "San Antonio" variations
+    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx' || cityA === 'san anton tx';
     const lookupCity = isSanAntonio ? 'San Antonio' : (load.location.city || '');
     
     const rate = await storage.getRateByLocation(lookupCity, load.location.state || '');
@@ -6017,9 +6018,10 @@ Reply YES to confirm acceptance or NO to decline.`
           // Get rate for the location
           if (load.location?.city && load.location?.state) {
             // Sanitize city names for exact matching
-    const sanitizeCity = (city: string) => city.trim().toLowerCase();
+    const sanitizeCity = (city: string) => (city || '').trim().toLowerCase();
     const cityA = sanitizeCity(load.location.city || '');
-    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx';
+    // Standardize "San Antonio" variations
+    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx' || cityA === 'san anton tx';
     const lookupCity = isSanAntonio ? 'San Antonio' : (load.location.city || '');
     
     const rate = await storage.getRateByLocation(lookupCity, load.location.state || '');
@@ -6136,9 +6138,10 @@ Reply YES to confirm acceptance or NO to decline.`
         // Generate invoice if missing (similar to backfill logic)
         if (load.location?.city && load.location?.state) {
           // Sanitize city names for exact matching
-    const sanitizeCity = (city: string) => city.trim().toLowerCase();
+    const sanitizeCity = (city: string) => (city || '').trim().toLowerCase();
     const cityA = sanitizeCity(load.location.city || '');
-    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx';
+    // Standardize "San Antonio" variations
+    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx' || cityA === 'san anton tx';
     const lookupCity = isSanAntonio ? 'San Antonio' : (load.location.city || '');
     
     const rate = await storage.getRateByLocation(lookupCity, load.location.state || '');
@@ -7122,9 +7125,10 @@ Reply YES to confirm acceptance or NO to decline.`
 
       // Get rate for the location
       // Sanitize city names for exact matching
-    const sanitizeCity = (city: string) => city.trim().toLowerCase();
+    const sanitizeCity = (city: string) => (city || '').trim().toLowerCase();
     const cityA = sanitizeCity(load.location.city || '');
-    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx';
+    // Standardize "San Antonio" variations
+    const isSanAntonio = cityA === 'san antonio' || cityA === 'san anton' || cityA === 'san antonio tx' || cityA === 'san anton tx';
     const lookupCity = isSanAntonio ? 'San Antonio' : (load.location.city || '');
     
     const rate = await storage.getRateByLocation(lookupCity, load.location.state || '');
@@ -8055,16 +8059,29 @@ Reply YES to confirm acceptance or NO to decline.`
       
       console.log(`🔍 DEBUG San Antonio POD check:`, {
         loadId: load.id,
+        loadNumber: load.number109,
         city: load.location?.city,
         podDocumentPath,
         foundSnapshots: allPodSnapshots.length,
         invoiceId: invoice.id,
-        hasPodSnapshotInInvoice: !!invoice.podSnapshot
+        hasPodSnapshotInInvoice: !!invoice.podSnapshot,
+        status: load.status
       });
       
-      if (allPodSnapshots.length > 0) {
-        console.log(`🖨️ Using ${allPodSnapshots.length} POD(s) for print preview: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
-        allPodSnapshots.forEach((snapshot, index) => {
+      // DIAGNOSTIC: If no snapshots found but path exists, try direct storage fetch
+      let finalSnapshots = allPodSnapshots;
+      if (finalSnapshots.length === 0 && podDocumentPath) {
+        console.log(`🔍 DIAGNOSTIC: No snapshots found for load ${load.number109} despite path existing. Attempting emergency direct fetch...`);
+        const emergencySnapshots = await fetchAllPodSnapshotsFromStorage(podDocumentPath);
+        if (emergencySnapshots.length > 0) {
+          console.log(`✅ EMERGENCY: Found ${emergencySnapshots.length} PODs via direct storage fetch!`);
+          finalSnapshots = emergencySnapshots;
+        }
+      }
+      
+      if (finalSnapshots.length > 0) {
+        console.log(`🖨️ Using ${finalSnapshots.length} POD(s) for print preview: stored=${!!invoice.podSnapshot} fallback=${!invoice.podSnapshot}`);
+        finalSnapshots.forEach((snapshot, index) => {
           const podBuffer = convertPodSnapshotToBuffer(snapshot);
           
           // Check if POD is a PDF - if so, track separately (cannot embed as image)
@@ -8095,7 +8112,14 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`🔗 Embedding ${podImages.length} POD image(s) into print preview...`);
         try {
           const podSectionHTML = generatePODSectionHTML(podImages, load.number109);
-          previewHTML = previewHTML.replace('</body>', `${podSectionHTML}</body>`);
+          // Ensure we're replacing the last </body> tag if multiple exist
+          if (previewHTML.includes('</body>')) {
+            const parts = previewHTML.split('</body>');
+            const lastPart = parts.pop();
+            previewHTML = parts.join('</body>') + `${podSectionHTML}</body>` + lastPart;
+          } else {
+            previewHTML += podSectionHTML;
+          }
           console.log(`✅ POD images embedded into print preview using same function as email`);
         } catch (embedError) {
           console.error(`❌ Failed to embed POD images in print preview:`, embedError);
