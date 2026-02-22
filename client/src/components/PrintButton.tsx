@@ -25,6 +25,7 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
   const [isEmailing, setIsEmailing] = useState(false);
+  const [isAfsEmailing, setIsAfsEmailing] = useState(false);
   const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
   const [selectedEmail, setSelectedEmail] = useState("");
   const [selectedCustomerEmail, setSelectedCustomerEmail] = useState(""); // Track customer email separately from dropdown selection
@@ -421,6 +422,53 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
     setIsEmailing(false);
   };
 
+  // AFS eSubmit handler - sends one combined PDF (invoice + POD only) to satisfy AFS eSubmit requirements
+  const handleAfsEsubmit = async () => {
+    const finalEmailAddress = selectedEmail === 'custom' ? emailAddress : selectedEmail;
+    if (!finalEmailAddress) {
+      toast({ title: "Email Required", description: "Please select a customer or enter an email address.", variant: "destructive" });
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(finalEmailAddress)) {
+      toast({ title: "Invalid Email", description: "Please enter a valid email address.", variant: "destructive" });
+      return;
+    }
+    setIsAfsEmailing(true);
+    try {
+      const invoiceIdentifier = invoice?.invoiceNumber || invoiceId;
+      if (!invoiceIdentifier) throw new Error("No invoice identifier found. Please try refreshing the page.");
+
+      let toEmail = finalEmailAddress;
+      let ccEmails: string[] = [];
+      if (selectedEmail === 'custom' && emailAddress && selectedCustomerEmail) {
+        toEmail = emailAddress;
+        ccEmails = [selectedCustomerEmail];
+      }
+
+      await apiRequest(`/api/invoices/${invoiceIdentifier}/email-afs-esubmit`, "POST", {
+        toEmail,
+        ccEmails,
+        loadId: loadId,
+      });
+
+      toast({
+        title: "✅ AFS eSubmit Sent",
+        description: `Invoice + POD combined PDF sent to ${finalEmailAddress} (1 attachment, AFS compliant)`,
+      });
+      setEmailDialogOpen(false);
+      setEmailAddress("");
+      setSelectedEmail("");
+    } catch (error: any) {
+      toast({
+        title: "AFS eSubmit Failed",
+        description: error.message || "Failed to send AFS eSubmit package. Please try again.",
+        variant: "destructive",
+      });
+    }
+    setIsAfsEmailing(false);
+  };
+
   return (
     <div className="flex space-x-2">
       {/* Email Button */}
@@ -512,12 +560,12 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
             </div>
             
             {invoice && load && (
-              <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="p-4 bg-gray-50 rounded-lg space-y-2">
                 <p className="text-sm text-gray-700 font-medium">
                   Invoice: {invoice.invoiceNumber} • Load: {load.number_109 || load.number109} • ${invoice.totalAmount}
                 </p>
-                <div className="text-xs text-gray-600 mt-2">
-                  <p><strong>Will include:</strong></p>
+                <div className="text-xs text-gray-600">
+                  <p><strong>Complete Package includes:</strong></p>
                   <ul className="list-disc list-inside mt-1 space-y-1">
                     <li>Invoice & Rate Confirmation (combined)</li>
                     {load.bolDocumentPath && <li>BOL Document (attached file)</li>}
@@ -527,10 +575,13 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                     )}
                   </ul>
                 </div>
+                <div className="text-xs text-blue-700 border-t pt-2">
+                  <p><strong>AFS eSubmit includes:</strong> Invoice + POD only (1 file: <code>Invoice_{`${invoice.invoiceNumber}`}.pdf</code>)</p>
+                </div>
               </div>
             )}
             
-            <div className="flex space-x-2 pt-2">
+            <div className="flex flex-wrap gap-2 pt-2">
               <Button 
                 variant="outline" 
                 onClick={() => {
@@ -539,13 +590,13 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                   setSelectedEmail("");
                   setShowCustomerDropdown(false);
                 }}
-                disabled={isEmailing}
+                disabled={isEmailing || isAfsEmailing}
               >
                 Cancel
               </Button>
               <Button 
                 onClick={handleEmailCompletePackage}
-                disabled={isEmailing || (!selectedEmail || (selectedEmail === 'custom' && !emailAddress))}
+                disabled={isEmailing || isAfsEmailing || (!selectedEmail || (selectedEmail === 'custom' && !emailAddress))}
                 className="bg-green-600 hover:bg-green-700"
                 data-testid="button-send-email"
               >
@@ -558,6 +609,25 @@ export function PrintButton({ invoiceId, loadId, invoice, load, variant = "defau
                   <>
                     <Mail className="h-4 w-4 mr-2" />
                     Send Complete Package
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleAfsEsubmit}
+                disabled={isEmailing || isAfsEmailing || (!selectedEmail || (selectedEmail === 'custom' && !emailAddress))}
+                className="bg-blue-600 hover:bg-blue-700"
+                data-testid="button-send-afs-esubmit"
+                title="Sends one combined PDF (invoice + POD only) per AFS eSubmit requirements"
+              >
+                {isAfsEmailing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Sending AFS...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4 mr-2" />
+                    AFS eSubmit
                   </>
                 )}
               </Button>

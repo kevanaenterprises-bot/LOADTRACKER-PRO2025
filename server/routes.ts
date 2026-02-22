@@ -4691,7 +4691,11 @@ Reply YES to confirm acceptance or NO to decline.`
   }, async (req, res) => {
     try {
       const invoiceIdOrNumber = req.params.id;
-      const { toEmail, emailAddress, ccEmails = [], loadId } = req.body;
+      const { toEmail, emailAddress, ccEmails = [], loadId, afsMode: reqAfsMode } = req.body;
+      
+      // AFS eSubmit mode: enabled via env var OR explicit request body flag
+      // When active: invoice + POD only (no BOL/rate-conf), Invoice_<number>.pdf filename
+      const isAfsMode = process.env.AFS_COMBINED_PDF === 'true' || reqAfsMode === true;
       
       // Support both old and new parameter names for backward compatibility
       const primaryEmail = toEmail || emailAddress;
@@ -4758,19 +4762,33 @@ Reply YES to confirm acceptance or NO to decline.`
       // Generate email with all available documents - Use BOL# as primary identifier (preferred over load number)
       const primaryIdentifier = load.bolNumber || load.number109 || 'Unknown';
       const identifierLabel = load.bolNumber ? `BOL# ${load.bolNumber}` : `Load ${primaryIdentifier}`;
-      const subject = `Complete Package - ${identifierLabel} - Invoice ${invoice.invoiceNumber}`;
       
-      // Simple email - single complete package attachment
-      let emailHTML = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #2d5aa0;">GO 4 Farms & Cattle</h2>
-          <p>Please find attached the complete document package for ${identifierLabel}.</p>
-          <p><strong>Invoice Number:</strong> ${invoice.invoiceNumber}</p>
-          <p><strong>Amount:</strong> $${invoice.totalAmount}</p>
-          <p>The attached PDF contains the invoice, rate confirmation, and proof of delivery documents.</p>
-          <p>Thank you for your business!</p>
-        </div>
-      `;
+      const subject = isAfsMode
+        ? `Invoice ${invoice.invoiceNumber} - ${identifierLabel} - AFS eSubmit`
+        : `Complete Package - ${identifierLabel} - Invoice ${invoice.invoiceNumber}`;
+      
+      // Simple email - single combined attachment
+      let emailHTML = isAfsMode
+        ? `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #2d5aa0;">GO 4 Farms & Cattle</h2>
+            <p>Please find attached the invoice and proof of delivery for ${identifierLabel}.</p>
+            <p><strong>Invoice Number:</strong> ${invoice.invoiceNumber}</p>
+            <p><strong>Amount:</strong> $${invoice.totalAmount}</p>
+            <p>The attached PDF contains the invoice followed by the proof of delivery documentation (1 combined file, AFS eSubmit compliant).</p>
+            <p>Thank you for your business!</p>
+          </div>
+        `
+        : `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #2d5aa0;">GO 4 Farms & Cattle</h2>
+            <p>Please find attached the complete document package for ${identifierLabel}.</p>
+            <p><strong>Invoice Number:</strong> ${invoice.invoiceNumber}</p>
+            <p><strong>Amount:</strong> $${invoice.totalAmount}</p>
+            <p>The attached PDF contains the invoice, rate confirmation, and proof of delivery documents.</p>
+            <p>Thank you for your business!</p>
+          </div>
+        `;
       
       // Send actual email using Outlook SMTP
       console.log("🔍 Attempting to send email to:", emailAddress);
@@ -4881,11 +4899,11 @@ Reply YES to confirm acceptance or NO to decline.`
         console.log(`⚠️ No POD available for ${identifierLabel} - invoice only`);
       }
       
-      // ALSO collect BOL documents if available
-      console.log(`🔍 EMAIL DEBUG: Checking BOL for ${identifierLabel}`);
+      // ALSO collect BOL documents if available (skipped in AFS eSubmit mode)
+      console.log(`🔍 EMAIL DEBUG: Checking BOL for ${identifierLabel} (afsMode=${isAfsMode})`);
       console.log(`🔍 Load bolDocumentPath: "${load.bolDocumentPath}"`);
 
-      if (load.bolDocumentPath && load.bolDocumentPath !== 'test-bol-document.pdf') {
+      if (!isAfsMode && load.bolDocumentPath && load.bolDocumentPath !== 'test-bol-document.pdf') {
         const allBolSnapshots = await fetchAllPodSnapshotsFromStorage(load.bolDocumentPath);
         
         if (allBolSnapshots.length > 0) {
@@ -4941,14 +4959,18 @@ Reply YES to confirm acceptance or NO to decline.`
           console.log(`⚠️ No BOL snapshots retrieved for ${identifierLabel}`);
         }
       } else {
-        console.log(`⚠️ No BOL document path available for ${identifierLabel}`);
+        if (isAfsMode) {
+          console.log(`ℹ️ AFS eSubmit mode: skipping BOL documents`);
+        } else {
+          console.log(`⚠️ No BOL document path available for ${identifierLabel}`);
+        }
       }
       
-      // ALSO collect Rate Confirmation documents if available
-      console.log(`🔍 EMAIL DEBUG: Checking Rate Confirmation for ${identifierLabel}`);
+      // ALSO collect Rate Confirmation documents if available (skipped in AFS eSubmit mode)
+      console.log(`🔍 EMAIL DEBUG: Checking Rate Confirmation for ${identifierLabel} (afsMode=${isAfsMode})`);
       console.log(`🔍 Load rateConfirmationDocumentPath: "${load.rateConfirmationDocumentPath}"`);
       
-      if (load.rateConfirmationDocumentPath) {
+      if (!isAfsMode && load.rateConfirmationDocumentPath) {
         try {
           console.log(`📧 Fetching rate confirmation from GCS: ${load.rateConfirmationDocumentPath}`);
           
@@ -5014,7 +5036,11 @@ Reply YES to confirm acceptance or NO to decline.`
           console.log(`⚠️ Continuing without rate confirmation in email`);
         }
       } else {
-        console.log(`⚠️ No rate confirmation available for ${identifierLabel}`);
+        if (isAfsMode) {
+          console.log(`ℹ️ AFS eSubmit mode: skipping rate confirmation`);
+        } else {
+          console.log(`⚠️ No rate confirmation available for ${identifierLabel}`);
+        }
       }
       
       // Step 3: Use PDF merge utility to create ONE combined PDF
@@ -5041,8 +5067,12 @@ Reply YES to confirm acceptance or NO to decline.`
       }
       
       // Step 4: Create ONE attachment as required by payment processor
+      // AFS eSubmit mode uses Invoice_<number>.pdf naming; standard mode uses Complete-Package-...pdf
+      const attachmentFilename = isAfsMode
+        ? `Invoice_${invoice.invoiceNumber}.pdf`
+        : `Complete-Package-${primaryIdentifier}-${invoice.invoiceNumber}.pdf`;
       const attachments = [{
-        filename: `Complete-Package-${primaryIdentifier}-${invoice.invoiceNumber}.pdf`,
+        filename: attachmentFilename,
         content: combinedPDF,
         contentType: 'application/pdf'
       }];
@@ -5069,8 +5099,9 @@ Reply YES to confirm acceptance or NO to decline.`
       // This ensures the workflow progresses even if email fails
       
       res.json({
-        message: "Complete document package emailed successfully",
+        message: isAfsMode ? "AFS eSubmit package emailed successfully" : "Complete document package emailed successfully",
         emailAddress,
+        afsMode: isAfsMode,
         attachments: attachments.map(att => ({
           filename: att.filename,
           size: att.content.length,
@@ -5084,6 +5115,168 @@ Reply YES to confirm acceptance or NO to decline.`
       console.error("Error sending complete document package:", error);
       res.status(500).json({ 
         message: "Failed to send complete document package",
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
+  // AFS eSubmit endpoint - always produces a single combined PDF (invoice + POD only)
+  // Satisfies AFS eSubmit requirements: one unsecured PDF, invoice first, POD follows, no cover page
+  app.post("/api/invoices/:id/email-afs-esubmit", (req, res, next) => {
+    console.log("🔍 AFS-ESUBMIT ROUTE HIT - Invoice ID:", req.params.id);
+    const bypassToken = req.headers['x-bypass-token'];
+    const hasTokenBypass = bypassToken === BYPASS_SECRET;
+    const hasAuth = !!(req.session as any)?.adminAuth || !!req.user || !!(req.session as any)?.driverAuth || hasTokenBypass;
+    if (!hasAuth) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    next();
+  }, async (req, res) => {
+    try {
+      const invoiceIdOrNumber = req.params.id;
+      const { toEmail, emailAddress, ccEmails = [], loadId } = req.body;
+      const primaryEmail = toEmail || emailAddress;
+
+      if (!primaryEmail) {
+        return res.status(400).json({ message: "Email address is required" });
+      }
+      if (invoiceIdOrNumber === 'undefined' || !invoiceIdOrNumber) {
+        return res.status(400).json({ message: "Invoice ID is required" });
+      }
+
+      // Resolve invoice
+      let invoice;
+      if (invoiceIdOrNumber.includes('-') && invoiceIdOrNumber.length === 36) {
+        const [invoiceById] = await db.select().from(invoices).where(eq(invoices.id, invoiceIdOrNumber));
+        invoice = invoiceById;
+      } else {
+        invoice = await storage.getInvoice(invoiceIdOrNumber);
+      }
+      if (!invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      // Finalize invoice before sending
+      await storage.finalizeInvoice(invoice.id);
+
+      // Resolve load
+      let load;
+      if (loadId) {
+        load = await storage.getLoad(loadId);
+      } else if (invoice.loadId) {
+        load = await storage.getLoad(invoice.loadId);
+      }
+      if (!load) {
+        return res.status(404).json({ message: "Load not found" });
+      }
+
+      const primaryIdentifier = load.bolNumber || load.number109 || 'Unknown';
+      const identifierLabel = load.bolNumber ? `BOL# ${load.bolNumber}` : `Load ${primaryIdentifier}`;
+      const subject = `Invoice ${invoice.invoiceNumber} - ${identifierLabel} - AFS eSubmit`;
+
+      const emailHTML = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #2d5aa0;">GO 4 Farms &amp; Cattle</h2>
+          <p>Please find attached the invoice and proof of delivery for ${identifierLabel}.</p>
+          <p><strong>Invoice Number:</strong> ${invoice.invoiceNumber}</p>
+          <p><strong>Amount:</strong> $${invoice.totalAmount}</p>
+          <p>The attached PDF contains the invoice followed by the proof of delivery documentation (1 combined file, AFS eSubmit compliant).</p>
+          <p>Thank you for your business!</p>
+        </div>
+      `;
+
+      // Build merged financial data (same as email-complete-package)
+      const mergedInvoice = {
+        ...invoice,
+        flatRate: load.tripRate ?? load.flatRate ?? invoice.flatRate,
+        lumperCharge: load.lumperCharge ?? invoice.lumperCharge,
+        extraStopsCharge: load.extraStops ?? invoice.extraStopsCharge
+      };
+      const flatRateNum = parseFloat(mergedInvoice.flatRate?.toString() || '0');
+      const lumperChargeNum = parseFloat(mergedInvoice.lumperCharge?.toString() || '0');
+      const extraStopsNum = parseFloat(mergedInvoice.extraStopsCharge?.toString() || '0');
+      mergedInvoice.totalAmount = (flatRateNum + lumperChargeNum + extraStopsNum).toFixed(2);
+
+      const invoiceContext = await computeInvoiceContext(load);
+      const invoiceHTML = generateInvoiceOnlyHTML(mergedInvoice, load, invoiceContext.deliveryLocationText, invoiceContext.bolPodText);
+
+      // AFS eSubmit: collect POD documents only (no BOL, no rate confirmation)
+      const podDocuments: Array<{content: Buffer, type: string}> = [];
+      const allPodSnapshots = await getAllPodSnapshots(invoice, load.podDocumentPath || undefined);
+
+      for (let i = 0; i < allPodSnapshots.length; i++) {
+        const snapshot = allPodSnapshots[i];
+        const podBuffer = convertPodSnapshotToBuffer(snapshot);
+        if (podBuffer.type.startsWith('image/')) {
+          try {
+            const { compressImageForPDF } = await import('./emailService');
+            const compressedBuffer = await compressImageForPDF(podBuffer.content, podBuffer.type, 800);
+            podDocuments.push({ content: compressedBuffer, type: 'image/jpeg' });
+          } catch {
+            podDocuments.push(podBuffer);
+          }
+        } else {
+          podDocuments.push(podBuffer);
+        }
+      }
+
+      console.log(`📧 AFS eSubmit: combining invoice + ${podDocuments.length} POD doc(s) for ${identifierLabel}`);
+
+      // Build ONE combined PDF: invoice first, then POD pages
+      let combinedPDF: Buffer;
+      try {
+        combinedPDF = await buildFinalInvoicePdf(invoiceHTML, podDocuments, primaryIdentifier);
+      } catch (pdfError) {
+        console.error(`❌ AFS eSubmit: PDF merge failed for ${primaryIdentifier}:`, pdfError);
+        console.log(`⚠️ AFS eSubmit: Falling back to invoice-only PDF...`);
+        const { generatePDF } = await import('./emailService');
+        combinedPDF = await generatePDF(invoiceHTML);
+      }
+
+      if (combinedPDF.length === 0) {
+        throw new Error('PDF generation resulted in empty file');
+      }
+
+      const { sendEmail, testEmailConnection } = await import('./emailService');
+      const connectionOk = await testEmailConnection();
+      if (!connectionOk) {
+        throw new Error("Email server connection failed");
+      }
+
+      // Single attachment: Invoice_<number>.pdf (AFS naming convention)
+      const attachments = [{
+        filename: `Invoice_${invoice.invoiceNumber}.pdf`,
+        content: combinedPDF,
+        contentType: 'application/pdf'
+      }];
+
+      console.log(`📧 AFS eSubmit - sending 1 attachment: ${attachments[0].filename} (${combinedPDF.length} bytes)`);
+
+      const emailResult = await sendEmail({
+        to: primaryEmail,
+        subject,
+        html: emailHTML,
+        cc: ccEmails,
+        attachments
+      });
+
+      res.json({
+        message: "AFS eSubmit package emailed successfully",
+        emailAddress: primaryEmail,
+        afsMode: true,
+        attachments: attachments.map(att => ({
+          filename: att.filename,
+          size: att.content.length,
+          contentType: att.contentType
+        })),
+        messageId: emailResult.messageId,
+        recipients: emailResult.recipients
+      });
+
+    } catch (error) {
+      console.error("Error sending AFS eSubmit package:", error);
+      res.status(500).json({
+        message: "Failed to send AFS eSubmit package",
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
