@@ -123,13 +123,25 @@ app.get('/api/status', (_req, res) => {
   res.status(200).json({ 
     status: 'LoadTracker Pro is running', 
     timestamp: new Date().toISOString(),
-    version: '2.1'
+    version: '2.1',
+    deployment: {
+      commitSha: process.env.RAILWAY_GIT_COMMIT_SHA || 'unknown',
+      branch: process.env.RAILWAY_GIT_BRANCH || 'unknown',
+      deploymentId: process.env.RAILWAY_DEPLOYMENT_ID || 'unknown',
+      environment: process.env.RAILWAY_ENVIRONMENT_NAME || process.env.NODE_ENV || 'unknown',
+      service: process.env.RAILWAY_SERVICE_NAME || 'unknown',
+    }
   });
 });
 
 // Health check endpoint for deployment readiness
 app.get('/api/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    commitSha: process.env.RAILWAY_GIT_COMMIT_SHA || 'unknown',
+    deploymentId: process.env.RAILWAY_DEPLOYMENT_ID || 'unknown',
+  });
 });
 
 // Readiness check endpoint (Cloud Run specific)
